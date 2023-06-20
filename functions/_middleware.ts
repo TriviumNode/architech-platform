@@ -6,7 +6,10 @@ const apiRoute: Route = {
       pattern: "alpha.architech.zone/api/*",
       methods: ["GET", 'POST'],
     },
-    to: { url: "api.architech.zone" },    
+    to: { url: "api.architech.zone" },
+    headers: {
+      request: { "Content-Type" : "application/json" }
+    } 
 }
 
 const apiRoute2: Route = {
