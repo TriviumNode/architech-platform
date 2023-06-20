@@ -2,8 +2,11 @@ import proxyflare from "@flaregun-net/proxyflare-for-pages"
 import { Route } from "@flaregun-net/proxyflare-for-pages/build/types"
 
 const apiRoute: Route = {
-    from: { pattern: "alpha.architech.zone/api/*" },
-    to: { url: "api.architech.zone" },
+    from: {
+      pattern: "alpha.architech.zone/api/*",
+      methods: ["GET", 'POST'],
+    },
+    to: { url: "api.architech.zone" },    
 }
 
 const apiRoute2: Route = {
