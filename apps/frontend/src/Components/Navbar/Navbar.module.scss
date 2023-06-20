@@ -1,0 +1,119 @@
+.navbar {
+    display: flex;
+    align-items: center;
+
+    background: rgba(255, 255, 255, 0.48);
+    backdrop-filter: blur(12px);
+    /* Note: backdrop-filter has minimal browser support */
+
+    border-radius: 8px;
+    height: 64px;
+
+    margin: 8px 0;
+    // padding: 0 8px;
+
+    font-family: 'TWK Everett', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+
+}
+
+.navbarInternal {
+    display: flex;
+    align-items: center;
+
+    height: calc(100% - 16px);
+    width: 100%;
+    margin: 8px;
+}
+
+.logoLink:hover {
+    background-color: initial !important;
+}
+
+.navbarInternal a {
+    height: 100%;
+    color: black;
+    text-decoration: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-radius: 4px;
+
+}
+
+.navbarInternal a:hover {
+    background-color: #c4c4c4;
+}
+
+.activeLink:hover {
+    background-color: #c4c4c4;
+}
+
+.navbarInternal form {
+    margin-left: auto;
+    height: 100%;
+}
+
+.navbarInternal input {
+    box-sizing: border-box;
+
+    /* Auto layout */
+    
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 16px;
+    height: 100%;
+
+
+    /* White/100 */
+    background: #FFFFFF;
+    /* Warm Gray/100 */
+    border: 1px solid #F2EFED;
+    border-radius: 8px;
+
+    /* Inside auto layout */
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
+
+
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+
+    color: #666666;
+
+    width: 40vw;
+}
+
+.navbarInternal button {
+    position: relative;
+    right: 0;
+    /* Black/100 */
+    background: #000000;
+    border-radius: 8px;
+
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 24px;
+
+    font-family: 'TWK Everett';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+
+    color: #FFFFFF;
+    height: 100%;
+
+    margin-left: 16px;
+
+    border: 2px solid #000000;
+}

@@ -1,0 +1,21 @@
+.vr {
+    // height: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.number {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+
+    display: flex;
+    align-items: center;
+}
+
+.label {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+
+    color: #666666;
+}

@@ -1,0 +1,73 @@
+import React, { CSSProperties, DetailedHTMLProps, HTMLAttributes, RefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Menu, MenuButton, MenuList, MenuItem } from "@reach/menu-button";
+import { Link } from "react-router-dom";
+import { useUser } from "../../Contexts/UserContext";
+
+import styles from './MultiSelect.module.scss';
+import Badge from "../Badge";
+
+interface MultiSelectProps {
+    title: string;
+    options: string[];
+    selected: string[];
+    onChange: (selected: string[]) => void;
+    style?: CSSProperties;
+    className?: string;
+}
+
+export default function MultiSelect(props: MultiSelectProps) {
+  const { title, options, selected, style, className, onChange } = props;
+
+  const [isOpen, setIsOpen] = useState<boolean>();
+
+  const handleChange = (e: any) => {
+    if (e.target.checked) {
+      if (selected.includes(e.target.value)) onChange(selected); //this shouldnt ever happen
+      else onChange([...selected, e.target.value]);
+    } else {
+      onChange(selected.filter(entry => entry !== e.target.value))
+    }
+  }
+
+  return (
+    <div className={`${styles.menuContainer} ${className}`} style={style}>
+      <button
+        type='button'
+        onClick={() => {
+          setIsOpen(!isOpen);
+        }}
+        className={isOpen ? styles.openButton : undefined}
+      >
+        {selected.length ? 
+          <div className='d-flex gap8'>
+            {selected.map(item=>
+              <Badge>{item}</Badge>
+              )}
+          </div>
+        :
+          <span>{title}</span>
+        }
+        <span aria-hidden>▾</span>
+      </button>
+      {isOpen && 
+      <div className={`${styles.menu}`}>
+          {options.map((option, key)=>{
+            return (
+              <>
+              <div className={styles.item}>
+                <div>
+                  {option}
+                </div>
+                <div style={{minWidth: '24px'}}>
+                  <input className='wide' type="checkbox" checked={selected.includes(option)} value={option} onChange={handleChange} />
+                </div>
+              </div>
+              { key < options.length - 1 && <hr />}
+              </>
+            )
+          })}
+      </div>
+      }
+    </div>
+  );
+}

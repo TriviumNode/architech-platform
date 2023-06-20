@@ -1,0 +1,34 @@
+{
+  "name": "@architech/types",
+  "version": "0.0.1",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "license": "MIT",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --external react",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts --external react",
+    "lint": "TIMING=1 eslint \"src/**/*.{ts,tsx,js,jsx}\" --fix",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/elliptic": "^6.4.14",
+    "class-validator": "^0.13.2",
+    "eslint": "8.15.0",
+    "eslint-config-architech": "*",
+    "react": "18.1.0",
+    "ts-config-architech": "*",
+    "tsup": "5.10.1",
+    "typescript": "4.5.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "crypto-js": "^4.1.1"
+  }
+}

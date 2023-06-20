@@ -1,0 +1,20 @@
+.pageButton {
+    border: none;
+    height: 48px;
+    background: inherit;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 16px;
+    line-height: 150%;
+    padding: 0 16px;
+    color: #000000;
+    font-family: 'TWK Everett';
+    cursor: pointer;
+    align-self: flex-start;
+}
+
+.pageButton:disabled {
+    background: rgba(0, 0, 0, 0.08) !important;
+    cursor: default !important;
+    align-self: initial !important;
+}

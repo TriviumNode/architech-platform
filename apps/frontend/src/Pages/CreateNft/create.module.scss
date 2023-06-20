@@ -1,0 +1,136 @@
+.form {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 120%;
+    color: #666666;
+}
+.form input {
+    width: calc(100% - 32px);
+    height: 48px;
+    border: 1px solid #cfccc9;
+    border-radius: 8px;
+    margin-top: 8px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 120%;
+    color: #666666;
+    padding: 0 16px;
+}
+.form textarea {
+    width: calc(100% - 32px);
+    height: 96px;
+    border: 1px solid #cfccc9;
+    border-radius: 8px;
+    margin-top: 8px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 120%;
+    color: #666666;
+    padding: 16px;
+}
+
+.form > div {
+    gap: 16px;
+}
+
+.form input[type="file"] {
+    display: none;
+}
+
+.customfileupload {
+    border: 1px solid #cfccc9;
+    cursor: pointer;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    height: 48px;
+
+    border-radius: 8px;
+    margin-top: 8px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 120%;
+    color: #666666;
+}
+
+.pageButton {
+    border: none;
+    height: 48px;
+    background: inherit;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 16px;
+    line-height: 150%;
+    padding: 0 16px;
+    color: #000000;
+    font-family: 'TWK Everett';
+    cursor: pointer;
+    align-self: flex-start;
+}
+
+.pageButton:disabled {
+    background: rgba(0, 0, 0, 0.08) !important;
+    cursor: default !important;
+    align-self: initial !important;
+}
+
+.pInputContainer {
+    position: relative;
+    float: left;
+}
+.pInputContainer:after {
+    position: absolute;
+    right: -16;
+    top: -16;
+    content: '%';
+}
+
+.percent{
+    text-align: right;
+    // width: 100%;
+    position: relative;
+    right: 8px;
+    bottom: 32px;
+}
+
+.alert {
+    text-align: right;
+    // width: 100%;
+    position: relative;
+    right: 8px;
+    bottom: 36px;
+    display: flex;
+    justify-content: flex-end;
+    height: 1.5em;
+}
+
+.lightButton {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 16px;
+    
+    // width: 48px;
+    height: 48px;
+    
+    /* White/100 */
+    
+    background: #FFFFFF;
+    /* Button */
+    
+    box-shadow: 3px 9px 32px -4px rgba(0, 0, 0, 0.07);
+    border-radius: 8px;
+    border: 1px solid #DDDDDD;
+
+    font-size: 16px;
+    line-height: 150%;
+    color: #000000;
+}
+
+.error {
+    border: 2px solid rgba(250, 20, 20, 0.75) !important;
+}

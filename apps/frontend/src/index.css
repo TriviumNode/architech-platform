@@ -1,0 +1,255 @@
+
+
+@font-face {
+  font-family: 'TWK Everett';
+  src: url('twkeverett-regular-webfont.woff2') format('woff2'),
+       url('twkeverett-regular-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Druk Wide';
+  src: url('druk-wide-bold-webfont.woff2') format('woff2'),
+       url('druk-wide-bold-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Druk Wide';
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  font-style: normal;
+  margin: 0;
+}
+
+h1 {
+  font-weight: 500;
+  font-size: 32px;
+  line-height: 38px;
+}
+
+h2 {
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 24px;
+}
+
+h3 {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+}
+
+body {
+  margin: 0;
+  font-family: 'TWK Everett', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #c4c4c4;
+  max-width: 1440px;
+  margin: auto;
+}
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+input {
+  height: 48px;
+  border: 1px solid #cfccc9;
+  border-radius: 8px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 120%;
+  color: #666666;
+  padding: 0 16px;
+}
+textarea {
+  height: 96px;
+  border: 1px solid #cfccc9;
+  border-radius: 8px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 120%;
+  color: #666666;
+  padding: 16px;
+}
+
+.card {
+  background: #FFFFFF;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.imgCard {
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.wide {
+  width: 100% !important;
+}
+
+.tall {
+  height: 100% !important;
+}
+
+.mt8 {
+  margin-top: 8px !important;
+}
+
+.mb8 {
+  margin-bottom: 8px !important;
+}
+
+.ml8 {
+  margin-left: 8px !important;
+}
+
+.mr8 {
+  margin-right: 8px !important;
+}
+
+.mt16 {
+  margin-top: 16px !important;
+}
+
+.mb16 {
+  margin-bottom: 16px !important;
+}
+
+.ml16 {
+  margin-left: 16px !important;
+}
+
+.mr16 {
+  margin-right: 16px !important;
+}
+
+.mb24 {
+  margin-bottom: 24px !important;
+}
+
+.mb32 {
+  margin-bottom: 32px !important;
+}
+
+.br8 {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.gap8 {
+  gap: 8px !important;
+}
+
+.gap16 {
+  gap: 16px !important;
+}
+
+.colGap8 {
+  column-gap: 8px !important;
+}
+
+.px8 {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 1fr;
+  grid-column-gap: 8px;
+  grid-row-gap: 8px;
+
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.halfMinus8 {
+  width: calc(50% - 8px);
+}
+
+.imgOverlay {
+  width: calc(100% - 16px);
+  margin-right: 8px;
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  backdrop-filter: blur(12px);
+  height: calc(98px - 24px);
+  
+  border-radius: 8px;
+}
+
+.genOverlay {
+  padding: 8px;
+  backdrop-filter: blur(24px) brightness(120%);
+  border-radius: 8px;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+.square {
+  aspect-ratio: 1 / 1;
+}
+
+.imgCover {
+  object-fit: cover;
+  image-position: center;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  background: #000000;
+  color: #FFFFFF;
+  height: 48px;
+  padding: 0 24px;
+  font-family: 'TWK Everett', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+button:disabled {
+  cursor: default !important;
+}
+
+.tallFill {
+  min-height: calc(100vh - 64px - 16px - 8px) !important;
+}
+
+.buttonLink {
+  border: none;
+  background: none;
+  padding: none;
+  color: black;
+  text-decoration: underline;
+  height: 1em;
+}
+
+.lightText14 {
+  font-family: 'TWK Everett';
+  font-style: normal;
+  font-weight: 400 !important;
+  font-size: 14px !important;
+  line-height: 120% !important;
+  color: #666666 !important;
+}
+
+.lightText12 {
+  font-family: 'TWK Everett';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 120%;
+  color: #666666;
+}

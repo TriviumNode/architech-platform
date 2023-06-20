@@ -1,0 +1,11 @@
+{
+  "name": "ts-config-architech",
+  "version": "0.0.1",
+  "license": "MIT",
+  "private": true,
+  "main": "index.js",
+  "files": [
+    "base.json",
+    "react-library.json"
+  ]
+}

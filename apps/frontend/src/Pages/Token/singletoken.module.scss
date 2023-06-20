@@ -1,0 +1,20 @@
+.halfMinus8 {
+    width: calc(50% - 8px);
+}
+
+.number {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+
+    display: flex;
+    align-items: center;
+}
+
+.label {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+
+    color: #666666;
+}
