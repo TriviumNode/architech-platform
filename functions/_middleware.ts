@@ -9,10 +9,12 @@ const apiRoute: Route = {
   to: { url: "api.architech.zone" },
   headers: {
     request: {
-      "content-type": "application/json"
+      "content-type": "application/json",
+      "test": "TESTHEADER"
     },
     response: {
-      "content-type": "application/json"
+      "content-type": "application/json",
+      "test": "TESTRESPONSEHEADER"
     }
   }
 }
