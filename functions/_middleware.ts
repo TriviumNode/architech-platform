@@ -1,12 +1,25 @@
 import proxyflare from "@flaregun-net/proxyflare-for-pages"
 import { Route } from "@flaregun-net/proxyflare-for-pages/build/types"
 
-const apiRoute: Route = {
+const apiRouteGet: Route = {
   from: {
     pattern: "alpha.architech.zone/api/*",
-    methods: ["GET", 'POST'],
+    methods: ["GET"],
   },
-  to: { url: "api.architech.zone" },
+  to: { url: "131.153.241.102:4050" },
+  headers: {
+    response: {
+      "content-type": "application/json",
+    }
+  }
+}
+
+const apiRoutePost: Route = {
+  from: {
+    pattern: "alpha.architech.zone/api/*",
+    methods: ['POST'],
+  },
+  to: { url: "131.153.241.102:4050" },
   headers: {
     request: {
       "content-type": "application/json",
@@ -18,13 +31,8 @@ const apiRoute: Route = {
     }
   }
 }
-
-const apiRoute2: Route = {
-    from: { pattern: "alpha.architech.zone/example" },
-    to: { url: "example.com" },
-}
   
-const routes: Route[] = [apiRoute, apiRoute2]
+const routes: Route[] = [apiRouteGet, apiRoutePost]
 
 // `PagesFunction` is from @cloudflare/workers-types
 export const onRequest: PagesFunction[] = [
