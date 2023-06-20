@@ -92,6 +92,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
       /* eslint-disable */
       // if (confirm(`Sign permit to authenticate wallet?\nThis is required to take advanted of profile features.`)){
         try {
+          console.log({ address, pubKey });
           const nonceResponse = await requestNonce(address, pubKey)
           console.log(nonceResponse)
 
