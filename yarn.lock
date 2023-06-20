@@ -2182,6 +2182,11 @@
     human-id "^1.0.2"
     prettier "^1.19.1"
 
+"@cloudflare/workers-types@^4.20230518.0":
+  version "4.20230518.0"
+  resolved "https://registry.yarnpkg.com/@cloudflare/workers-types/-/workers-types-4.20230518.0.tgz#de1b0f71d68e2eac1b546542968ea2b837cb967e"
+  integrity sha512-A0w1V+5SUawGaaPRlhFhSC/SCDT9oQG8TMoWOKFLA4qbqagELqEAFD4KySBIkeVOvCBLT1DZSYBMCxbXddl0kw==
+
 "@colors/colors@1.5.0":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
@@ -2858,6 +2863,11 @@
   version "8.41.0"
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.41.0.tgz#080321c3b68253522f7646b55b577dd99d2950b3"
   integrity sha512-LxcyMGxwmTh2lY9FwHPGWOHmYFCZvbrFCBZL4FzSSsxsRPuhrYUg/49/0KDfW8tnIEaEHtfmn6+NPN+1DqaNmA==
+
+"@flaregun-net/proxyflare-for-pages@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@flaregun-net/proxyflare-for-pages/-/proxyflare-for-pages-0.1.0.tgz#9e9d55ae29eabc288567423c845f9c8dec147a60"
+  integrity sha512-uVZ4s1GxpYJ+InnXLTczHqjrIUSWqxiHV2I6NQj4AVyV5ZozbMhuFXETpnk0IT5a4aRXew7rGMuYr4hzsu0T+g==
 
 "@gar/promisify@^1.1.3":
   version "1.1.3"
