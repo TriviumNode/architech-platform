@@ -20,11 +20,13 @@ const apiRoute: Route = {
 
 export const onRequest: PagesFunction[] = [
   (context) =>
-    proxyflare({
-      config: {
-        global: { debug: true },
-        routes: [apiRoute],
-      },
-    })(context),
+    // proxyflare({
+    //   config: {
+    //     global: { debug: true },
+    //     routes: [apiRoute],
+    //   },
+    //@ts-expect-error
+      context.env.backend.fetch(context.request)
+    (context),
   // other Pages plugins and middleware
 ]
