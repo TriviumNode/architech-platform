@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import FileInput from "../../Components/FileInput";
 import ImageDropzone from "../../Components/ImageDropzone";
 import { useUser } from "../../Contexts/UserContext";
-import { getTokens, updateProfile, updateProfileImage } from "../../Utils/backend";
+import { getApiUrl, getTokens, updateProfile, updateProfileImage } from "../../Utils/backend";
 import { useRevalidator } from 'react-router-dom'
 import Loader from "../../Components/Loader";
 import NftTile from "../../Components/NftTile/NftTile";
@@ -191,7 +191,7 @@ const ProfilePage: FC<any> = (): ReactElement => {
 
 
     const displayName = userProfile?.profile?.username || userAddress
-    const displayImage = userProfile.profile.profile_image ? `/api/public/${userProfile.profile.profile_image}` : undefined;
+    const displayImage = userProfile.profile.profile_image ? getApiUrl(`/public/${userProfile.profile.profile_image}`) : undefined;
     return (<>
                 <EditProfileModal open={editProfile} onClose={()=>setEditProfile(false)} userId={userProfile.profile._id} />
                 <div className='d-flex mb8' style={{gap: '8px', margin: '0 -8px', maxHeight: '350px'}}>
@@ -205,7 +205,7 @@ const ProfilePage: FC<any> = (): ReactElement => {
                             // ...bgStyle,
                         }}
                     >
-                        {/* {!!collection.collectionProfile.banner_image && <img src={`/api/public/${collection.collectionProfile.banner_image}`} className='wide imgCover' /> } */}
+                        {/* {!!collection.collectionProfile.banner_image && <img src={getApiUrl(`/public/${collection.collectionProfile.banner_image}`} className='wide imgCover' /> } */}
                         <div className='d-flex flex-column genOverlay' style={{position: 'absolute', left: '16px', bottom: '16px'}}>
                             <h1>{displayName}</h1>
                             <p>{userProfile.profile.bio}</p>

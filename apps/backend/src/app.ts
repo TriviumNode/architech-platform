@@ -91,8 +91,8 @@ class App {
       apis: ['swagger.yaml'],
     };
 
-    const specs = swaggerJSDoc(options);
-    this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+    // const specs = swaggerJSDoc(options);
+    // this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
   }
 
   private initializeErrorHandling() {

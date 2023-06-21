@@ -8,7 +8,7 @@ import Modal from "../../Components/Modal";
 import NftTile from "../../Components/NftTile/NftTile";
 import SocialLinks from "../../Components/Socials";
 import { useUser } from "../../Contexts/UserContext";
-import { getTokens } from "../../Utils/backend";
+import { getApiUrl, getTokens } from "../../Utils/backend";
 import { getCollectionName } from "../../Utils/helpers";
 import BannerModal from "./BannerModal";
 import EditModal from "./EditModal";
@@ -50,7 +50,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
 
     const bgStyle: CSSProperties = collection.collectionProfile.banner_image ?
         {
-            backgroundImage: `url('/api/public/${collection.collectionProfile.banner_image}')`,
+            backgroundImage: `url('${getApiUrl(`/public/${collection.collectionProfile.banner_image}`)}')`,
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
             backgroundSize: 'cover',
@@ -58,7 +58,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
     : {};
 
     const collectionName = getCollectionName(collection);
-    const collectionImage = collection.collectionProfile?.profile_image ? `/api/public/${collection.collectionProfile?.profile_image}` : tokens[0]?.metadataExtension?.image || tokens[0]?.metadataExtension?.image_data || undefined;
+    const collectionImage = collection.collectionProfile?.profile_image ? getApiUrl(`/public/${collection.collectionProfile?.profile_image}`) : tokens[0]?.metadataExtension?.image || tokens[0]?.metadataExtension?.image_data || undefined;
     return (
         <>
             <EditModal open={isEditing} onClose={()=>setIsEditing(false)} collectionId={collection._id} />
@@ -92,7 +92,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
             <>
                 <div style={{width: '100vw', maxHeight: '320px', overflow: 'hidden', position: 'absolute', zIndex: -5, background: 'linear-gradient(to bottom left, rgb(345, 123, 98), rgb(12, 211, 123), rgb(123, 231, 11))', paddingTop: collection.collectionProfile?.banner_image ? undefined : '300px' }}>
                     { !!collection.collectionProfile?.banner_image &&
-                        <img alt={collectionName} style={{width: '100vw'}} src={`/api/public/${collection.collectionProfile?.banner_image}`} />
+                        <img alt={collectionName} style={{width: '100vw'}} src={getApiUrl(`/public/${collection.collectionProfile?.banner_image}`} />
                     }    
                 </div>
                     <Row>
@@ -125,7 +125,6 @@ const SingleCollection: FC<any> = (): ReactElement => {
                             ...bgStyle,
                         }}
                     >
-                        {/* {!!collection.collectionProfile.banner_image && <img src={`/api/public/${collection.collectionProfile.banner_image}`} className='wide imgCover' /> } */}
                         <div className='d-flex flex-column genOverlay' style={{position: 'absolute', left: '16px', bottom: '16px'}}>
                             <h1>{collectionName}</h1>
                             <p>{collection.collectionProfile.description}</p>

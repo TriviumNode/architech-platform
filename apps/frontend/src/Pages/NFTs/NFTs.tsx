@@ -148,19 +148,7 @@ const NftPage: FC<any> = (): ReactElement => {
             {collections && [...collections, ...collections, ...collections].map((collection: Collection)=>{
                 const collectionName = collection.collectionProfile.name || collection.cw721_name
                 return(
-                    // <Link to={`/nfts/${collection.address}`}>
-                    // <div className={styles.collectionCard}>
-                    //     <img style={{width: '100%'}} src={`/api/public/${collection.collectionProfile.profile_image}`} alt={collection.collectionProfile.name} />
-                    //     <div className={styles.overlay}>
-                    //         <h2>{collectionName}</h2>
-                    //         <span style={{display: 'flex', alignItems: 'center'}}>
-                    //             Floor&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;<ArchDenom />
-                    //         </span>
-                    //     </div>                       
-                    // </div>
-                    // </Link>
                     <CollectionTile collection={collection} />
-                
                 );
             })}
         </div>

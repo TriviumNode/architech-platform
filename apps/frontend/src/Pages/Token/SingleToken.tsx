@@ -13,7 +13,7 @@ import SocialLinks from "../../Components/Socials";
 import TokenImage from "../../Components/TokenImg";
 import Vr from "../../Components/vr";
 import { useUser } from "../../Contexts/UserContext";
-import { refreshToken } from "../../Utils/backend";
+import { getApiUrl, refreshToken } from "../../Utils/backend";
 import { getCollectionName } from "../../Utils/helpers";
 
 import styles from './singletoken.module.scss';
@@ -126,7 +126,7 @@ const SingleToken: FC<any> = (): ReactElement => {
       <div className='d-flex gap8' style={{height: '64px', marginBottom: '8px'}}>
         <Col className='tall square br8' xs="auto">
           <Link to={`/nfts/${collection.address}`}>
-            <img src={`/api/public/${collection.collectionProfile.profile_image}`} className='tall wide imgCover' />
+            <img alt={collectionName} src={getApiUrl(`/public/${collection.collectionProfile.profile_image}`)} className='tall wide imgCover' />
           </Link>
         </Col>
         <Col className='card d-flex flex-row justify-content-between align-items-center'>

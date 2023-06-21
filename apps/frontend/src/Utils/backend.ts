@@ -6,7 +6,6 @@ import { ImportCollectionData, UpdateProfileData } from '../Interfaces/interface
 axios.defaults.withCredentials = true;
 
 export const getApiUrl = (path: string): string => {
-    // return `/api${path}`;
     // const url = new URL(path, process.env.REACT_APP_BACKEND_URL);
     // return url.toString();
     return `${process.env.REACT_APP_BACKEND_URL.replace(/\/\s*$/, "")}${path}`;

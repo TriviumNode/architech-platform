@@ -2,6 +2,7 @@ import { Collection, Token } from "@architech/types"
 import { FC, ReactElement } from "react"
 import { Col, Row } from "react-bootstrap"
 import { Link } from "react-router-dom"
+import { getApiUrl } from "../../Utils/backend"
 import ArchDenom from "../ArchDenom"
 
 import styles from './CollectionTile.module.scss'
@@ -16,7 +17,7 @@ const CollectionTile: FC<Props> = ({ collection }): ReactElement => {
   return (
     <Link to={`/nfts/${collection.address}`}>
       <div className={styles.collectionCard}>
-          <img style={{width: '100%'}} src={`/api/public/${collection.collectionProfile.profile_image}`} alt={collection.collectionProfile.name} />
+          <img style={{width: '100%'}} src={getApiUrl(`/public/${collection.collectionProfile.profile_image}`)} alt={collection.collectionProfile.name} />
           <div className={styles.overlay}>
               <h2>{collectionName}</h2>
               <span style={{display: 'flex', alignItems: 'center'}}>
@@ -35,7 +36,7 @@ const CollectionTile: FC<Props> = ({ collection }): ReactElement => {
     //           { !!collection.collectionProfile.profile_image ?
     //             <img
     //                 alt={collectionName}
-    //                 src={`/api/public/${collection.collectionProfile.profile_image}`} 
+    //                 src={getApiUrl(`/public/${collection.collectionProfile.profile_image}`} 
     //                 style={{width: '100%', backgroundColor: '#444'}}
     //             />
 
