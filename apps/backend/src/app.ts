@@ -70,7 +70,21 @@ class App {
     this.app.use(express.urlencoded({ extended: true, limit: '50mb' }));
     this.app.use(cookieParser());
 
-    this.app.use('/public', cors({ credentials: true, origin: true }), express.static('uploads'));
+    this.app.use(
+      '/public',
+      express.static('uploads', {
+        setHeaders: function (res, path) {
+          res.set('Access-Control-Allow-Origin', '*');
+          res.set('Access-Control-Allow-Headers', 'Content-Type,X-Requested-With');
+          res.set('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS');
+          // res.type('application/json');
+          // res.type('jpg');
+          res.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
+          res.set('Cross-Origin-Opener-Policy', 'unsafe-none');
+          res.set('Cross-Origin-Resource-Policy', 'same-site');
+        },
+      }),
+    );
   }
 
   private initializeRoutes(routes: Routes[]) {
