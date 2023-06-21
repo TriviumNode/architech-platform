@@ -93,7 +93,7 @@ function handleOptions(request) {
 
 const handle = async(request: Request) => {
   const url = new URL(request.url)
-
+  console.log(url)
   if (request.method === "OPTIONS") {
     // Handle CORS preflight requests
     return handleOptions(request);

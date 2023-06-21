@@ -87,7 +87,13 @@ export const walletLogin = async (req: Request, res: Response, next: NextFunctio
       collections: ownedCollections || [],
     };
     // res.setHeader('Set-Cookie', [cookie]);
-    res.cookie('Authorization', tokenData.token, { httpOnly: true, sameSite: 'strict', secure: false, maxAge: tokenData.expiresIn });
+    res.cookie('Authorization', tokenData.token, {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+      maxAge: tokenData.expiresIn,
+      domain: 'api.architech.zone',
+    });
     res.status(200).json(response);
   } catch (error) {
     next(error);

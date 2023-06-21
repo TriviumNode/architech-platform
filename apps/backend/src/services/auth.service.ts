@@ -34,8 +34,8 @@ import { isEmpty } from '@utils/util';
 //   return { cookie, findUser };
 // }
 
-export async function walletLogin(userData: CreateUserDto)/*: Promise<{ cookie: string; findUser: User }>*/ {
-  if (isEmpty(userData)) throw new HttpException(400, "userData is empty");
+export async function walletLogin(userData: CreateUserDto) /*: Promise<{ cookie: string; findUser: User }>*/ {
+  if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
 
   const findUser: User = await userModel.findOne({ address: userData.address });
   if (!findUser) throw new HttpException(409, `This address ${userData.address} was not found`);
@@ -46,12 +46,12 @@ export async function walletLogin(userData: CreateUserDto)/*: Promise<{ cookie: 
   const cookie = createCookie(tokenData);
 
   // return { cookie, findUser };
-  return {tokenData, findUser}
+  return { tokenData, findUser };
 }
 
 // Wtf does this even do
 export async function logout(userData: User): Promise<User> {
-  if (isEmpty(userData)) throw new HttpException(400, "userData is empty");
+  if (isEmpty(userData)) throw new HttpException(400, 'userData is empty');
 
   const findUser: User = await userModel.findOne({ address: userData.address });
   if (!findUser) throw new HttpException(409, `This address ${userData.address} was not found`);
