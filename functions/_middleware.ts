@@ -6,7 +6,7 @@ const apiRouteGet: Route = {
     pattern: "alpha.architech.zone/api/*",
     methods: ["GET"],
   },
-  to: { url: "131.153.241.102:4050" },
+  to: { url: "api.architech.zone:4050" },
   // headers: {
   //   response: {
   //     "content-type": "application/json",
@@ -19,7 +19,7 @@ const apiRoutePost: Route = {
     pattern: "alpha.architech.zone/api/*",
     methods: ['POST'],
   },
-  to: { url: "131.153.241.102:4050" },
+  to: { url: "api.architech.zone:4050" },
   headers: {
     request: {
       "content-type": "application/json",
