@@ -69,14 +69,14 @@ class App {
     this.app.use(express.json({ limit: '50mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '50mb' }));
     this.app.use(cookieParser());
+
+    this.app.use('/public', express.static('uploads'));
   }
 
   private initializeRoutes(routes: Routes[]) {
     routes.forEach(route => {
       this.app.use('/', route.router);
     });
-
-    this.app.use('/public', express.static('uploads'));
   }
 
   private initializeSwagger() {
