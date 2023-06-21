@@ -28,4 +28,3 @@ export const onRequest: PagesFunction[] = [
     })(context),
   // other Pages plugins and middleware
 ]
-
