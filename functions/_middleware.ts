@@ -7,11 +7,11 @@ const apiRouteGet: Route = {
     methods: ["GET"],
   },
   to: { url: "131.153.241.102:4050" },
-  headers: {
-    response: {
-      "content-type": "application/json",
-    }
-  }
+  // headers: {
+  //   response: {
+  //     "content-type": "application/json",
+  //   }
+  // }
 }
 
 const apiRoutePost: Route = {
