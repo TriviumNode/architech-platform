@@ -29,15 +29,15 @@ export default function MainLayout() {
             <p>© Architech 2023</p>
             <Row>
               <Col>
-                <a target='_blank' rel='noreferrer' href='https://twitter.com/triviumnode'><img src="/twitter.svg" alt='Twitter' /></a>
+                <a target='_blank' rel='noreferrer' href='https://twitter.com/Architech_Build'><img src="/twitter.svg" alt='Twitter' /></a>
               </Col>
 
               <Col>
                 <a target='_blank' rel='noreferrer' href='https://discord.gg/56Kn4DQc5P'><img src="/discord.svg" alt='Discord' /></a>
               </Col>
-              <Col>
+              {/* <Col>
                 <a target='_blank' rel='noreferrer' href='#'><img src="/telegram.svg" alt='Telegram' /></a>
-              </Col>
+              </Col> */}
               <Col>
                 <a target='_blank' rel='noreferrer' href='https://github.com/triviumnode'><img src="/github.svg" alt='Github' /></a>
               </Col>

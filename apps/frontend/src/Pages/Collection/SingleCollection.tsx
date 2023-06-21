@@ -130,7 +130,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
                             <h1>{collectionName}</h1>
                             <p>{collection.collectionProfile.description}</p>
                             <div className='d-flex wide justify-content-space-between'>
-                                <CollectionStats collection={collection} forSale={fullCollection.forSale.length} />
+                                <CollectionStats collection={collection} asks={fullCollection.forSale} />
                             </div>
                         </div>
                         <div style={{position: 'absolute', right: '16px', top: '16px'}}>

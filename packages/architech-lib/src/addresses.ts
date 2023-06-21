@@ -1,5 +1,5 @@
-export const MARKETPLACE_ADDRESS = 'archway1uqplgphzrdjjjx6x7f6z4rqr5lhkju4rx6xxmvlzxr7u3frchh6qldwcj2';
+export const MARKETPLACE_ADDRESS = 'archway1k9m3n9288tpkv6tfe9k5avzwx0n208500mu3udttdftmlmfmwqzqrhjdde';
 export const COLLECTION_FACTORY_ADDRESS = '';
-export const CREDIT_ADDRESS = 'archway1w8cp7t4dy8dus6hznkklrt57yupxzlavz0yhr958mz3afvaz2h9qmqafty';
+export const CREDIT_ADDRESS = 'archway19ju9qdz5e0hsmsf0589v6zfqs4uqh82xe37ussjkh7pk0xyggzgs2kajgz';
 
-export const CW721_CODE_ID = 150;
+export const CW721_CODE_ID = 312;

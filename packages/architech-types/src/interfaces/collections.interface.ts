@@ -1,4 +1,4 @@
-import { cw721 } from "../contracts";
+import { cw721, marketplace } from "../contracts";
 import { Token } from "./tokens.interface";
 import { Ref } from '@typegoose/typegoose';
 
@@ -46,5 +46,5 @@ export interface ImportCollectionRequest extends CollectionProfile {
 
 export interface GetCollectionResponse {
   collection: Collection;
-  forSale: any[];
+  forSale: marketplace.Ask[];
 }

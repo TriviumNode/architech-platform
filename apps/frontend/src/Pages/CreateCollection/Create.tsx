@@ -117,13 +117,13 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                 <Col style={{textAlign: 'center'}}>
                     { status === "CREATING" && <><p>Deploying collection...</p><Loader /></>}
                     { status === "IMPORTING" && <><p>Importing collection into Aerchitech...</p><Loader /></>}
-                    { status === "COMPLETE" && <p>{detailState.name} has been created. <Link to={`/collections/${collectionAddress}`}>View your collection.</Link></p>}
+                    { status === "COMPLETE" && <p>{detailState.name} has been created. <Link to={`/nfts/${collectionAddress}`}>View your collection.</Link></p>}
                     { status === "ERROR" && <>
                         <h3>Error</h3>
                         { !!collectionAddress &&
                         <p>
                             Your collection was deployed on chain successfully, but we were unable to import it into Architech due to the error below.<br />
-                            You can try again now, or come back later and import it manually on our <Link to='/import'>import page</Link>.<br />
+                            You can try again now, or come back later and import it manually on our <Link to='nfts/import'>import page</Link>.<br />
                             Please write down your collection address:<br />
                             {collectionAddress}
                         </p>

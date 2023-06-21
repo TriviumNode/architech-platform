@@ -48,12 +48,6 @@ export interface Fee {
   [k: string]: unknown;
 }
 export type QueryMsg = {
-  cw721_deposits: {
-    collection: string;
-    owner: string;
-    [k: string]: unknown;
-  };
-} | {
   ask: {
     collection: string;
     token_id: string;
@@ -65,6 +59,16 @@ export type QueryMsg = {
   };
 } | {
   get_collection_asks: {
+    collection: string;
+    [k: string]: unknown;
+  };
+} | {
+  get_seller_asks: {
+    seller: string;
+    [k: string]: unknown;
+  };
+} | {
+  get_collection_volume: {
     collection: string;
     [k: string]: unknown;
   };
@@ -86,8 +90,14 @@ export type Cw20HookMsg = {
 };
 export type Cw721HookMsg = {
   set_listing: {
-    amount: number;
+    amount: Uint128;
     cw20_contract?: string | null;
     [k: string]: unknown;
   };
 };
+export interface Volume {
+  amount: Uint128;
+  cw20_contract?: string | null;
+  denom?: string | null;
+  [k: string]: unknown;
+}

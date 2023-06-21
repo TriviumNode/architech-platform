@@ -122,6 +122,23 @@
     color: #FFFFFF !important;
 }
 
+.infoLink {
+    color: #FFF;
+    font-size: 16px;
+    font-family: TWK Everett;
+    line-height: 150%;
+}
+.infoLink:hover {
+    text-decoration: underline;
+}
+
+.infoText {
+    color: #999;
+    font-size: 14px;
+    // font-family: Inter;
+    letter-spacing: -0.56px;
+}
+
 .collectionsLabel {
     width: 100%;
     background: rgba(255, 255, 255, 0.48);

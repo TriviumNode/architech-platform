@@ -86,7 +86,7 @@ const ImportPage: FC<any> = (): ReactElement => {
                 <h3>Import Complete</h3>
                 <p>
                     Successfully imported {count} tokens from {collection?.cw721_name}.<br />
-                    <Link to={`/collections/${collection?.address}`}>Visit your collection</Link> to edit the collection profile.
+                    <Link to={`/nfts/${collection?.address}`}>Visit your collection</Link> to edit the collection profile.
                 </p>
                 <button type="button" onClick={handleReset}>Import Another Collection</button>
                 </>

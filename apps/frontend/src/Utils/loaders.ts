@@ -11,7 +11,7 @@ export async function collectionLoader({ params, request }: any) {
     const searchParams = new URL(request.url).searchParams;
     const currentParams = Object.fromEntries([...searchParams]);
 
-    console.log('alalalal', currentParams)
+    console.log('Search Params', currentParams)
 
     const url = getApiUrl(`/collections/${params.contractAddr}`)
     const {data: collection} = await axios.get(url)

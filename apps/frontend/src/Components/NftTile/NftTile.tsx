@@ -16,7 +16,7 @@ interface Props {
 
 const NftTile: FC<any> = ({token}: Props): ReactElement => {
   const {collectionInfo: collection} = token;
-  const collectionName = collection.collectionProfile.name || collection.cw721_name
+  const collectionName = collection.collectionProfile?.name || collection.cw721_name
 
   const num = isNaN(token.tokenId as any) ? null : '#'
 
@@ -24,7 +24,7 @@ const NftTile: FC<any> = ({token}: Props): ReactElement => {
 
   return (
       // <Col xs={6} md={3} className='p-3'>
-      <Link to={`/collections/${collection.address}/${token.tokenId}`}>
+      <Link to={`/nfts/${collection.address}/${token.tokenId}`}>
         <div style={{backgroundColor: token.averageColor, borderRadius: '8px', overflow: 'hidden', position: 'relative', paddingBottom: '64px'}}>
           <TokenImage
               alt={`${collectionName} ${token.tokenId}`}
@@ -43,7 +43,7 @@ const NftTile: FC<any> = ({token}: Props): ReactElement => {
 //     const {collectionInfo: collection} = token;
 //     return (
 //         <Col xs={6} md={3} className='p-3'>
-//         <Link to={`/collections/${collection.address}/${token.tokenId}`}>
+//         <Link to={`/nfts/${collection.address}/${token.tokenId}`}>
 //           <div style={{backgroundColor: '#6b778a', borderRadius: '10px', overflow: 'hidden'}}>
 //             <img
 //                 alt={`${collectionName} ${token.tokenId}`}

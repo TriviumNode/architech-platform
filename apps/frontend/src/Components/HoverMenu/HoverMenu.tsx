@@ -92,14 +92,21 @@ export default function ProfileMenu(props: HoverMenuProps) {
               setIsOpen(false);
             }}
           >
-              <Link to={`/create`}>Create Collection</Link>
+              <Link to={`/nfts/createcollection`}>Create Collection</Link>
           </MenuItem>
           <MenuItem
             onSelect={() => {
               setIsOpen(false);
             }}
           >
-              <Link to={`/import`}>Import Collection</Link>
+              <Link to={`/nfts/create`}>Create NFT</Link>
+          </MenuItem>
+          <MenuItem
+            onSelect={() => {
+              setIsOpen(false);
+            }}
+          >
+              <Link to={`nfts/import`}>Import Collection</Link>
           </MenuItem>
         </MenuItems>
       </MenuPopover>

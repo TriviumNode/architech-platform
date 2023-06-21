@@ -47,8 +47,9 @@
     background-color: #c4c4c4;
 }
 
-.activeLink:hover {
+.activeLink {
     background-color: #c4c4c4;
+    cursor: default !important;
 }
 
 .navbarInternal form {

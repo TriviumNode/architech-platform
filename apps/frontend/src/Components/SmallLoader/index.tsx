@@ -1,3 +1,3 @@
-import Loader from "./Loader";
+import SmallLoader from "./SmallLoader";
 
-export default Loader;
+export default SmallLoader;

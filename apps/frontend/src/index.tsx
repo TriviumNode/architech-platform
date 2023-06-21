@@ -31,30 +31,34 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "/collections",
+        path: "/nfts",
         element: <NftPage />,
         loader: allCollectionsLoader
       },
       {
-        path: "/collections/:contractAddr/:tokenId",
+        path: "/nfts/:contractAddr/:tokenId",
         element: <SingleToken />,
         loader: tokenLoader
       },
       {
-        path: "/collections/:contractAddr",
+        path: "/nfts/:contractAddr",
         element: <SingleCollection />,
         loader: collectionLoader,
       },
       {
-        path: "/import",
+        path: "/nfts/import",
         element: <ImportPage />,
       },
       {
-        path: "/create",
+        path: "/nfts/createcollection",
         element: <CreateCollectionPage />,
       },
       {
-        path: "/createnft",
+        path: "/nfts/create",
+        element: <CreateSingleNftPage />,
+      },
+      {
+        path: "/nfts/create/:contractAddr",
         element: <CreateSingleNftPage />,
       },
       {

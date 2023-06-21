@@ -125,14 +125,14 @@ const SingleToken: FC<any> = (): ReactElement => {
       <ListModal open={isListing} onClose={()=>setIsListing(false)} token={tokenData.token} />
       <div className='d-flex gap8' style={{height: '64px', marginBottom: '8px'}}>
         <Col className='tall square br8' xs="auto">
-          <Link to={`/collections/${collection.address}`}>
+          <Link to={`/nfts/${collection.address}`}>
             <img src={`/api/public/${collection.collectionProfile.profile_image}`} className='tall wide imgCover' />
           </Link>
         </Col>
         <Col className='card d-flex flex-row justify-content-between align-items-center'>
           <h2 className='ml16'>{collectionName}</h2>
           <div style={{width: '50%', paddingRight: '24px'}}  className='d-flex justify-content-between align-items-center'>
-            <CollectionStats collection={collection} forSale={fullCollection.forSale.length} />
+            <CollectionStats collection={collection} asks={fullCollection.forSale} />
             <SocialLinks discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} website={collection.collectionProfile.website} />
           </div>
         </Col>

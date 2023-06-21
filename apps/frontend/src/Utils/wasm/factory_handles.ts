@@ -39,7 +39,10 @@ export const initStandardProject = async({
         CW721_CODE_ID,
         msg as any,
         label,
-        getFee(500_000)
+        getFee(500_000),
+        {
+            admin: signer,
+        }
     )
     return result;
 

@@ -12,7 +12,7 @@ const NftPage: FC<any> = (): ReactElement => {
     console.log(collections);
     return (
         <>
-        <div className={styles.featuredContainer}>
+        {/* <div className={styles.featuredContainer}>
             <div>
                 <img src='example/featured1.png' alt='AstroKitKats' />
             </div>
@@ -22,7 +22,7 @@ const NftPage: FC<any> = (): ReactElement => {
             <div>
                 <img src='example/featured3.png' alt='AstroKitKats' />
             </div>
-        </div>
+        </div> */}
         <div className={`${styles.gridContainer} ${styles.trendingContainer}`}>
             <div className={styles.listCard}>
                 <h2>Trending</h2>
@@ -133,6 +133,12 @@ const NftPage: FC<any> = (): ReactElement => {
                         <img src='logo_white.svg' style={{maxHeight: '1em', marginRight: '0.5em'}} />
                         <h2 style={{display: "inline"}}>Architech</h2>
                     </div>
+                    <div style={{marginTop: 'auto'}}>
+                        <p className={styles.infoText} style={{marginBottom: '36px'}}>
+                            A brand new platform for Web3 Community Management on Archway. Build your DAO, NFTCommunity, manage treasuries and more at the click of a button! 
+                        </p>
+                        <a href='#' className={styles.infoLink}>Learn more about us</a>
+                    </div>
             </div>
         </div>
         <div className={styles.collectionsLabel}>
@@ -142,7 +148,7 @@ const NftPage: FC<any> = (): ReactElement => {
             {collections && [...collections, ...collections, ...collections].map((collection: Collection)=>{
                 const collectionName = collection.collectionProfile.name || collection.cw721_name
                 return(
-                    // <Link to={`/collections/${collection.address}`}>
+                    // <Link to={`/nfts/${collection.address}`}>
                     // <div className={styles.collectionCard}>
                     //     <img style={{width: '100%'}} src={`/api/public/${collection.collectionProfile.profile_image}`} alt={collection.collectionProfile.name} />
                     //     <div className={styles.overlay}>
@@ -228,7 +234,7 @@ const NftPage: FC<any> = (): ReactElement => {
                 return(
                     <div>
                         <div style={{display: 'flex'}}>
-                            <Link to={`/collections/${collection.address}`}><h3 style={{margin: 0}}>{collectionName}</h3></Link>
+                            <Link to={`/nfts/${collection.address}`}><h3 style={{margin: 0}}>{collectionName}</h3></Link>
                             <p style={{paddingLeft: '10px'}}>{collection.totalTokens} Items</p>
                         </div>
                         <h6 style={{margin: 0}}>Created By: {collection.creator}</h6>

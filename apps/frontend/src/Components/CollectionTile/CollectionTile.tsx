@@ -14,7 +14,7 @@ const CollectionTile: FC<Props> = ({ collection }): ReactElement => {
   const collectionName = collection.collectionProfile.name || collection.cw721_name;
 
   return (
-    <Link to={`/collections/${collection.address}`}>
+    <Link to={`/nfts/${collection.address}`}>
       <div className={styles.collectionCard}>
           <img style={{width: '100%'}} src={`/api/public/${collection.collectionProfile.profile_image}`} alt={collection.collectionProfile.name} />
           <div className={styles.overlay}>
@@ -29,7 +29,7 @@ const CollectionTile: FC<Props> = ({ collection }): ReactElement => {
     // return (
     //   // <Col xs={6} md={4} style={{}} className={styles.tileContainer}>
     //   <Col style={{}} className={styles.tileContainer}>
-    //     <Link to={`/collections/${collection.address}`}>
+    //     <Link to={`/nfts/${collection.address}`}>
     //       <div style={{backgroundColor: '#555555', borderRadius: '10px', overflow: 'hidden'}}>
 
     //           { !!collection.collectionProfile.profile_image ?

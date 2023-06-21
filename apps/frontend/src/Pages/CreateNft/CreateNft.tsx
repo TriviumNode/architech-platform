@@ -172,7 +172,7 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
                     { status === "UPLOADING" && <><p>Uploading image to IPFS...</p><Loader /></>}
                     { status === "MINTING" && <><p>Minting NFT on chain...<br />Please approve the transaction in your wallet.</p><Loader /></>}
                     { status === "IMPORTING" && <><p>Importing collection into Aerchitech...</p><Loader /></>}
-                    { status === "COMPLETE" && <p>{detailState.name} has been created. <Link to={`/collections/${collection?.address}/${detailState.tokenId}`}>View your collection.</Link></p>}
+                    { status === "COMPLETE" && <p>{detailState.name} has been created. <Link to={`/nfts/${collection?.address}/${detailState.tokenId}`}>View your collection.</Link></p>}
                     { status === "ERROR" && <>
                         <h3>Error</h3>
                         <div>{error || 'Unknown error.'}</div>
