@@ -4,12 +4,12 @@ import { Route } from "@flaregun-net/proxyflare-for-pages/build/types"
 const apiRoute: Route = {
   from: {
     pattern: "alpha.architech.zone/api/*",
-    methods: ["GET","POST"],
+    methods: ["POST"],
   },
   to: { url: "http://api.architech.zone:4050" },
   headers: {
     request: {
-      // "content-type": "application/json",
+      "content-type": "application/json",
       "custom-test": "TESTHEADER"
     },
     response: {
