@@ -65,7 +65,7 @@ const fileUploadMiddleware = async (req: RequestWithImages, res: Response, next:
       next();
     }
   } catch (error) {
-    next(new HttpException(401, 'Wrong authentication token'));
+    next(new HttpException(500, `File upload failed: ${error.toString()}`));
   }
 };
 
