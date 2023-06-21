@@ -1,7 +1,7 @@
 import proxyflare from "@flaregun-net/proxyflare-for-pages"
 import { Route } from "@flaregun-net/proxyflare-for-pages/build/types"
 
-const apiRouteGet: Route = {
+const apiRoute: Route = {
   from: {
     pattern: "alpha.architech.zone/api/*",
     // methods: ["GET"],
@@ -33,7 +33,7 @@ const apiRoutePost: Route = {
   }
 }
   
-const routes: Route[] = [apiRouteGet, apiRoutePost]
+const routes: Route[] = [apiRoute]
 
 // `PagesFunction` is from @cloudflare/workers-types
 export const onRequest: PagesFunction[] = [
