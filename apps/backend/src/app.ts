@@ -70,7 +70,7 @@ class App {
     this.app.use(express.urlencoded({ extended: true, limit: '50mb' }));
     this.app.use(cookieParser());
 
-    this.app.use('/public', express.static('uploads'));
+    this.app.use('/public', cors({ credentials: true, origin: true }), express.static('uploads'));
   }
 
   private initializeRoutes(routes: Routes[]) {
