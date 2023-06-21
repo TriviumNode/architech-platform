@@ -9,43 +9,21 @@ const apiRoute: Route = {
   to: { url: "http://api.architech.zone:4050" },
   headers: {
     request: {
-      "content-type": "application/json",
+      // "content-type": "application/json",
       "custom-test": "TESTHEADER"
     },
     response: {
-      // "content-type": "application/json",
-      "custom-test": "TESTRESPONSEHEADER"
+      "custom-test": "TESTHEADER"
     }
   }
 }
 
-const apiRoutePost: Route = {
-  from: {
-    pattern: "alpha.architech.zone/api/*",
-    methods: ['POST'],
-  },
-  to: { url: "http://api.architech.zone:4050" },
-  headers: {
-    request: {
-      "content-type": "application/json",
-      "test": "TESTHEADER"
-    },
-    response: {
-      "content-type": "application/json",
-      "test": "TESTRESPONSEHEADER"
-    }
-  }
-}
-  
-const routes: Route[] = [apiRoute]
-
-// `PagesFunction` is from @cloudflare/workers-types
 export const onRequest: PagesFunction[] = [
   (context) =>
     proxyflare({
       config: {
         global: { debug: true },
-        routes,
+        routes: [apiRoute],
       },
     })(context),
   // other Pages plugins and middleware
