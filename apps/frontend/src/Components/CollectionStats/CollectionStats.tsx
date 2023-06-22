@@ -17,7 +17,11 @@ interface Props {
 const CollectionStats: FC<Props> = ({collection, asks}): ReactElement => {
     const [volume, setVolume] = useState<number>();
 
-    const floor: string = asks && asks.length ? asks.sort((a, b)=>parseInt(a.price) - parseInt(b.price))[0].price : '--'
+    const floor: string = asks &&
+        asks.length ?
+            asks.filter(a=>a.cw20_contract === undefined || a.cw20_contract === null)
+                .sort((a, b)=>parseInt(a.price) - parseInt(b.price))[0].price : '0'
+    const floorAmount = denomToHuman(floor, parseInt(process.env.REACT_APP_NETWORK_DECIMALS));
 
     const queryVolume = async() => {
         const volumeResult = await getVolume({
@@ -47,7 +51,7 @@ const CollectionStats: FC<Props> = ({collection, asks}): ReactElement => {
             </div>
             <div className={styles.vr} />
             <div>
-                <div className={`${styles.number} d-flex align-items-center`}>{floor}&nbsp;<ArchDenom /></div>
+                <div className={`${styles.number} d-flex align-items-center`}>{floorAmount}&nbsp;<ArchDenom /></div>
                 <span className={styles.label}>Floor</span>
             </div>
             <div>
