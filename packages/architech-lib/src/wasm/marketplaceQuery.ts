@@ -9,7 +9,7 @@ export interface Ask {
     price: string;
     seller: string;
     token_id: string;
-  }
+}
 
 export const getAllAsks = async ({
     client,

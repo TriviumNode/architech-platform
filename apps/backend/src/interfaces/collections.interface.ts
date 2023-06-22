@@ -11,7 +11,7 @@ export interface CreateCollectionData {
   traits?: cw721.Trait[];
   traitTypes?: string[];
   uniqueTraits: number;
-  tokens?: string[];
+  tokenIds?: string[];
   totalTokens: number;
   importComplete: boolean;
   hidden: boolean;

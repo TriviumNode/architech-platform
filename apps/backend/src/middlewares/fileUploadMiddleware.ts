@@ -17,6 +17,18 @@ export interface RequestWithImages extends RequestWithUser {
 
 const DEST = 'uploads/';
 
+export const hashBuffer = (buffer: Buffer) => {
+  const hash = crypto.createHash('sha256');
+  hash.update(buffer);
+  return hash.digest('hex');
+};
+
+export const saveBuffer = (buffer: Buffer, fileName: string) => {
+  //  Save to upload directory
+  const filePath = `${DEST}${fileName}`;
+  fs.writeFileSync(filePath, buffer);
+};
+
 const fileUploadMiddleware = async (req: RequestWithImages, res: Response, next: NextFunction) => {
   try {
     //@ts-expect-error whatever
@@ -30,16 +42,19 @@ const fileUploadMiddleware = async (req: RequestWithImages, res: Response, next:
 
     if (profile_image) {
       // Create hash using file buffer
-      const hash = crypto.createHash('sha256');
-      hash.update(profile_image.buffer);
+      // const hash = crypto.createHash('sha256');
+      // hash.update(profile_image.buffer);
 
+      const hash = hashBuffer(profile_image.buffer);
       // Filename `hash.ext`
-      const fileName = `${hash.digest('hex')}${path.extname(profile_image.originalname)}`;
+      // const fileName = `${hash.digest('hex')}${path.extname(profile_image.originalname)}`;
+      const fileName = `${hash}${path.extname(profile_image.originalname)}`;
       console.log(fileName);
 
       //  Save to upload directory
-      const filePath = `${DEST}${fileName}`;
-      fs.writeFileSync(filePath, profile_image.buffer);
+      // const filePath = `${DEST}${fileName}`;
+      // fs.writeFileSync(filePath, profile_image.buffer);
+      saveBuffer(profile_image.buffer, fileName);
       profile_name = fileName;
     }
 

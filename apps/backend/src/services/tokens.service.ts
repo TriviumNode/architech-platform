@@ -4,12 +4,12 @@ import { HttpException } from '@exceptions/HttpException';
 import tokenModel from '@models/tokens.model';
 import { isEmpty } from '@utils/util';
 import { queryClient as client } from '@/utils/chainClients';
-import { getAllNftInfo } from '@/utils/queries/cw721Query';
 import sleep from '@/utils/sleep';
 import { cw721 } from '@architech/types';
 import equal from 'fast-deep-equal';
 import { updateCollection } from './collections.service';
 import { getAverageColor } from 'fast-average-color-node';
+import { getAllNftInfo } from '@architech/lib';
 
 export async function findAllTokens(): Promise<Token[]> {
   const tokens: Token[] = await tokenModel.find();

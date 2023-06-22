@@ -206,7 +206,7 @@ const SingleToken: FC<any> = (): ReactElement => {
               { tokenData.sale ? 
               <>
                 <div>
-                  <div style={{fontSize: '28px'}}>{saleAmount.toString()} <DenomImg denom={saleDenom} /></div>
+                  <div style={{fontSize: '28px'}}>{saleAmount.toString()} <DenomImg denom={saleDenom} size='medium' /></div>
                   <div className='lightText12'>~ $1.23</div>
                 </div>
                 {

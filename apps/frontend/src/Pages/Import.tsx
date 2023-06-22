@@ -11,6 +11,7 @@ import { getCollection, getTokenCount, getTokens, importCollection, updateProfil
 import { useRevalidator } from 'react-router-dom'
 import { AxiosError } from "axios";
 import Loader from "../Components/Loader";
+import { ImportCollectionData } from "../Interfaces/interfaces";
 
 const emptyToUndefined =(str: string) => {
     return str.length ? str : undefined;
@@ -50,10 +51,16 @@ const ImportPage: FC<any> = (): ReactElement => {
     const handleImport = async (e: any) => {
         e.preventDefault();
         try {
-            // const response = await importCollection(address);
-            // console.log(response);
-            // setImporting(true);
-            // setCollection(response);
+            const request: ImportCollectionData = {
+                categories: [],
+                description: '',
+                hidden: true,
+                name: '',
+            }
+            const response = await importCollection(address, request);
+            console.log(response);
+            setImporting(true);
+            setCollection(response);
         } catch(err: any) {
             console.error(err)
             toast.error(err.response.data || err.message)

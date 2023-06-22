@@ -24,7 +24,7 @@ export const getNftInfo = async ({
     client: SigningArchwayClient | ArchwayClient,
     contract: string,
     token_id: string,
-}) => {
+}): Promise<{token_uri?: string | null, extension?: cw721.Metadata | null}> => {
     const query: cw721.QueryMsg = {
         nft_info: {
             token_id
@@ -119,3 +119,34 @@ export const getOwnedTokens = async ({
     const result = await client.queryContractSmart(contract, query);
     return result.tokens;
 }
+
+export const getNumTokens = async ({ client, contract }: { client: SigningArchwayClient | ArchwayClient; contract: string }) => {
+    const query: cw721.QueryMsg = {
+      num_tokens: {},
+    };
+  
+    const result: cw721.NumTokensResponse = await client.queryContractSmart(contract, query);
+    return result.count;
+  };
+
+export const getAllTokens = async ({
+    client,
+    contract,
+    start_after,
+    limit = 1000,
+  }: {
+    client: SigningArchwayClient | ArchwayClient;
+    contract: string;
+    start_after?: string;
+    limit?: number;
+  }) => {
+    const query: cw721.QueryMsg = {
+      all_tokens: {
+        limit,
+        start_after,
+      },
+    };
+  
+    const result = await client.queryContractSmart(contract, query);
+    return result.tokens;
+  };

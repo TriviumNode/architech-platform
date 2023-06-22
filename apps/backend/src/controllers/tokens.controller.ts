@@ -1,12 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
-import { refreshCollection, startImportCollection } from '@services/collections.service';
 import { queryClient } from '@/utils/chainClients';
 import * as tokenService from '@/services/tokens.service';
 import { CollectionModel, cw721, RequestWithOptionalUser, SortOption, Token } from '@architech/types';
 
-import { MARKETPLACE_ADDRESS } from '@/../../../packages/architech-lib/dist';
+import { getAsk, MARKETPLACE_ADDRESS } from '@architech/lib';
 import ViewModel from '@/models/views.model';
-import { getAsk, getCollectionAsks } from '@/utils/queries/marketplaceQuery';
 import { View } from '@/interfaces/views.interface';
 import TokenModel from '@/models/tokens.model';
 import { HttpException } from '@/exceptions/HttpException';

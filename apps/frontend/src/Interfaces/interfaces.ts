@@ -1,6 +1,5 @@
 export interface ImportCollectionData {
     name: string;
-    symbol: string;
     description: string;
     hidden: boolean;
     profileImage?: File;

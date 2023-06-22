@@ -10,8 +10,6 @@ import { View } from '@/interfaces/views.interface';
 import ViewModel from '@/models/views.model';
 import CollectionModel from '@/models/collections.model';
 import mongoose from 'mongoose';
-import { getCollectionAsks } from '@/utils/queries/marketplaceQuery';
-import { MARKETPLACE_ADDRESS } from '@/../../../packages/architech-lib/dist';
 import { RequestWithImages } from '@/middlewares/fileUploadMiddleware';
 import { HttpException } from '@/exceptions/HttpException';
 
@@ -132,9 +130,9 @@ export const importCollectionAdmin = async (req: Request, res: Response, next: N
       res.status(400).send('Invalid contract address.');
       return;
     }
-    console.log('Importing ', contractAddress);
+    console.log('Admin Importing ', contractAddress);
 
-    const importResponse = await collectionService.startImportCollection(contractAddress, { hidden: true, categories: [] });
+    const importResponse = await collectionService.importCollection(contractAddress, { name: '', hidden: 'true', categories: '[]' });
 
     res.status(200).json(importResponse);
   } catch (error) {
@@ -153,8 +151,6 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
 
     const profile_image: string | undefined = req.images?.profile;
     const banner_image: string | undefined = req.images?.banner;
-    // const { profile: profile_image, banner: banner_image } = req.images;
-    console.log({ profile: profile_image, banner: banner_image });
 
     // validate body contents
     const validator = new EditCollectionBodyDto();
@@ -182,7 +178,6 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
 
     // Strip undefined fields
     Object.keys(profileData).forEach(key => profileData[key] === undefined && delete profileData[key]);
-    console.log('EDIT DATA', profileData);
 
     const updateCollection: Partial<Collection> = {
       collectionProfile: profileData,
@@ -191,13 +186,6 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
     };
 
     Object.keys(updateCollection).forEach(key => updateCollection[key] === undefined && delete updateCollection[key]);
-    console.log('UPDATE DATA', updateCollection);
-
-    // const updated = await CollectionModel.findByIdAndUpdate(
-    //   collectionId,
-    //   { collectionProfile: { ...profileData }, hidden: validator.hidden },
-    //   { new: true },
-    // );
 
     const updated: Collection = await collectionService.updateCollection(collectionId, updateCollection);
     res.status(200).json(updated);
@@ -208,15 +196,18 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
 
 export const importCollection = async (req: RequestWithImages, res: Response, next: NextFunction) => {
   try {
+    // Get contract Addr from URL
     const contractAddress: string = req.params.contractAddr;
 
+    // Validate contract address
     if (contractAddress.length !== CONTRACT_ADDR_LENGTH || !contractAddress.startsWith(process.env.PREFIX)) {
       res.status(400).send('Invalid contract address.');
       return;
     }
-    console.log('SAVED IMAGES', req.images);
-    const profile_image: string | undefined = req.images.profile;
-    const banner_image: string | undefined = req.images.banner;
+
+    // Fetch image filenames provided by middleware
+    const profile_image: string | undefined = req.images?.profile;
+    const banner_image: string | undefined = req.images?.banner;
 
     // validate body contents
     const validator = new ImportCollectionBodyDto();
@@ -232,20 +223,7 @@ export const importCollection = async (req: RequestWithImages, res: Response, ne
 
     await validate(validator);
 
-    const importData: StartImportData = {
-      name: validator.name,
-      description: validator.description,
-      categories: JSON.parse(validator.categories),
-      hidden: validator.hidden === 'true',
-      website: validator.website,
-      twitter: validator.twitter,
-      discord: validator.discord,
-      telegram: validator.telegram,
-      profile_image,
-      banner_image,
-    };
-
-    const importResponse = await collectionService.startImportCollection(contractAddress, importData);
+    const importResponse = await collectionService.importCollection(contractAddress, validator, profile_image, banner_image);
 
     res.status(200).json(importResponse);
   } catch (error) {
