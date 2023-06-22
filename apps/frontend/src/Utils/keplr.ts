@@ -16,8 +16,8 @@ export const connectKeplrWallet = async(): Promise<{
     }
 
     await window.keplr.experimentalSuggestChain({
-        chainId: "localnet",
-        chainName: "Archway Local",
+        chainId: process.env.REACT_APP_CHAIN_ID,
+        chainName: `Archway ${process.env.REACT_APP_CHAIN_ID}`,
         rpc: process.env.REACT_APP_RPC_URL,
         rest: process.env.REACT_APP_REST_URL,
         bip44: {
@@ -33,16 +33,16 @@ export const connectKeplrWallet = async(): Promise<{
         },
         currencies: [ 
             { 
-                coinDenom: "STAKE", 
-                coinMinimalDenom: "stake", 
-                coinDecimals: 6, 
+                coinDenom: process.env.REACT_APP_NETWORK_DENOM, 
+                coinMinimalDenom: process.env.REACT_APP_NETWORK_DENOM, 
+                coinDecimals: parseInt(process.env.REACT_APP_NETWORK_DECIMALS), 
             }, 
         ],
         feeCurrencies: [
             {
-                coinDenom: "STAKE",
-                coinMinimalDenom: "stake",
-                coinDecimals: 6,
+                coinDenom: process.env.REACT_APP_NETWORK_DENOM, 
+                coinMinimalDenom: process.env.REACT_APP_NETWORK_DENOM, 
+                coinDecimals: parseInt(process.env.REACT_APP_NETWORK_DECIMALS), 
                 // gasPriceStep: {
                 //     low: 0.00,
                 //     average: 0.00,
@@ -51,14 +51,14 @@ export const connectKeplrWallet = async(): Promise<{
             },
         ],
         stakeCurrency: {
-            coinDenom: "STAKE",
-            coinMinimalDenom: "stake",
-            coinDecimals: 6,
+            coinDenom: process.env.REACT_APP_NETWORK_DENOM, 
+            coinMinimalDenom: process.env.REACT_APP_NETWORK_DENOM, 
+            coinDecimals: parseInt(process.env.REACT_APP_NETWORK_DECIMALS), 
         },
         gasPriceStep: {
-            low: 0.00,
-            average: 0.00,
-            high: 0.01,
+            low: 900000000000,
+            average: 900000000000,
+            high: 900000000000,
         },
     });
     await window.keplr.enable(process.env.REACT_APP_CHAIN_ID);
