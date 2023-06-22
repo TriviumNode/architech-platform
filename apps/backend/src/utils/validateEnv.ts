@@ -11,6 +11,8 @@ const validateEnv = () => {
     LOG_FORMAT: str(),
     LOG_DIR: str(),
     ORIGIN: str(),
+    FILEBASE_S3_KEY_ID: str(),
+    FILEBASE_S3_KEY: str(),
   });
 };
 

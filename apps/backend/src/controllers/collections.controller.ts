@@ -206,7 +206,7 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
   }
 };
 
-export const importCollection = async (req: Request, res: Response, next: NextFunction) => {
+export const importCollection = async (req: RequestWithImages, res: Response, next: NextFunction) => {
   try {
     const contractAddress: string = req.params.contractAddr;
 
@@ -214,11 +214,9 @@ export const importCollection = async (req: Request, res: Response, next: NextFu
       res.status(400).send('Invalid contract address.');
       return;
     }
-    console.log('FILES', req.files);
-    //@ts-expect-error whatever
-    const profile_image: string | undefined = req.files.profile[0]?.filename;
-    //@ts-expect-error whatever
-    const banner_image: string | undefined = req.files.banner[0]?.filename;
+    console.log('SAVED IMAGES', req.images);
+    const profile_image: string | undefined = req.images.profile;
+    const banner_image: string | undefined = req.images.banner;
 
     // validate body contents
     const validator = new ImportCollectionBodyDto();

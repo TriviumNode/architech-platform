@@ -5,11 +5,12 @@ import path from 'path';
 
 import AWS from 'aws-sdk';
 import { HttpException } from '@/exceptions/HttpException';
+import { FILEBASE_S3_KEY, FILEBASE_S3_KEY_ID } from '@/config';
 
 const s3 = new AWS.S3({
   apiVersion: '2006-03-01',
-  accessKeyId: '0F9CE3AA4E3375B813B8',
-  secretAccessKey: 'DNw7JZgO5fcRXGMhawlnzPRSOjOuogxdVW1RvNiy',
+  accessKeyId: FILEBASE_S3_KEY_ID,
+  secretAccessKey: FILEBASE_S3_KEY,
   endpoint: 'https://s3.filebase.com',
   region: 'us-east-1',
   s3ForcePathStyle: true,
