@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useUser } from "../../Contexts/UserContext";
 
 import styles from './filtermenu.module.scss';
+import { cw721 } from "@architech/types";
 
 interface HoverMenuProps {
     title: string;
@@ -12,17 +13,67 @@ interface HoverMenuProps {
     setOptions: (selected: string[]) => void;
 }
 
+interface TraitMenuProps {
+  trait_type: string;
+  traits: cw721.Trait[];
+  selected_traits: Partial<cw721.Trait>[];
+  onCheck: (checked: cw721.Trait) => void;
+  onUncheck: (unchecked: cw721.Trait) => void;
+}
+
+export function TraitFilterMenu(props: TraitMenuProps) {
+  const { trait_type, traits, selected_traits, onCheck, onUncheck } = props;
+  const [isOpen, setIsOpen] = useState<boolean>();
+
+  const handleChange = (trait: cw721.Trait, checked: boolean): void => {
+    if (checked) {
+      onCheck(trait);
+    } else {
+      onUncheck(trait);
+    }
+  }
+
+  return (
+    <div className={styles.menuContainer} id="lalala">
+      <button
+        onClick={() => {
+          setIsOpen(!isOpen);
+        }}
+        className={isOpen ? styles.openButton : undefined}
+      >
+        <span>{trait_type}</span> <span aria-hidden>▾</span>
+      </button>
+      {isOpen && 
+      <div className={`${styles.menu}`}>
+        <form>
+          {traits.map(trait=>{
+            return (
+              <div key={trait.value} className='d-flex justify-content-between'>
+                <div>
+                  {trait.value}
+                </div>
+                <input type="checkbox" checked={selected_traits.findIndex(t=>t.value === trait.value) > -1} onChange={(e) => handleChange(trait, e.target.checked)} />
+              </div>
+            )
+          })}
+        </form>
+      </div>
+      }
+    </div>
+  );
+}
+
 export default function FilterMenu(props: HoverMenuProps) {
   const { title, options, selected, setOptions } = props;
 
   const [isOpen, setIsOpen] = useState<boolean>();
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: any): void => {
     if (e.target.checked) {
-      if (selected.includes(e.target.value)) return selected;
-      else return [...selected, e.target.value];
+      if (selected.includes(e.target.value)) setOptions(selected);
+      else setOptions([...selected, e.target.value]);
     } else {
-      return selected.filter(entry => entry !== e.target.value)
+      setOptions(selected.filter(entry => entry !== e.target.value));
     }
   }
 
@@ -41,7 +92,7 @@ export default function FilterMenu(props: HoverMenuProps) {
         <form>
           {options.map(option=>{
             return (
-              <div className='d-flex justify-content-between'>
+              <div key={option} className='d-flex justify-content-between'>
                 <div>
                   {option}
                 </div>

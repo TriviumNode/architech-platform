@@ -33,8 +33,9 @@ export const getTokensByOwner = async (req: Request, res: Response, next: NextFu
 
 export const getCollectionTokens = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log('QUERYYY', req.query);
     const collectionAddr: string = req.params.collectionAddr;
-    const findAllTokensData: Token[] = await tokenService.findCollectionTokens(collectionAddr);
+    const findAllTokensData: Token[] = await tokenService.findCollectionTokens(collectionAddr, JSON.parse((req.query.traits as string) || '[]'));
 
     res.status(200).json(findAllTokensData);
   } catch (error) {

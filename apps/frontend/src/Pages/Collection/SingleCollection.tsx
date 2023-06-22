@@ -1,9 +1,10 @@
-import { Collection, GetCollectionResponse, Token } from "@architech/types";
+import { Collection, cw721, GetCollectionResponse, Token } from "@architech/types";
 import React, {ReactElement, FC, useState, useEffect, CSSProperties} from "react";
 import { Col, Container, Row, Image } from "react-bootstrap";
 import { Link, useLoaderData, useSearchParams } from "react-router-dom";
 import CollectionStats from "../../Components/CollectionStats/CollectionStats";
 import FilterMenu from "../../Components/FilterMenu";
+import { TraitFilterMenu } from "../../Components/FilterMenu/FilterMenu";
 import LinkButton from "../../Components/LinkButton";
 import Modal from "../../Components/Modal";
 import NftTile from "../../Components/NftTile/NftTile";
@@ -17,16 +18,15 @@ import PictureModal from "./PictureModal";
 
 const statusOptions = [
     'For Sale',
-    'Test Option',
+    // 'Test Option',
 ]
 
 const SingleCollection: FC<any> = (): ReactElement => {
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    useEffect(() => {
-      const currentParams = Object.fromEntries([...searchParams]);
-      console.log(currentParams); // get new values onchange
-    }, [searchParams]);
+    // useEffect(() => {
+    //   const currentParams = Object.fromEntries([...searchParams]);
+    // }, [searchParams]);
     
     const [tokens, setTokens] = useState<Token[]>([])
     const { collection: fullCollection } = useLoaderData() as { collection: GetCollectionResponse};
@@ -36,18 +36,41 @@ const SingleCollection: FC<any> = (): ReactElement => {
     const [isEditing, setIsEditing] = useState(false);
 
     const [statusFilter, setStatusFilter] = useState<string[]>([])
+    const [traitFilter, setTraitFilter] = useState<Partial<cw721.Trait>[]>([]);
+
+    const addTraitFilter = (trait: cw721.Trait) => {
+        Object.keys(trait).forEach((key: any)=>{
+            //@ts-expect-error
+            if (trait[key] === null || trait[key] === undefined) delete trait[key]
+        })
+        if (traitFilter.findIndex(t=>t.trait_type === trait.trait_type && t.value === trait.value) > -1) return;
+        const newFilter = [...traitFilter, trait]
+        setTraitFilter(newFilter)
+        setSearchParams({ traits: JSON.stringify(newFilter) })
+    }
+
+    const removeTraitFilter = (trait: cw721.Trait) => {
+        const index = traitFilter.findIndex(t=>t.trait_type === trait.trait_type && t.value === trait.value);
+        if (index === -1) return;
+        const newFilter = [...traitFilter];
+        newFilter.splice(index, 1);
+        setTraitFilter(newFilter)
+        setSearchParams({ traits: JSON.stringify(newFilter) })
+    }
 
     const loadTokens = async() => {
-        const fetchTokens = await getTokens(collection.address)
-        console.log('FetchTokens', fetchTokens);
-
+        let fetchTokens = await getTokens(collection.address, searchParams)
+        if (statusFilter.includes('For Sale')) {
+            const filtered = fetchTokens.filter(t=>fullCollection.forSale.findIndex(ask=>ask.token_id===t.tokenId) > -1)
+            fetchTokens = filtered;
+        }
         setTokens(fetchTokens);
     }
 
     useEffect(()=>{
         if (!collection) return;
         loadTokens()
-    },[collection])
+    },[collection, traitFilter, statusFilter])
 
     const bgStyle: CSSProperties = collection.collectionProfile.banner_image ?
         {
@@ -60,6 +83,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
 
     const collectionName = getCollectionName(collection);
     const collectionImage = collection.collectionProfile?.profile_image ? getApiUrl(`/public/${collection.collectionProfile?.profile_image}`) : tokens[0]?.metadataExtension?.image || tokens[0]?.metadataExtension?.image_data || undefined;
+
     return (
         <>
             <EditModal open={isEditing} onClose={()=>setIsEditing(false)} collectionId={collection._id} />
@@ -151,17 +175,28 @@ const SingleCollection: FC<any> = (): ReactElement => {
                         <div style={{margin: '24px'}}>
                             <FilterMenu title={'Status'} options={statusOptions} selected={statusFilter} setOptions={(selected)=>setStatusFilter(selected)}  />
                         </div>
+                        <div>Traits</div>
+                        { collection.traitTypes.map(type=>{
+                            const traits = collection.traits.filter((trait: cw721.Trait)=>trait.trait_type === type);
+                            const selected = traitFilter.filter((trait: Partial<cw721.Trait>)=>trait.trait_type === type);
+                            const values = traits.map(t=>t.value);
+                            return (
+                                <div style={{margin: '24px'}} key={type}>
+                                    <TraitFilterMenu trait_type={type} traits={traits} selected_traits={selected} onCheck={(trait)=>addTraitFilter(trait)} onUncheck={(trait)=>removeTraitFilter(trait)}  />
+                                </div>
+                            )
+                        })}
                     </Col>
                     
                     {tokens.length ?
                         <Col className='grid-4 wide'>
                             {tokens.map(token=>{
                                 return (
-                                    <NftTile collectionName={collectionName} token={token} />
+                                    <NftTile collectionName={collectionName} token={token} key={token.tokenId} />
                                 );
                             })}
                         </Col>
-                    :
+                    : !collection.totalTokens ?
                         <Col className='card' style={{textAlign: 'center', padding: '32px 0'}}>
                             <h2 className='mb16'>This collection doesn't have any NFTs yet.</h2>
                             { (collection.creator === wallet?.address || collection.admin === wallet?.address) &&
@@ -170,6 +205,10 @@ const SingleCollection: FC<any> = (): ReactElement => {
                                 </LinkButton>
                             }
                         </Col>
+                    : 
+                    <Col className='card' style={{textAlign: 'center', padding: '32px 0'}}>
+                        <h2 className='mb16'>No NFTs found.</h2>
+                    </Col>
                     }
                     {/* <Col className='d-flex flex-wrap gx-5'>
                     {

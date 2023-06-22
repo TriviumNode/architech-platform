@@ -16,10 +16,59 @@ export async function findAllTokens(): Promise<Token[]> {
   return tokens;
 }
 
-export async function findCollectionTokens(collectionAddress: string): Promise<Token[]> {
+const buildOrFilter = (traits: cw721.Trait[]) => {
+  const filters = [];
+  traits.forEach(t => {
+    filters.push({
+      traits: {
+        $elemMatch: { trait_type: t.trait_type, value: t.value },
+      },
+    });
+  });
+
+  const filter = filters.length
+    ? {
+        $or: filters,
+      }
+    : {};
+  return filter;
+};
+
+export async function findCollectionTokens(collectionAddress: string, traitFilter: cw721.Trait[] = []): Promise<Token[]> {
   if (isEmpty(collectionAddress)) throw new HttpException(400, 'Collection address is empty');
 
-  const findTokens: Token[] = await tokenModel.find({ collectionAddress: collectionAddress }).populate('collectionInfo');
+  const byTrait = {};
+  traitFilter.forEach(t => {
+    if (byTrait[t.trait_type]) {
+      byTrait[t.trait_type].push(t);
+    } else {
+      byTrait[t.trait_type] = [t];
+    }
+  });
+  console.log('byTrait', byTrait);
+
+  const andFilters = [];
+  Object.keys(byTrait).forEach(key => {
+    const traits = byTrait[key];
+    const orFilters = buildOrFilter(traits);
+    andFilters.push(orFilters);
+  });
+
+  const fullFilter = andFilters.length
+    ? {
+        $and: andFilters,
+      }
+    : {};
+  console.log('fullFilter', fullFilter);
+
+  // const filter = buildOrFilter(traitFilter);
+
+  const findTokens: Token[] = await tokenModel
+    .find({
+      collectionAddress: collectionAddress,
+      ...fullFilter,
+    })
+    .populate('collectionInfo');
   if (!findTokens) throw new HttpException(404, 'No tokens found');
 
   return findTokens;
@@ -106,7 +155,6 @@ export const refreshToken = async (token_id: string, collectionAddress: string) 
       owner,
     };
     const updatedToken = await updateToken(tokenData._id, updatedData);
-    console.log(updatedData, 'ajkabhjkabahj');
     return updatedToken;
   } else {
     return tokenData;
@@ -129,7 +177,6 @@ export const processCollectionTokens = async (collection: Collection, tokenList:
       contract: collection.address,
       token_id,
     });
-    console.log(extension);
 
     let avgColor = '#232323';
     if (extension.image) {
@@ -138,7 +185,6 @@ export const processCollectionTokens = async (collection: Collection, tokenList:
       if (isIpfs) url = `https://ipfs.filebase.io/ipfs/${url.replace('ipfs://', '')}`;
       try {
         const color = await getAverageColor(url);
-        console.log(color);
         avgColor = color.hex;
       } catch (err: any) {
         console.error(`Error determining average color.\nCollection: ${collection.address}\nToken: ${token_id}`, err);
@@ -154,6 +200,7 @@ export const processCollectionTokens = async (collection: Collection, tokenList:
       owner,
       averageColor: avgColor,
       total_views: 0,
+      traits: (extension?.attributes as cw721.Trait[]) || [],
     };
     await createToken(createTokenData);
     await sleep(200);
@@ -177,31 +224,6 @@ export const processCollectionTraits = async (collection: Collection) => {
       if (!typeExists) traitTypes.push(attribute.trait_type);
     });
   });
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-  console.log(traitTypes);
-
   const updateCollectionData: Partial<Collection> = {
     traits: uniqueTraits,
     traitTypes,

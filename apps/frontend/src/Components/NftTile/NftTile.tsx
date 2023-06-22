@@ -17,7 +17,6 @@ interface Props {
 const NftTile: FC<any> = ({token}: Props): ReactElement => {
   const {collectionInfo} = token;
   const collectionName = collectionInfo.collectionProfile?.name || collectionInfo.cw721_name
-  console.log('TOKEN', token)
   const num = isNaN(token.tokenId as any) ? null : '#'
 
   const saturated = saturateColor(token.averageColor);

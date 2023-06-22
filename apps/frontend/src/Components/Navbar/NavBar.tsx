@@ -13,7 +13,6 @@ type HeaderPage = 'NFTS' | 'DAOS' | 'HOME';
 const Navbar = () => {
   const {user, balances, connectKeplr, loadingConnectWallet} = useUser()
   const location = useLocation();
-  console.log(location.pathname);
 
   const page: HeaderPage =
     location.pathname.toLowerCase().includes('nfts') ? 'NFTS' :

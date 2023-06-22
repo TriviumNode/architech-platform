@@ -6,7 +6,7 @@ import { getAllTokens, getContractInfo, getNumTokens } from '@/utils/queries/cw7
 import { queryClient as client, queryClient } from '@/utils/chainClients';
 import equal from 'fast-deep-equal';
 import { findCollectionTokenCount, processCollectionTokens, processCollectionTraits } from './tokens.service';
-import { Collection, GetCollectionResponse } from '@architech/types';
+import { Collection, cw721, GetCollectionResponse } from '@architech/types';
 import { CreateCollectionData, StartImportData } from '@/interfaces/collections.interface';
 import CollectionModel from '@models/collections.model';
 import { MARKETPLACE_ADDRESS } from '@architech/lib';

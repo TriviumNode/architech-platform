@@ -27,6 +27,9 @@ export class TokenClass implements TokenModelInterface {
 
   @prop({ type: Number, required: true, default: 0 })
   public total_views: number;
+
+  @prop({ required: true })
+  public traits!: mongoose.Types.Array<cw721.Trait>;
 }
 
 const TokenModel = getModelForClass(TokenClass);

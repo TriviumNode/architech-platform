@@ -7,4 +7,5 @@ export let queryClient: ArchwayClient;
 export async function initClients(): Promise<void> {
   if (!process.env.RPC_URL) throw 'ENV variable RPC_URL is undefined.';
   queryClient = await ArchwayClient.connect(process.env.RPC_URL);
+  console.log('RPC_URLRPC_URLRPC_URLRPC_URLRPC_URL', process.env.RPC_URL);
 }

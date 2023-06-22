@@ -34,6 +34,8 @@ export class CreateTokenDto implements TokenModel {
 
   @IsNumber()
   public total_views: number;
+
+  traits: cw721.Trait[];
 }
 
 

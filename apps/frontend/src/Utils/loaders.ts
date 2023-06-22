@@ -8,10 +8,6 @@ export async function allCollectionsLoader({ params }: any) {
 }
 
 export async function collectionLoader({ params, request }: any) {
-    const searchParams = new URL(request.url).searchParams;
-    const currentParams = Object.fromEntries([...searchParams]);
-
-    console.log('Search Params', currentParams)
     if (!params.contractAddr) return { collection: undefined }
 
     const url = getApiUrl(`/collections/${params.contractAddr}`)

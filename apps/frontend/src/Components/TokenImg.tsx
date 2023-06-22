@@ -23,9 +23,7 @@ const TokenImage = React.forwardRef<HTMLImageElement, ImageProps>(
     },
     ref,
   ) => {
-    console.log('srcb4', src)
     src = resolveIpfs(src || '');
-    console.log('src', src)
     return (
       <img // eslint-disable-line jsx-a11y/alt-text
         ref={ref}

@@ -18,8 +18,8 @@ export const getCollection = async(contractAddr: string): Promise<GetCollectionR
     return data;
 }
 
-export const getTokens = async(contractAddr: string) => {
-    const url = getApiUrl(`/tokens/collection/${contractAddr}`)
+export const getTokens = async(contractAddr: string, query?: URLSearchParams): Promise<Token[]> => {
+    const url = getApiUrl(`/tokens/collection/${contractAddr}?${(query || '').toString()}`)
     const {data: tokens} = await axios.get(url)
     return tokens;
 }
