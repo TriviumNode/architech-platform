@@ -1,3 +1,5 @@
+import BigNumber from "bignumber.js";
+
 export const getFee = (gas: number) => {
     const fee = Math.ceil(gas * parseFloat(process.env.GAS_PRICE || '1'))
     return {
@@ -19,8 +21,9 @@ export const denomToHuman = (amount: number | string, decimals: number) => {
     return humanAmount;
 }
 
-export const humanToDenom = (amount: number | string, decimals: number) => {
+export const humanToDenom = (amount: number | string, decimals: number): string => {
     amount = parseFloat(amount.toString());
-    const denomAmount = amount * Math.pow(10, decimals)
-    return denomAmount;
+    const result = amount * Math.pow(10, decimals)
+    const denomAmount = BigNumber(result)
+    return denomAmount.toFixed();
 }

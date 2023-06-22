@@ -71,7 +71,7 @@ export default function ListModal({open, token, onClose}: Props) {
                 cw721_contract: token.collectionAddress,  
                 marketplace_contract: MARKETPLACE_ADDRESS,              
             });
-            console.log('response', response)
+            console.log('TX Result', response)
             revalidator.revalidate();
             onClose();
         } catch (err: any) {

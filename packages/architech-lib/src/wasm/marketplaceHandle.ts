@@ -92,12 +92,12 @@ export const listToken = async({
     cw20_contract?: string;
     cw721_contract: string;
     token_id: string;
-    amount: number;
+    amount: string;
 }) => {
     const listMsg = {
         set_listing: {
             cw20_contract,
-            amount: amount.toString(),
+            amount: amount,
         }
     }
 
