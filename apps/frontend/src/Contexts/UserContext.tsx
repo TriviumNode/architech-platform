@@ -14,7 +14,7 @@ import { Coin, Pubkey } from '@cosmjs/amino';
 import { Row, Col } from 'react-bootstrap';
 import Modal from '../Components/Modal';
 import Loader from '../Components/Loader';
-import { CREDIT_ADDRESS, getCreditBalance } from '@architech/lib';
+import { CREDIT_ADDRESS, denomToHuman, getCreditBalance } from '@architech/lib';
 import { GetUserProfileResponse } from '@architech/types';
 
 interface Props {
@@ -94,7 +94,8 @@ export const UserProvider = ({ children }: Props): ReactElement => {
       creditErr = err.toString();
     }
     setBalances({
-      arch: archBalance ? parseInt(archBalance.amount) / Math.pow(10, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)) : undefined,
+      // arch: archBalance ? parseInt(archBalance.amount) / Math.pow(10, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)) : undefined,
+      arch: archBalance ? denomToHuman(archBalance.amount, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)) : undefined,
       credits: creditBalance ? parseInt(creditBalance) : undefined,
       arch_err: archErr,
       credits_err: creditErr,

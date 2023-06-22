@@ -65,7 +65,7 @@ export const mintNft = async({
         signer,
         contract,
         msg,
-        getFee(200_000),
+        getFee(215_000),
     )
     return result;
 
@@ -104,7 +104,7 @@ export const mintRoyaltyNft = async({
         signer,
         contract,
         msg,
-        getFee(200_000),
+        getFee(215_000),
     )
     return result;
 
