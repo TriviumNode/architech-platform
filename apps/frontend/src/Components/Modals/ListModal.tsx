@@ -1,4 +1,4 @@
-import { DENOMS, humanToDenom, listToken, MARKETPLACE_ADDRESS } from "@architech/lib";
+import { findDenom, humanToDenom, listToken, MARKETPLACE_ADDRESS } from "@architech/lib";
 import { Denom, Token } from "@architech/types";
 import { useState, ChangeEvent, useEffect } from "react";
 import { Row, Col } from "react-bootstrap";
@@ -22,22 +22,25 @@ interface State {
     amount: string,
 }
 
-const defaultState: State = {
-    denom: DENOMS[0],
-    amount: '',
-}
 
-const selectOptions: SelectOption[] = DENOMS.map(denom=>{
-    return {
-        value: denom,
+const nativeDenom = findDenom(process.env.REACT_APP_NETWORK_DENOM);
+const selectOptions: SelectOption[] = [
+    {
+        value: nativeDenom,
         content: (
             <div>
-                <DenomRow denom={denom} />
+                <DenomRow denom={nativeDenom} />
             </div>
         )
 
     }
-})
+]
+
+const defaultState: State = {
+    denom: nativeDenom,
+    amount: '',
+}
+
 
 export default function ListModal({open, token, onClose}: Props) {
     const revalidator = useRevalidator();

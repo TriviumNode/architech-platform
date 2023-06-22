@@ -1,4 +1,4 @@
-import { cancelListing, DENOMS, denomToHuman, MARKETPLACE_ADDRESS, purchaseNative } from "@architech/lib";
+import { cancelListing, denomToHuman, findDenom, findToken, MARKETPLACE_ADDRESS, purchaseNative } from "@architech/lib";
 import { Collection, Token, cw721, GetTokenResponse, GetCollectionResponse, Denom } from "@architech/types";
 import { FC, ReactElement, useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
@@ -85,13 +85,13 @@ const SingleToken: FC<any> = (): ReactElement => {
     };
     if (tokenData?.sale) {
       if (tokenData.sale.cw20_contract) {
-        const denom = DENOMS.find(denom=>denom.cw20Contract === tokenData.sale.cw20_contract)
+        const denom = findToken(tokenData.sale.cw20_contract);
         if (denom) {
           saleDenom = denom;
           saleAmount = denomToHuman(tokenData.sale.price, denom.decimals).toString()
         }
       } else {
-        const denom = DENOMS.find(denom=>denom.nativeDenom === process.env.REACT_APP_NETWORK_DENOM)
+        const denom = findDenom(process.env.REACT_APP_NETWORK_DENOM);
         if (denom) {
           saleDenom = denom;
           saleAmount = denomToHuman(tokenData.sale.price, denom.decimals).toString()

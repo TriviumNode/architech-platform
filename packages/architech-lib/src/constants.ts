@@ -20,5 +20,19 @@ export const DENOMS: Denom[] = [
         decimals: 6,
         displayDenom: 'ARCH',
         image: 'arch.svg'
-    }
+    },
+    {
+        nativeDenom: 'aconst',
+        decimals: 18,
+        displayDenom: 'ARCH',
+        image: 'arch.svg'
+    },
 ]
+
+export const findDenom = (denom: string) => {
+    return DENOMS.find(d=>d.nativeDenom === denom)
+}
+
+export const findToken = (cw20_addr: string) => {
+    return DENOMS.find(d=>d.cw20Contract === cw20_addr)
+}
