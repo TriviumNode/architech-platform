@@ -26,7 +26,7 @@ const Navbar = () => {
   }
 
     return (
-      <nav id="navBar"  className={styles.navbar}>
+      <nav id="navBar"  className={`${styles.navbar} grayCard`}>
         <div className={styles.navbarInternal}>
           <Link to="/" className={styles.logoLink}><img src='/logo.svg' alt="Architech"/></Link>
           <Link to={`nfts`} className={page === 'NFTS' ? styles.activeLink : undefined }>NFTs</Link>

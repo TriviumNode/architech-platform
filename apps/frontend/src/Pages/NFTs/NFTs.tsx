@@ -142,8 +142,8 @@ const NftPage: FC<any> = (): ReactElement => {
                     </div>
             </div>
         </div>
-        <div className={styles.collectionsLabel}>
-            <h2>Collections</h2>
+        <div className={`grayCard wide mb8 d-flex align-items-center`} style={{height: '64px'}}>
+            <h2 style={{marginLeft: '24px'}}>Collections</h2>
         </div>
         <div className={styles.collectionsContainer}>
             <CreateTile />
