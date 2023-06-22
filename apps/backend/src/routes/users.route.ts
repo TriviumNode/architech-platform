@@ -19,10 +19,6 @@ class UsersRoute implements Routes {
     // Get public user profile
     this.router.get(`${this.path}/address/:address`, usersController.getUserByAddress);
 
-    // Get full user profile
-    // Requires authentication
-    this.router.get(`${this.path}/:id`, authMiddleware, usersController.getUserById);
-
     // Update user profile
     // Requires authentication
     //TODO verify same user
@@ -41,6 +37,11 @@ class UsersRoute implements Routes {
       fileUploadMiddleware,
       usersController.editUser,
     );
+
+    // Get user profile by ID
+    // Requires authentication
+    // Really only used to check if the user is already logged in
+    this.router.get(`${this.path}/:id`, authMiddleware, usersController.getUserById);
   }
 }
 

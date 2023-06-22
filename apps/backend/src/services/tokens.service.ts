@@ -20,7 +20,7 @@ export async function findCollectionTokens(collectionAddress: string): Promise<T
   if (isEmpty(collectionAddress)) throw new HttpException(400, 'Collection address is empty');
 
   const findTokens: Token[] = await tokenModel.find({ collectionAddress: collectionAddress }).populate('collectionInfo');
-  if (!findTokens) throw new HttpException(409, 'No tokens found');
+  if (!findTokens) throw new HttpException(404, 'No tokens found');
 
   return findTokens;
 }
@@ -29,7 +29,7 @@ export async function findTokensByOwner(owner: string): Promise<Token[]> {
   if (isEmpty(owner)) throw new HttpException(400, 'Owner address is empty');
 
   const findTokens: Token[] = await tokenModel.find({ owner: owner }).populate('collectionInfo');
-  if (!findTokens) throw new HttpException(409, 'No tokens found');
+  if (!findTokens) throw new HttpException(404, 'No tokens found');
 
   return findTokens;
 }
@@ -45,7 +45,7 @@ async function findTokenById(databaseId: string): Promise<Token> {
   if (isEmpty(databaseId)) throw new HttpException(400, 'databaseId is empty');
 
   const findToken: Token = await tokenModel.findOne({ _id: databaseId });
-  if (!findToken) throw new HttpException(409, "Token doesn't exist");
+  if (!findToken) throw new HttpException(404, "Token doesn't exist");
 
   return findToken;
 }
@@ -55,7 +55,7 @@ export async function findTokenIdInCollection(tokenId: string, collectionAddress
   if (isEmpty(collectionAddress)) throw new HttpException(400, 'Collection Address is empty');
 
   const findToken: Token = await tokenModel.findOne({ tokenId: tokenId, collectionAddress: collectionAddress }).populate('collectionInfo');
-  if (!findToken) throw new HttpException(409, 'Token not found');
+  if (!findToken) throw new HttpException(404, 'Token not found');
 
   return findToken;
 }
@@ -76,7 +76,7 @@ async function updateToken(databaseId: string, tokenData: Partial<UpdateTokenDto
   if (isEmpty(tokenData)) throw new HttpException(400, 'tokenData is empty');
 
   const updateTokenById = await tokenModel.findByIdAndUpdate(databaseId, { ...tokenData });
-  if (!updateTokenById) throw new HttpException(409, 'Token not found');
+  if (!updateTokenById) throw new HttpException(404, 'Token not found');
   await updateTokenById.populate('collectionInfo');
 
   return updateTokenById as unknown as Token;
@@ -84,7 +84,7 @@ async function updateToken(databaseId: string, tokenData: Partial<UpdateTokenDto
 
 async function deleteToken(databaseId: string): Promise<Token> {
   const deleteTokenById: Token = await tokenModel.findByIdAndDelete(databaseId);
-  if (!deleteTokenById) throw new HttpException(409, "Token doesn't exist");
+  if (!deleteTokenById) throw new HttpException(404, "Token doesn't exist");
 
   return deleteTokenById;
 }
@@ -153,6 +153,7 @@ export const processCollectionTokens = async (collection: Collection, tokenList:
       metadataExtension: extension,
       owner,
       averageColor: avgColor,
+      total_views: 0,
     };
     await createToken(createTokenData);
     await sleep(200);

@@ -54,6 +54,11 @@ export const getUserProfile = async(userAddress: string): Promise<GetUserProfile
     return data;
 }
 
+export const checkLogin = async(userAddress: string): Promise<GetUserProfileResponse> => {
+    const url = getApiUrl(`/auth/check/${userAddress}`)
+    const {data}: {data: GetUserProfileResponse} = await axios.get(url, {withCredentials: true})
+    return data;
+}
 
 
 

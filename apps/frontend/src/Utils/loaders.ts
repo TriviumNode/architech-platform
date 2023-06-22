@@ -36,7 +36,7 @@ export async function userProfileloader({ params }: any) {
         return { userProfile };
     } catch (err: unknown) {
         if (err instanceof AxiosError) {
-            if (err.response && err.response.status === 409){
+            if (err.response && err.response.status === 404){
                 return { profileData: undefined, ownedTokens }
             }
             else {

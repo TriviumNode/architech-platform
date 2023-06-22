@@ -14,14 +14,28 @@ export const DefaultTrait: cw721.Trait = {
     value: ''
 }
 
+const collectionOption = (collection: Collection) => {
+    return ({
+        value: collection,
+        content: (
+            <div>
+                <h4>{collection.collectionProfile.name || collection.cw721_name}</h4>
+            </div>
+        )
+    });
+}
+
 const CollectionPage: FC<{
     collection: Collection | undefined,
     onChange: (collection: Collection)=>void;
     next: ()=>void;
 }> = ({collection, onChange, next}): ReactElement => {
     const { user } = useUser();
+    const [selected, setSelected] = useState<SelectOption | undefined>(collection ? collectionOption(collection) : undefined)
 
-    const [selected, setSelected] = useState<SelectOption>()
+    // useEffect(()=>{
+
+    // },[collection])
 
     const handleSelect = (newSelect: SelectOption) => {
         setSelected(newSelect);
@@ -36,14 +50,7 @@ const CollectionPage: FC<{
     const collections = user?.profile.collections || []
     console.log('userProfile!', user?.profile)
     const options: SelectOption[] = collections.map(collection=>{
-        return ({
-            value: collection,
-            content: (
-                <div>
-                    <h4>{collection.collectionProfile.name || collection.cw721_name}</h4>
-                </div>
-            )
-        })
+        return (collectionOption(collection))
     });
 
     return (

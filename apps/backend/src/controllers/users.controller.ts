@@ -49,7 +49,7 @@ export const getUserByAddress = async (req: Request, res: Response, next: NextFu
     const userAddr: string = req.params.address;
 
     const userData: User = await userModel.findOne({ address: userAddr });
-    const ownedTokens: Token[] = await TokenModel.find({ owner: userAddr });
+    const ownedTokens: Token[] = await TokenModel.find({ owner: userAddr }).populate('collectionInfo');
     const ownedCollections: Collection[] = await CollectionModel.find({ creator: userAddr });
 
     const response: GetUserProfileResponse = {
@@ -184,15 +184,6 @@ export const getNonce = async (req: Request, res: Response, next: NextFunction) 
     next(error);
   }
 };
-
-// export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
-//   try {
-//     const users: User[] = await userModel.find();
-//     res.status(200).json(users);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
 
 // export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
 //   try {

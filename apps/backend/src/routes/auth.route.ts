@@ -17,6 +17,10 @@ class AuthRoute implements Routes {
   private initializeRoutes() {
     // Fetch login nonce from database.
     // User will be created and a random nonce generated if they are not in the database.
+    this.router.get(`${this.path}/check/:userAddress`, authMiddleware, authController.checkLogin);
+
+    // Fetch login nonce from database.
+    // User will be created and a random nonce generated if they are not in the database.
     this.router.post(`${this.path}/nonce`, validationMiddleware(NonceRequestDto, 'body'), usersController.getNonce);
 
     // Handle login with wallet.
@@ -25,7 +29,7 @@ class AuthRoute implements Routes {
     this.router.post(`${this.path}/wallet`, validationMiddleware(WalletLoginDto, 'body'), authController.walletLogin);
 
     // Clear Cookie
-    this.router.post(`${this.path}logout`, authMiddleware, authController.logOut);
+    this.router.post(`${this.path}/logout`, authMiddleware, authController.logOut);
   }
 }
 

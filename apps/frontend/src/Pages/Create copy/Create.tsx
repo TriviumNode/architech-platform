@@ -24,7 +24,7 @@ export {}
 
 // type Status = 'CREATING' | 'IMPORTING' | 'COMPLETE' | 'ERROR';
 // const CreatePage: FC<any> = (): ReactElement => {
-//     const { user: wallet, authenticated } = useUser();
+//     const { user: wallet } = useUser();
 //     const [detailState, setDetailState] = useState<DetailState>(DefaultDetailState);
 //     const [royaltyState, setRoyaltyState] = useState<RoyaltyState>(DefaultRoyaltyState);
 //     const [finishState, setFinishState] = useState<FinishState>(DefaultFinishState);

@@ -9,8 +9,8 @@ import {
 import { SigningArchwayClient } from '@archwayhq/arch3.js/build';
 import { connectKeplrWallet, signLoginPermit } from '../Utils/keplr';
 import { toast } from 'react-toastify';
-import { requestNonce, walletLogin } from '../Utils/backend';
-import { Pubkey } from '@cosmjs/amino';
+import { checkLogin, requestNonce, walletLogin } from '../Utils/backend';
+import { Coin, Pubkey } from '@cosmjs/amino';
 import { Row, Col } from 'react-bootstrap';
 import Modal from '../Components/Modal';
 import Loader from '../Components/Loader';
@@ -31,21 +31,23 @@ interface User {
 
 interface Balances {
   arch?: number;
+  arch_err?: string;
   credits?: number;
+  credits_err?: string;
 }
 
 export interface UserContextState {
   user: User | undefined;
   balances: Balances | undefined;
   loadingConnectWallet: boolean
-  authenticated: boolean;
+  // authenticated: boolean;
   connectKeplr: undefined | (()=>Promise<void>)
 }
 
 // created context with no default values
 const UserContext = createContext<UserContextState>({
   loadingConnectWallet: false,
-  authenticated: false,
+  // authenticated: false,
   balances: undefined,
   connectKeplr: undefined,
   user: undefined,
@@ -58,7 +60,7 @@ const connectedKeplr = localStorage.getItem(KEY);
 export const UserProvider = ({ children }: Props): ReactElement => {
   const [user, setUser] = useState<User>();
   const [loadingConnectWallet, setLoadingConnectWallet] = useState<boolean>(false);
-  const [authenticated, setAuthenticated] = useState<boolean>(false);
+  // const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [waitingForSig, setWaitingForSig] = useState(false);
   const [balances, setBalances] = useState<Balances>();
 
@@ -70,15 +72,32 @@ export const UserProvider = ({ children }: Props): ReactElement => {
 
   const getBalances = async(client = user?.client, addr = user?.address) => {
     if (!addr || !client) throw new Error('Unable to retrieve balances when wallet is not set.');
-    const archBalance = await client.getBalance(addr, process.env.REACT_APP_NETWORK_DENOM).catch();
-    const creditBalance = await getCreditBalance({
-      client: client,
-      address: addr,
-      creditContract: CREDIT_ADDRESS,
-    }).catch();
+    let archErr = undefined;
+    let creditErr = undefined;
+    let archBalance: Coin | undefined = undefined;
+    try {
+      archBalance = await client.getBalance(addr, process.env.REACT_APP_NETWORK_DENOM).catch();
+    } catch(err:any) {
+      console.error('Error fetching arch balance.', err)
+      archErr = err.toString();
+    }
+    
+    let creditBalance: string | undefined = undefined;
+    try {
+      creditBalance = await getCreditBalance({
+        client: client,
+        address: addr,
+        creditContract: CREDIT_ADDRESS,
+      })
+    } catch(err:any) {
+      console.error('Error fetching credit balance.', err)
+      creditErr = err.toString();
+    }
     setBalances({
-      arch: parseInt(archBalance.amount) / Math.pow(10, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)),
-      credits: parseInt(creditBalance),
+      arch: archBalance ? parseInt(archBalance.amount) / Math.pow(10, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)) : undefined,
+      credits: creditBalance ? parseInt(creditBalance) : undefined,
+      arch_err: archErr,
+      credits_err: creditErr,
     })
 
   }
@@ -91,33 +110,37 @@ export const UserProvider = ({ children }: Props): ReactElement => {
 
       /* eslint-disable */
       // if (confirm(`Sign permit to authenticate wallet?\nThis is required to take advanted of profile features.`)){
-        try {
-          console.log({ address, pubKey });
-          const nonceResponse = await requestNonce(address, pubKey)
-          console.log(nonceResponse)
-
-          setWaitingForSig(true);
-          const signResult = await signLoginPermit(nonceResponse.nonce, address)
-          setWaitingForSig(false);
-
-
-          const loginResult = await walletLogin(JSON.stringify(signResult.pub_key), signResult.signature)
-          console.log(loginResult);
-          setAuthenticated(true);
-          const newUser: User = {client, address, pubKey, wallet_type: 'Keplr', profile: loginResult}
-
-          setUser(newUser)
-          localStorage.setItem(KEY, 'true');
-        }catch(err: any){
-          toast.error(err.message);
-        } finally {
-          setWaitingForSig(false);
-        }
-        
-        
-      // }
-
       
+      // Check if already logged in
+      try {
+        const response = await checkLogin(address);
+        console.log('CHECK LOGIN SUCCESS!', response)
+        const newUser: User = {client, address, pubKey, wallet_type: 'Keplr', profile: response}
+        setUser(newUser)
+        localStorage.setItem(KEY, 'true');
+        return;
+      } catch (err: any){
+        console.error('Check Login Failure:', err)
+      }
+      try {
+        const nonceResponse = await requestNonce(address, pubKey)
+
+        setWaitingForSig(true);
+        const signResult = await signLoginPermit(nonceResponse.nonce, address)
+        setWaitingForSig(false);
+
+
+        const loginResult = await walletLogin(JSON.stringify(signResult.pub_key), signResult.signature)
+        // setAuthenticated(true);
+        const newUser: User = {client, address, pubKey, wallet_type: 'Keplr', profile: loginResult}
+
+        setUser(newUser)
+        localStorage.setItem(KEY, 'true');
+      }catch(err: any){
+        toast.error(err.message);
+      } finally {
+        setWaitingForSig(false);
+      }
     } catch(err: any){
       switch(err.message){
         case 'Keplr Wallet not found':
@@ -135,7 +158,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
     user,
     balances,
     loadingConnectWallet,
-    authenticated,
+    // authenticated,
     connectKeplr
   };
 

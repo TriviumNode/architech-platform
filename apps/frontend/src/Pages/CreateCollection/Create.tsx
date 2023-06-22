@@ -23,7 +23,7 @@ export const Pages: Page[] = [
 
 type Status = 'CREATING' | 'IMPORTING' | 'COMPLETE' | 'ERROR';
 const CreateCollectionPage: FC<any> = (): ReactElement => {
-    const { user: wallet, authenticated } = useUser();
+    const { user: wallet } = useUser();
     const [detailState, setDetailState] = useState<DetailState>(DefaultDetailState);
     const [royaltyState, setRoyaltyState] = useState<RoyaltyState>(DefaultRoyaltyState);
     const [finishState, setFinishState] = useState<FinishState>(DefaultFinishState);
@@ -87,7 +87,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
         }
     }
 
-    if (!authenticated) return (
+    if (!wallet) return (
         <Row>
             Your wallet must be connected and authenticated to create a collection.
         </Row>

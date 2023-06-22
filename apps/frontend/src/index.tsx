@@ -60,6 +60,7 @@ const router = createBrowserRouter([
       {
         path: "/nfts/create/:contractAddr",
         element: <CreateSingleNftPage />,
+        loader: collectionLoader,
       },
       {
         path: "/profile/:userAddress",

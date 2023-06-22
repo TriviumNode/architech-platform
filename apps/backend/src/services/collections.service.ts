@@ -33,7 +33,7 @@ export async function findCollectionByAddress(address: string): Promise<Collecti
   console.log(address);
   const findCollection: Collection = await collectionsModel.findOne({ address: address });
   console.log(findCollection);
-  if (!findCollection) throw new HttpException(409, 'Collection not found');
+  if (!findCollection) throw new HttpException(404, 'Collection not found');
 
   return findCollection;
 }
@@ -65,7 +65,7 @@ export async function updateCollection(collectionId: string, collectionData: Par
   console.log('collectionData', collectionData);
 
   const updateCollectionById: Collection = await collectionsModel.findByIdAndUpdate(collectionId, collectionData);
-  if (!updateCollectionById) throw new HttpException(409, 'Collection not found');
+  if (!updateCollectionById) throw new HttpException(404, 'Collection not found');
 
   return updateCollectionById;
 }
@@ -74,14 +74,14 @@ export async function updateCollectionTokens(collectionId: string, tokens: strin
   if (isEmpty(tokens)) throw new HttpException(400, 'tokenData is empty');
 
   const updateCollectionById: Collection = await collectionsModel.findByIdAndUpdate(collectionId, { tokens, totalTokens });
-  if (!updateCollectionById) throw new HttpException(409, 'Collection not found');
+  if (!updateCollectionById) throw new HttpException(404, 'Collection not found');
 
   return updateCollectionById;
 }
 
 export async function deleteCollection(collectionId: string): Promise<Collection> {
   const deleteCollectionById: Collection = await collectionsModel.findByIdAndDelete(collectionId);
-  if (!deleteCollectionById) throw new HttpException(409, 'Collection not found');
+  if (!deleteCollectionById) throw new HttpException(404, 'Collection not found');
 
   return deleteCollectionById;
 }

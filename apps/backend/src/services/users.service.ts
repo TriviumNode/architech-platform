@@ -20,3 +20,15 @@ export async function findOrCreateUser(address: string, pubKey: string): Promise
   const createdUser: User = await userModel.create(newUser);
   return createdUser;
 }
+
+// Internal Use
+export async function rotateNonce(userId: string): Promise<User> {
+  const newNonce = generateNonce();
+
+  const updateUser: Partial<CreateUserDto> = {
+    nonce: newNonce,
+  };
+
+  const updatedUser: User = await userModel.findByIdAndUpdate(userId, updateUser);
+  return updatedUser;
+}

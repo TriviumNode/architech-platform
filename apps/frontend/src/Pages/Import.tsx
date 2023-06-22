@@ -17,7 +17,7 @@ const emptyToUndefined =(str: string) => {
 }
 
 const ImportPage: FC<any> = (): ReactElement => {
-    const { user: wallet, authenticated } = useUser();
+    const { user } = useUser();
     const [address, setAddress] = useState<string>('') 
     const [importing, setImporting] = useState(false);
     const [collection, setCollection] = useState<Collection>()
@@ -68,7 +68,7 @@ const ImportPage: FC<any> = (): ReactElement => {
         setComplete(false);
     }
 
-    if (!authenticated) return (
+    if (!user) return (
         <Row>
             Your wallet must be connected and authenticated to import a collection.
         </Row>

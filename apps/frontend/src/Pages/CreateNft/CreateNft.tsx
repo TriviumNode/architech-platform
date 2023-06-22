@@ -1,6 +1,6 @@
 import {ReactElement, FC, useState} from "react";
 import { Col, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useLoaderData, useParams } from "react-router-dom";
 import { useUser } from "../../Contexts/UserContext";
 import Loader from "../../Components/Loader";
 import Modal from "../../Components/Modal";
@@ -14,7 +14,7 @@ import ImagePage from "./NftImagePage";
 import ReviewNftPage from "./ReviewPage";
 import { mintNft } from '@architech/lib';
 import CollectionPage from "./CollectionPage";
-import { Collection, cw721 } from "@architech/types";
+import { Collection, cw721, GetCollectionResponse } from "@architech/types";
 
 export type Page = 'Collection' | 'Details' | 'Image' | 'Review'
 
@@ -27,13 +27,13 @@ export const Pages: Page[] = [
 
 type Status = 'UPLOADING' | 'MINTING' | 'IMPORTING' | 'COMPLETE' | 'ERROR';
 const CreateSingleNftPage: FC<any> = (): ReactElement => {
-    const { user: wallet, authenticated } = useUser();
+    const { collection: fullCollection } = useLoaderData() as { collection: GetCollectionResponse};
+    const { user: wallet } = useUser();
     const [detailState, setDetailState] = useState<DetailState>(DefaultDetailState);
     const [image, setImage] = useState<File>();
     const [preview, setPreview] = useState<any>();
 
-    const [collection, setCollection] = useState<Collection>()
-
+    const [collection, setCollection] = useState<Collection>(fullCollection.collection)
     
     const [status, setStatus] = useState<Status>()
     const [error, setError] = useState<any>()
@@ -44,7 +44,7 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
     const getPage = () => {
         switch(page) {
             case 'Collection':
-                return <CollectionPage collection={collection} onChange={(data) => setCollection(data)} next={()=>setPage('Image')} />
+                return <CollectionPage collection={collection} onChange={(data) => setCollection(data)} next={()=>setPage('Details')} />
             case 'Details':
                 return <DetailPage state={detailState} onChange={(data) => setDetailState(data)} next={()=>setPage('Image')} />
             case 'Image':
@@ -62,16 +62,16 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
         const badAttributes = detailState.attributes.filter((attribute: cw721.Trait)=>
             (!attribute.trait_type && attribute.value) || (attribute.trait_type && !attribute.value)
         )
-        console.log('badAttributes', badAttributes, detailState.attributes)
 
         const filteredAttributes = detailState.attributes.filter((attribute: cw721.Trait)=> attribute.trait_type && attribute.value)
 
         const cleanedDetails = { ...detailState, image, attributes: filteredAttributes };
 
+        console.log('cleanedDetails', cleanedDetails)
         // Remove unfilled attributes
         Object.keys(cleanedDetails).forEach((key: any) => 
             //@ts-expect-error
-            (cleanedDetails[key].trait_type === '' && cleanedDetails[key].value === '') && delete cleanedDetails[key]);
+            (cleanedDetails[key]?.trait_type === '' && cleanedDetails[key]?.value === '') && delete cleanedDetails[key]);
 
         //verify required data
         if (!cleanedDetails.name || !cleanedDetails.tokenId || !cleanedDetails.image || badAttributes.length) {
@@ -119,18 +119,16 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
                 tokenId: cleanedDetails.tokenId,
                 extension: {
                     name: cleanedDetails.name,
-                    description: cleanedDetails.description,
+                    description: cleanedDetails.description || undefined,
                     image: `ipfs://${cid}`,
                     attributes: cleanedDetails.attributes.length ? detailState.attributes : undefined,
-                    external_url: cleanedDetails.externalLink,
+                    external_url: cleanedDetails.externalLink || undefined,
                 },
                 owner: wallet.address,
             })
-            console.log(result);
             
             setStatus("IMPORTING")
             const updateResponse = await refreshCollection(collection.address);
-            console.log('response', updateResponse)
 
             setStatus("COMPLETE")
         } catch(err: any) {
@@ -141,7 +139,7 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
         }
     }
 
-    if (!authenticated) return (
+    if (!wallet) return (
         <Row>
             Your wallet must be connected and authenticated to create an NFT.
         </Row>

@@ -2,6 +2,7 @@ import { useState, ChangeEvent, useEffect } from "react";
 import { Row, Col } from "react-bootstrap";
 import { useRevalidator } from "react-router-dom";
 import { toast } from "react-toastify";
+import FileSelect from "../../Components/FileSelect";
 import Modal from "../../Components/Modal";
 import { ImportCollectionData } from "../../Interfaces/interfaces";
 import { editCollection, importCollection, updateCollectionImage } from "../../Utils/backend";
@@ -91,10 +92,10 @@ export default function EditModal({open, collectionId, onClose}: Props) {
                 </Col>
             </Row>
             <Row>
-                <Col xs="auto">
+                <Col xs="6">
                     <label>
                         Collection Image:<br />
-                        <input
+                        {/* <input
                             type="file"
                             onChange={(e)=> {
                                 if (e.target.files) {
@@ -103,13 +104,14 @@ export default function EditModal({open, collectionId, onClose}: Props) {
                                 }
                             }}
                             accept="image/*"
-                        />
+                        /> */}
+                        <FileSelect selected={formState.profileImage} onChange={(newFile)=>updateFormState({profileImage: newFile})} />
                     </label>
                 </Col>
-                <Col xs="auto">
+                <Col xs="6">
                     <label>
                         Collection Banner:<br />
-                        <input
+                        {/* <input
                             type="file"
                             onChange={(e)=> {
                                 if (e.target.files) {
@@ -118,7 +120,8 @@ export default function EditModal({open, collectionId, onClose}: Props) {
                                 }
                             }}
                             accept="image/*"
-                        />
+                        /> */}
+                        <FileSelect selected={formState.bannerImage} onChange={(newFile)=>updateFormState({bannerImage: newFile})} />
                     </label>
                 </Col>
             </Row>

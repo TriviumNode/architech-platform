@@ -4,6 +4,7 @@ import { Col, Container, Row, Image } from "react-bootstrap";
 import { Link, useLoaderData, useSearchParams } from "react-router-dom";
 import CollectionStats from "../../Components/CollectionStats/CollectionStats";
 import FilterMenu from "../../Components/FilterMenu";
+import LinkButton from "../../Components/LinkButton";
 import Modal from "../../Components/Modal";
 import NftTile from "../../Components/NftTile/NftTile";
 import SocialLinks from "../../Components/Socials";
@@ -30,7 +31,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
     const [tokens, setTokens] = useState<Token[]>([])
     const { collection: fullCollection } = useLoaderData() as { collection: GetCollectionResponse};
     const collection = fullCollection?.collection; 
-    const { user: wallet, authenticated } = useUser();
+    const { user: wallet } = useUser();
 
     const [isEditing, setIsEditing] = useState(false);
 
@@ -133,10 +134,11 @@ const SingleCollection: FC<any> = (): ReactElement => {
                             </div>
                         </div>
                         <div style={{position: 'absolute', right: '16px', top: '16px'}}>
-                                    {/* { (authenticated && collection.creator === wallet?.address) && */}
+                                    { (wallet && collection.creator === wallet.address) &&
                                     <Col>
                                         <button type="button" onClick={()=>setIsEditing(true)}>Edit</button>
                                     </Col>
+                                    }
                                 </div>
                         <div style={{position: 'absolute', right: '16px', bottom: '16px'}}>
                             <SocialLinks discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} website={collection.collectionProfile.website} />
@@ -163,9 +165,9 @@ const SingleCollection: FC<any> = (): ReactElement => {
                         <Col className='card' style={{textAlign: 'center', padding: '32px 0'}}>
                             <h2 className='mb16'>This collection doesn't have any NFTs yet.</h2>
                             { (collection.creator === wallet?.address || collection.admin === wallet?.address) &&
-                                <button>
+                                <LinkButton to={`/nfts/create/${collection.address}`}>
                                     Create an NFT
-                                </button>
+                                </LinkButton>
                             }
                         </Col>
                     }

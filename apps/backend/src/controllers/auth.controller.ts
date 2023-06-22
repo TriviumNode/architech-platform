@@ -10,29 +10,7 @@ import UserModel from '@/models/users.model';
 import { isEmpty } from '@/utils/util';
 import TokenModel from '@/models/tokens.model';
 import CollectionModel from '@/models/collections.model';
-
-// export const signUp = async (req: Request, res: Response, next: NextFunction) => {
-//   try {
-//     const userData: CreateUserDto = req.body;
-//     const signUpUserData: User = await this.authService.signup(userData);
-
-//     res.status(201).json({ data: signUpUserData, message: 'signup' });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// export const logIn = async (req: Request, res: Response, next: NextFunction) => {
-//   try {
-//     const userData: CreateUserDto = req.body;
-//     const { cookie, findUser } = await this.authService.login(userData);
-
-//     res.setHeader('Set-Cookie', [cookie]);
-//     res.status(200).json({ data: findUser, message: 'login' });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+import { rotateNonce } from '@/services/users.service';
 
 export const walletLogin = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -45,7 +23,7 @@ export const walletLogin = async (req: Request, res: Response, next: NextFunctio
 
     // Validate Signature
     const userData: User = await UserModel.findOne({ address: address });
-    if (!userData) throw new HttpException(409, 'User not found');
+    if (!userData) throw new HttpException(404, 'User not found');
 
     const loginString = getLoginString(userData.nonce);
     const base64 = Buffer.from(loginString, 'utf-8').toString('base64');
@@ -81,6 +59,9 @@ export const walletLogin = async (req: Request, res: Response, next: NextFunctio
     const ownedTokens: Token[] = await TokenModel.find({ owner: findUser.address });
     const ownedCollections: Collection[] = await CollectionModel.find({ creator: findUser.address });
 
+    // Rotate nonce
+    rotateNonce(userData._id);
+
     const response: GetUserProfileResponse = {
       profile: findUser,
       tokens: ownedTokens || [],
@@ -92,7 +73,7 @@ export const walletLogin = async (req: Request, res: Response, next: NextFunctio
       sameSite: 'none',
       secure: true,
       maxAge: tokenData.expiresIn,
-      domain: 'api.architech.zone',
+      domain: '.architech.zone',
     });
     res.status(200).json(response);
   } catch (error) {
@@ -107,6 +88,27 @@ export const logOut = async (req: RequestWithUser, res: Response, next: NextFunc
 
     res.setHeader('Set-Cookie', ['Authorization=; Max-age=0']);
     res.status(200).json({ data: logOutUserData, message: 'logout' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkLogin = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  try {
+    const userData: User = req.user;
+    const userAddress: string = req.params.userAddress;
+    if (userAddress !== userData.address) res.status(400).send('Authorization not valid for this resource.');
+    else {
+      const createdCollections = await CollectionModel.find({ creator: userAddress });
+      const ownedTokens = await TokenModel.find({ owner: userAddress }).populate('collectionInfo');
+      const response: GetUserProfileResponse = {
+        profile: userData,
+        collections: createdCollections,
+        //@ts-expect-error idfk
+        tokens: ownedTokens,
+      };
+      res.status(200).json(response);
+    }
   } catch (error) {
     next(error);
   }

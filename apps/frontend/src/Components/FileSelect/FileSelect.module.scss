@@ -1,0 +1,18 @@
+.customfileupload {
+    border: 1px solid #cfccc9;
+    cursor: pointer;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    height: 48px;
+
+    border-radius: 8px;
+    margin-top: 8px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 120%;
+    color: #666666;
+}

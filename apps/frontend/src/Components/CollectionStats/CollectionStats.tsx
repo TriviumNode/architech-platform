@@ -20,17 +20,13 @@ const CollectionStats: FC<Props> = ({collection, asks}): ReactElement => {
     const floor: string = asks && asks.length ? asks.sort((a, b)=>parseInt(a.price) - parseInt(b.price))[0].price : '--'
 
     const queryVolume = async() => {
-        console.log('Querying Volume')
-
         const volumeResult = await getVolume({
             client: QueryClient,
             contract: MARKETPLACE_ADDRESS,
             collection: collection.address
         })
-        console.log('VOLUME', volumeResult);
         const amount = volumeResult.find(v=>v.denom === process.env.REACT_APP_NETWORK_DENOM)?.amount || '0';
         const humanAmount = denomToHuman(amount, parseInt(process.env.REACT_APP_NETWORK_DECIMALS))
-        console.log('humanAmount', humanAmount)
         setVolume(humanAmount);
     }
 
@@ -39,7 +35,6 @@ const CollectionStats: FC<Props> = ({collection, asks}): ReactElement => {
         queryVolume()
     },[collection, QueryClient])
 
-    console.log('collection.totalTokens', collection.totalTokens)
     return (
         <div className='d-flex wide' style={{gap: '32px'}}>
             <div>

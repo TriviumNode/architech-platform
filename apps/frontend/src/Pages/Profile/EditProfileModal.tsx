@@ -2,6 +2,7 @@ import { useState, ChangeEvent, useEffect } from "react";
 import { Row, Col } from "react-bootstrap";
 import { useRevalidator } from "react-router-dom";
 import { toast } from "react-toastify";
+import FileSelect from "../../Components/FileSelect";
 import Modal from "../../Components/Modal";
 import { UpdateProfileData } from "../../Interfaces/interfaces";
 import { editCollection, editProfile } from "../../Utils/backend";
@@ -93,10 +94,10 @@ export default function EditProfileModal({open, userId, onClose}: Props) {
                 </Col>
             </Row>
             <Row>
-                <Col xs="auto">
+                <Col xs="12">
                     <label>
                         Profile Image:<br />
-                        <input
+                        {/* <input
                             type="file"
                             onChange={(e)=> {
                                 if (e.target.files) {
@@ -105,7 +106,8 @@ export default function EditProfileModal({open, userId, onClose}: Props) {
                                 }
                             }}
                             accept="image/*"
-                        />
+                        /> */}
+                        <FileSelect selected={formState.profileImage} onChange={(newFile)=>updateFormState({profileImage: newFile})} />
                     </label>
                 </Col>
             </Row>

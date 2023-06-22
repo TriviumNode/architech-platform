@@ -14,6 +14,7 @@ import NftTile from "../../Components/NftTile/NftTile";
 import CollectionTile from "../../Components/CollectionTile/CollectionTile";
 import PageSelector from "../../Components/PageSelector/PageSelector";
 import EditProfileModal from "./EditProfileModal";
+import LinkButton from "../../Components/LinkButton";
 
 const emptyToUndefined =(str: string) => {
     return str.length ? str : undefined;
@@ -30,22 +31,13 @@ const Pages: Page[] = [
 const ProfilePage: FC<any> = (): ReactElement => {
     const { userProfile } = useLoaderData() as { userProfile: GetUserProfileResponse };
     const { userAddress } = useParams();
-    const { user: wallet, authenticated } = useUser();
+    const { user: wallet } = useUser();
     const revalidator = useRevalidator();
-
-
     const [editProfile, setEditProfile] = useState<boolean>(false)
-    const [editImage, setEditImage] = useState<boolean>(false)
 
-    const [bio, setBio] = useState<string>(userProfile?.profile?.bio || '') 
-    const [username, setUsername] = useState<string>(userProfile?.profile?.username || '') 
-    const [profileImage, setProfileImage] = useState<any>() 
-
-    
     const [page, setPage] = useState<Page>(Pages[0]);
 
     console.log('userAddress', userAddress)
-
     console.log('userProfile', userProfile)
     if (!userProfile)
         return (
@@ -55,72 +47,6 @@ const ProfilePage: FC<any> = (): ReactElement => {
             </Col>
             </Row>
         )
-
-    console.log(userProfile)
-
-    const handleEditProfile = (e: any) => {
-        setEditImage(false);
-        setEditProfile(true);
-    }
-
-    const handleEditImage = (e: any) => {
-        setEditImage(true);
-        setEditProfile(false);
-    }
-
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            console.log(e.target.files[0])
-            setProfileImage(e.target.files[0]);
-        }
-    };
-
-        // // 👇 Uploading the file using the fetch API to the server
-        // fetch('https://httpbin.org/post', {
-        //     method: 'POST',
-        //     body: profileImage,
-        //     // 👇 Set headers manually for single file upload
-        //     headers: {
-        //     'content-type': profileImage.type,
-        //     'content-length': `${profileImage.size}`, // 👈 Headers need to be a string
-        //     },
-        // })
-        //     .then((res) => res.json())
-        //     .then((data) => console.log(data))
-        //     .catch((err) => console.error(err));
-        // };
-
-    const saveProfile = async (e: any) => {
-        e.preventDefault();
-        if (!userProfile) throw new Error('userProfile is not loaded.');
-
-        try {
-            const result = await updateProfile(userProfile.profile._id, {bio: emptyToUndefined(bio), username: emptyToUndefined(username)})
-            console.log(result)
-    
-            setEditProfile(false);
-            revalidator.revalidate();
-        } catch(err: any) {
-            toast.error(err.message)
-        }
-    }
-
-    const saveImage = async(e: any) => {
-        e.preventDefault();
-        if (!userProfile) throw new Error('userProfile is not loaded.');
-
-        if (!profileImage) {
-            return;
-        }
-        try {
-            const result = await updateProfileImage(userProfile.profile._id, profileImage)
-            console.log('Result!', result);
-            setEditImage(false);
-            revalidator.revalidate();
-        } catch(err: any){
-            toast.error(err.message);
-        }
-    }
 
     const getPage = (_page: Page) => { 
         switch(_page){
@@ -140,11 +66,10 @@ const ProfilePage: FC<any> = (): ReactElement => {
                             { (userProfile.profile.address === wallet?.address) ?
                                 <>
                                     <h2 className='mb16'>You don't own any NFTs yet.</h2>
-                                    <button>
+                                    <LinkButton to='/nfts'>
                                         Start Collecting
-                                    </button>
+                                    </LinkButton>
                                 </>
-
                                 :
                                 <h2 className='mb16'>This user doesn't own any NFTs yet.</h2>
                             }
@@ -215,7 +140,7 @@ const ProfilePage: FC<any> = (): ReactElement => {
                             </div>
                         </div>
                         <div style={{position: 'absolute', right: '16px', top: '16px'}}>
-                                    { (authenticated && userProfile.profile.address === wallet?.address) &&
+                                    { (wallet && wallet.address === userProfile.profile.address) &&
                                         <Col>
                                             <button type="button" onClick={()=>setEditProfile(true)}>Edit</button>
                                         </Col>
