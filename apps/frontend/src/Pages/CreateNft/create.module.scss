@@ -134,3 +134,13 @@
 .error {
     border: 2px solid rgba(250, 20, 20, 0.75) !important;
 }
+
+.spanButton {
+    font-size: 12px;
+    margin-top: 4px;
+    cursor: pointer;
+}
+
+.spanButton:hover {
+    text-decoration: underline;
+}

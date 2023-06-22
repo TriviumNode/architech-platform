@@ -1,5 +1,5 @@
 import { hash } from 'bcrypt';
-import { Collection, CreateTokenDto, SortOptions, Token, UpdateTokenDto } from '@architech/types';
+import { Collection, CreateTokenDto, SortOption, Token, UpdateTokenDto } from '@architech/types';
 import { HttpException } from '@exceptions/HttpException';
 import tokenModel from '@models/tokens.model';
 import { isEmpty } from '@utils/util';
@@ -38,7 +38,7 @@ export async function findCollectionTokens(
   collectionAddress: string,
   page = 1,
   limit = 30,
-  sort: SortOptions = 'Name',
+  sort: SortOption = 'Name',
   traitFilter: cw721.Trait[] = [],
 ) {
   if (isEmpty(collectionAddress)) throw new HttpException(400, 'Collection address is empty');

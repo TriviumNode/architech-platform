@@ -4,14 +4,14 @@ import { Link } from "react-router-dom";
 import { useUser } from "../../Contexts/UserContext";
 import { positionMatchWidth } from "@reach/popover";
 import styles from './SortByButton.module.scss';
-import { SortOptions } from "@architech/types";
+import { SortOption } from "@architech/types";
 
 interface HoverMenuProps {
-    selectedOption: SortOptions | undefined,
-    setSelected: (option: SortOptions)=>void;
+    selectedOption: SortOption | undefined,
+    setSelected: (option: SortOption)=>void;
 }
 
-export const sortOptions: SortOptions[] = ["Name", "Recently Created", "Most Viewed"];
+export const sortOptions: SortOption[] = ["Name", "Recently Created", "Most Viewed"];
 
 export default function SortByButton(props: HoverMenuProps) {
   let { selectedOption, setSelected } = props;

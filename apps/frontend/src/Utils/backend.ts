@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Collection, GetUserProfileResponse, NonceRequest, NonceResponse, Token, UpdateUserDto, User, WalletLogin, ImportCollectionRequest, GetTokenResponse, GetCollectionResponse, SortOptions } from '@architech/types'
+import { Collection, GetUserProfileResponse, NonceRequest, NonceResponse, Token, UpdateUserDto, User, WalletLogin, ImportCollectionRequest, GetTokenResponse, GetCollectionResponse, SortOption } from '@architech/types'
 import { Pubkey } from '@cosmjs/amino';
 import { ImportCollectionData, UpdateProfileData } from '../Interfaces/interfaces';
 
@@ -18,7 +18,7 @@ export const getCollection = async(contractAddr: string): Promise<GetCollectionR
     return data;
 }
 
-export const getTokens = async(contractAddr: string, query?: URLSearchParams, sortBy: SortOptions = 'Name', page = 1, limit = 32): Promise<Token[]> => {
+export const getTokens = async(contractAddr: string, query?: URLSearchParams, sortBy: SortOption = 'Name', page = 1, limit = 32): Promise<Token[]> => {
     const url = getApiUrl(`/tokens/collection/${contractAddr}?page=${page}&limit=${limit}&sort=${sortBy}&${(query || '').toString()}`)
     const {data: tokens} = await axios.get(url)
     return tokens;

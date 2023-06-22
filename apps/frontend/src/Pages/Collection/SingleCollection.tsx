@@ -1,4 +1,4 @@
-import { Collection, cw721, GetCollectionResponse, SortOptions, Token } from "@architech/types";
+import { Collection, cw721, GetCollectionResponse, SortOption, Token } from "@architech/types";
 import React, {ReactElement, FC, useState, useEffect, CSSProperties} from "react";
 import { Col, Container, Row, Image } from "react-bootstrap";
 import { Link, useLoaderData, useSearchParams } from "react-router-dom";
@@ -40,7 +40,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
     const [statusFilter, setStatusFilter] = useState<string[]>([])
     const [traitFilter, setTraitFilter] = useState<Partial<cw721.Trait>[]>([]);
     
-    const [sortBy, setSortBy] = useState<SortOptions>(sortOptions[0])
+    const [sortBy, setSortBy] = useState<SortOption>(sortOptions[0])
     const [page, setPage] = useState(1);
 
     const addTraitFilter = (trait: cw721.Trait) => {
@@ -74,7 +74,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
         setTokens(fetchTokens);
     }
 
-    const updateSortBy = (newSort: SortOptions) => {
+    const updateSortBy = (newSort: SortOption) => {
         searchParams.set('sortBy', newSort);
         setSearchParams(searchParams);
 

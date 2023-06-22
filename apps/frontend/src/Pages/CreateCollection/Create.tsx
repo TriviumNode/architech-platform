@@ -8,16 +8,16 @@ import { ImportCollectionData } from "../../Interfaces/interfaces";
 
 import styles from './create.module.scss'
 import DetailPage, { DetailState, DefaultDetailState } from "./DetailPage";
-import RoyaltyPage, { DefaultRoyaltyState, RoyaltyState } from "./RoyaltyPage";
 import FinishPage, { DefaultFinishState, FinishState } from "./FinishPage";
 import { initStandardProject } from "../../Utils/wasm/factory_handles";
 import { importCollection } from "../../Utils/backend";
+import AdminPage, { AdminState, DefaultAdminState } from "./AdminPage";
 
-export type Page = 'Details' | 'Royalties' | 'Finish'
+export type Page = 'Details' | 'Finish' //| 'Royalties'
 
 export const Pages: Page[] = [
     'Details',
-    'Royalties',
+    // 'Royalties',
     'Finish',
 ]
 
@@ -25,7 +25,7 @@ type Status = 'CREATING' | 'IMPORTING' | 'COMPLETE' | 'ERROR';
 const CreateCollectionPage: FC<any> = (): ReactElement => {
     const { user: wallet } = useUser();
     const [detailState, setDetailState] = useState<DetailState>(DefaultDetailState);
-    const [royaltyState, setRoyaltyState] = useState<RoyaltyState>(DefaultRoyaltyState);
+    const [adminState, setAdminState] = useState<AdminState>(DefaultAdminState);
     const [finishState, setFinishState] = useState<FinishState>(DefaultFinishState);
 
     
@@ -41,8 +41,8 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
         switch(page) {
             case 'Details':
                 return <DetailPage data={detailState} onChange={(data) => setDetailState(data)} />
-            case 'Royalties':
-                return <RoyaltyPage data={royaltyState} onChange={(data) => setRoyaltyState(data)} />
+            // case 'Royalties':
+            //     return <AdminPage data={royaltyState} onChange={(data) => setRoyaltyState(data)} />
             case 'Finish':
                 return <FinishPage data={finishState} onChange={(data) => setFinishState(data)} onClick={handleCreate}/>
             default:

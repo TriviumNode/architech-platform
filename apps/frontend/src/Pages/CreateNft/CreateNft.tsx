@@ -15,13 +15,16 @@ import ReviewNftPage from "./ReviewPage";
 import { mintNft } from '@architech/lib';
 import CollectionPage from "./CollectionPage";
 import { Collection, cw721, GetCollectionResponse } from "@architech/types";
+import FinancialPage, { DefaultFinancialState, FinancialState } from "./FinancialsPage";
+import sleep from "../../Utils/sleep";
 
-export type Page = 'Collection' | 'Details' | 'Image' | 'Review'
+export type Page = 'Collection' | 'Details' | 'Image' | 'Review' | 'Financials'
 
 export const Pages: Page[] = [
     'Collection',
     'Details',
     'Image',
+    'Financials',
     'Review',
 ]
 
@@ -30,6 +33,10 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
     const { collection: fullCollection } = useLoaderData() as { collection?: GetCollectionResponse};
     const { user: wallet } = useUser();
     const [detailState, setDetailState] = useState<DetailState>(DefaultDetailState);
+    const [financialState, setFinancialState] = useState<FinancialState>({
+        address: wallet?.address || '',
+        percent: '',
+    });
     const [image, setImage] = useState<File>();
     const [preview, setPreview] = useState<any>();
 
@@ -48,7 +55,9 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
             case 'Details':
                 return <DetailPage state={detailState} onChange={(data) => setDetailState(data)} next={()=>setPage('Image')} />
             case 'Image':
-                return <ImagePage image={image} preview={preview} onChange={(data, preview) => {setImage(data); setPreview(preview)}} next={()=>setPage('Review')} />
+                return <ImagePage image={image} preview={preview} onChange={(data, preview) => {setImage(data); setPreview(preview)}} next={()=>setPage('Financials')} />
+            case 'Financials':
+                return <FinancialPage state={financialState} onChange={(data) => setFinancialState(data)} next={()=>setPage('Review')} />
             case 'Review':
                 return <ReviewNftPage onClick={handleCreate} />
             default:
@@ -90,14 +99,18 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
                         setPage('Details');
                     }}>Click here to visit the details page</button>
                     </p>}
-                { (!cleanedDetails.image) && <p className='mb24'>
-                    Please select an image for this NFT.<br />
-                    <button type='button' className='buttonLink' onClick={()=>{
-                        setStatus(undefined);
-                        setError(undefined);
-                        setPage('Image');
-                    }}>Click here to visit the image page</button>
-                    </p>}
+                {(!cleanedDetails.image) &&
+                    <p className='mb24'>
+                        Please select an image for this NFT.<br />
+                        <button type='button' className='buttonLink' onClick={()=>{
+                            setStatus(undefined);
+                            setError(undefined);
+                            setPage('Image');
+                        }}>
+                            Click here to visit the image page
+                        </button>
+                    </p>
+                }
             </div>);
             return;
         }
@@ -123,12 +136,15 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
                     image: `ipfs://${cid}`,
                     attributes: cleanedDetails.attributes.length ? detailState.attributes : undefined,
                     external_url: cleanedDetails.externalLink || undefined,
+                    royalty_payment_address: financialState.address || undefined,
+                    royalty_percentage: financialState.percent ? parseInt(financialState.percent) : undefined,
                 },
                 owner: wallet.address,
             })
             
             setStatus("IMPORTING")
             const updateResponse = await refreshCollection(collection.address);
+            await sleep(1_000);
 
             setStatus("COMPLETE")
         } catch(err: any) {
@@ -170,7 +186,7 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
                     { status === "UPLOADING" && <><p>Uploading image to IPFS...</p><Loader /></>}
                     { status === "MINTING" && <><p>Minting NFT on chain...<br />Please approve the transaction in your wallet.</p><Loader /></>}
                     { status === "IMPORTING" && <><p>Importing collection into Aerchitech...</p><Loader /></>}
-                    { status === "COMPLETE" && <p>{detailState.name} has been created. <Link to={`/nfts/${collection?.address}/${detailState.tokenId}`}>View your collection.</Link></p>}
+                    { status === "COMPLETE" && <p>{detailState.name} has been created. <Link to={`/nfts/${collection?.address}/${detailState.tokenId}`}>View your NFT.</Link></p>}
                     { status === "ERROR" && <>
                         <h3>Error</h3>
                         <div>{error || 'Unknown error.'}</div>

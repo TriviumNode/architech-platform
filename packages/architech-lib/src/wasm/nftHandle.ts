@@ -1,5 +1,5 @@
 import type { SigningArchwayClient } from "@archwayhq/arch3.js/build";
-import { cw721 } from '@architech/types'
+import { cw2981, cw721 } from '@architech/types'
 import { getFee } from "../utils";
 
 type ExecuteMsg = cw721.ExecuteMsg;
@@ -51,7 +51,7 @@ export const mintNft = async({
     contract: string,
     tokenId: string;
     owner?: string;
-    extension: cw721.Metadata
+    extension: cw2981.Metadata
 }) => {
     const msg: ExecuteMsg = {
         mint: {

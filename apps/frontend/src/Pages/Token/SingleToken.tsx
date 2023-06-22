@@ -112,13 +112,14 @@ const SingleToken: FC<any> = (): ReactElement => {
     console.log(tokenData)
     const tokenImage = tokenData.token.metadataExtension?.image || tokenData.token.metadataExtension?.image_data || undefined
     const collectionName = getCollectionName(collection);
+    const num = isNaN(tokenData.token.tokenId as any) ? null : '#'
 
     // const handleRefresh = async (e: any) => {
     //   e.preventDefault()
     //   const data = await refreshToken(collection.address, tokenData.token.tokenId);
     //   setTokenData(data);
     // }
-          console.log('user!', user)
+      console.log('user!', user)
     console.log(collection.collectionProfile)
     return (
       <>
@@ -144,7 +145,7 @@ const SingleToken: FC<any> = (): ReactElement => {
         <Col className='d-flex flex-column'>
           <div className='d-flex card justify-content-between' style={{height: '128px', marginBottom: '8px'}}>
             <div style={{margin: '24px 0 0 24px'}}>
-              <div className='d-flex align-items-center mb16'><h1 className='mr8' style={{lineHeight: 1}}>#{tokenData.token?.tokenId}</h1>
+              <div className='d-flex align-items-center mb16'><h1 className='mr8' style={{lineHeight: 1}}>{num}{tokenData.token?.tokenId}</h1>
                 {(tokenData.token?.collectionInfo.categories || []).map(category=>
                   <Badge><span>{category}</span></Badge>
                 )}
@@ -199,7 +200,7 @@ const SingleToken: FC<any> = (): ReactElement => {
       <div className='card d-flex' style={{height: '84px', marginBottom: '8px'}}>
         <div style={{margin: '0 16px'}} className='d-flex align-items-center align-self-stretch justify-content-between wide'>
             <div className='d-flex align-items-center lightText justify-content-between'>
-              <h2>#{tokenData.token?.tokenId}</h2>
+              <h2>{num}{tokenData.token?.tokenId}</h2>
             </div>
             <div className='d-flex align-items-center' style={{gap: '24px'}}>
               { tokenData.sale ? 

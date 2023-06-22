@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import { refreshCollection, startImportCollection } from '@services/collections.service';
 import { queryClient } from '@/utils/chainClients';
 import * as tokenService from '@/services/tokens.service';
-import { CollectionModel, cw721, RequestWithOptionalUser, SortOptions, Token } from '@architech/types';
+import { CollectionModel, cw721, RequestWithOptionalUser, SortOption, Token } from '@architech/types';
+
 import { MARKETPLACE_ADDRESS } from '@/../../../packages/architech-lib/dist';
 import ViewModel from '@/models/views.model';
 import { getAsk, getCollectionAsks } from '@/utils/queries/marketplaceQuery';
@@ -36,7 +37,7 @@ export const getCollectionTokens = async (req: Request, res: Response, next: Nex
     console.log('QUERYYY', req.query);
     const collectionAddr: string = req.params.collectionAddr;
 
-    const sort: SortOptions = (req.query.sort as SortOptions) || 'Name';
+    const sort: SortOption = (req.query.sort as SortOption) || 'Name';
 
     let traitFilter: cw721.Trait[] = [];
     if (req.query.traits) {

@@ -5,43 +5,40 @@ import MultiSelect from "../../Components/MultiSelect";
 
 import styles from './create.module.scss'
 
-export interface RoyaltyState {
+export interface AdminState {
     address: string,
-    percent: string,
 }
 
-export const DefaultRoyaltyState: RoyaltyState = {
+export const DefaultAdminState: AdminState = {
     address: '',
-    percent: '',
 }
 
-const RoyaltyPage: FC<{
-    data: RoyaltyState,
-    onChange: (data: RoyaltyState)=>void;
+const AdminPage: FC<{
+    data: AdminState,
+    onChange: (data: AdminState)=>void;
 }> = ({data, onChange}): ReactElement => {
 
-    const updateDetailState = (newDetailState: Partial<RoyaltyState>) => {
-        console.log(newDetailState)
-        onChange({...data, ...newDetailState})
+    const updateState = (newState: Partial<AdminState>) => {
+        console.log(newState)
+        onChange({...data, ...newState})
     }
     return (
         <div style={{margin: '48px'}} className='d-flex flex-column'>
-            <h2 className='mb32'>Royalty<br />Details</h2>
+            <h2 className='mb32'>Contract<br />Admin</h2>
             <form className={styles.form}>
                 <div className='d-flex mb24'>
                     <Col xs={8}>
                         <label>
-                            Royalty Payment Wallet
+                            Contract Admin Address
                             <input placeholder='archway1a2b...' />
                         </label>
                     </Col>
                     <Col xs={4}>
                         <label>
-                            Royalty Percentage
-                            {/* <div className={styles.pInputContainer}> */}
+                            Customize Admin
                             <div className='d-flex flex-column wide'>
-                                <input placeholder='5' /><span className={styles.percent}>%</span></div>
-                            {/* </div> */}
+                                <input type='checkbox' />
+                            </div>
                         </label>
                     </Col>
                 </div>
@@ -50,4 +47,4 @@ const RoyaltyPage: FC<{
     )
 }
 
-export default RoyaltyPage;
+export default AdminPage;
