@@ -4,6 +4,7 @@ import { Row, Col } from "react-bootstrap";
 import { Link, useLoaderData } from "react-router-dom";
 import ArchDenom from "../../Components/ArchDenom";
 import CollectionTile from "../../Components/CollectionTile/CollectionTile";
+import CreateTile from "../../Components/CreateTile/CreateTile";
 
 import styles from './NFTs.module.scss'
 
@@ -145,10 +146,11 @@ const NftPage: FC<any> = (): ReactElement => {
             <h2>Collections</h2>
         </div>
         <div className={styles.collectionsContainer}>
-            {collections && [...collections, ...collections, ...collections].map((collection: Collection)=>{
-                const collectionName = collection.collectionProfile.name || collection.cw721_name
+            <CreateTile />
+            {collections && collections.map((collection: Collection, key: number)=>{
+                const style = key === 0 ? {gridColumn: 1, gridRow: 1} : key === 1 ? {gridColumn: 2, gridRow: 1} : key === 3 ? {gridColumn: 3, gridRow: 1} : undefined;
                 return(
-                    <CollectionTile collection={collection} />
+                    <CollectionTile collection={collection} style={style} />
                 );
             })}
         </div>

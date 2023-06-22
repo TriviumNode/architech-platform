@@ -1,0 +1,32 @@
+// .tileContainer a {
+//     color: inherit;
+//     font-style: inherit;
+//     text-decoration: inherit;
+// }
+
+.createCard {
+    position: relative;
+    color: black;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 100%;
+    max-height: 350px;
+    grid-column: 4;
+}
+
+.createCard p {
+    color: #999;
+    font-size: 14px;
+    letter-spacing: -0.56px;
+    margin: 8px 0 32px 0;
+}
+
+.createInner {
+    margin: 0 86px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    height: calc(100% - 16px);
+}

@@ -27,13 +27,13 @@ export const Pages: Page[] = [
 
 type Status = 'UPLOADING' | 'MINTING' | 'IMPORTING' | 'COMPLETE' | 'ERROR';
 const CreateSingleNftPage: FC<any> = (): ReactElement => {
-    const { collection: fullCollection } = useLoaderData() as { collection: GetCollectionResponse};
+    const { collection: fullCollection } = useLoaderData() as { collection?: GetCollectionResponse};
     const { user: wallet } = useUser();
     const [detailState, setDetailState] = useState<DetailState>(DefaultDetailState);
     const [image, setImage] = useState<File>();
     const [preview, setPreview] = useState<any>();
 
-    const [collection, setCollection] = useState<Collection>(fullCollection.collection)
+    const [collection, setCollection] = useState<Collection | undefined>(fullCollection?.collection)
     
     const [status, setStatus] = useState<Status>()
     const [error, setError] = useState<any>()
