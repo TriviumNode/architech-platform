@@ -1,4 +1,4 @@
-import { Collection, cw721, GetCollectionResponse, Token } from "@architech/types";
+import { Collection, cw721, GetCollectionResponse, SortOptions, Token } from "@architech/types";
 import React, {ReactElement, FC, useState, useEffect, CSSProperties} from "react";
 import { Col, Container, Row, Image } from "react-bootstrap";
 import { Link, useLoaderData, useSearchParams } from "react-router-dom";
@@ -9,6 +9,8 @@ import LinkButton from "../../Components/LinkButton";
 import Modal from "../../Components/Modal";
 import NftTile from "../../Components/NftTile/NftTile";
 import SocialLinks from "../../Components/Socials";
+import SortByButton from "../../Components/SortByButton";
+import { sortOptions } from "../../Components/SortByButton/SortByButton";
 import { useUser } from "../../Contexts/UserContext";
 import { getApiUrl, getTokens } from "../../Utils/backend";
 import { getCollectionName } from "../../Utils/helpers";
@@ -37,6 +39,9 @@ const SingleCollection: FC<any> = (): ReactElement => {
 
     const [statusFilter, setStatusFilter] = useState<string[]>([])
     const [traitFilter, setTraitFilter] = useState<Partial<cw721.Trait>[]>([]);
+    
+    const [sortBy, setSortBy] = useState<SortOptions>(sortOptions[0])
+    const [page, setPage] = useState(1);
 
     const addTraitFilter = (trait: cw721.Trait) => {
         Object.keys(trait).forEach((key: any)=>{
@@ -46,7 +51,9 @@ const SingleCollection: FC<any> = (): ReactElement => {
         if (traitFilter.findIndex(t=>t.trait_type === trait.trait_type && t.value === trait.value) > -1) return;
         const newFilter = [...traitFilter, trait]
         setTraitFilter(newFilter)
-        setSearchParams({ traits: JSON.stringify(newFilter) })
+        searchParams.set('traits', JSON.stringify(newFilter));
+        setSearchParams(searchParams);
+        // setSearchParams({ traits: JSON.stringify(newFilter) })
     }
 
     const removeTraitFilter = (trait: cw721.Trait) => {
@@ -58,8 +65,8 @@ const SingleCollection: FC<any> = (): ReactElement => {
         setSearchParams({ traits: JSON.stringify(newFilter) })
     }
 
-    const loadTokens = async() => {
-        let fetchTokens = await getTokens(collection.address, searchParams)
+    const loadTokens = async(pageNumber = page) => {
+        let fetchTokens = await getTokens(collection.address, searchParams, sortBy, 1, pageNumber*32)
         if (statusFilter.includes('For Sale')) {
             const filtered = fetchTokens.filter(t=>fullCollection.forSale.findIndex(ask=>ask.token_id===t.tokenId) > -1)
             fetchTokens = filtered;
@@ -67,10 +74,26 @@ const SingleCollection: FC<any> = (): ReactElement => {
         setTokens(fetchTokens);
     }
 
+    const updateSortBy = (newSort: SortOptions) => {
+        searchParams.set('sortBy', newSort);
+        setSearchParams(searchParams);
+
+        setSortBy(newSort);
+    }
+
+    const loadMore = async () => {
+        const newPage = page+1
+        setPage(newPage);
+
+        let moreTokens = await getTokens(collection.address, searchParams, sortBy, newPage)
+        setTokens([...tokens, ...moreTokens]);
+    }
+
     useEffect(()=>{
         if (!collection) return;
+
         loadTokens()
-    },[collection, traitFilter, statusFilter])
+    },[collection, traitFilter, statusFilter, sortBy])
 
     const bgStyle: CSSProperties = collection.collectionProfile.banner_image ?
         {
@@ -174,18 +197,19 @@ const SingleCollection: FC<any> = (): ReactElement => {
                     <Col xs={12} md={3} className='card d-flex flex-column'>
                         <div style={{margin: '24px'}}>
                             <FilterMenu title={'Status'} options={statusOptions} selected={statusFilter} setOptions={(selected)=>setStatusFilter(selected)}  />
+
+                            <div style={{marginTop: '32px', marginBottom: '16px'}} className='lightText12'>Traits</div>
+                            { collection.traitTypes.map(type=>{
+                                const traits = collection.traits.filter((trait: cw721.Trait)=>trait.trait_type === type);
+                                const selected = traitFilter.filter((trait: Partial<cw721.Trait>)=>trait.trait_type === type);
+                                const values = traits.map(t=>t.value);
+                                return (
+                                    <div key={type} className='mb8'>
+                                        <TraitFilterMenu trait_type={type} traits={traits} selected_traits={selected} onCheck={(trait)=>addTraitFilter(trait)} onUncheck={(trait)=>removeTraitFilter(trait)}  />
+                                    </div>
+                                )
+                            })}
                         </div>
-                        <div>Traits</div>
-                        { collection.traitTypes.map(type=>{
-                            const traits = collection.traits.filter((trait: cw721.Trait)=>trait.trait_type === type);
-                            const selected = traitFilter.filter((trait: Partial<cw721.Trait>)=>trait.trait_type === type);
-                            const values = traits.map(t=>t.value);
-                            return (
-                                <div style={{margin: '24px'}} key={type}>
-                                    <TraitFilterMenu trait_type={type} traits={traits} selected_traits={selected} onCheck={(trait)=>addTraitFilter(trait)} onUncheck={(trait)=>removeTraitFilter(trait)}  />
-                                </div>
-                            )
-                        })}
                     </Col>
                     
                     {tokens.length ?
@@ -210,15 +234,17 @@ const SingleCollection: FC<any> = (): ReactElement => {
                         <h2 className='mb16'>No NFTs found.</h2>
                     </Col>
                     }
-                    {/* <Col className='d-flex flex-wrap gx-5'>
-                    {
-                                    tokens.map(token=>{
-                                        return (
-                                            <NftTile collectionName={collectionName} token={token} />
-                                        );
-                                    })
-                                }
-                    </Col> */}
+                </div>
+                <div className='d-flex mb8 mt8 gap8 justify-content-center' style={{gap: '8px', margin: '0 -8px', maxHeight: '350px'}}>
+                    <Col xs="auto">
+                        <SortByButton selectedOption={sortBy} setSelected={(option) => updateSortBy(option)} />
+                    </Col>
+                    { tokens.length === 32*page &&
+                    <Col xs="auto">
+                        <button type='button' onClick={()=>loadMore()}>Load More</button>
+                    </Col>
+                    }
+ 
                 </div>
                 {/* <Row>
                     <Col xs={12} md={9}>

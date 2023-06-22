@@ -44,12 +44,13 @@ export function TraitFilterMenu(props: TraitMenuProps) {
         <span>{trait_type}</span> <span aria-hidden>▾</span>
       </button>
       {isOpen && 
-      <div className={`${styles.menu}`}>
+      <div className={`${styles.menu} flex-column`}>
+        <hr style={{margin: 0}} />
         <form>
           {traits.map(trait=>{
             return (
               <div key={trait.value} className='d-flex justify-content-between'>
-                <div>
+                <div className='d-flex align-items-center'>
                   {trait.value}
                 </div>
                 <input type="checkbox" checked={selected_traits.findIndex(t=>t.value === trait.value) > -1} onChange={(e) => handleChange(trait, e.target.checked)} />
@@ -88,12 +89,13 @@ export default function FilterMenu(props: HoverMenuProps) {
         <span>{title}</span> <span aria-hidden>▾</span>
       </button>
       {isOpen && 
-      <div className={`${styles.menu}`}>
+      <div className={`${styles.menu} flex-column`}>
+        <hr style={{margin: 0}} />
         <form>
           {options.map(option=>{
             return (
               <div key={option} className='d-flex justify-content-between'>
-                <div>
+                <div className='d-flex align-items-center'>
                   {option}
                 </div>
                 <input type="checkbox" value={option} onChange={handleChange} />

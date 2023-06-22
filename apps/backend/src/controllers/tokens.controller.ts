@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { refreshCollection, startImportCollection } from '@services/collections.service';
 import { queryClient } from '@/utils/chainClients';
 import * as tokenService from '@/services/tokens.service';
-import { CollectionModel, RequestWithOptionalUser, Token } from '@architech/types';
+import { CollectionModel, cw721, RequestWithOptionalUser, SortOptions, Token } from '@architech/types';
 import { MARKETPLACE_ADDRESS } from '@/../../../packages/architech-lib/dist';
 import ViewModel from '@/models/views.model';
 import { getAsk, getCollectionAsks } from '@/utils/queries/marketplaceQuery';
@@ -35,7 +35,22 @@ export const getCollectionTokens = async (req: Request, res: Response, next: Nex
   try {
     console.log('QUERYYY', req.query);
     const collectionAddr: string = req.params.collectionAddr;
-    const findAllTokensData: Token[] = await tokenService.findCollectionTokens(collectionAddr, JSON.parse((req.query.traits as string) || '[]'));
+
+    const sort: SortOptions = (req.query.sort as SortOptions) || 'Name';
+
+    let traitFilter: cw721.Trait[] = [];
+    if (req.query.traits) {
+      try {
+        traitFilter = JSON.parse(req.query.traits as string) as cw721.Trait[];
+      } catch {}
+    }
+    const findAllTokensData: Token[] = await tokenService.findCollectionTokens(
+      collectionAddr,
+      req.query.page ? parseInt(req.query.page as string) : undefined,
+      req.query.limit ? parseInt(req.query.limit as string) : undefined,
+      sort,
+      traitFilter,
+    );
 
     res.status(200).json(findAllTokensData);
   } catch (error) {

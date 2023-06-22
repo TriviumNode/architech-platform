@@ -1,9 +1,28 @@
 import { cw721, TokenModel as TokenModelInterface } from '@architech/types';
-import { prop, getModelForClass, modelOptions, mongoose, Ref } from '@typegoose/typegoose';
+import { prop, getModelForClass, modelOptions, mongoose, Ref, plugin } from '@typegoose/typegoose';
 import { CollectionClass } from './collections.model';
+import paginate from 'mongoose-paginate-v2';
+import { FilterQuery, PaginateOptions, PaginateResult } from 'mongoose';
 
+// type PaginateMethod<T> = (
+//   query?: FilterQuery<T>,
+//   options?: PaginateOptions,
+//   callback?: (err: any, result: PaginateResult<T>) => void,
+// ) => Promise<PaginateResult<T>>;
+
+@plugin(paginate)
+export class PaginatedModel {
+  static paginate: <T extends PaginatedModel>(
+    this: T,
+    query?: FilterQuery<T>,
+    options?: PaginateOptions,
+    callback?: (err: Error, result: PaginateResult<T>) => void,
+  ) => Promise<PaginateResult<T>>;
+}
+
+// @plugin(paginate)
 @modelOptions({ schemaOptions: { collection: 'tokens', timestamps: true } })
-export class TokenClass implements TokenModelInterface {
+export class TokenClass extends PaginatedModel implements TokenModelInterface {
   @prop({ type: String, required: true })
   public tokenId: string;
 
@@ -30,6 +49,10 @@ export class TokenClass implements TokenModelInterface {
 
   @prop({ required: true })
   public traits!: mongoose.Types.Array<cw721.Trait>;
+
+  public createdAt?: Date;
+
+  public updatedAt?: Date;
 }
 
 const TokenModel = getModelForClass(TokenClass);

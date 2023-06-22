@@ -1,5 +1,5 @@
 import { hash } from 'bcrypt';
-import { Collection, CreateTokenDto, Token, UpdateTokenDto } from '@architech/types';
+import { Collection, CreateTokenDto, SortOptions, Token, UpdateTokenDto } from '@architech/types';
 import { HttpException } from '@exceptions/HttpException';
 import tokenModel from '@models/tokens.model';
 import { isEmpty } from '@utils/util';
@@ -34,7 +34,13 @@ const buildOrFilter = (traits: cw721.Trait[]) => {
   return filter;
 };
 
-export async function findCollectionTokens(collectionAddress: string, traitFilter: cw721.Trait[] = []): Promise<Token[]> {
+export async function findCollectionTokens(
+  collectionAddress: string,
+  page = 1,
+  limit = 30,
+  sort: SortOptions = 'Name',
+  traitFilter: cw721.Trait[] = [],
+) {
   if (isEmpty(collectionAddress)) throw new HttpException(400, 'Collection address is empty');
 
   const byTrait = {};
@@ -63,15 +69,44 @@ export async function findCollectionTokens(collectionAddress: string, traitFilte
 
   // const filter = buildOrFilter(traitFilter);
 
-  const findTokens: Token[] = await tokenModel
-    .find({
+  let sortFilter;
+  switch (sort) {
+    case 'Name':
+      sortFilter = {
+        'metadataExtension.name': 'asc',
+      };
+      break;
+    case 'Most Viewed':
+      sortFilter = {
+        total_views: 'desc',
+      };
+      break;
+    case 'Recently Created':
+      sortFilter = {
+        createdAt: -1,
+      };
+      break;
+    default:
+      sortFilter = {};
+  }
+  console.log('sortFilter', sort, sortFilter);
+  const { docs }: { docs: any[] } = await tokenModel.paginate(
+    {
       collectionAddress: collectionAddress,
       ...fullFilter,
-    })
-    .populate('collectionInfo');
-  if (!findTokens) throw new HttpException(404, 'No tokens found');
+    },
+    {
+      page,
+      limit,
+      populate: 'collectionInfo',
+      lean: true,
+      sort: sortFilter,
+    },
+  );
+  // .populate('collectionInfo');
+  if (!docs) throw new HttpException(404, 'No tokens found');
 
-  return findTokens;
+  return docs;
 }
 
 export async function findTokensByOwner(owner: string): Promise<Token[]> {
