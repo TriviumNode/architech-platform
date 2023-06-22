@@ -8,7 +8,7 @@ import Modal from "../../Components/Modal";
 import { useUser } from "../../Contexts/UserContext";
 import { ImportCollectionData } from "../../Interfaces/interfaces";
 import { editCollection, importCollection, updateCollectionImage } from "../../Utils/backend";
-import { DenomRow } from "../ArchDenom";
+import { DenomImg } from "../ArchDenom";
 import SelectMenu, { SelectOption } from "../SelectMenu/SelectMenu";
 
 interface Props {
@@ -29,7 +29,7 @@ const selectOptions: SelectOption[] = [
         value: nativeDenom,
         content: (
             <div>
-                <DenomRow denom={nativeDenom} />
+                <DenomImg denom={nativeDenom} /> {nativeDenom.displayDenom}
             </div>
         )
 
@@ -46,7 +46,7 @@ export default function ListModal({open, token, onClose}: Props) {
     const revalidator = useRevalidator();
     const { user } = useUser()
 
-    const [selectedOption, setSelectedOption] = useState<SelectOption>()
+    const [selectedOption, setSelectedOption] = useState<SelectOption>(selectOptions[0])
     const [formState, setFormState] = useState<State>(defaultState);
 
     const handleSelect = (selected: SelectOption) => {

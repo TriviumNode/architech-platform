@@ -4,7 +4,7 @@ import { FC, ReactElement, useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { Link, useLoaderData, useRevalidator } from "react-router-dom";
 import { toast } from "react-toastify";
-import ArchDenom, { DenomRow } from "../../Components/ArchDenom";
+import ArchDenom, { DenomImg } from "../../Components/ArchDenom";
 import Badge from "../../Components/Badge";
 import CollectionStats from "../../Components/CollectionStats/CollectionStats";
 import Loader from "../../Components/Loader";
@@ -206,7 +206,7 @@ const SingleToken: FC<any> = (): ReactElement => {
               { tokenData.sale ? 
               <>
                 <div>
-                  <div style={{fontSize: '28px'}}>{saleAmount.toString()} <DenomRow denom={saleDenom} /></div>
+                  <div style={{fontSize: '28px'}}>{saleAmount.toString()} <DenomImg denom={saleDenom} /></div>
                   <div className='lightText12'>~ $1.23</div>
                 </div>
                 {
