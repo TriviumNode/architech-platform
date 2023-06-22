@@ -33,7 +33,7 @@ export const purchaseNative = async({
         signer,
         marketplace_contract,
         msg,
-        getFee(500_000),
+        getFee(700_000),
         undefined,
         [{ amount, denom }]
     )

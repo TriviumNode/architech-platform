@@ -53,7 +53,7 @@ const Navbar = () => {
           { !!user ? 
             <ProfileMenu content={
               <div className='d-flex align-items-stretch' style={{color: "white", columnGap: '24px'}}>
-                <div className='d-flex align-items-center'>{balances?.arch || <SmallLoader />}&nbsp;<ArchDenom /></div>
+                <div className='d-flex align-items-center'>{balances?.arch ? balances.arch.toFixed(4) : <SmallLoader />}&nbsp;<ArchDenom /></div>
                 <Vr color='#666666' />
                 <div className='d-flex align-items-center' style={{fontSize: '12px'}}>{balances?.credits === undefined ? <SmallLoader /> : balances.credits}&nbsp;Credits</div>
               </div>
