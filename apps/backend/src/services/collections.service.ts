@@ -73,10 +73,10 @@ export async function updateCollection(collectionId: string, collectionData: Par
   return updateCollectionById;
 }
 
-export async function updateCollectionTokens(collectionId: string, tokens: string[], totalTokens: number): Promise<Collection> {
-  if (isEmpty(tokens)) throw new HttpException(400, 'tokenData is empty');
+export async function updateCollectionTokens(collectionId: string, tokenIds: string[], totalTokens: number): Promise<Collection> {
+  if (isEmpty(tokenIds)) throw new HttpException(400, 'tokenData is empty');
 
-  const updateCollectionById: Collection = await collectionsModel.findByIdAndUpdate(collectionId, { tokens, totalTokens });
+  const updateCollectionById: Collection = await collectionsModel.findByIdAndUpdate(collectionId, { tokenIds, totalTokens });
   if (!updateCollectionById) throw new HttpException(404, 'Collection not found');
 
   return updateCollectionById;
