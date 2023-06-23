@@ -1,13 +1,42 @@
 import { NextFunction, Request, Response } from 'express';
 import { queryClient } from '@/utils/chainClients';
 import * as tokenService from '@/services/tokens.service';
-import { CollectionModel, cw721, RequestWithOptionalUser, SortOption, Token } from '@architech/types';
+import { cw721, GetLatestListingsResponse, GetTokenResponse, marketplace, RequestWithOptionalUser, SortOption, Token } from '@architech/types';
 
-import { getAsk, MARKETPLACE_ADDRESS } from '@architech/lib';
+import { getAllAsks, getAsk, MARKETPLACE_ADDRESS } from '@architech/lib';
 import ViewModel from '@/models/views.model';
 import { View } from '@/interfaces/views.interface';
 import TokenModel from '@/models/tokens.model';
 import { HttpException } from '@/exceptions/HttpException';
+import CollectionModel from '@/models/collections.model';
+
+export const getLatestListings = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const asks = await getAllAsks({ client: queryClient, contract: MARKETPLACE_ADDRESS, limit: 10 });
+
+    const response: GetLatestListingsResponse[] = [];
+    for (let i = 0; i < asks.length; i++) {
+      const ask = asks[i];
+
+      const collection = await CollectionModel.findOne({ address: ask.collection });
+      if (!collection) continue;
+
+      // TODO query token from chain if not in DB
+      const token = await TokenModel.findOne({ tokenId: ask.token_id, collectionAddress: ask.collection });
+      if (!token) continue;
+
+      response.push({
+        ask: ask,
+        collection,
+        token: token as unknown as Token,
+      });
+    }
+
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const getAllTokens = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -91,16 +120,16 @@ export const getCollectionTokenId = async (req: RequestWithOptionalUser, res: Re
       const updated = await TokenModel.findByIdAndUpdate(tokenData._id, { $inc: { total_views: 1 } }, { new: true });
 
       // Get ask from marketplace (if any)
-      const forSale = await getAsk({
+      const ask = await getAsk({
         client: queryClient,
         contract: MARKETPLACE_ADDRESS,
         collection: tokenData.collectionAddress,
         token_id: tokenData.tokenId,
       });
 
-      const response = {
-        token: updated,
-        sale: forSale,
+      const response: GetTokenResponse = {
+        token: updated as unknown as Token,
+        ask: ask as marketplace.Ask,
       };
 
       res.status(200).json(response);

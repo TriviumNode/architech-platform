@@ -18,7 +18,6 @@ const TrendingRow: FC<
     const humanVolume = denomToHuman(volume, parseInt(process.env.REACT_APP_NETWORK_DECIMALS))
     const collectionName = getCollectionName(result.collection)
     return(
-    // <Row style={{width: '100%'}}>
     <Link to={`/nfts/${result.collection.address}`}
         style={{
             display: 'flex',
@@ -42,26 +41,14 @@ const TrendingRow: FC<
                     <div className='lightText11 twoLineLimit'>{result.collection.collectionProfile.description}</div>
                 </div>
             </div>
-            {/* </Row> */}
         </Col>
-        <Col xs={2}>
-            <Row style={{justifyContent: "center", alignItems: "center", height: '100%'}}>
-                <span style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                }}>{floor ? parseFloat(floor.toFixed(2)) : '--'}&nbsp;<ArchDenom /></span>
-            </Row>
+        <Col xs={2} className='d-flex flex-column justify-content-center' style={{textAlign: 'center'}}>
+            <span>{floor ? parseFloat(floor.toFixed(2)) : '--'}&nbsp;<ArchDenom /></span>
         </Col>
-        <Col xs={2}>
-            <Row style={{justifyContent: "center", alignItems: "center", height: '100%'}}>
-                <span style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                }}>{humanVolume ? parseFloat(humanVolume.toFixed(2)) : '--'}&nbsp;<ArchDenom /></span>
-            </Row>
+        <Col xs={2} className='d-flex flex-column justify-content-center' style={{textAlign: 'center'}}>
+            <span>{humanVolume ? parseFloat(humanVolume.toFixed(2)) : '--'}&nbsp;<ArchDenom /></span>
         </Col>
     </Link>
-    // </Row>
     )
 }
 

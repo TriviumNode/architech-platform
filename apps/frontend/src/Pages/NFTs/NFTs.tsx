@@ -5,6 +5,7 @@ import { Link, useLoaderData } from "react-router-dom";
 import ArchDenom from "../../Components/ArchDenom";
 import CollectionTile from "../../Components/CollectionTile/CollectionTile";
 import CreateTile from "../../Components/CreateTile/CreateTile";
+import LatestListingsCard from "./LatestListingsCard";
 
 import styles from './NFTs.module.scss'
 import TrendingCard from "./TrendingCard";
@@ -26,125 +27,11 @@ const NftPage: FC<any> = (): ReactElement => {
             </div>
         </div> */}
         <div className={`${styles.gridContainer} ${styles.trendingContainer}`}>
-            {/* <div className={styles.listCard}>
-                <h2>Trending</h2>
-                <Row style={{width: '100%', marginBottom: '24px'}}>
-                    <Col xs={8}>
-                        <span>Project</span>
-                    </Col>
-                    <Col xs={2}>
-                        <span>Floor</span>
-                    </Col>
-                    <Col xs={2}>
-                        <span>Volume</span>
-                    </Col>
-                </Row>
-            </div> */}
             <TrendingCard />
-            <div className={`${styles.listCard}`}>
-                <h2>Latest Listings</h2>
-                <Row style={{width: '100%', marginBottom: '24px'}}>
-                    <Col xs={8}>
-                        <span>Project</span>
-                    </Col>
-                    <Col xs={2}>
-                        <span>Floor</span>
-                    </Col>
-                    <Col xs={2}>
-                        <span>Volume</span>
-                    </Col>
-                </Row>
-                <Row style={{width: '100%'}}>
-                    <Col xs={8}>
-                        <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
-                            <img src="logo.svg" className={styles.nftImage} />
-                            <div>
-                                <span>Title</span><br />
-                                <span>Description</span>
-                            </div>
-                        </div>
-                    </Col>
-                    <Col xs={2}>
-                        <Row style={{justifyContent: "center", alignItems: "center", height: '100%'}}>
-                            <span style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                            }}>1&nbsp;<ArchDenom /></span>
-                        </Row>
-                    </Col>
-                    <Col xs={2}>
-                        <Row style={{justifyContent: "center", alignItems: "center", height: '100%'}}>
-                            <span style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                            }}>1&nbsp;<ArchDenom /></span>
-                        </Row>
-                    </Col>
-                </Row>
-                <hr />
-                <Row style={{width: '100%'}}>
-                    <Col xs={8}>
-                        {/* <Row style={{width: '100%'}}> */}
-                        <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
-                            <img src="logo.svg" className={styles.nftImage} />
-                            <div>
-                                <span>Title</span><br />
-                                <span>Description</span>
-                            </div>
-                        </div>
-                        {/* </Row> */}
-                    </Col>
-                    <Col xs={2}>
-                        <Row style={{justifyContent: "center", alignItems: "center", height: '100%'}}>
-                            <span style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                            }}>1&nbsp;<ArchDenom /></span>
-                        </Row>
-                    </Col>
-                    <Col xs={2}>
-                        <Row style={{justifyContent: "center", alignItems: "center", height: '100%'}}>
-                            <span style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                            }}>1&nbsp;<ArchDenom /></span>
-                        </Row>
-                    </Col>
-                </Row>
-                <hr />
-                <Row style={{width: '100%'}}>
-                    <Col xs={8}>
-                        {/* <Row style={{width: '100%'}}> */}
-                        <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
-                            <img src="logo.svg" className={styles.nftImage} />
-                            <div>
-                                <span>Title</span><br />
-                                <span>Description</span>
-                            </div>
-                        </div>
-                        {/* </Row> */}
-                    </Col>
-                    <Col xs={2}>
-                        <Row style={{justifyContent: "center", alignItems: "center", height: '100%'}}>
-                            <span style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                            }}>1&nbsp;<ArchDenom /></span>
-                        </Row>
-                    </Col>
-                    <Col xs={2}>
-                        <Row style={{justifyContent: "center", alignItems: "center", height: '100%'}}>
-                            <span style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                            }}>1&nbsp;<ArchDenom /></span>
-                        </Row>
-                    </Col>
-                </Row>
-            </div>
+            <LatestListingsCard />
             <div className={styles.infoCard}>
                     <div style={{display: 'flex', alignItems: 'center'}}>
-                        <img src='logo_white.svg' style={{maxHeight: '1em', marginRight: '0.5em'}} />
+                        <img alt='' src='logo_white.svg' style={{maxHeight: '1em', marginRight: '0.5em'}} />
                         <h2 style={{display: "inline"}}>Architech</h2>
                     </div>
                     <div style={{marginTop: 'auto'}}>

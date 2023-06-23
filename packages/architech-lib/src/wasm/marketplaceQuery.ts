@@ -4,22 +4,28 @@ type QueryMsg = marketplace.QueryMsg;
 // type Ask = marketplace.Ask;
 
 export interface Ask {
+    id: string;
     collection: string;
     cw20_contract?: string | null;
     price: string;
     seller: string;
     token_id: string;
+    [k: string]: unknown;
 }
 
 export const getAllAsks = async ({
     client,
     contract,
+    limit,
 }:{
     client: SigningArchwayClient | ArchwayClient,
     contract: string,
+    limit?: number,
 }) => {
-    const query = {
-        get_all_asks: {}
+    const query: QueryMsg = {
+        get_all_asks: {
+            limit
+        }
     };
 
     const { asks }: { asks: Ask[] } = await client.queryContractSmart(contract, query);

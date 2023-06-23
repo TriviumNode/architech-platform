@@ -1,8 +1,7 @@
 import {ReactElement, FC, useState, useEffect} from "react";
-import { Row, Col } from "react-bootstrap";
+import { Col } from "react-bootstrap";
 import { useLoaderData } from "react-router-dom";
 import { getTrendingCollections } from "../../Utils/backend";
-import { QueryClient } from "../../Utils/queryClient";
 import { GetTrendingCollectionResponse } from '@architech/types'
 
 import styles from './NFTs.module.scss'
@@ -32,22 +31,24 @@ const TrendingCard: FC<any> = (): ReactElement => {
     return (
         <>
             <div className={styles.listCard}>
-                <h2>Trending</h2>
-                <Row style={{width: '100%', marginBottom: '24px'}}>
+                <h2 className='mb24'>Trending</h2>
+                <div className='d-flex wide mb24 lightText12'>
                     <Col xs={8}>
                         <span>Project</span>
                     </Col>
-                    <Col xs={2}>
+                    <Col xs={2} style={{textAlign: 'center'}}>
                         <span>Floor</span>
                     </Col>
-                    <Col xs={2}>
+                    <Col xs={2} style={{textAlign: 'center'}}>
                         <span>Volume</span>
                     </Col>
-                </Row>
-                { trending.map(t=><>
-                    <TrendingRow result={t} key={t.collection._id} />
-                    <hr />
-                </>)}
+                </div>
+                { trending.map((t, k)=>
+                    <div key={t.collection.address} className='wide'>
+                        <TrendingRow result={t} />
+                        {k < 2 && <hr className='mt16'  />}
+                    </div>
+                )}
             </div>
         </>
     );

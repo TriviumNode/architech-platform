@@ -7,6 +7,7 @@ import {
   getCollectionTokenCount,
   getCollectionTokenId,
   getCollectionTokens,
+  getLatestListings,
   getTokensByOwner,
   refreshToken,
 } from '@/controllers/tokens.controller';
@@ -24,6 +25,9 @@ class TokensRoute implements Routes {
     // Get all tokens
     // TODO: Pagination or remove
     this.router.get(`${this.path}`, getAllTokens);
+
+    // Get number of imported tokens in collection.
+    this.router.get(`${this.path}/latest_listings`, getLatestListings);
 
     // Get number of imported tokens in collection.
     this.router.get(`${this.path}/count/:collectionAddr`, getCollectionTokenCount);

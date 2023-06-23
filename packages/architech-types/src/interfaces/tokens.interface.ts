@@ -18,5 +18,11 @@ export interface Token extends TokenModel {
 
 export interface GetTokenResponse {
     token: Token;
-    sale: marketplace.Ask;
+    ask: marketplace.Ask;
+}
+
+export interface GetLatestListingsResponse {
+    ask: marketplace.Ask;
+    token: Token;
+    collection: Collection;
 }
