@@ -184,6 +184,7 @@ export const refreshCollection = async (contract: string) => {
 
     // ensure pfp
     let pfp = knownCollectionData.collectionProfile.profile_image;
+    console.log('Existing PFP', pfp);
     if (!pfp && knownCollectionData.tokenIds.length) {
       console.log('Ensuring PFP');
       const ensured = await getEnsuredPfp(contract, knownCollectionData.tokenIds);
