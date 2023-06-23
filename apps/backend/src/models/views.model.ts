@@ -8,8 +8,8 @@ export class ViewClass implements View {
   // @prop({ ref: () => CollectionClass, type: () => String, required: true })
   // public collectionId: Ref<CollectionClass, string>;
 
-  @prop({ type: String, required: true })
-  public collectionAddress: string;
+  @prop({ ref: () => CollectionClass, type: () => String, required: true })
+  public collectionRef: Ref<CollectionClass, string>;
 
   @prop({ type: String })
   public tokenId?: string;

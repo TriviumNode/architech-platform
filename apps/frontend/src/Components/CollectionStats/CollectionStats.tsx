@@ -51,11 +51,11 @@ const CollectionStats: FC<Props> = ({collection, asks}): ReactElement => {
             </div>
             <div className={styles.vr} />
             <div>
-                <div className={`${styles.number} d-flex align-items-center`}>{floorAmount}&nbsp;<ArchDenom /></div>
+                <div className={`${styles.number} d-flex align-items-center`}>{floorAmount || '--'}&nbsp;<ArchDenom /></div>
                 <span className={styles.label}>Floor</span>
             </div>
             <div>
-                <div className={`${styles.number} d-flex align-items-center`}>{volume === undefined ? <SmallLoader /> : volume}&nbsp;<ArchDenom /></div>
+                <div className={`${styles.number} d-flex align-items-center`}>{(volume === undefined ? <SmallLoader /> : volume) || '--'}&nbsp;<ArchDenom /></div>
                 <span className={styles.label}>Total Volume</span>
             </div>
         </div>

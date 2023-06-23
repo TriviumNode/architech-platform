@@ -1,7 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import * as collectionService from '@services/collections.service';
 import { CONTRACT_ADDR_LENGTH, queryClient } from '@/utils/chainClients';
-import { Collection, CollectionProfile, RequestWithOptionalUser, RequestWithUser, updateCollectionDto } from '@architech/types';
+import {
+  Collection,
+  CollectionProfile,
+  GetTrendingCollectionResponse,
+  RequestWithOptionalUser,
+  RequestWithUser,
+  updateCollectionDto,
+} from '@architech/types';
 import { EditCollectionBodyDto, ImportCollectionBodyDto } from '@/dtos/collections.dto';
 import { findAllCollections } from '@/queriers/collection.querier';
 import { validate } from 'class-validator';
@@ -12,6 +19,7 @@ import CollectionModel from '@/models/collections.model';
 import mongoose from 'mongoose';
 import { RequestWithImages } from '@/middlewares/fileUploadMiddleware';
 import { HttpException } from '@/exceptions/HttpException';
+import { getBatchCollectionDossier, MARKETPLACE_ADDRESS } from '@/../../../packages/architech-lib/dist';
 
 export const getAllCollections = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -26,7 +34,7 @@ export const getAllCollections = async (req: Request, res: Response, next: NextF
 export const getTrendingCollections = async (req: Request, res: Response, next: NextFunction) => {
   const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
   try {
-    const trending: Collection[] = await ViewModel.aggregate([
+    const trending = await ViewModel.aggregate([
       {
         $match: {
           createdAt: { $gte: new Date(new Date().valueOf() - SEVEN_DAYS) },
@@ -34,14 +42,23 @@ export const getTrendingCollections = async (req: Request, res: Response, next: 
       },
       {
         $group: {
-          _id: '$collectionAddress',
+          _id: '$collectionRef',
           count: { $sum: 1 },
         },
       },
       { $sort: { count: -1 } },
     ]);
-
-    res.status(200).json(trending);
+    await CollectionModel.populate(trending, { path: '_id' });
+    const addresses = trending.map(t => t._id.address);
+    const dossiers = await getBatchCollectionDossier({
+      client: queryClient,
+      collections: addresses,
+      contract: MARKETPLACE_ADDRESS,
+    });
+    const result: GetTrendingCollectionResponse = trending.map(function (elm, key) {
+      return { collection: elm._id, count: elm.count, asks: dossiers[key].asks, volume: dossiers[key].volume };
+    });
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
@@ -57,10 +74,10 @@ export const getCollectionByAddress = async (req: RequestWithOptionalUser, res: 
     if (fullCollection) {
       // Increment view count
       const view: View = {
-        collectionAddress: fullCollection.collection.address,
+        collectionRef: fullCollection.collection._id,
         viewer: userId ? userId : undefined,
       };
-
+      console.log('adding view', view);
       await ViewModel.create(view);
       const updated = await CollectionModel.findByIdAndUpdate(fullCollection.collection._id, { $inc: { total_views: 1 } }, { new: true });
       fullCollection.collection = updated;

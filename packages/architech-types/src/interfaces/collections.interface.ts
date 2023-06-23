@@ -48,3 +48,12 @@ export interface GetCollectionResponse {
   collection: Collection;
   forSale: marketplace.Ask[];
 }
+
+export type GetTrendingCollectionResponse = TrendingCollectionResult[];
+
+export type TrendingCollectionResult = {
+  collection: Collection;
+  count: number;
+  asks: marketplace.Ask[];
+  volume: marketplace.Volume[];
+};

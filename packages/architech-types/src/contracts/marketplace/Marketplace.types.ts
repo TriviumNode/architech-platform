@@ -72,6 +72,16 @@ export type QueryMsg = {
     collection: string;
     [k: string]: unknown;
   };
+} | {
+  collection_dossier: {
+    collection: string;
+    [k: string]: unknown;
+  };
+} | {
+  batch_collection_dossier: {
+    collections: string[];
+    [k: string]: unknown;
+  };
 };
 export interface Ask {
   collection: string;

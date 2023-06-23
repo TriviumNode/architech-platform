@@ -1,4 +1,4 @@
-import { CollectionProfile, cw721 } from '@architech/types';
+import { Collection, CollectionProfile, cw721 } from '@architech/types';
 
 export interface CreateCollectionData {
   address: string;

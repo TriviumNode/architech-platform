@@ -1,3 +1,4 @@
+import { marketplace } from "@architech/types";
 import BigNumber from "bignumber.js";
 
 export const getFee = (gas: number) => {
@@ -26,4 +27,14 @@ export const humanToDenom = (amount: number | string, decimals: number): string 
     const result = amount * Math.pow(10, decimals)
     const denomAmount = BigNumber(result)
     return denomAmount.toFixed();
+}
+
+export const findFloor = (asks: marketplace.Ask[], decimals: number) => {
+    const floor: string = asks &&
+        asks.length ?
+            asks.filter(a=>a.cw20_contract === undefined || a.cw20_contract === null)
+                .sort((a, b)=>parseInt(a.price) - parseInt(b.price))[0].price
+        : '0'
+    const floorAmount = denomToHuman(floor, decimals);
+    return floorAmount;
 }

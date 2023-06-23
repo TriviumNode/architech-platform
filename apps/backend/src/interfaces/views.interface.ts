@@ -3,7 +3,7 @@ import { UserClass } from '@/models/users.model';
 import { Ref } from '@typegoose/typegoose';
 
 export interface View {
-  collectionAddress: string;
+  collectionRef: Ref<CollectionClass, string>;
   tokenId?: string;
   viewer?: Ref<UserClass, string>;
 }

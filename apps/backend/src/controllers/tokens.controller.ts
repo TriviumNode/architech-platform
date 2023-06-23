@@ -82,21 +82,21 @@ export const getCollectionTokenId = async (req: RequestWithOptionalUser, res: Re
       // Increment view count
       const userId: string = req.user?._id;
       const view: View = {
-        collectionAddress: tokenData.collectionAddress,
-
+        collectionRef: tokenData.collectionInfo._id,
+        tokenId: tokenId,
         viewer: userId ? userId : undefined,
       };
 
       await ViewModel.create(view);
       const updated = await TokenModel.findByIdAndUpdate(tokenData._id, { $inc: { total_views: 1 } }, { new: true });
 
+      // Get ask from marketplace (if any)
       const forSale = await getAsk({
         client: queryClient,
         contract: MARKETPLACE_ADDRESS,
         collection: tokenData.collectionAddress,
         token_id: tokenData.tokenId,
       });
-      console.log('forSale!!!!!!!!!!!!!!!!', forSale);
 
       const response = {
         token: updated,

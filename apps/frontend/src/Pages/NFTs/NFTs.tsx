@@ -7,6 +7,7 @@ import CollectionTile from "../../Components/CollectionTile/CollectionTile";
 import CreateTile from "../../Components/CreateTile/CreateTile";
 
 import styles from './NFTs.module.scss'
+import TrendingCard from "./TrendingCard";
 
 const NftPage: FC<any> = (): ReactElement => {
     const { collections } = useLoaderData() as { collections: any[]};
@@ -25,9 +26,21 @@ const NftPage: FC<any> = (): ReactElement => {
             </div>
         </div> */}
         <div className={`${styles.gridContainer} ${styles.trendingContainer}`}>
-            <div className={styles.listCard}>
+            {/* <div className={styles.listCard}>
                 <h2>Trending</h2>
-            </div>
+                <Row style={{width: '100%', marginBottom: '24px'}}>
+                    <Col xs={8}>
+                        <span>Project</span>
+                    </Col>
+                    <Col xs={2}>
+                        <span>Floor</span>
+                    </Col>
+                    <Col xs={2}>
+                        <span>Volume</span>
+                    </Col>
+                </Row>
+            </div> */}
+            <TrendingCard />
             <div className={`${styles.listCard}`}>
                 <h2>Latest Listings</h2>
                 <Row style={{width: '100%', marginBottom: '24px'}}>

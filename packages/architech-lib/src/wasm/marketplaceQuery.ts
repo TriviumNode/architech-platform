@@ -118,3 +118,41 @@ export const getVolume = async ({
     const {volume} = await client.queryContractSmart(contract, query);
     return volume;
 }
+
+export const getCollectionDossier = async ({
+    client,
+    contract,
+    collection
+}:{
+    client: SigningArchwayClient | ArchwayClient,
+    contract: string,
+    collection: string,
+}) => {
+    const query: QueryMsg = {
+        collection_dossier: {
+            collection
+        }
+    };
+
+    const response: {volume: marketplace.Volume[], asks: []} = await client.queryContractSmart(contract, query);
+    return response;
+}
+
+export const getBatchCollectionDossier = async ({
+    client,
+    contract,
+    collections
+}:{
+    client: SigningArchwayClient | ArchwayClient,
+    contract: string,
+    collections: string[],
+}) => {
+    const query: QueryMsg = {
+        batch_collection_dossier: {
+            collections
+        }
+    };
+
+    const response: {volume: marketplace.Volume[], asks: []}[] = await client.queryContractSmart(contract, query);
+    return response;
+}
