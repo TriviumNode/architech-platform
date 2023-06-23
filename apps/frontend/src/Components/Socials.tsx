@@ -24,7 +24,7 @@ const SocialLinks: FC<Props> = (props: Props): ReactElement => {
             {
             !!twitter && 
                 <div>
-                    <a target='_blank' rel='noreferrer' href={twitter}><img src="/twitter.svg" alt='Twitter' style={{height: '24px'}} /></a>
+                    <a target='_blank' rel='noreferrer' href={`https://twitter.com/${twitter.replace('@','')}`}><img src="/twitter.svg" alt='Twitter' style={{height: '24px'}} /></a>
                 </div>
             }
 

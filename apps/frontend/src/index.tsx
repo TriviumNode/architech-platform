@@ -21,7 +21,7 @@ import ImportPage from './Pages/Import';
 import SingleCollection from './Pages/Collection/SingleCollection';
 import SingleToken from './Pages/Token/SingleToken';
 import CreateSingleNftPage from './Pages/CreateNft/CreateNft';
-import CreateCollectionPage from './Pages/CreateCollection/Create';
+import CreateCollectionPage from './Pages/CreateCollection/CreateCollection';
 
 
 const router = createBrowserRouter([

@@ -201,13 +201,13 @@ export const refreshCollection = async (contract: string) => {
     const updatedCollection = await updateCollection(knownCollectionData._id, updateData);
 
     // Start refreshing tokens
-    // refreshCollectionTokenList(updatedCollection._id, updatedCollection, numTokens);
+    refreshCollectionTokenList(updatedCollection._id, updatedCollection, numTokens);
 
     // Return updated data
     return updatedCollection;
   } else {
     // No differences found, but lets update trait stats async
-    // processCollectionTraits(knownCollectionData);
+    processCollectionTraits(knownCollectionData);
   }
 
   // Return what we already know if nothing else was returned
@@ -233,24 +233,6 @@ export const importCollection = async (
   // Ensure profile image
   if (!profile_image) {
     try {
-      // // Get random token's image to use as profile image
-      // const random_token = tokenIdList[Math.floor(Math.random() * tokenIdList.length)];
-      // const tokenInfo = await getNftInfo({ client, contract: contractAddress, token_id: random_token });
-      // const imageUrl = tokenInfo.extension?.image;
-      // if (!imageUrl) throw new Error(); //break
-
-      // // Download image URL and save locally
-      // // TODO handle IPFS
-      // const res = await fetch(imageUrl);
-      // const contentType = res.headers.get('Content-Type');
-      // const extension = mime.extension(contentType);
-
-      // const buffer = Buffer.from(await res.arrayBuffer());
-      // const hash = hashBuffer(buffer);
-
-      // const fileName = `${hash}.${extension}`;
-      // saveBuffer(buffer, fileName);
-      // profile_image = fileName;
       profile_image = await getEnsuredPfp(contractAddress, tokenIdList);
     } catch {}
   }
@@ -292,6 +274,7 @@ export const importCollection = async (
       website: importBody.website,
       twitter: importBody.twitter,
       discord: importBody.discord,
+      telegram: importBody.telegram,
     },
     categories: categories,
     totalTokens,

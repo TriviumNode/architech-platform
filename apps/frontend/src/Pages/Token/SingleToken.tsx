@@ -146,7 +146,7 @@ const SingleToken: FC<any> = (): ReactElement => {
           <div className='d-flex card justify-content-between' style={{height: '128px', marginBottom: '8px'}}>
             <div style={{margin: '24px 0 0 24px'}}>
               <div className='d-flex align-items-center mb16'><h1 className='mr8' style={{lineHeight: 1}}>{num}{tokenData.token?.tokenId}</h1>
-                {(tokenData.token?.collectionInfo.categories || []).map(category=>
+                {(collection.categories || []).map(category=>
                   <Badge><span>{category}</span></Badge>
                 )}
               </div>

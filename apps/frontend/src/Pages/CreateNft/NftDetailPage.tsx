@@ -198,7 +198,7 @@ const DetailPage: FC<{
                         </Col>
                         <Col>
                             <label>
-                                <input placeholder={index.toString()} value={attribute.value} onChange={(e)=>updateAttribute(index, {value: e.target.value})} />
+                                <input value={attribute.value} onChange={(e)=>updateAttribute(index, {value: e.target.value})} />
                             </label>
                         </Col>
                         <Col xs={'auto'} className='d-flex align-items-end'>

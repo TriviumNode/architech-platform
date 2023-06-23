@@ -265,10 +265,36 @@ button:disabled {
 }
 
 .lightText12 {
-  font-family: 'TWK Everett';
-  font-style: normal;
   font-weight: 400;
   font-size: 14px;
   line-height: 120%;
   color: #666666;
+}
+.lightText11 {
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 120%;
+  color: #666666;
+}
+
+.lightText10 {
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 120%;
+  color: #666666;
+}
+
+.error {
+  border: 2px solid rgba(250, 20, 20, 0.75) !important;
+}
+
+.inputAlert {
+  text-align: right;
+  /* width: 100%; */
+  position: relative;
+  right: 8px;
+  bottom: 36px;
+  display: flex;
+  justify-content: flex-end;
+  height: 1.5em;
 }

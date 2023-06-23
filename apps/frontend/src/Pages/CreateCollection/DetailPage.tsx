@@ -1,6 +1,7 @@
 import { CATEGORIES } from "@architech/lib";
-import { FC, ReactElement } from "react";
+import { FC, ReactElement, useState } from "react";
 import { Col } from "react-bootstrap";
+import { toast } from "react-toastify";
 import MultiSelect from "../../Components/MultiSelect";
 
 import styles from './create.module.scss'
@@ -24,29 +25,65 @@ export const DefaultDetailState: DetailState = {
 }
 
 const DetailPage: FC<{
-    data: DetailState,
+    state: DetailState,
     onChange: (detail: DetailState)=>void;
-}> = ({data, onChange}): ReactElement => {
+    next: ()=>void;
+}> = ({state, onChange, next}): ReactElement => {
+    const [errors, setErrors] = useState<Partial<DetailState>>()
 
     const updateDetailState = (newDetailState: Partial<DetailState>) => {
         console.log(newDetailState)
-        onChange({...data, ...newDetailState})
+        onChange({...state, ...newDetailState})
     }
+
+    const handleNext = (e: any) => {
+        e.preventDefault();
+        if (validateForm()) {
+            toast.error('Please fill all required fields.')
+        } else {
+            next();
+        }
+    }
+    const validateForm = () => {
+        const errors: Partial<DetailState> = {}
+        if (!state.name) errors.name='true';
+        if (!state.symbol) errors.symbol='true';
+        if(Object.keys(errors).length){
+            setErrors(errors);
+            return true;
+        } else
+            return false;
+    }
+
     return (
         <div style={{margin: '48px'}} className='d-flex flex-column'>
-            <h2 className='mb32'>Collection<br />Details</h2>
+            <div className='d-flex' style={{justifyContent: 'space-between'}}>
+                <h2 className='mb32'>Collection<br />Details</h2>
+                <button type='button' onClick={handleNext}>Next</button>
+            </div>
+            
             <form className={styles.form}>
                 <div className='d-flex mb24'>
                     <Col>
                         <label>
                             Collection Name
-                            <input value={data.name} onChange={(e)=>updateDetailState({name: e.target.value})} />
+                            <input value={state.name} onChange={(e)=>updateDetailState({name: e.target.value})}  className={errors?.name && 'error'} />
+                            {!!errors?.name &&
+                                <div className='inputAlert'>
+                                    <img alt='alert' src='/alert.svg' style={{height:'1.5em'}} />
+                                </div>
+                            }
                         </label>
                     </Col>
                     <Col>
                         <label>
                             Collection Symbol
-                            <input value={data.symbol} onChange={(e)=>updateDetailState({symbol: e.target.value})} />
+                            <input value={state.symbol} onChange={(e)=>updateDetailState({symbol: e.target.value})}  className={errors?.symbol && 'error'} />
+                            {!!errors?.symbol &&
+                                <div className='inputAlert'>
+                                    <img alt='alert' src='/alert.svg' style={{height:'1.5em'}} />
+                                </div>
+                            }
                         </label>
                     </Col>
                 </div>
@@ -56,7 +93,7 @@ const DetailPage: FC<{
                             Collection Image
                             <label className={styles.customfileupload}>
                                 <div className='ml16'>
-                                    { data.profileImage ? data.profileImage.name : 'Select a file' }
+                                    { state.profileImage ? state.profileImage.name : 'Select a file' }
                                 </div>
                                 <img src='/upload.svg' style={{maxHeight: '1em' }} className='mr16' />
                                 <input
@@ -68,13 +105,16 @@ const DetailPage: FC<{
                                 />
                             </label>
                         </label>
+                        <div className='lightText11' style={{margin: '4px 8px 0 8px'}}>
+                            Accepts JPG, PNG, SVG.&nbsp;&nbsp;Max size: 2 MB<br />
+                        </div>
                     </Col>
                     <Col>
                         <label>
                             Collection Banner
                             <label className={styles.customfileupload}>
                                 <div className='ml16'>
-                                    { data.bannerImage ? data.bannerImage.name : 'Select a file' }
+                                    { state.bannerImage ? state.bannerImage.name : 'Select a file' }
                                 </div>
                                 <img src='/upload.svg' style={{maxHeight: '1em' }} className='mr16' />
                                 <input
@@ -86,13 +126,16 @@ const DetailPage: FC<{
                                 />
                             </label>
                         </label>
+                        <div className='lightText11' style={{margin: '4px 8px 0 8px'}}>
+                            Recommended Size: 1080 x 350
+                        </div>
                     </Col>
                 </div>
                 <div className='d-flex mb24'>
                     <Col xs={6}>
                         <label>
                             Category
-                            <MultiSelect title={'Select...'} style={{marginTop: '8px'}} options={CATEGORIES} selected={data.categories} onChange={(selected) => updateDetailState({ categories: selected })} />
+                            <MultiSelect title={'Select...'} style={{marginTop: '8px'}} options={CATEGORIES} selected={state.categories} onChange={(selected) => updateDetailState({ categories: selected })} />
                         </label>
                     </Col>
                 </div>
@@ -100,7 +143,7 @@ const DetailPage: FC<{
                     <Col>
                         <label>
                             Description
-                            <textarea value={data.description} onChange={(e)=>updateDetailState({description: e.target.value})} />
+                            <textarea value={state.description} onChange={(e)=>updateDetailState({description: e.target.value})} />
                         </label>
                     </Col>
                 </div>

@@ -12,20 +12,21 @@ import FinishPage, { DefaultFinishState, FinishState } from "./FinishPage";
 import { initStandardProject } from "../../Utils/wasm/factory_handles";
 import { importCollection } from "../../Utils/backend";
 import AdminPage, { AdminState, DefaultAdminState } from "./AdminPage";
+import LinksPage, { DefaultLinksState, LinkState } from "./LinksPage";
 
-export type Page = 'Details' | 'Finish' //| 'Royalties'
+export type Page = 'Details' | 'Finish' | 'Links'
 
 export const Pages: Page[] = [
     'Details',
-    // 'Royalties',
+    'Links',
     'Finish',
 ]
 
 type Status = 'CREATING' | 'IMPORTING' | 'COMPLETE' | 'ERROR';
 const CreateCollectionPage: FC<any> = (): ReactElement => {
-    const { user: wallet } = useUser();
+    const { user: wallet, refreshProfile } = useUser();
     const [detailState, setDetailState] = useState<DetailState>(DefaultDetailState);
-    const [adminState, setAdminState] = useState<AdminState>(DefaultAdminState);
+    const [linkState, setLinkState] = useState<LinkState>(DefaultLinksState);
     const [finishState, setFinishState] = useState<FinishState>(DefaultFinishState);
 
     
@@ -40,9 +41,9 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
     const getPage = () => {
         switch(page) {
             case 'Details':
-                return <DetailPage data={detailState} onChange={(data) => setDetailState(data)} />
-            // case 'Royalties':
-            //     return <AdminPage data={royaltyState} onChange={(data) => setRoyaltyState(data)} />
+                return <DetailPage state={detailState} onChange={(data) => setDetailState(data)} next={()=>setPage('Links')} />
+            case 'Links':
+                return <LinksPage state={linkState} onChange={(newState) => setLinkState(newState)} next={()=>setPage('Finish')} />
             case 'Finish':
                 return <FinishPage data={finishState} onChange={(data) => setFinishState(data)} onClick={handleCreate}/>
             default:
@@ -75,8 +76,11 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
             const importData: ImportCollectionData = {
                 ...detailState,
                 ...finishState,
+                ...linkState,
             }
             const response = await importCollection(nftAddress as string, importData);
+            if (!refreshProfile) throw 'WOT'
+            await refreshProfile()
             console.log('response', response)
             setStatus("COMPLETE")
         } catch(err: any) {

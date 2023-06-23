@@ -9,7 +9,7 @@ import {
 import { SigningArchwayClient } from '@archwayhq/arch3.js/build';
 import { connectKeplrWallet, signLoginPermit } from '../Utils/keplr';
 import { toast } from 'react-toastify';
-import { checkLogin, requestNonce, walletLogin } from '../Utils/backend';
+import { checkLogin, getUserProfile, requestNonce, walletLogin } from '../Utils/backend';
 import { Coin, Pubkey } from '@cosmjs/amino';
 import { Row, Col } from 'react-bootstrap';
 import Modal from '../Components/Modal';
@@ -42,6 +42,7 @@ export interface UserContextState {
   loadingConnectWallet: boolean
   // authenticated: boolean;
   connectKeplr: undefined | (()=>Promise<void>)
+  refreshProfile: undefined | (()=>Promise<void>)
 }
 
 // created context with no default values
@@ -50,6 +51,7 @@ const UserContext = createContext<UserContextState>({
   // authenticated: false,
   balances: undefined,
   connectKeplr: undefined,
+  refreshProfile: undefined,
   user: undefined,
 });
 
@@ -155,12 +157,21 @@ export const UserProvider = ({ children }: Props): ReactElement => {
     setLoadingConnectWallet(false);
   }
 
+  const refreshProfile = async() => {
+    if (!user) throw 'Unable to refresh profile when user is not set.'
+    console.log('Refreshing Profile!')
+    const newProfile = await getUserProfile(user?.address);
+    const newUser: User = {...user, profile: newProfile}
+    setUser(newUser)
+  }
+
   const values = {
     user,
     balances,
     loadingConnectWallet,
     // authenticated,
-    connectKeplr
+    connectKeplr,
+    refreshProfile
   };
 
   // add values to provider to reach them out from another component
