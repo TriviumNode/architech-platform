@@ -1,9 +1,10 @@
+import { GetCollectionResponse } from "@architech/types";
 import axios, { Axios, AxiosError } from "axios";
 import { getApiUrl, getCollection, getOwnedTokens, getToken, getTokens, getUserProfile } from "./backend";
 
 export async function allCollectionsLoader({ params }: any) {
     const url = getApiUrl(`/collections`)
-    const {data: collections} = await axios.get(url.toString())
+    const {data: collections}: {data: GetCollectionResponse[]} = await axios.get(url.toString())
     return { collections };
 }
 
@@ -11,7 +12,7 @@ export async function collectionLoader({ params, request }: any) {
     if (!params.contractAddr) return { collection: undefined }
 
     const url = getApiUrl(`/collections/${params.contractAddr}`)
-    const {data: collection} = await axios.get(url)
+    const {data: collection}: {data: GetCollectionResponse} = await axios.get(url)
     return { collection };
 }
 

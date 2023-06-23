@@ -2,6 +2,18 @@ import { prop, getModelForClass, modelOptions, mongoose, plugin, Ref } from '@ty
 import { CollectionProfile, cw721, CollectionModel as CollectionModelInterface } from '@architech/types';
 import mongoosastic from 'mongoosastic';
 import { esClient } from '@/utils/elasticsearch';
+import paginate from 'mongoose-paginate-v2';
+import { FilterQuery, PaginateOptions, PaginateResult } from 'mongoose';
+
+@plugin(paginate)
+export class PaginatedModel {
+  static paginate: <T extends PaginatedModel>(
+    this: T,
+    query?: FilterQuery<T>,
+    options?: PaginateOptions,
+    callback?: (err: Error, result: PaginateResult<T>) => void,
+  ) => Promise<PaginateResult<T>>;
+}
 
 class CollectionProfileClass implements CollectionProfile {
   @prop({ type: String })
@@ -32,7 +44,7 @@ class CollectionProfileClass implements CollectionProfile {
 
 @plugin(mongoosastic, { esClient: esClient })
 @modelOptions({ schemaOptions: { collection: 'collections', timestamps: true } })
-export class CollectionClass implements CollectionModelInterface {
+export class CollectionClass extends PaginatedModel implements CollectionModelInterface {
   @prop({ type: String, required: true, unique: true })
   public address: string;
 

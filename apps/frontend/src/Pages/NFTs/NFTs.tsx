@@ -1,4 +1,4 @@
-import { Collection } from "@architech/types";
+import { Collection, GetCollectionResponse } from "@architech/types";
 import React, {ReactElement, FC} from "react";
 import { Row, Col } from "react-bootstrap";
 import { Link, useLoaderData } from "react-router-dom";
@@ -10,7 +10,7 @@ import styles from './NFTs.module.scss'
 import TrendingCard from "./TrendingCard";
 
 const NftPage: FC<any> = (): ReactElement => {
-    const { collections } = useLoaderData() as { collections: any[]};
+    const { collections } = useLoaderData() as { collections: GetCollectionResponse[]};
     console.log(collections);
     return (
         <>
@@ -160,11 +160,11 @@ const NftPage: FC<any> = (): ReactElement => {
         </div>
         <div className={styles.collectionsContainer}>
             <CreateTile />
-            {collections && collections.map((collection: Collection, key: number)=>{
+            {collections && collections.map((collection: GetCollectionResponse, key: number)=>{
                 console.log('key', key)
                 const style = key === 0 ? {gridColumn: 1, gridRow: 1} : key === 1 ? {gridColumn: 2, gridRow: 1} : key === 2 ? {gridColumn: 3, gridRow: 1} : undefined;
                 return(
-                    <CollectionTile collection={collection} style={{...style, ...{maxHeight: '350px'}}} key={key} />
+                    <CollectionTile fullCollection={collection} style={{...style, ...{maxHeight: '350px'}}} key={key} />
                 );
             })}
         </div>

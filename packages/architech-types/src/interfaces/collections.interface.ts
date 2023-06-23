@@ -46,7 +46,8 @@ export interface ImportCollectionRequest extends CollectionProfile {
 
 export interface GetCollectionResponse {
   collection: Collection;
-  forSale: marketplace.Ask[];
+  asks: marketplace.Ask[];
+  volume: marketplace.Volume[];
 }
 
 export type GetTrendingCollectionResponse = TrendingCollectionResult[];

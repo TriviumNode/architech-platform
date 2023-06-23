@@ -1,14 +1,13 @@
-import { hash } from 'bcrypt';
 import { HttpException } from '@exceptions/HttpException';
 import collectionsModel from '@models/collections.model';
 import { isEmpty } from '@utils/util';
 import { queryClient as client, queryClient } from '@/utils/chainClients';
 import equal from 'fast-deep-equal';
 import { findCollectionTokenCount, processCollectionTokens, processCollectionTraits } from './tokens.service';
-import { Collection, cw721, GetCollectionResponse, marketplace } from '@architech/types';
-import { CreateCollectionData, StartImportData } from '@/interfaces/collections.interface';
+import { Collection, GetCollectionResponse } from '@architech/types';
+import { CreateCollectionData } from '@/interfaces/collections.interface';
 import CollectionModel from '@models/collections.model';
-import { getAllTokens, getCollectionAsks, getContractInfo, getNftInfo, getNumTokens, getTokenInfo, MARKETPLACE_ADDRESS } from '@architech/lib';
+import { getAllTokens, getCollectionDossier, getContractInfo, getNftInfo, getNumTokens, MARKETPLACE_ADDRESS } from '@architech/lib';
 import { ImportCollectionBodyDto } from '@/dtos/collections.dto';
 import { isArray, isBoolean } from 'class-validator';
 import fetch from 'node-fetch';
@@ -19,7 +18,7 @@ export const getFullCollection = async (collectionAddress: string): Promise<GetC
   const collectionData: Collection = await CollectionModel.findOne({ address: collectionAddress });
   if (!collectionData) return undefined;
 
-  const forSale = await getCollectionAsks({
+  const dossier = await getCollectionDossier({
     client: queryClient,
     contract: MARKETPLACE_ADDRESS,
     collection: collectionAddress,
@@ -27,7 +26,8 @@ export const getFullCollection = async (collectionAddress: string): Promise<GetC
 
   return {
     collection: collectionData,
-    forSale: forSale as marketplace.Ask[],
+    asks: dossier.asks,
+    volume: dossier.volume,
   };
 };
 
@@ -88,46 +88,6 @@ export async function deleteCollection(collectionId: string): Promise<Collection
 
   return deleteCollectionById;
 }
-
-// export const startImportCollection = async (contractAddress: string, importData: StartImportData) => {
-//   // Get Collection Info
-//   const { name, symbol } = await getContractInfo({ client, contract: contractAddress });
-//   const totalTokens = await getNumTokens({ client, contract: contractAddress });
-//   const { admin, creator } = await client.getContract(contractAddress);
-
-//   console.log('cw721 stuff', { name, symbol }, { admin, creator });
-
-//   console.log('importData', importData);
-//   const newCollection: CreateCollectionData = {
-//     address: contractAddress,
-//     admin: admin,
-//     cw721_name: name,
-//     cw721_symbol: symbol,
-//     creator: creator,
-//     collectionProfile: {
-//       name: importData.name,
-//       description: importData.description,
-//       profile_image: importData.profile_image,
-//       banner_image: importData.banner_image,
-//       website: importData.website,
-//       twitter: importData.twitter,
-//       discord: importData.discord,
-//     },
-//     categories: importData.categories,
-//     totalTokens,
-//     importComplete: false,
-//     traits: [],
-//     uniqueTraits: 0,
-//     hidden: importData.hidden,
-//   };
-//   console.log('collectionProfile', newCollection.collectionProfile);
-//   const result = await createCollection(newCollection);
-
-//   // Runs in background
-//   refreshCollectionTokenList(result._id, result, totalTokens);
-
-//   return result;
-// };
 
 // Refresh collection list of token IDs
 const refreshCollectionTokenList = async (collectionId: string, collectionData: Collection, numTokens: number) => {

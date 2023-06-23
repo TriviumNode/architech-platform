@@ -4,6 +4,7 @@ import { CONTRACT_ADDR_LENGTH, queryClient } from '@/utils/chainClients';
 import {
   Collection,
   CollectionProfile,
+  GetCollectionResponse,
   GetTrendingCollectionResponse,
   RequestWithOptionalUser,
   RequestWithUser,
@@ -21,11 +22,52 @@ import { RequestWithImages } from '@/middlewares/fileUploadMiddleware';
 import { HttpException } from '@/exceptions/HttpException';
 import { getBatchCollectionDossier, MARKETPLACE_ADDRESS } from '@/../../../packages/architech-lib/dist';
 
+export const collectionsToResponse = async (collections: Collection[]): Promise<GetCollectionResponse[]> => {
+  // Get array of cw721 addresses
+  const addresses = collections.map(t => t.address);
+
+  try {
+    // Query collection dossier from marketplace
+    const dossiers = await getBatchCollectionDossier({
+      client: queryClient,
+      collections: addresses,
+      contract: MARKETPLACE_ADDRESS,
+    });
+
+    console.log('MATCH?', dossiers[3], collections[3]);
+
+    // Build Collection Responses
+    const result: GetCollectionResponse[] = collections.map(function (collection, key) {
+      return {
+        collection,
+        asks: dossiers[key].asks,
+        volume: dossiers[key].volume,
+      };
+    });
+    return result;
+  } catch (err: any) {
+    // Handle query error
+    console.error('ERROR QUERYING MARKETPLACE', err);
+
+    // Build result with empty dossier data
+    const result: GetCollectionResponse[] = collections.map(function (collection, key) {
+      return { collection, asks: [], volume: [] };
+    });
+    return result;
+  }
+};
+
 export const getAllCollections = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const findAllCollectionsData: Collection[] = await findAllCollections();
+    const page = req.query.page ? parseInt(req.query.page as string) : undefined;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
 
-    res.status(200).json(findAllCollectionsData);
+    const paginatedCollections: Collection[] = await findAllCollections(page, limit);
+
+    // Generate GetCollectionResponse objects by querying marketplace
+    const response = await collectionsToResponse(paginatedCollections);
+
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
@@ -50,25 +92,41 @@ export const getTrendingCollections = async (req: Request, res: Response, next: 
     ]);
     await CollectionModel.populate(trending, { path: '_id' });
 
-    const addresses = trending.map(t => t._id.address);
-    try {
-      const dossiers = await getBatchCollectionDossier({
-        client: queryClient,
-        collections: addresses,
-        contract: MARKETPLACE_ADDRESS,
-      });
-      const result: GetTrendingCollectionResponse = trending.map(function (elm, key) {
-        return { collection: elm._id, count: elm.count, asks: dossiers[key].asks, volume: dossiers[key].volume };
-      });
-      res.status(200).json(result);
-    } catch (err: any) {
-      console.error('ERROR QUERYING MARKETPLACE', err);
-      res.status(200).json(
-        trending.map(function (elm, key) {
-          return { collection: elm._id, count: elm.count, asks: [], volume: [] };
-        }),
-      );
-    }
+    const collections: Collection[] = trending.map(t => t._id);
+    const collectionsResponse = await collectionsToResponse(collections);
+
+    // Append counts
+    const response: GetTrendingCollectionResponse = collectionsResponse.map(function (cr, key) {
+      return {
+        // collection: elm._id,
+        // count: elm.count,
+        // asks: dossiers[key].asks,
+        // volume: dossiers[key].volume,
+        ...cr,
+        count: trending[key].count,
+      };
+    });
+    res.status(200).json(response);
+
+    // const addresses = trending.map(t => t._id.address);
+    // try {
+    //   const dossiers = await getBatchCollectionDossier({
+    //     client: queryClient,
+    //     collections: addresses,
+    //     contract: MARKETPLACE_ADDRESS,
+    //   });
+    //   const result: GetTrendingCollectionResponse = trending.map(function (elm, key) {
+    //     return { collection: elm._id, count: elm.count, asks: dossiers[key].asks, volume: dossiers[key].volume };
+    //   });
+    //   res.status(200).json(result);
+    // } catch (err: any) {
+    //   console.error('ERROR QUERYING MARKETPLACE', err);
+    //   res.status(200).json(
+    //     trending.map(function (elm, key) {
+    //       return { collection: elm._id, count: elm.count, asks: [], volume: [] };
+    //     }),
+    //   );
+    // }
   } catch (error) {
     next(error);
   }
