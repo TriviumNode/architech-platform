@@ -133,7 +133,7 @@ const SingleToken: FC<any> = (): ReactElement => {
         <Col className='card d-flex flex-row justify-content-between align-items-center'>
           <h2 className='ml16'>{collectionName}</h2>
           <div style={{width: '50%', paddingRight: '24px'}}  className='d-flex justify-content-between align-items-center'>
-            <CollectionStats collection={collection} asks={fullCollection.forSale} />
+            <CollectionStats collection={collection} asks={fullCollection.asks} />
             <SocialLinks discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} website={collection.collectionProfile.website} />
           </div>
         </Col>

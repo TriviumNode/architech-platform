@@ -69,7 +69,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
     const loadTokens = async(pageNumber = page) => {
         let fetchTokens = await getTokens(collection.address, searchParams, sortBy, 1, pageNumber*32)
         if (statusFilter.includes('For Sale')) {
-            const filtered = fetchTokens.filter(t=>fullCollection.forSale.findIndex(ask=>ask.token_id===t.tokenId) > -1)
+            const filtered = fetchTokens.filter(t=>fullCollection.asks.findIndex(ask=>ask.token_id===t.tokenId) > -1)
             fetchTokens = filtered;
         }
         setTokens(fetchTokens);
@@ -131,7 +131,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
                         </div>
                         <p>{collection.collectionProfile.description}</p>
                         <div className='d-flex wide justify-content-space-between'>
-                            <CollectionStats collection={collection} asks={fullCollection.forSale} />
+                            <CollectionStats collection={collection} asks={fullCollection.asks} />
                         </div>
                     </div>
                     <div style={{position: 'absolute', right: '16px', top: '16px'}}>

@@ -50,7 +50,7 @@ const CollectionPage: FC<{
     const collections = user?.profile.collections || []
     console.log('userProfile!', user?.profile)
     const options: SelectOption[] = collections.map(collection=>{
-        return (collectionOption(collection))
+        return (collectionOption(collection.collection))
     });
 
     return (

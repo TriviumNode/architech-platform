@@ -23,6 +23,7 @@ import TokenModel from '@/models/tokens.model';
 import CollectionModel from '@/models/collections.model';
 import { isEmpty } from '@/utils/util';
 import { RequestWithImages } from '@/middlewares/fileUploadMiddleware';
+import { collectionsToResponse } from './collections.controller';
 
 // HTTP
 // Return user profile only.
@@ -52,10 +53,12 @@ export const getUserByAddress = async (req: Request, res: Response, next: NextFu
     const ownedTokens: Token[] = await TokenModel.find({ owner: userAddr }).populate('collectionInfo');
     const ownedCollections: Collection[] = await CollectionModel.find({ creator: userAddr });
 
+    const fullCollections = await collectionsToResponse(ownedCollections);
+
     const response: GetUserProfileResponse = {
       profile: userData,
       tokens: ownedTokens || [],
-      collections: ownedCollections || [],
+      collections: fullCollections || [],
     };
 
     res.status(200).json(response);

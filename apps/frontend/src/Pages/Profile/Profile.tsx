@@ -89,7 +89,7 @@ const ProfilePage: FC<any> = (): ReactElement => {
                         <Col className='grid-4 wide'>
                             {userProfile.collections.map(collection=>{
                                 return (
-                                    <CollectionTile collection={collection} />
+                                    <CollectionTile fullCollection={collection} />
                                 );
                             })}
                         </Col>
