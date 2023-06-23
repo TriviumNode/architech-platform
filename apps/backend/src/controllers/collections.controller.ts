@@ -49,16 +49,26 @@ export const getTrendingCollections = async (req: Request, res: Response, next: 
       { $sort: { count: -1 } },
     ]);
     await CollectionModel.populate(trending, { path: '_id' });
+
     const addresses = trending.map(t => t._id.address);
-    const dossiers = await getBatchCollectionDossier({
-      client: queryClient,
-      collections: addresses,
-      contract: MARKETPLACE_ADDRESS,
-    });
-    const result: GetTrendingCollectionResponse = trending.map(function (elm, key) {
-      return { collection: elm._id, count: elm.count, asks: dossiers[key].asks, volume: dossiers[key].volume };
-    });
-    res.status(200).json(result);
+    try {
+      const dossiers = await getBatchCollectionDossier({
+        client: queryClient,
+        collections: addresses,
+        contract: MARKETPLACE_ADDRESS,
+      });
+      const result: GetTrendingCollectionResponse = trending.map(function (elm, key) {
+        return { collection: elm._id, count: elm.count, asks: dossiers[key].asks, volume: dossiers[key].volume };
+      });
+      res.status(200).json(result);
+    } catch (err: any) {
+      console.error('ERROR QUERYING MARKETPLACE', err);
+      res.status(200).json(
+        trending.map(function (elm, key) {
+          return { collection: elm._id, count: elm.count, asks: [], volume: [] };
+        }),
+      );
+    }
   } catch (error) {
     next(error);
   }
