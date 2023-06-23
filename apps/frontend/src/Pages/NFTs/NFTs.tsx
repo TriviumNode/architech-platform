@@ -164,7 +164,7 @@ const NftPage: FC<any> = (): ReactElement => {
                 console.log('key', key)
                 const style = key === 0 ? {gridColumn: 1, gridRow: 1} : key === 1 ? {gridColumn: 2, gridRow: 1} : key === 2 ? {gridColumn: 3, gridRow: 1} : undefined;
                 return(
-                    <CollectionTile collection={collection} style={style} />
+                    <CollectionTile collection={collection} style={{...style, ...{maxHeight: '350px'}}} key={key} />
                 );
             })}
         </div>
