@@ -16,8 +16,6 @@ export const collectionsToResponse = async (collections: Collection[]): Promise<
       contract: MARKETPLACE_ADDRESS,
     });
 
-    console.log('MATCH?', dossiers[3], collections[3]);
-
     // Build Collection Responses
     const result: GetCollectionResponse[] = collections.map(function (collection, key) {
       return {
@@ -40,12 +38,14 @@ export const collectionsToResponse = async (collections: Collection[]): Promise<
 };
 
 export async function queryDbCollections(query = {}, page?: number, limit = 30): Promise<GetCollectionResponse[]> {
+  console.log('Query Start', page, limit);
   const { docs } = await collectionsModel.paginate(query, {
     page,
     limit,
     lean: true,
     // sort: sortFilter,
   });
+  console.log('Query End')
   const response = await collectionsToResponse(docs as unknown as Collection[]);
   return response;
 }
