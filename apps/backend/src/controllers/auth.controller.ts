@@ -11,6 +11,7 @@ import { isEmpty } from '@/utils/util';
 import TokenModel from '@/models/tokens.model';
 import CollectionModel from '@/models/collections.model';
 import { rotateNonce } from '@/services/users.service';
+import { queryDbCollectionsByCreator } from '@/queriers/collection.querier';
 
 export const walletLogin = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -57,7 +58,7 @@ export const walletLogin = async (req: Request, res: Response, next: NextFunctio
     // const { cookie, findUser } = await authService.walletLogin(userData);
     const { tokenData, findUser } = await authService.walletLogin(userData);
     const ownedTokens: Token[] = await TokenModel.find({ owner: findUser.address });
-    const ownedCollections: Collection[] = await CollectionModel.find({ creator: findUser.address });
+    const ownedCollections = await queryDbCollectionsByCreator(findUser.address);
 
     // Rotate nonce
     rotateNonce(userData._id);
@@ -99,7 +100,8 @@ export const checkLogin = async (req: RequestWithUser, res: Response, next: Next
     const userAddress: string = req.params.userAddress;
     if (userAddress !== userData.address) res.status(400).send('Authorization not valid for this resource.');
     else {
-      const createdCollections = await CollectionModel.find({ creator: userAddress });
+      // const createdCollections = await CollectionModel.find({ creator: userAddress });
+      const createdCollections = await queryDbCollectionsByCreator(userAddress);
       const ownedTokens = await TokenModel.find({ owner: userAddress }).populate('collectionInfo');
       const response: GetUserProfileResponse = {
         profile: userData,

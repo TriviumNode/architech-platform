@@ -1,4 +1,4 @@
-import { Collection } from "./collections.interface";
+import { Collection, GetCollectionResponse } from "./collections.interface";
 import { Token } from "./tokens.interface";
 
 export type LoginType = 'auth0' | 'keplr';
@@ -24,5 +24,5 @@ export interface User extends UserModel {
 export interface GetUserProfileResponse {
   profile: User;
   tokens: Token[];
-  collections: Collection[];
+  collections: GetCollectionResponse[];
 }

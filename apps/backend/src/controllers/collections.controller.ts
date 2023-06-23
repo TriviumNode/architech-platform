@@ -11,7 +11,6 @@ import {
   updateCollectionDto,
 } from '@architech/types';
 import { EditCollectionBodyDto, ImportCollectionBodyDto } from '@/dtos/collections.dto';
-import { findAllCollections } from '@/queriers/collection.querier';
 import { validate } from 'class-validator';
 import { StartImportData } from '@/interfaces/collections.interface';
 import { View } from '@/interfaces/views.interface';
@@ -20,52 +19,14 @@ import CollectionModel from '@/models/collections.model';
 import mongoose from 'mongoose';
 import { RequestWithImages } from '@/middlewares/fileUploadMiddleware';
 import { HttpException } from '@/exceptions/HttpException';
-import { getBatchCollectionDossier, MARKETPLACE_ADDRESS } from '@/../../../packages/architech-lib/dist';
-
-export const collectionsToResponse = async (collections: Collection[]): Promise<GetCollectionResponse[]> => {
-  // Get array of cw721 addresses
-  const addresses = collections.map(t => t.address);
-
-  try {
-    // Query collection dossier from marketplace
-    const dossiers = await getBatchCollectionDossier({
-      client: queryClient,
-      collections: addresses,
-      contract: MARKETPLACE_ADDRESS,
-    });
-
-    console.log('MATCH?', dossiers[3], collections[3]);
-
-    // Build Collection Responses
-    const result: GetCollectionResponse[] = collections.map(function (collection, key) {
-      return {
-        collection,
-        asks: dossiers[key].asks,
-        volume: dossiers[key].volume,
-      };
-    });
-    return result;
-  } catch (err: any) {
-    // Handle query error
-    console.error('ERROR QUERYING MARKETPLACE', err);
-
-    // Build result with empty dossier data
-    const result: GetCollectionResponse[] = collections.map(function (collection, key) {
-      return { collection, asks: [], volume: [] };
-    });
-    return result;
-  }
-};
+import { collectionsToResponse, queryDbCollectionByAddress, queryDbCollections } from '@/queriers/collection.querier';
 
 export const getAllCollections = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const page = req.query.page ? parseInt(req.query.page as string) : undefined;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
 
-    const paginatedCollections: Collection[] = await findAllCollections(page, limit);
-
-    // Generate GetCollectionResponse objects by querying marketplace
-    const response = await collectionsToResponse(paginatedCollections);
+    const response = await queryDbCollections({}, page, limit);
 
     res.status(200).json(response);
   } catch (error) {
@@ -98,10 +59,6 @@ export const getTrendingCollections = async (req: Request, res: Response, next: 
     // Append counts
     const response: GetTrendingCollectionResponse = collectionsResponse.map(function (cr, key) {
       return {
-        // collection: elm._id,
-        // count: elm.count,
-        // asks: dossiers[key].asks,
-        // volume: dossiers[key].volume,
         ...cr,
         count: trending[key].count,
       };
@@ -136,8 +93,8 @@ export const getCollectionByAddress = async (req: RequestWithOptionalUser, res: 
   try {
     const userId: string = req.user?._id;
     const collectionAddress: string = req.params.contractAddr;
-    // const collectionData: Collection = await collectionService.findCollectionByAddress(collectionAddress);
-    const fullCollection = await collectionService.getFullCollection(collectionAddress);
+    // const fullCollection = await collectionService.getFullCollection(collectionAddress);
+    const fullCollection = await queryDbCollectionByAddress(collectionAddress);
 
     if (fullCollection) {
       // Increment view count
