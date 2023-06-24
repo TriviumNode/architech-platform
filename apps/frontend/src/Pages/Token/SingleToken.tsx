@@ -61,7 +61,7 @@ const SingleToken: FC<any> = (): ReactElement => {
           cw721_contract: tokenData?.token.collectionAddress,
           marketplace_contract: MARKETPLACE_ADDRESS,
           token_id: tokenData.token.tokenId,
-          amount: tokenData.sale.price,
+          amount: tokenData.ask.price,
           denom: process.env.REACT_APP_NETWORK_DENOM,
         })
         console.log('Purchase Result',result);
@@ -83,18 +83,18 @@ const SingleToken: FC<any> = (): ReactElement => {
       displayDenom: 'UNKNOWN',
       image: 'arch.svg',
     };
-    if (tokenData?.sale) {
-      if (tokenData.sale.cw20_contract) {
-        const denom = findToken(tokenData.sale.cw20_contract);
+    if (tokenData?.ask) {
+      if (tokenData.ask.cw20_contract) {
+        const denom = findToken(tokenData.ask.cw20_contract);
         if (denom) {
           saleDenom = denom;
-          saleAmount = denomToHuman(tokenData.sale.price, denom.decimals).toString()
+          saleAmount = denomToHuman(tokenData.ask.price, denom.decimals).toString()
         }
       } else {
         const denom = findDenom(process.env.REACT_APP_NETWORK_DENOM);
         if (denom) {
           saleDenom = denom;
-          saleAmount = denomToHuman(tokenData.sale.price, denom.decimals).toString()
+          saleAmount = denomToHuman(tokenData.ask.price, denom.decimals).toString()
         }
       }
     }
@@ -203,7 +203,7 @@ const SingleToken: FC<any> = (): ReactElement => {
               <h2>{num}{tokenData.token?.tokenId}</h2>
             </div>
             <div className='d-flex align-items-center' style={{gap: '24px'}}>
-              { tokenData.sale ? 
+              { tokenData.ask ? 
               <>
                 <div>
                   <div style={{fontSize: '28px'}}>{saleAmount.toString()} <DenomImg denom={saleDenom} size='medium' /></div>
