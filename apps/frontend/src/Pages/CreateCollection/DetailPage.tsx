@@ -26,13 +26,13 @@ export const DefaultDetailState: DetailState = {
 
 const DetailPage: FC<{
     state: DetailState,
+    isEditing: boolean,
     onChange: (detail: DetailState)=>void;
     next: ()=>void;
-}> = ({state, onChange, next}): ReactElement => {
+}> = ({state, isEditing, onChange, next}): ReactElement => {
     const [errors, setErrors] = useState<Partial<DetailState>>()
 
     const updateDetailState = (newDetailState: Partial<DetailState>) => {
-        console.log(newDetailState)
         onChange({...state, ...newDetailState})
     }
 
@@ -55,6 +55,7 @@ const DetailPage: FC<{
             return false;
     }
 
+    console.log(state)
     return (
         <div style={{margin: '48px'}} className='d-flex flex-column'>
             <div className='d-flex' style={{justifyContent: 'space-between'}}>
@@ -75,17 +76,27 @@ const DetailPage: FC<{
                             }
                         </label>
                     </Col>
-                    <Col>
-                        <label>
-                            Collection Symbol
-                            <input value={state.symbol} onChange={(e)=>updateDetailState({symbol: e.target.value})}  className={errors?.symbol && 'error'} />
-                            {!!errors?.symbol &&
-                                <div className='inputAlert'>
-                                    <img alt='alert' src='/alert.svg' style={{height:'1.5em'}} />
-                                </div>
-                            }
-                        </label>
-                    </Col>
+                    { isEditing ?
+                        <Col xs={6}>
+                            <label>
+                                Category
+                                <MultiSelect title={'Select...'} style={{marginTop: '8px'}} options={CATEGORIES} selected={state.categories} onChange={(selected) => updateDetailState({ categories: selected })} />
+                            </label>
+                        </Col>
+                    :
+                        <Col>
+                            <label>
+                                Collection Symbol
+                                <input value={state.symbol} onChange={(e)=>updateDetailState({symbol: e.target.value})}  className={errors?.symbol && 'error'} />
+                                {!!errors?.symbol &&
+                                    <div className='inputAlert'>
+                                        <img alt='alert' src='/alert.svg' style={{height:'1.5em'}} />
+                                    </div>
+                                }
+                            </label>
+                        </Col>
+                    }
+
                 </div>
                 <div className='d-flex mb24'>
                     <Col>
@@ -131,14 +142,16 @@ const DetailPage: FC<{
                         </div>
                     </Col>
                 </div>
-                <div className='d-flex mb24'>
-                    <Col xs={6}>
-                        <label>
-                            Category
-                            <MultiSelect title={'Select...'} style={{marginTop: '8px'}} options={CATEGORIES} selected={state.categories} onChange={(selected) => updateDetailState({ categories: selected })} />
-                        </label>
-                    </Col>
-                </div>
+                {!isEditing &&
+                    <div className='d-flex mb24'>
+                        <Col xs={6}>
+                            <label>
+                                Category
+                                <MultiSelect title={'Select...'} style={{marginTop: '8px'}} options={CATEGORIES} selected={state.categories} onChange={(selected) => updateDetailState({ categories: selected })} />
+                            </label>
+                        </Col>
+                    </div>
+                }
                 <div className='d-flex'>
                     <Col>
                         <label>

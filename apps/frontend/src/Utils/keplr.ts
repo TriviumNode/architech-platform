@@ -68,7 +68,7 @@ export const connectKeplrWallet = async(): Promise<{
     const offlineSigner = window.keplr.getOfflineSigner(process.env.REACT_APP_CHAIN_ID);
     const accounts = await offlineSigner.getAccounts();
 
-    const client = await SigningArchwayClient.connectWithSigner(process.env.REACT_APP_RPC_URL, offlineSigner, {  prefix: process.env.REACT_APP_NETWORK_PREFIX });
+    const client = await SigningArchwayClient.connectWithSigner(process.env.REACT_APP_RPC_URL, offlineSigner);
 
     const stdPubKey: Pubkey = {
         type: 'tendermint/PubKeySecp256k1', //hopefully Keplr is always this

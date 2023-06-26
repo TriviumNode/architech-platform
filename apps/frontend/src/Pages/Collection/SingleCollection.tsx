@@ -137,7 +137,8 @@ const SingleCollection: FC<any> = (): ReactElement => {
                     <div style={{position: 'absolute', right: '16px', top: '16px'}}>
                                 { (wallet && collection.creator === wallet.address) &&
                                 <Col>
-                                    <button type="button" onClick={()=>setIsEditing(true)}>Edit</button>
+                                    {/* <button type="button" onClick={()=>setIsEditing(true)}>Edit</button> */}
+                                    <LinkButton to={`/nfts/edit/${collection.address}`}>Edit</LinkButton>
                                 </Col>
                                 }
                             </div>

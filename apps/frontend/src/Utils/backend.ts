@@ -220,7 +220,7 @@ export const importCollection = async(address: string, request: ImportCollection
 export const editCollection = async(address: string, request: Partial<ImportCollectionData>): Promise<Collection> => {
     const url = getApiUrl(`/collections/edit/${address}`);
 
-    console.log('form!!!!', request)
+    console.log('Edit Request', request)
 
     const formData = new FormData();
 

@@ -23,7 +23,7 @@ import TokenModel from '@/models/tokens.model';
 import CollectionModel from '@/models/collections.model';
 import { isEmpty } from '@/utils/util';
 import { RequestWithImages } from '@/middlewares/fileUploadMiddleware';
-import { collectionsToResponse } from './collections.controller';
+import { collectionsToResponse } from '@/queriers/collection.querier';
 
 // HTTP
 // Return user profile only.

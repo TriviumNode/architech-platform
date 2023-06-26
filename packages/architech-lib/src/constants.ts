@@ -29,10 +29,18 @@ export const DENOMS: Denom[] = [
     },
 ]
 
-export const findDenom = (denom: string) => {
-    return DENOMS.find(d=>d.nativeDenom === denom)
+const unknownDenom: Denom = {
+    decimals: 0,
+    displayDenom: 'UNKNOWN',
+    image: 'arch.svg',
+};
+
+export const findDenom = (denom: string): Denom => {
+    const found = DENOMS.find(d=>d.nativeDenom === denom);
+    return found || unknownDenom;
 }
 
-export const findToken = (cw20_addr: string) => {
-    return DENOMS.find(d=>d.cw20Contract === cw20_addr)
+export const findToken = (cw20_addr: string): Denom => {
+    const found = DENOMS.find(d=>d.cw20Contract === cw20_addr)
+    return found || unknownDenom;
 }

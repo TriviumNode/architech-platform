@@ -43,7 +43,7 @@ const TrendingCard: FC<any> = (): ReactElement => {
                         <span>Volume</span>
                     </Col>
                 </div>
-                { trending.map((t, k)=>
+                { trending.slice(0,3).map((t, k)=>
                     <div key={t.collection.address} className='wide'>
                         <TrendingRow result={t} />
                         {k < 2 && <hr className='mt16'  />}

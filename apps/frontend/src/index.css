@@ -1,4 +1,6 @@
-
+:root {
+  --toastify-toast-width: auto !important;
+}
 
 @font-face {
   font-family: 'TWK Everett';
@@ -240,6 +242,10 @@ button {
 }
 button:disabled {
   cursor: default !important;
+}
+.clearBtn,.clearButton {
+  background: #FFFFFF00;
+  color: #000;
 }
 
 .tallFill {

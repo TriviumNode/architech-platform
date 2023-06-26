@@ -40,7 +40,7 @@ const FinancialPage: FC<{
                             Royalty Payment Wallet
                             <input value={state.address} onChange={e=>updateState({address: e.target.value})} placeholder='archway1a2b...' />
                         </label>
-                        <div style={{textAlign: 'right'}} className={`${styles.spanButton} wide`} onClick={()=>updateState({address: user?.address || ''})}>Use my address</div>
+                        <div style={{textAlign: 'right', cursor: 'pointer'}} className={`${styles.spanButton} wide`} onClick={()=>updateState({address: user?.address || ''})}>Use my address</div>
                     </Col>
                     <Col xs={4}>
                         <label>

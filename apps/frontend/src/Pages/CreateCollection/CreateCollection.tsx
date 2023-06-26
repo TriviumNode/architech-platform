@@ -41,7 +41,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
     const getPage = () => {
         switch(page) {
             case 'Details':
-                return <DetailPage state={detailState} onChange={(data) => setDetailState(data)} next={()=>setPage('Links')} />
+                return <DetailPage isEditing={false} state={detailState} onChange={(data) => setDetailState(data)} next={()=>setPage('Links')} />
             case 'Links':
                 return <LinksPage state={linkState} onChange={(newState) => setLinkState(newState)} next={()=>setPage('Finish')} />
             case 'Finish':

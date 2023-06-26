@@ -94,3 +94,19 @@
     right: 8px;
     bottom: 32px;
   }
+
+
+.saveToast {
+    border-radius: 8px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.20);
+    backdrop-filter: blur(12px);
+    color: #000;
+    width: auto;
+    display: flex;
+    align-items: center;
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, 0);
+    bottom: 32px
+}

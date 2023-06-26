@@ -22,6 +22,7 @@ import SingleCollection from './Pages/Collection/SingleCollection';
 import SingleToken from './Pages/Token/SingleToken';
 import CreateSingleNftPage from './Pages/CreateNft/CreateNft';
 import CreateCollectionPage from './Pages/CreateCollection/CreateCollection';
+import EditCollectionPage from './Pages/CreateCollection/EditCollection';
 
 
 const router = createBrowserRouter([
@@ -61,6 +62,11 @@ const router = createBrowserRouter([
       {
         path: "/nfts/create/:contractAddr",
         element: <CreateSingleNftPage />,
+        loader: collectionLoader,
+      },
+      {
+        path: "/nfts/edit/:contractAddr",
+        element: <EditCollectionPage />,
         loader: collectionLoader,
       },
       {

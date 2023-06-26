@@ -115,9 +115,9 @@ export const UserProvider = ({ children }: Props): ReactElement => {
       // if (confirm(`Sign permit to authenticate wallet?\nThis is required to take advanted of profile features.`)){
       
       // Check if already logged in
+      // TODO handle error
       try {
         const response = await checkLogin(address);
-        console.log('CHECK LOGIN SUCCESS!', response)
         const newUser: User = {client, address, pubKey, wallet_type: 'Keplr', profile: response}
         setUser(newUser)
         localStorage.setItem(KEY, 'true');

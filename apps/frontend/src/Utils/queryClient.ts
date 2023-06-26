@@ -1,4 +1,4 @@
-import { ArchwayClient } from "@archwayhq/arch3.js/build";
+import { ArchwayClient } from "@archwayhq/arch3.js";
 
 export let QueryClient: ArchwayClient;
 
