@@ -1,6 +1,6 @@
 import { cw721, factory } from "@architech/types";
 import { getFee } from "../helpers";
-import { SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import { SigningArchwayClient } from "@archwayhq/arch3.js";
 
 import { COLLECTION_FACTORY_ADDRESS, CW721_CODE_ID } from '@architech/lib'
 import secureRandom from "secure-random";

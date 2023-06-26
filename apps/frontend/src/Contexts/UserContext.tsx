@@ -6,7 +6,7 @@ import {
   ReactNode,
   useEffect
 } from 'react';
-import { SigningArchwayClient } from '@archwayhq/arch3.js/build';
+import { SigningArchwayClient } from '@archwayhq/arch3.js';
 import { connectKeplrWallet, signLoginPermit } from '../Utils/keplr';
 import { toast } from 'react-toastify';
 import { checkLogin, getUserProfile, requestNonce, walletLogin } from '../Utils/backend';

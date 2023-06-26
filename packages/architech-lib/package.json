@@ -33,6 +33,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@archwayhq/arch3.js": "^0.3.1",
     "bignumber.js": "^9.1.1",
     "crypto-js": "^4.1.1"
   }
