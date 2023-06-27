@@ -117,7 +117,7 @@ export default function ProfileMenu(props: HoverMenuProps) {
                 }}>
                   <div>
                     <span className='lightText12'>Arch Rewards</span><br/>
-                    <span>{balances?.rewards || 0} ARCH</span>
+                    <span>{balances?.rewards.toFixed(3) || 0} ARCH</span>
                   </div>
                   <button style={{height: 'unset', padding: '12px'}} disabled={claiming} onClick={()=>handleClaimRewards()}>{claiming ? <SmallLoader /> : 'Claim'}</button>
 
