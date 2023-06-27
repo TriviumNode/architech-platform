@@ -102,6 +102,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                     contract: fullCollection.collection.address,
                     rewards_address: rewardsState.address,
                 })
+                setUnsaved(false)
                 toast.success('Saved rewards address')
             }
             refreshProfile()
