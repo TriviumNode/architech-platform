@@ -46,6 +46,8 @@ const RewardsPage: FC<{
             address: user.address
         });
         console.log('Rewards!', rewards)
+        setRewardsAddress(rewards?.rewardsAddress)
+        setLoadingMetadata(false);
     }
 
     const updateState = (newState: Partial<RewardsState>) => {
@@ -68,14 +70,14 @@ const RewardsPage: FC<{
 
             <form className={styles.form}>
                 <div className='d-flex mb24'>
-                    <Col xs={{span: 6, offset: 0}} md={{span: 6, offset: 0}} >
+                    <Col xs={{span: 12, offset: 0}} md={{span: 10, offset: 1}} >
                         <label>
                             New Rewards Payment Address
                             <input value={state.address} onChange={e=>updateState({address: e.target.value})} placeholder='archway1a2b...' />
                         </label>
                         <div style={{textAlign: 'right', cursor: 'pointer'}} className={`${styles.spanButton} wide`} onClick={()=>updateState({address: user?.address || ''})}>Use my address</div>
                     </Col>
-                    <Col xs={{span: 6, offset: 0}} md={{span: 6, offset: 0}} >
+                    {/* <Col xs={{span: 6, offset: 0}} md={{span: 6, offset: 0}} >
                         <label>
                             Pending Rewards
                             <input disabled={true} value={state.address} onChange={e=>updateState({address: e.target.value})} placeholder='todo...' />
@@ -83,7 +85,7 @@ const RewardsPage: FC<{
                         <div style={{textAlign: 'right'}}>
                             <button className='mt8'>Claim</button>
                         </div>
-                    </Col>
+                    </Col> */}
                 </div>
             </form>
         </div>

@@ -1,4 +1,4 @@
-import { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js";
+import { ArchwayClient, OutstandingRewards, SigningArchwayClient } from "@archwayhq/arch3.js";
 import { getFee } from "./utils";
 
 
@@ -41,6 +41,13 @@ export const getRewards = async({
 }:{
     client: SigningArchwayClient | ArchwayClient,
     address: string,
-}) => {
-    return await client.getOutstandingRewards(address);
+}): Promise<OutstandingRewards | undefined> => {
+    try {
+        return await client.getOutstandingRewards(address);
+    } catch(err: any) {
+        if (err.toString().includes('metadata for the contract: not found: key not found'))
+            return undefined;
+        else
+            throw err;
+    }
 }
