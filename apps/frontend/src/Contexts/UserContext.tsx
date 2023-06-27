@@ -43,17 +43,19 @@ export interface UserContextState {
   balances: Balances | undefined;
   loadingConnectWallet: boolean
   // authenticated: boolean;
-  connectKeplr: undefined | (()=>Promise<void>)
-  refreshProfile: undefined | (()=>Promise<void>)
+  connectKeplr: (()=>Promise<void>)
+  refreshProfile: (()=>Promise<void>)
 }
+
+const whatever = async() => {}
 
 // created context with no default values
 const UserContext = createContext<UserContextState>({
   loadingConnectWallet: false,
   // authenticated: false,
   balances: undefined,
-  connectKeplr: undefined,
-  refreshProfile: undefined,
+  connectKeplr: whatever,
+  refreshProfile: whatever,
   user: undefined,
 });
 

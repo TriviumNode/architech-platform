@@ -242,6 +242,7 @@ button {
 }
 button:disabled {
   cursor: default !important;
+  color: #777777;
 }
 .clearBtn,.clearButton {
   background: #FFFFFF00;

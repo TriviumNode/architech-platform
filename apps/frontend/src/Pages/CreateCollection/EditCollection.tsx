@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import equal from "fast-deep-equal";
 import RewardsPage, { DefaultRewardsState, RewardsState } from "./RewardsPage";
 import { setRewardsMetadata } from "@architech/lib";
+import SmallLoader from "../../Components/SmallLoader";
 
 export type Page = 'Details' | 'Rewards' | 'Links'
 
@@ -56,6 +57,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     const [page, setPage] = useState<Page>(Pages[0])
 
     const [unsaved, setUnsaved] = useState(false);
+    const [saving, setSaving] = useState(false);
       
     useEffect(()=>{
         if ((!equal(currentDetail, detailState) || !equal(currentLinks, linkState)) || rewardsState.address){
@@ -82,6 +84,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     }
 
     const handleSave = async () => {
+        setSaving(true);
         try {
             if (!wallet) throw new Error('Wallet is not connected.');
             if (!equal(currentDetail, detailState) || !equal(currentLinks, linkState)){
@@ -91,6 +94,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                 }
                 const response = await editCollection(collection._id, importData);
                 revalidator.revalidate();
+                toast.success('Saved collection profile')
             } else if (rewardsState.address) {
                 const result = await setRewardsMetadata({
                     client: wallet.client,
@@ -98,10 +102,14 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                     contract: fullCollection.collection.address,
                     rewards_address: rewardsState.address,
                 })
+                toast.success('Saved rewards address')
             }
-
+            refreshProfile()
         } catch(err: any) {
+            toast.error(err.toString())
             console.error(err)
+        } finally {
+            setSaving(false);
         }
     }
 
@@ -142,8 +150,8 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
         { unsaved &&
             <div className={styles.saveToast}>
                 <div style={{margin: '0 24px 0 8px', whiteSpace: 'nowrap'}}>You have unsaved changes</div>
-                <button onClick={handleCancel} className='mr8 clearBtn'>Cancel</button>
-                <button onClick={()=>handleSave()}>Save</button>
+                <button disabled={saving} onClick={handleCancel} className='mr8 clearBtn'>Cancel</button>
+                <button disabled={saving} onClick={()=>handleSave()}>{saving ? <SmallLoader /> : 'Save'}</button>
             </div>
         }
         {/* <Modal open={!!status} locked={true} onClose={()=>{}} >
