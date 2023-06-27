@@ -154,49 +154,8 @@ export const processCollectionTokens = async (collection: Collection, tokenList:
     const token_id = tokenList[i];
     console.log('Processing', token_id);
 
-    // Skip if already in database
-    const inDb: Token = await tokenModel.findOne({ tokenId: token_id, collectionAddress: collection.address });
-    console.log('inDb', inDb);
-    if (inDb) continue;
-
-    const {
-      info: { extension, token_uri },
-      access: { owner },
-    } = await getAllNftInfo({
-      client,
-      contract: collection.address,
-      token_id,
-    });
-    console.log({ extension, token_uri, owner });
-
-    let avgColor = '#232323';
-    if (extension.image) {
-      let url: string = extension.image as string;
-      const isIpfs = url.startsWith('ipfs://');
-      if (isIpfs) url = `https://ipfs.filebase.io/ipfs/${url.replace('ipfs://', '')}`;
-      try {
-        const color = await getAverageColor(url);
-        avgColor = color.hex;
-      } catch (err: any) {
-        console.error(`Error determining average color.\nCollection: ${collection.address}\nToken: ${token_id}`, err);
-      }
-    }
-    console.log('avgColor', avgColor);
-
-    const createTokenData: TokenClass = {
-      collectionAddress: collection.address,
-      collectionInfo: collection._id,
-      tokenId: token_id,
-      metadataUri: token_uri,
-      metadataExtension: extension,
-      owner,
-      averageColor: avgColor,
-      total_views: 0,
-      traits: (extension?.attributes as cw721.Trait[]) || [],
-    };
-    console.log('createTokenData', createTokenData);
-    await createToken(createTokenData);
-    await sleep(200);
+    await ensureToken(collection.address, token_id);
+    await sleep(300);
   }
   processCollectionTraits(collection);
 };

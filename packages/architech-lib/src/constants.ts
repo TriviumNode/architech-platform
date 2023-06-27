@@ -1,5 +1,7 @@
 import { Denom } from "@architech/types";
+import { ArchwayClient } from "@archwayhq/arch3.js";
 
+export const PLACEHOLDER_URL = 'https://placehold.jp/a2a2a2/ffffff/350x350.png?text=%F0%9F%93%B7';
 
 export const LOGIN_STRING = `Login to Architech`
 
@@ -16,15 +18,9 @@ export const CATEGORIES = [
 
 export const DENOMS: Denom[] = [
     {
-        nativeDenom: 'stake',
-        decimals: 6,
-        displayDenom: 'ARCH',
-        image: 'arch.svg'
-    },
-    {
         nativeDenom: 'aconst',
         decimals: 18,
-        displayDenom: 'ARCH',
+        displayDenom: 'CONST',
         image: 'arch.svg'
     },
 ]
