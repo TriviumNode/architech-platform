@@ -55,7 +55,6 @@ const DetailPage: FC<{
             return false;
     }
 
-    console.log(state)
     return (
         <div style={{margin: '48px'}} className='d-flex flex-column'>
             <div className='d-flex' style={{justifyContent: 'space-between'}}>

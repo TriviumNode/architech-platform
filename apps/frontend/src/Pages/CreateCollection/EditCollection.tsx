@@ -82,7 +82,6 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     }
 
     const handleSave = async () => {
-        console.log('SAVING NAME', detailState.name)
         try {
             if (!wallet) throw new Error('Wallet is not connected.');
             if (!equal(currentDetail, detailState) || !equal(currentLinks, linkState)){
@@ -99,7 +98,6 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                     contract: fullCollection.collection.address,
                     rewards_address: rewardsState.address,
                 })
-                console.log('Metadata Response', result);
             }
 
         } catch(err: any) {
