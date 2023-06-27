@@ -111,7 +111,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
 
     return (
         <>
-            <EditModal open={isEditing} onClose={()=>setIsEditing(false)} collectionId={collection._id} />
+            <EditModal open={isEditing} onClose={()=>setIsEditing(false)} collectionId={collection._id.toString()} />
             <div className='d-flex mb8' style={{gap: '8px', margin: '0 -8px', maxHeight: '350px'}}>
                 <Col xs={{span: 10, offset: 1}} md={{span: 3, offset: 0}} className='card' style={{aspectRatio: '1 / 1'}}>
                     <PlaceholdImg alt={collectionName} src={collectionImage} style={{objectFit: 'cover', width: '100%', height: '100%'}} />

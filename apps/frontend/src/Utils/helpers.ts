@@ -6,9 +6,12 @@ export function getCollectionName(collection: Collection) {
 }
 
 export const getFee = (gas: number) => {
-    const fee = Math.ceil(gas * parseFloat(process.env.GAS_PRICE || '1'))
+    console.log('GAS PRICE', process.env.REACT_APP_GAS_PRICE)
+    console.log('GAS DENOM', process.env.REACT_APP_GAS_DENOM)
+    const fee = Math.ceil(gas * parseFloat(process.env.REACT_APP_GAS_PRICE || '1'))
+    console.log('FEE', fee)
     return {
-        amount: [{denom: process.env.GAS_DENOM || 'uconst', amount: fee.toString()}],
+        amount: [{denom: process.env.REACT_APP_GAS_DENOM || 'aconst', amount: fee.toString()}],
         gas: gas.toString(),
     }
 }

@@ -22,6 +22,7 @@ class CollectionProfileClass implements CollectionProfile {
   @prop({ type: String })
   public description?: string;
 
+  // Socials
   @prop({ type: String })
   public website?: string;
 
@@ -42,9 +43,13 @@ class CollectionProfileClass implements CollectionProfile {
   public banner_image?: string;
 }
 
-@plugin(mongoosastic, { esClient: esClient })
+@plugin(mongoosastic, { esClient: esClient }) // ElasticSearch
 @modelOptions({ schemaOptions: { collection: 'collections', timestamps: true } })
-export class CollectionClass extends PaginatedModel implements CollectionModelInterface {
+export class CollectionClass extends PaginatedModel {
+  //implements CollectionModelInterface {
+
+  public _id: mongoose.Types.ObjectId;
+
   @prop({ type: String, required: true, unique: true })
   public address: string;
 
@@ -54,29 +59,31 @@ export class CollectionClass extends PaginatedModel implements CollectionModelIn
   @prop({ type: String, required: true })
   public cw721_symbol: string;
 
-  @prop({ type: String, required: false })
+  // Archway Contract Admin
+  @prop({ type: String })
   public admin?: string;
 
+  // Original Initializer's Address
   @prop({ type: String, required: true })
   public creator: string;
 
   @prop({ required: true })
   public collectionProfile: CollectionProfileClass;
 
-  @prop({ type: String, required: true, default: [] })
-  public categories!: mongoose.Types.Array<string>;
+  @prop({ type: () => [String], required: true, default: [] })
+  public categories!: string[];
 
   @prop({ required: true, default: [] })
   public traits!: mongoose.Types.Array<cw721.Trait>;
 
-  @prop({ type: String, required: true, default: [] })
-  public traitTypes!: mongoose.Types.Array<string>;
+  @prop({ type: () => [String], required: true, default: [] })
+  public traitTypes!: string[];
 
   @prop({ type: Number, required: true })
   public uniqueTraits: number;
 
-  @prop({ type: String, required: true, default: [] })
-  public tokenIds!: mongoose.Types.Array<string>;
+  @prop({ type: () => [String], required: true, default: [] })
+  public tokenIds!: string[];
 
   @prop({ type: Number, required: true })
   public totalTokens: number;

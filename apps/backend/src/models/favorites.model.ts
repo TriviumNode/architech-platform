@@ -8,11 +8,11 @@ import { UserClass } from './users.model';
 
 @modelOptions({ schemaOptions: { collection: 'favorites', timestamps: true } })
 export class FavoritesClass implements IFavoritesModel {
-  @prop({ ref: () => TokenClass, type: () => String, required: true })
-  public token: Ref<ObjectId>;
+  @prop({ ref: () => TokenClass, required: true })
+  public token!: Ref<TokenClass>;
 
-  @prop({ ref: () => UserClass, type: () => String, required: true })
-  public user: Ref<ObjectId>;
+  @prop({ ref: () => UserClass, required: true })
+  public user!: Ref<UserClass>;
 }
 
 const FavoritesModel = getModelForClass(FavoritesClass);

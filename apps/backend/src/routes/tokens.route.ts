@@ -1,9 +1,6 @@
 import { Router } from 'express';
-import { CreateUserDto } from '@architech/types';
 import { Routes } from '@interfaces/routes.interface';
-import validationMiddleware from '@middlewares/validation.middleware';
 import {
-  getAllTokens,
   getCollectionTokenCount,
   getCollectionTokenId,
   getCollectionTokens,
@@ -23,21 +20,16 @@ class TokensRoute implements Routes {
   }
 
   private initializeRoutes() {
-    // Get all tokens
-    // TODO: Pagination or remove
-    this.router.get(`${this.path}`, getAllTokens);
-
-    // Get number of imported tokens in collection.
+    // Get Latest listed tokens live from marketplace contract
     this.router.get(`${this.path}/latest_listings`, getLatestListings);
 
     // Get number of imported tokens in collection.
     this.router.get(`${this.path}/count/:collectionAddr`, getCollectionTokenCount);
 
-    // Get details of tokens in collection
+    // Get detail list of tokens in collection
     this.router.get(`${this.path}/collection/:collectionAddr`, getCollectionTokens);
 
     // Get details of specific token_id
-    // TODO: Try to fetch from chain when token is not found.
     this.router.get(`${this.path}/collection/:collectionAddr/:tokenId`, optionalAuthMiddleware, getCollectionTokenId);
 
     // Get details of tokens owned by specific address

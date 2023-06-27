@@ -20,6 +20,7 @@ import mongoose from 'mongoose';
 import { RequestWithImages } from '@/middlewares/fileUploadMiddleware';
 import { HttpException } from '@/exceptions/HttpException';
 import { collectionsToResponse, queryDbCollectionByAddress, queryDbCollections } from '@/queriers/collection.querier';
+import { addCollectionView } from '@/services/view.service';
 
 export const getAllCollections = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -98,13 +99,13 @@ export const getCollectionByAddress = async (req: RequestWithOptionalUser, res: 
 
     if (fullCollection) {
       // Increment view count
-      const view: View = {
+      const updated = await addCollectionView({
         collectionRef: fullCollection.collection._id,
-        viewer: userId ? userId : undefined,
-      };
-      console.log('adding view', view);
-      await ViewModel.create(view);
-      const updated = await CollectionModel.findByIdAndUpdate(fullCollection.collection._id, { $inc: { total_views: 1 } }, { new: true });
+        collectionAddress,
+        viewerRef: userId ? new mongoose.Types.ObjectId(userId) : undefined,
+        viewerIP: (req.headers['x-forwarded-for'] as string) || '0.0.0.0',
+      });
+
       fullCollection.collection = updated;
       res.status(200).json(fullCollection);
       return;
@@ -115,54 +116,6 @@ export const getCollectionByAddress = async (req: RequestWithOptionalUser, res: 
     next(error);
   }
 };
-
-//   public getCollectionById = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       const collectionId: string = req.params.id;
-//       const findOneCollectionData: Collection = await this.collectionService.findCollectionById(collectionId);
-
-//       res.status(200).json({ data: findOneCollectionData, message: 'findOne' });
-//     } catch (error) {
-//       next(error);
-//     }
-//   };
-
-//   public createCollection = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       const collectionData: CreateCollectionDto = req.body;
-//       const createCollectionData: Collection = await this.collectionService.createCollection(collectionData);
-
-//       res.status(201).json({ data: createCollectionData, message: 'created' });
-//     } catch (error) {
-//       next(error);
-//     }
-//   };
-
-//   public updateCollection = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       const collectionId: string = req.params.id;
-//       const collectionData: CreateCollectionDto = req.body;
-//       const updateCollectionData: Collection = await this.collectionService.updateCollection(collectionId, collectionData);
-
-//       res.status(200).json({ data: updateCollectionData, message: 'updated' });
-//     } catch (error) {
-//       next(error);
-//     }
-//   };
-
-//   public deleteCollection = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       const collectionId: string = req.params.id;
-//       const deleteCollectionData: Collection = await this.collectionService.deleteCollection(collectionId);
-
-//       res.status(200).json({ data: deleteCollectionData, message: 'deleted' });
-//     } catch (error) {
-//       next(error);
-//     }
-//   };
-// }
-
-// export default CollectionsController;
 
 export const importCollectionAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -229,7 +182,7 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
 
     Object.keys(updateCollection).forEach(key => updateCollection[key] === undefined && delete updateCollection[key]);
 
-    const updated: Collection = await collectionService.updateCollection(collectionId, updateCollection);
+    const updated: Collection = await collectionService.updateCollection(new mongoose.Types.ObjectId(collectionId), updateCollection);
     res.status(200).json(updated);
   } catch (error) {
     next(error);

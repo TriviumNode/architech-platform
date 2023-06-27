@@ -1,3 +1,4 @@
+import { getAverageColor } from 'fast-average-color-node';
 import secureRandom from 'secure-random';
 
 /**
@@ -22,4 +23,13 @@ export const isEmpty = (value: string | number | object): boolean => {
 
 export const generateNonce = () => {
   return Buffer.from(secureRandom(8, { type: 'Uint8Array' })).toString('base64');
+};
+
+export const processAverageColor = async (imageUrl: string): Promise<string> => {
+  let url: string = imageUrl as string;
+  const isIpfs = url.startsWith('ipfs://');
+  if (isIpfs) url = `https://ipfs.filebase.io/ipfs/${url.replace('ipfs://', '')}`;
+  const color = await getAverageColor(url);
+  const avgColor = color.hex;
+  return avgColor;
 };

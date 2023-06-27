@@ -92,7 +92,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                     ...detailState,
                     ...linkState,
                 }
-                const response = await editCollection(collection._id, importData);
+                const response = await editCollection(collection._id.toString(), importData);
                 revalidator.revalidate();
                 toast.success('Saved collection profile')
             } else if (rewardsState.address) {

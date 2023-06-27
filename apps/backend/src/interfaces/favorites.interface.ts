@@ -4,8 +4,8 @@ import { Ref } from '@typegoose/typegoose';
 import { ObjectId } from 'mongoose';
 
 export interface IFavoritesModel {
-  user: Ref<ObjectId>;
-  token: Ref<ObjectId>;
+  user: Ref<UserClass>;
+  token: Ref<TokenClass>;
 }
 
 export interface Favorite extends IFavoritesModel {

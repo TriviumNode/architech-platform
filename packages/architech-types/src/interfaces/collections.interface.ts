@@ -1,6 +1,7 @@
 import { cw721, marketplace } from "../contracts";
 import { Token } from "./tokens.interface";
 import { Ref } from '@typegoose/typegoose';
+import mongoose from "mongoose";
 
 export interface CollectionProfile {
   name?: string;
@@ -37,7 +38,7 @@ export interface CollectionModel {
 }
 
 export interface Collection extends CollectionModel {
-  _id: string;
+  _id: mongoose.Types.ObjectId;
 }
 
 export interface ImportCollectionRequest extends CollectionProfile {

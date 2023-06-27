@@ -1,20 +1,21 @@
 import { NextFunction, Request, Response } from 'express';
 import { queryClient } from '@/utils/chainClients';
 import * as tokenService from '@/services/tokens.service';
-import { cw721, GetLatestListingsResponse, GetTokenResponse, marketplace, RequestWithOptionalUser, SortOption, Token } from '@architech/types';
+import { cw721, GetLatestListingsResponse, GetTokenResponse, RequestWithOptionalUser, SortOption, Token } from '@architech/types';
 
-import { getAllAsks, getAllNftInfo, getAsk, getNftInfo, MARKETPLACE_ADDRESS } from '@architech/lib';
-import ViewModel from '@/models/views.model';
-import { View } from '@/interfaces/views.interface';
+import { getAllAsks, MARKETPLACE_ADDRESS } from '@architech/lib';
 import TokenModel from '@/models/tokens.model';
 import { HttpException } from '@/exceptions/HttpException';
 import CollectionModel from '@/models/collections.model';
 import { findFavoritesCount } from '@/services/favorites.service';
-import equal from 'fast-deep-equal';
 import UserModel from '@/models/users.model';
+import mongoose from 'mongoose';
+import { addTokenView } from '@/services/view.service';
 
+// TODO cache this!!
 export const getLatestListings = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // Query latest asks from marketplace contract
     const asks = await getAllAsks({ client: queryClient, contract: MARKETPLACE_ADDRESS, limit: 10 });
 
     const response: GetLatestListingsResponse[] = [];
@@ -24,8 +25,7 @@ export const getLatestListings = async (req: Request, res: Response, next: NextF
       const collection = await CollectionModel.findOne({ address: ask.collection });
       if (!collection) continue;
 
-      // TODO query token from chain if not in DB
-      const token = await TokenModel.findOne({ tokenId: ask.token_id, collectionAddress: ask.collection });
+      const token = await tokenService.ensureToken(ask.collection, ask.token_id);
       if (!token) continue;
 
       response.push({
@@ -36,16 +36,6 @@ export const getLatestListings = async (req: Request, res: Response, next: NextF
     }
 
     res.status(200).json(response);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const getAllTokens = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const findAllTokensData: Token[] = await tokenService.findAllTokens();
-
-    res.status(200).json(findAllTokensData);
   } catch (error) {
     next(error);
   }
@@ -64,7 +54,7 @@ export const getTokensByOwner = async (req: Request, res: Response, next: NextFu
 
 export const getCollectionTokens = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('QUERYYY', req.query);
+    console.log('QUERY STRING', req.query);
     const collectionAddr: string = req.params.collectionAddr;
 
     const sort: SortOption = (req.query.sort as SortOption) || 'Name';
@@ -109,52 +99,28 @@ export const getCollectionTokenId = async (req: RequestWithOptionalUser, res: Re
   try {
     const collectionAddr: string = req.params.collectionAddr;
     const tokenId: string = req.params.tokenId;
-    const tokenData: Token = await tokenService.findTokenIdInCollection(tokenId, collectionAddr);
+    const tokenData = await tokenService.ensureToken(collectionAddr, tokenId);
     if (tokenData) {
       // Increment view count
       const userId: string = req.user?._id;
-      const view: View = {
+      const updated = await addTokenView({
+        collectionAddress: tokenData.collectionAddress,
         collectionRef: tokenData.collectionInfo._id,
-        tokenId: tokenId,
-        viewer: userId ? userId : undefined,
-      };
-
-      await ViewModel.create(view);
-      let updated = await TokenModel.findByIdAndUpdate(tokenData._id, { $inc: { total_views: 1 } }, { new: true });
-
-      let ask: marketplace.Ask;
-      let owner = tokenData.owner;
-      try {
-        // Get ask from marketplace (if any)
-        ask = await getAsk({
-          client: queryClient,
-          contract: MARKETPLACE_ADDRESS,
-          collection: tokenData.collectionAddress,
-          token_id: tokenData.tokenId,
-        });
-
-        // Get current owner
-        const { access } = await getAllNftInfo({ client: queryClient, contract: tokenData.collectionAddress, token_id: tokenData.tokenId });
-        if (access.owner === MARKETPLACE_ADDRESS) owner = ask.seller;
-        else owner = access.owner;
-      } catch (err: any) {
-        console.error('Error fetching toke ask:', err);
-      }
+        tokenRef: tokenData._id,
+        tokenId,
+        viewerRef: new mongoose.Types.ObjectId(userId),
+        viewerIP: (req.headers['x-forwarded-for'] as string) || '0.0.0.0',
+      });
 
       // Get number of likes
       const count = await findFavoritesCount(tokenData._id);
 
       // Get owner profile
-      const ownerProfile = await UserModel.findOne({ address: owner }).lean();
-
-      // Update DB if needed
-      if (owner !== tokenData.owner || !equal(ask, tokenData.ask)) {
-        updated = await TokenModel.findByIdAndUpdate(tokenData._id, { owner, ask }, { new: true });
-      }
+      const ownerProfile = await UserModel.findOne({ address: tokenData.owner }).lean();
 
       const response: GetTokenResponse = {
         token: updated as unknown as Token,
-        ask: ask as marketplace.Ask,
+        ask: updated.ask,
         favorites: count,
         ownerName: ownerProfile?.username || tokenData.owner,
       };
@@ -172,58 +138,10 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
   try {
     const collectionAddr: string = req.params.collectionAddr;
     const tokenId: string = req.params.tokenId;
-    const tokenData: Token = await tokenService.refreshToken(tokenId, collectionAddr);
+    const tokenData = await tokenService.ensureToken(collectionAddr, tokenId);
 
     res.status(200).json(tokenData);
   } catch (error) {
     next(error);
   }
 };
-
-//   public getTokenById = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       const tokenId: string = req.params.id;
-//       const findOneTokenData: Token = await this.tokenService.findTokenById(tokenId);
-
-//       res.status(200).json({ data: findOneTokenData, message: 'findOne' });
-//     } catch (error) {
-//       next(error);
-//     }
-//   };
-
-//   public createToken = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       const tokenData: CreateTokenDto = req.body;
-//       const createTokenData: Token = await this.tokenService.createToken(tokenData);
-
-//       res.status(201).json({ data: createTokenData, message: 'created' });
-//     } catch (error) {
-//       next(error);
-//     }
-//   };
-
-//   public updateToken = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       const tokenId: string = req.params.id;
-//       const tokenData: CreateTokenDto = req.body;
-//       const updateTokenData: Token = await this.tokenService.updateToken(tokenId, tokenData);
-
-//       res.status(200).json({ data: updateTokenData, message: 'updated' });
-//     } catch (error) {
-//       next(error);
-//     }
-//   };
-
-//   public deleteToken = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       const tokenId: string = req.params.id;
-//       const deleteTokenData: Token = await this.tokenService.deleteToken(tokenId);
-
-//       res.status(200).json({ data: deleteTokenData, message: 'deleted' });
-//     } catch (error) {
-//       next(error);
-//     }
-//   };
-// }
-
-// export default TokensController

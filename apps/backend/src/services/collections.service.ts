@@ -13,6 +13,7 @@ import { isArray, isBoolean } from 'class-validator';
 import fetch from 'node-fetch';
 import { hashBuffer, saveBuffer } from '@/middlewares/fileUploadMiddleware';
 import mime from 'mime-types';
+import mongoose from 'mongoose';
 
 export const getFullCollection = async (collectionAddress: string): Promise<GetCollectionResponse> => {
   const collectionData: Collection = await CollectionModel.findOne({ address: collectionAddress });
@@ -52,7 +53,7 @@ export async function createCollection(collectionData: CreateCollectionData): Pr
   return createCollectionData;
 }
 
-export async function updateCollection(collectionId: string, collectionData: Partial<Collection>): Promise<Collection> {
+export async function updateCollection(collectionId: mongoose.Types.ObjectId, collectionData: Partial<Collection>): Promise<Collection> {
   if (isEmpty(collectionData)) throw new HttpException(400, 'collectionData is empty');
 
   // if (collectionData.address) {
@@ -162,7 +163,7 @@ export const refreshCollection = async (contract: string) => {
     const updatedCollection = await updateCollection(knownCollectionData._id, updateData);
 
     // Start refreshing tokens
-    refreshCollectionTokenList(updatedCollection._id, updatedCollection, numTokens);
+    refreshCollectionTokenList(updatedCollection._id.toString(), updatedCollection, numTokens);
 
     // Return updated data
     return updatedCollection;
@@ -249,7 +250,7 @@ export const importCollection = async (
   const result = await createCollection(newCollection);
 
   // Runs in background
-  refreshCollectionTokenList(result._id, result, totalTokens);
+  refreshCollectionTokenList(result._id.toString(), result, totalTokens);
 
   return result;
 };

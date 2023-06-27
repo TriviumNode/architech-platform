@@ -1,5 +1,7 @@
+import { ObjectId } from "mongoose";
 import { cw721, marketplace } from "../contracts";
 import { Collection } from "./collections.interface";
+import { Ref } from '@typegoose/typegoose';
 
 export interface ITokenModel {
     tokenId: string;
@@ -9,12 +11,13 @@ export interface ITokenModel {
     owner: string;
     averageColor: string;
     total_views: number;
+    traits: cw721.Trait[];
     ask?: marketplace.Ask;
+    collectionInfo: Collection;
 }
 
 export interface Token extends ITokenModel {
     _id: string;
-    collectionInfo: Collection;
 }
 
 export interface GetTokenResponse {
