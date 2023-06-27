@@ -20,6 +20,10 @@ const TrendingRow: FC<
     const collectionName = getCollectionName(result.collection)
 
     console.log('Trending Row API URL',result.collection.collectionProfile.profile_image, getApiUrl(`/public/${result.collection.collectionProfile.profile_image}`))
+
+    console.log('Result!', result);
+
+    const imgUrl = result.collection.collectionProfile.profile_image ? getApiUrl(`/public/${result.collection.collectionProfile.profile_image}`) : undefined;
     return(
     <Link to={`/nfts/${result.collection.address}`}
         style={{
@@ -31,7 +35,7 @@ const TrendingRow: FC<
             <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
                 <PlaceholdImg
                     alt=''
-                    src={getApiUrl(`/public/${result.collection.collectionProfile.profile_image}`)}
+                    src={imgUrl}
                     style={{
                         height: '48px',
                         width: '48px',
