@@ -59,7 +59,7 @@ export default function SortByButton(props: HoverMenuProps) {
         onKeyDown={() => {
           setIsOpen(!isOpen);
         }}
-        style={{background: '#fff', color: '#000', fontSize: '16px'}}
+        style={{background: '#FFFFFF00', color: '#000', fontSize: '16px'}}
       >
         <span className='mr8'>Sort By{selectedOption ? `: ${selectedOption}` : ''}</span><span aria-hidden>▾</span>
         {/* <span aria-hidden>▾</span> */}

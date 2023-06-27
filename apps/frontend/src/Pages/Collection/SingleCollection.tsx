@@ -191,7 +191,22 @@ const SingleCollection: FC<any> = (): ReactElement => {
                 </Col>
                 }
             </div>
-            <div className='d-flex mb8 mt8 gap8 justify-content-center' style={{gap: '8px', margin: '0 -8px', maxHeight: '350px'}}>
+            <div
+                className='d-flex mb8 mt8 justify-content-center'
+                style={{
+                    margin: '0 -8px',
+                    maxHeight: '350px',
+                }}
+            >
+                <div
+                    className='d-flex gap8 br8 justify-content-center'
+                    style={{
+                        padding: '8px',
+                        background: 'rgba(255, 255, 255, 0.80)',
+                        backdropFilter: 'blur(12px)',
+                        width: 'auto'   
+                    }}
+                >
                 <Col xs="auto">
                     <SortByButton selectedOption={sortBy} setSelected={(option) => updateSortBy(option)} />
                 </Col>
@@ -202,6 +217,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
                 }
 
             </div>
+        </div>
 
         </>
     );

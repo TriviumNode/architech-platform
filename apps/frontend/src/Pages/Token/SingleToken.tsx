@@ -10,6 +10,7 @@ import CollectionStats from "../../Components/CollectionStats/CollectionStats";
 import Loader from "../../Components/Loader";
 import ListModal from "../../Components/Modals/ListModal";
 import PlaceholdImg from "../../Components/PlaceholdImg";
+import SmallLoader from "../../Components/SmallLoader";
 import SocialLinks from "../../Components/Socials";
 import TokenImage from "../../Components/TokenImg";
 import Vr from "../../Components/vr";
@@ -27,6 +28,7 @@ const SingleToken: FC<any> = (): ReactElement => {
     const [tokenData, setTokenData] = useState<GetTokenResponse | undefined>(tokenResponse);
 
     const [isListing, setIsListing] = useState(false);
+    const [loadingTx, setLoadingTx] = useState(false);
 
     const { user, refreshProfile } = useUser()
     const revalidator = useRevalidator()
@@ -37,6 +39,7 @@ const SingleToken: FC<any> = (): ReactElement => {
 
     const handleCancel = async (e: any) => {
       e.preventDefault();
+      setLoadingTx(true);
       try {
         if (!user) throw new Error('Wallet is not connected.')
         if (!tokenData) throw new Error('Token data is not loaded.')
@@ -52,11 +55,14 @@ const SingleToken: FC<any> = (): ReactElement => {
       } catch(err: any) {
         console.error(err)
         toast.error(err.toString())
+      } finally {
+        setLoadingTx(false);
       }
     }
 
     const handleBuy = async (e: any) => {
       e.preventDefault();
+      setLoadingTx(true);
       try {
         if (!user) throw new Error('Wallet is not connected.')
         if (!tokenData) throw new Error('Token data is not loaded.')
@@ -69,11 +75,13 @@ const SingleToken: FC<any> = (): ReactElement => {
           amount: tokenData.ask.price,
           denom: process.env.REACT_APP_NETWORK_DENOM,
         })
-        await refreshToken(tokenData.token.collectionAddress, tokenData.token.tokenId)
+        await refreshToken(tokenData.token.collectionAddress, tokenData.token.tokenId);
         revalidator.revalidate();
       } catch(err: any) {
         console.error(err)
         toast.error(err.toString())
+      } finally {
+        setLoadingTx(false);
       }
     }
 
@@ -151,19 +159,20 @@ const SingleToken: FC<any> = (): ReactElement => {
           </div>
         </Col>
       </div>
-      <div className='d-flex colGap8'>
-        <Col xs={12} md={6} className={`br8 square`} style={{maxHeight: '630px'}}>
+      <div className='d-flex colGap8 flex-wrap' style={{minWidth: 0}}>
+        <Col xs={{span: 10, offset: 2}} md={{span: 6, offset: 0}} className={`br8 square`} style={{maxHeight: '630px'}}>
           <TokenImage alt={`${collectionName} ${tokenData.token.tokenId}`} src={tokenImage} className='tall wide imgCover' />
         </Col>
-        <Col className='d-flex flex-column'>
-          <div className='d-flex card justify-content-between' style={{height: '128px', marginBottom: '8px'}}>
-            <div style={{margin: '24px 0 0 24px'}}>
-              <div className='d-flex align-items-center mb16'><h1 className='mr8' style={{lineHeight: 1}}>{num}{tokenData.token?.tokenId}</h1>
+        <Col className='d-flex flex-column' style={{maxWidth: '712px', minWidth: 0}}>
+          <div className='d-flex card justify-content-between' style={{height: '128px', marginBottom: '8px', overflow: "hidden", minWidth: 0}}>
+            <div style={{margin: '24px 0 0 24px', overflow: 'hidden'}}>
+              <div className='d-flex align-items-center mb16'>
+                <h1 className='mr8' style={{lineHeight: 1}}>{num}{tokenData.token?.tokenId}</h1>
                 {(collection.categories || []).map(category=>
                   <Badge><span>{category}</span></Badge>
                 )}
               </div>
-              <span className='lightText14'>Owned by&nbsp;</span><Link to={`/profile/${tokenData.token?.owner}`}>{tokenData.ownerName}</Link>
+              <span className='lightText14'>Owned by&nbsp;</span><Link  style={{overflow: "hidden"}} to={`/profile/${tokenData.token?.owner}`}>{tokenData.ownerName}</Link>
             </div>
             <div className='d-flex align-items-center mr16'>
               <div className="d-flex align-items-stretch" style={{gap: '16px'}}>
@@ -185,7 +194,7 @@ const SingleToken: FC<any> = (): ReactElement => {
           <div className='d-flex card flex-column' style={{minHeight: '300px', marginBottom: '8px'}}>
             <div style={{margin: '32px'}}>
               <div className='d-flex align-items-center lightText14'>
-                <img src='/database.svg' style={{height: '1.2em'}} className='mr8' />Price History
+                <img alt='' src='/database.svg' style={{height: '1.2em'}} className='mr8' />Price History
               </div>
 
             </div>
@@ -193,7 +202,7 @@ const SingleToken: FC<any> = (): ReactElement => {
           <div className='d-flex card flex-column' style={{height: '89px', marginBottom: '8px'}}>
             <div style={{margin: '32px'}}>
               <div className='d-flex align-items-center lightText14'>
-                <img src='/database.svg' style={{height: '1.2em'}} className='mr8' /><span>Listings</span>
+                <img alt='' src='/database.svg' style={{height: '1.2em'}} className='mr8' /><span>Listings</span>
               </div>
 
             </div>
@@ -201,7 +210,7 @@ const SingleToken: FC<any> = (): ReactElement => {
           <div className='d-flex card flex-column' style={{height: '89px', marginBottom: '8px'}}>
             <div style={{margin: '32px'}}>
               <div className='d-flex align-items-center lightText14'>
-                <img src='/database.svg' style={{height: '1.2em'}} className='mr8' /><span>Offers</span>
+                <img alt='' src='/database.svg' style={{height: '1.2em'}} className='mr8' /><span>Offers</span>
               </div>
 
             </div>
@@ -224,9 +233,9 @@ const SingleToken: FC<any> = (): ReactElement => {
                 </div>
                 {
                   tokenData.token.owner === user?.address ? 
-                    <button type='button' onClick={handleCancel}>Cancel Listing</button>
+                    <button disabled={loadingTx} type='button' onClick={handleCancel}>{loadingTx && <><SmallLoader />&nbsp;</>}Cancel Listing</button>
                   :
-                    <button type='button' onClick={handleBuy}>Buy now</button>
+                    <button disabled={loadingTx} type='button' onClick={handleBuy}>{loadingTx && <><SmallLoader />&nbsp;</>}Buy now</button>
                 }
               </>
               :
