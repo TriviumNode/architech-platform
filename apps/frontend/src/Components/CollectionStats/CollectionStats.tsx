@@ -24,14 +24,18 @@ const CollectionStats: FC<Props> = ({collection, asks}): ReactElement => {
     const floorAmount = denomToHuman(floor, parseInt(process.env.REACT_APP_NETWORK_DECIMALS));
 
     const queryVolume = async() => {
-        const volumeResult = await getVolume({
-            client: QueryClient,
-            contract: MARKETPLACE_ADDRESS,
-            collection: collection.address
-        })
-        const amount = volumeResult.find(v=>v.denom === process.env.REACT_APP_NETWORK_DENOM)?.amount || '0';
-        const humanAmount = denomToHuman(amount, parseInt(process.env.REACT_APP_NETWORK_DECIMALS))
-        setVolume(humanAmount);
+        try {
+            const volumeResult = await getVolume({
+                client: QueryClient,
+                contract: MARKETPLACE_ADDRESS,
+                collection: collection.address
+            })
+            const amount = volumeResult.find(v=>v.denom === process.env.REACT_APP_NETWORK_DENOM)?.amount || '0';
+            const humanAmount = denomToHuman(amount, parseInt(process.env.REACT_APP_NETWORK_DECIMALS))
+            setVolume(humanAmount);
+        } catch (err: any) {
+            console.error('Error querying collection volume:', err)
+        }
     }
 
     useEffect(()=>{

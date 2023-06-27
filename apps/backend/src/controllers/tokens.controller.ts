@@ -122,22 +122,27 @@ export const getCollectionTokenId = async (req: RequestWithOptionalUser, res: Re
       await ViewModel.create(view);
       let updated = await TokenModel.findByIdAndUpdate(tokenData._id, { $inc: { total_views: 1 } }, { new: true });
 
-      // Get ask from marketplace (if any)
-      const ask = await getAsk({
-        client: queryClient,
-        contract: MARKETPLACE_ADDRESS,
-        collection: tokenData.collectionAddress,
-        token_id: tokenData.tokenId,
-      });
+      let ask: marketplace.Ask;
+      let owner = tokenData.owner;
+      try {
+        // Get ask from marketplace (if any)
+        ask = await getAsk({
+          client: queryClient,
+          contract: MARKETPLACE_ADDRESS,
+          collection: tokenData.collectionAddress,
+          token_id: tokenData.tokenId,
+        });
+
+        // Get current owner
+        const { access } = await getAllNftInfo({ client: queryClient, contract: tokenData.collectionAddress, token_id: tokenData.tokenId });
+        if (access.owner === MARKETPLACE_ADDRESS) owner = ask.seller;
+        else owner = access.owner;
+      } catch (err: any) {
+        console.error('Error fetching toke ask:', err);
+      }
 
       // Get number of likes
       const count = await findFavoritesCount(tokenData._id);
-
-      // Get current owner
-      let {
-        access: { owner },
-      } = await getAllNftInfo({ client: queryClient, contract: tokenData.collectionAddress, token_id: tokenData.tokenId });
-      if (owner === MARKETPLACE_ADDRESS) owner = ask.seller;
 
       // Get owner profile
       const ownerProfile = await UserModel.findOne({ address: owner }).lean();

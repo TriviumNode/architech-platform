@@ -16,6 +16,7 @@ import TokenImage from "../../Components/TokenImg";
 import Vr from "../../Components/vr";
 import { useUser } from "../../Contexts/UserContext";
 import { addFavorite, getApiUrl, refreshToken, removeFavorite } from "../../Utils/backend";
+import { getPrice } from "../../Utils/data";
 import { getCollectionName } from "../../Utils/helpers";
 
 import styles from './singletoken.module.scss';
@@ -104,6 +105,7 @@ const SingleToken: FC<any> = (): ReactElement => {
     },[tokenResponse])
 
     let saleAmount: string = '--';
+    let usdAmount: string = '--';
     let saleDenom: Denom = {
       decimals: 0,
       displayDenom: 'UNKNOWN',
@@ -114,13 +116,17 @@ const SingleToken: FC<any> = (): ReactElement => {
         const denom = findToken(tokenData.ask.cw20_contract);
         if (denom) {
           saleDenom = denom;
-          saleAmount = denomToHuman(tokenData.ask.price, denom.decimals).toString()
+          const num = denomToHuman(tokenData.ask.price, denom.decimals)
+          saleAmount = num.toString()
+          usdAmount = getPrice(saleDenom.displayDenom, num).toFixed(2);
         }
       } else {
         const denom = findDenom(process.env.REACT_APP_NETWORK_DENOM);
         if (denom) {
           saleDenom = denom;
-          saleAmount = denomToHuman(tokenData.ask.price, denom.decimals).toString()
+          const num = denomToHuman(tokenData.ask.price, denom.decimals)
+          saleAmount = num.toString()
+          usdAmount = getPrice(saleDenom.displayDenom, num).toFixed(2);
         }
       }
     }
@@ -229,7 +235,7 @@ const SingleToken: FC<any> = (): ReactElement => {
               <>
                 <div>
                   <div style={{fontSize: '28px'}}>{saleAmount.toString()} <DenomImg denom={saleDenom} size='medium' /></div>
-                  <div className='lightText12'>~ $1.23</div>
+                  <div className='lightText12'>~ ${usdAmount}</div>
                 </div>
                 {
                   tokenData.token.owner === user?.address ? 
