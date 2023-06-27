@@ -34,7 +34,6 @@ const SingleToken: FC<any> = (): ReactElement => {
     const isFavorite = !user ? false :
       !user.profile.favorites.length ? false :
       (user.profile.favorites.findIndex(f=>f.token._id === tokenResponse.token._id)) > -1 ? true : false;
-      console.log('isFavorite',isFavorite)
 
     const handleCancel = async (e: any) => {
       e.preventDefault();
@@ -80,12 +79,10 @@ const SingleToken: FC<any> = (): ReactElement => {
 
     const handleFavorite = async (e: any) => {
       e.preventDefault()
-      console.log('Favoriting')
       if (!tokenData) throw new Error('Token data is not loaded.')
       try { 
         if (isFavorite) await removeFavorite(tokenData.token._id)
         else await addFavorite(tokenData.token._id);
-        console.log('DONE!')
         await refreshProfile();
         revalidator.revalidate();
       } catch (err: any) {

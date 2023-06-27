@@ -72,7 +72,6 @@ export const UserProvider = ({ children }: Props): ReactElement => {
 
 
   // useEffect(()=>{   
-  //   console.log('EFFECT')
   //   if (!wallet && connectedKeplr === 'true') connectKeplr();
   // },[])
 
@@ -180,11 +179,8 @@ export const UserProvider = ({ children }: Props): ReactElement => {
   }
 
   const refreshProfile = async() => {
-    console.log('Refreshing!!!')
     if (!user) throw 'Unable to refresh profile when user is not set.'
-    console.log('Refreshing Profile!')
     const newProfile = await getUserProfile(user?.address);
-    console.log('New Favs', newProfile.favorites)
     const newUser: User = {...user, profile: newProfile}
     setUser(newUser)
   }

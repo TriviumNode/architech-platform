@@ -22,7 +22,6 @@ export default function BannerModal({open, collectionId, onClose}: BannerModalPr
         }
         try {
             const result = await updateCollectionBanner(collectionId, image)
-            console.log('Result!', result);
             revalidator.revalidate();
             setImage(undefined)
             onClose()
@@ -33,7 +32,6 @@ export default function BannerModal({open, collectionId, onClose}: BannerModalPr
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            console.log(e.target.files[0])
             setImage(e.target.files[0]);
         }
     };

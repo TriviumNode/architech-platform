@@ -30,7 +30,6 @@ export default function EditModal({open, collectionId, onClose}: Props) {
         e.preventDefault();
         try {
         const response = await editCollection(collectionId, formState);
-        console.log('response', response)
         revalidator.revalidate();
         onClose();
         } catch (err: any) {
@@ -40,7 +39,6 @@ export default function EditModal({open, collectionId, onClose}: Props) {
     }
 
     const updateFormState = (newFormState: Partial<ImportCollectionData>) => {
-        console.log('updating', newFormState)
         setFormState({...formState, ...newFormState})
     }
 
@@ -99,7 +97,6 @@ export default function EditModal({open, collectionId, onClose}: Props) {
                             type="file"
                             onChange={(e)=> {
                                 if (e.target.files) {
-                                    console.log(e.target.files[0])
                                     updateFormState({profileImage: e.target.files[0]})
                                 }
                             }}
@@ -115,7 +112,6 @@ export default function EditModal({open, collectionId, onClose}: Props) {
                             type="file"
                             onChange={(e)=> {
                                 if (e.target.files) {
-                                    console.log(e.target.files[0])
                                     updateFormState({bannerImage: e.target.files[0]})
                                 }
                             }}

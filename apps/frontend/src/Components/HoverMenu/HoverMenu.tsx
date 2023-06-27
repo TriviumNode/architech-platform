@@ -36,7 +36,6 @@ export default function ProfileMenu(props: HoverMenuProps) {
         address: user.address,
         num_records: balances.rewards_records
       })
-      console.log(result);
     } catch (err: any) {
       console.error('Failed to claim Archway Rewards:', err);
       toast.error(err.toString())

@@ -19,7 +19,6 @@ const AdminPage: FC<{
 }> = ({data, onChange}): ReactElement => {
 
     const updateState = (newState: Partial<AdminState>) => {
-        console.log(newState)
         onChange({...data, ...newState})
     }
     return (

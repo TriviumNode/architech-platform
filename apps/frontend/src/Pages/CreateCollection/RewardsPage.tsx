@@ -36,22 +36,18 @@ const RewardsPage: FC<{
             client: QueryClient,
             contract: contractAddress
         });
-        console.log(metadata);
         setRewardsAddress(metadata.rewardsAddress);
         setLoadingMetadata(false);
-        console.log('aaa')
         if (!user) return;
         const rewards = await getRewards({
             client: QueryClient,
             address: user.address
         });
-        console.log('Rewards!', rewards)
         setRewardsAddress(rewards?.rewardsAddress)
         setLoadingMetadata(false);
     }
 
     const updateState = (newState: Partial<RewardsState>) => {
-        console.log(newState)
         onChange({...state, ...newState})
     }
     return (

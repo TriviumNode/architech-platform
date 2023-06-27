@@ -76,7 +76,6 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
 
         const cleanedDetails = { ...detailState, image, attributes: filteredAttributes };
 
-        console.log('cleanedDetails', cleanedDetails)
         // Remove unfilled attributes
         Object.keys(cleanedDetails).forEach((key: any) => 
             //@ts-expect-error
@@ -145,7 +144,6 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
             setStatus("IMPORTING")
             const updateResponse = await refreshCollection(collection.address);
             await sleep(1_000);
-            console.log('updateResponse', updateResponse)
 
             setStatus("COMPLETE")
         } catch(err: any) {

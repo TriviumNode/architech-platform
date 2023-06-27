@@ -22,7 +22,6 @@ const FinishPage: FC<{
 }> = ({data, onChange, onClick}): ReactElement => {
 
     const updateState = (newState: Partial<FinishState>) => {
-        console.log(newState)
         onChange({...data, ...newState})
     }
     return (

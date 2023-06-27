@@ -12,12 +12,9 @@ const LatestListingsCard: FC<any> = (): ReactElement => {
 
     const [latest, setLatest] = useState<GetLatestListingsResponse[]>([]);
 
-    console.log(collections);
-
     const GetLatest = async () => {
         try {
             const result = await getLatestListings();
-            console.log(result)
             setLatest(result);
         } catch(err: any) {
             console.error('Error getting trending collections:', err)

@@ -12,12 +12,9 @@ const TrendingCard: FC<any> = (): ReactElement => {
 
     const [trending, setTrending] = useState<GetTrendingCollectionResponse>([]);
 
-    console.log(collections);
-
     const getTrending = async () => {
         try {
             const result = await getTrendingCollections();
-            console.log(result)
             setTrending(result);
         } catch(err: any) {
             console.error('Error getting trending collections:', err)

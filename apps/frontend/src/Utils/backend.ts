@@ -177,7 +177,6 @@ export const updateProfileImage = async(userId: string, file: File): Promise<Use
 
 export const importCollection = async(address: string, request: ImportCollectionData): Promise<Collection> => {
     const url = getApiUrl(`/collections/import/${address}`);
-    console.log('REQUEST', request);
     const formData = new FormData();
     formData.append('name', request.name);
     formData.append('description', request.description);
@@ -201,8 +200,6 @@ export const importCollection = async(address: string, request: ImportCollection
     if (request.telegram)
         formData.append('telegram', request.telegram);
 
-    console.log(formData)
-
     const {data}: {data: Collection} = await axios(
         url,
         {
@@ -219,8 +216,6 @@ export const importCollection = async(address: string, request: ImportCollection
 
 export const editCollection = async(address: string, request: Partial<ImportCollectionData>): Promise<Collection> => {
     const url = getApiUrl(`/collections/edit/${address}`);
-
-    console.log('Edit Request', request)
 
     const formData = new FormData();
 
@@ -249,8 +244,6 @@ export const editCollection = async(address: string, request: Partial<ImportColl
     if (request.telegram)
         formData.append('telegram', request.telegram);
     
-    console.log(formData)
-
     try {
         const {data}: {data: Collection} = await axios(
             url,
@@ -266,15 +259,12 @@ export const editCollection = async(address: string, request: Partial<ImportColl
         return data;
         } catch(err: any) {
             const {response} = err;
-            console.log(response.data)
             throw response.data || err;
         }
 }
 
 export const editProfile = async(address: string, request: Partial<UpdateProfileData>): Promise<User> => {
     const url = getApiUrl(`/users/edit/${address}`);
-
-    console.log('form!!!!', request)
 
     const formData = new FormData();
 
@@ -297,8 +287,6 @@ export const editProfile = async(address: string, request: Partial<UpdateProfile
     if (request.telegram)
         formData.append('telegram', request.telegram);
     
-    console.log(formData)
-
     const {data}: {data: User} = await axios(
         url,
         {
@@ -370,7 +358,6 @@ export const uploadImage = async(file: File): Promise<any> => {
             },
         }
     )
-    console.log(data);
     return data.cid;
 }
 

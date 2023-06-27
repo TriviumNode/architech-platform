@@ -24,7 +24,6 @@ const FinancialPage: FC<{
     const {user} = useUser()
 
     const updateState = (newState: Partial<FinancialState>) => {
-        console.log(newState)
         onChange({...state, ...newState})
     }
     return (

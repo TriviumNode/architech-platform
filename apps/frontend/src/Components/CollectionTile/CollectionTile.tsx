@@ -16,7 +16,6 @@ interface Props {
 }
 
 const CollectionTile: FC<Props> = ({ fullCollection, style }): ReactElement => {
-  console.log('FULL COLLECTION', fullCollection)
   const { collection } = fullCollection;
   const collectionName = getCollectionName(collection);
 

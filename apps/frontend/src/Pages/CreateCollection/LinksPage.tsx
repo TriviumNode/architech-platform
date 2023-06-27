@@ -26,7 +26,6 @@ const LinksPage: FC<{
 }> = ({state, onChange, next}): ReactElement => {
 
     const updateDetailState = (newDetailState: Partial<LinkState>) => {
-        console.log(newDetailState)
         onChange({...state, ...newDetailState})
     }
     return (

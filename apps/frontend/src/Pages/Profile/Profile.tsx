@@ -38,8 +38,6 @@ const ProfilePage: FC<any> = (): ReactElement => {
 
     const [page, setPage] = useState<Page>(Pages[0]);
 
-    console.log('userAddress', userAddress)
-    console.log('userProfile', userProfile)
     if (!userProfile)
         return (
             <Row>

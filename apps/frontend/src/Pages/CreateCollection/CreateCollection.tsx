@@ -65,7 +65,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     nft_symbol: detailState.symbol,
                     minter: wallet.address,
                 })
-                console.log(result);
+                console.log('Init Result', result);
                 const { contractAddress } = result;
                 setCollectionAddress(contractAddress)
                 nftAddress = contractAddress;
@@ -81,7 +81,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
             const response = await importCollection(nftAddress as string, importData);
             if (!refreshProfile) throw 'WOT'
             await refreshProfile()
-            console.log('response', response)
+            console.log('Import Response', response)
             setStatus("COMPLETE")
         } catch(err: any) {
             console.error(err)
@@ -189,7 +189,6 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                                     type="file"
                                     onChange={(e)=> {
                                         if (e.target.files) {
-                                            console.log(e.target.files[0])
                                             updateFormState({profileImage: e.target.files[0]})
                                         }
                                     }}
@@ -204,7 +203,6 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                                     type="file"
                                     onChange={(e)=> {
                                         if (e.target.files) {
-                                            console.log(e.target.files[0])
                                             updateFormState({bannerImage: e.target.files[0]})
                                         }
                                     }}

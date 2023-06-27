@@ -32,7 +32,6 @@ export default function EditProfileModal({open, userId, onClose}: Props) {
         e.preventDefault();
         try {
         const response = await editProfile(userId, formState);
-        console.log('response', response)
         revalidator.revalidate();
         onClose();
         } catch (err: any) {
@@ -42,7 +41,6 @@ export default function EditProfileModal({open, userId, onClose}: Props) {
     }
 
     const updateFormState = (newFormState: Partial<UpdateProfileData>) => {
-        console.log('updating', newFormState)
         setFormState({...formState, ...newFormState})
     }
 
@@ -101,7 +99,6 @@ export default function EditProfileModal({open, userId, onClose}: Props) {
                             type="file"
                             onChange={(e)=> {
                                 if (e.target.files) {
-                                    console.log(e.target.files[0])
                                     updateFormState({profileImage: e.target.files[0]})
                                 }
                             }}

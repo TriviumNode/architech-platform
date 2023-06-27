@@ -32,7 +32,7 @@ const ImportPage: FC<any> = (): ReactElement => {
     useEffect(() => {
         if (!importing) return;
         const interval = setInterval(() => {
-            console.log('This will run every 5 seconds!');
+            // Runs every 5 seconds
             refreshImport();
         }, 5000);
         return () => clearInterval(interval);
@@ -58,7 +58,6 @@ const ImportPage: FC<any> = (): ReactElement => {
                 name: '',
             }
             const response = await importCollection(address, request);
-            console.log(response);
             setImporting(true);
             setCollection(response);
         } catch(err: any) {

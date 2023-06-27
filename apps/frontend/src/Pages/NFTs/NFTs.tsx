@@ -12,7 +12,6 @@ import TrendingCard from "./TrendingCard";
 
 const NftPage: FC<any> = (): ReactElement => {
     const { collections } = useLoaderData() as { collections: GetCollectionResponse[]};
-    console.log(collections);
     return (
         <>
         {/* <div className={styles.featuredContainer}>
@@ -48,7 +47,6 @@ const NftPage: FC<any> = (): ReactElement => {
         <div className={styles.collectionsContainer}>
             <CreateTile />
             {collections && collections.map((collection: GetCollectionResponse, key: number)=>{
-                console.log('key', key)
                 const style = key === 0 ? {gridColumn: 1, gridRow: 1} : key === 1 ? {gridColumn: 2, gridRow: 1} : key === 2 ? {gridColumn: 3, gridRow: 1} : undefined;
                 return(
                     <CollectionTile fullCollection={collection} style={{...style, ...{maxHeight: '350px'}}} key={key} />
