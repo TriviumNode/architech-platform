@@ -3,6 +3,8 @@ import TokenModel from '@/models/tokens.model';
 import ViewModel, { ViewClass } from '@/models/views.model';
 import mongoose from 'mongoose';
 
+const ONE_DAY = 1 * 24 * 60 * 60 * 1000;
+
 export const addTokenView = async ({
   collectionRef,
   collectionAddress,
@@ -18,6 +20,16 @@ export const addTokenView = async ({
   viewerRef?: mongoose.Types.ObjectId;
   viewerIP: string;
 }) => {
+  const recentView = await ViewModel.find({
+    collectionAddress,
+    tokenId,
+    $or: [{ viewerRef }, { viewerIP }],
+    createdAt: { $gte: new Date(new Date().valueOf() - ONE_DAY) },
+  });
+  if (recentView.length) {
+    return;
+  }
+
   const view: ViewClass = {
     collectionRef,
     collectionAddress,
@@ -44,6 +56,15 @@ export const addCollectionView = async ({
   viewerRef?: mongoose.Types.ObjectId;
   viewerIP: string;
 }) => {
+  const recentView = await ViewModel.find({
+    collectionAddress,
+    $or: [{ viewerRef }, { viewerIP }],
+    createdAt: { $gte: new Date(new Date().valueOf() - ONE_DAY) },
+  });
+  if (recentView.length) {
+    return;
+  }
+
   const view: ViewClass = {
     collectionRef,
     collectionAddress,

@@ -8,8 +8,6 @@ import styles from './NFTs.module.scss'
 import ListingRow from "../../Components/ListingRow/ListingRow";
 
 const LatestListingsCard: FC<any> = (): ReactElement => {
-    const { collections } = useLoaderData() as { collections: any[]};
-
     const [latest, setLatest] = useState<GetLatestListingsResponse[]>([]);
 
     const GetLatest = async () => {

@@ -99,7 +99,7 @@ export const getCollectionTokenId = async (req: RequestWithOptionalUser, res: Re
   try {
     const collectionAddr: string = req.params.collectionAddr;
     const tokenId: string = req.params.tokenId;
-    const tokenData = await tokenService.ensureToken(collectionAddr, tokenId);
+    let tokenData = await tokenService.ensureToken(collectionAddr, tokenId);
     if (tokenData) {
       // Increment view count
       const userId: string = req.user?._id;
@@ -111,6 +111,7 @@ export const getCollectionTokenId = async (req: RequestWithOptionalUser, res: Re
         viewerRef: new mongoose.Types.ObjectId(userId),
         viewerIP: (req.headers['x-forwarded-for'] as string) || '0.0.0.0',
       });
+      if (updated) tokenData = updated;
 
       // Get number of likes
       const count = await findFavoritesCount(tokenData._id);
@@ -119,8 +120,8 @@ export const getCollectionTokenId = async (req: RequestWithOptionalUser, res: Re
       const ownerProfile = await UserModel.findOne({ address: tokenData.owner }).lean();
 
       const response: GetTokenResponse = {
-        token: updated as unknown as Token,
-        ask: updated.ask,
+        token: tokenData as unknown as Token,
+        ask: tokenData.ask,
         favorites: count,
         ownerName: ownerProfile?.username || tokenData.owner,
       };

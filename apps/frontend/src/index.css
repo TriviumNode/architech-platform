@@ -223,7 +223,7 @@ a {
   aspect-ratio: 1 / 1;
 }
 
-.imgCover {
+.imgCover,.coverImg {
   object-fit: cover;
   image-position: center;
 }

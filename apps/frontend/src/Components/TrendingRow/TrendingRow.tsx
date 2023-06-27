@@ -6,6 +6,7 @@ import { Link } from "react-router-dom"
 import { getApiUrl } from "../../Utils/backend"
 import { getCollectionName } from "../../Utils/helpers"
 import ArchDenom from "../ArchDenom"
+import PlaceholdImg from "../PlaceholdImg"
 
 const TrendingRow: FC<
     {
@@ -26,7 +27,7 @@ const TrendingRow: FC<
     >
         <Col xs={8}>
             <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
-                <img
+                <PlaceholdImg
                     alt=''
                     src={getApiUrl(`/public/${result.collection.collectionProfile.profile_image}`)}
                     style={{
@@ -35,6 +36,7 @@ const TrendingRow: FC<
                         borderRadius: '16px',
                         marginRight: '16px',
                     }}
+                    className='coverImg'
                 />
                 <div style={{overflow: "hidden"}}>
                     <div className='oneLineLimit'>{collectionName}</div>

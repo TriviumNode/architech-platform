@@ -106,7 +106,9 @@ export const getCollectionByAddress = async (req: RequestWithOptionalUser, res: 
         viewerIP: (req.headers['x-forwarded-for'] as string) || '0.0.0.0',
       });
 
-      fullCollection.collection = updated;
+      if (updated) {
+        fullCollection.collection = updated;
+      }
       res.status(200).json(fullCollection);
       return;
     } else {

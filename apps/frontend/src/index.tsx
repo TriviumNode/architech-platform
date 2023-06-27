@@ -23,6 +23,7 @@ import SingleToken from './Pages/Token/SingleToken';
 import CreateSingleNftPage from './Pages/CreateNft/CreateNft';
 import CreateCollectionPage from './Pages/CreateCollection/CreateCollection';
 import EditCollectionPage from './Pages/CreateCollection/EditCollection';
+import Home from './Pages/Home/Home';
 
 
 const router = createBrowserRouter([
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     errorElement: <ErrorPage />,
     children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
       {
         path: "/nfts",
         element: <NftPage />,

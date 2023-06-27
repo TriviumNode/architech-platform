@@ -1,0 +1,86 @@
+.headerContainer {
+    height: 320px;
+    display: flex;
+    align-items: center;
+}
+
+.mainHeader {
+    color: #000;
+    font-size: 58px;
+    font-weight: 500;
+    line-height: 119%;
+}
+
+.linkRow {
+    display: flex;
+    flex-wrap: wrap;
+    height: 513px;
+    column-gap: 8px;
+    margin-bottom: 8px;
+}
+
+.linkCard {
+    position: relative;
+}
+
+.overlay {
+    position: absolute;
+    bottom: 8px;
+    height: calc(92px - 48px);
+    color: #fff;
+    backdrop-filter: blur(24px) brightness(80%);
+    border-radius: 8px;
+    margin: 0 8px;
+    padding: 24px;
+    width: calc(100% - 16px - 48px);
+    font-size: 12px;
+}
+.overlay > h2 {
+    margin-bottom: 4px;
+}
+
+.trendingRow {
+    display: flex;
+    flex-wrap: wrap;
+    // height: 407px;
+    column-gap: 8px;
+    margin-bottom: 8px;
+}
+
+.trendingCol {
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.socialRow {
+    display: flex;
+    flex-wrap: wrap;
+    // height: 407px;
+    column-gap: 8px;
+    // max-height: 220px;
+}
+
+.discordCard {
+    color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+}
+
+.discordCard h2 {
+    margin-bottom: 32px;
+}
+
+.discordCard div p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.60);
+    font-size: 14px;
+    line-height: 120%;
+}
+
+.discordCard div button {
+    background: #fff;
+    color: #000;
+    font-size: 16px;
+}

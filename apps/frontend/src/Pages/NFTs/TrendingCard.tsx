@@ -8,8 +8,6 @@ import styles from './NFTs.module.scss'
 import TrendingRow from "../../Components/TrendingRow/TrendingRow";
 
 const TrendingCard: FC<any> = (): ReactElement => {
-    const { collections } = useLoaderData() as { collections: any[]};
-
     const [trending, setTrending] = useState<GetTrendingCollectionResponse>([]);
 
     const getTrending = async () => {
