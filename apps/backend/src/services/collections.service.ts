@@ -195,6 +195,7 @@ export const importCollection = async (
   // Ensure profile image
   if (!profile_image) {
     try {
+      console.log('Ensuring PFP', tokenIdList);
       profile_image = await getEnsuredPfp(contractAddress, tokenIdList);
     } catch {}
   }
@@ -259,6 +260,7 @@ const getEnsuredPfp = async (collection: string, tokenList: string[]) => {
   try {
     // Get random token's image to use as profile image
     const random_token = tokenList[Math.floor(Math.random() * tokenList.length)];
+    console.log('Random ID', random_token);
     const tokenInfo = await getNftInfo({ client, contract: collection, token_id: random_token });
     const imageUrl = tokenInfo.extension?.image;
     if (!imageUrl) throw new Error(); //break
@@ -275,5 +277,7 @@ const getEnsuredPfp = async (collection: string, tokenList: string[]) => {
     const fileName = `${hash}.${extension}`;
     saveBuffer(buffer, fileName);
     return fileName;
-  } catch {}
+  } catch (err) {
+    console.log('Failed to ensure PFP', err);
+  }
 };
