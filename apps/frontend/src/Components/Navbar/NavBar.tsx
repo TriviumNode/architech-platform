@@ -7,6 +7,7 @@ import Vr from "../vr";
 import { useLocation } from 'react-router-dom'
 
 import  styles from './Navbar.module.scss';
+import { truncateAddress } from "@architech/lib";
 
 type HeaderPage = 'NFTS' | 'DAOS' | 'HOME';
 
@@ -53,9 +54,16 @@ const Navbar = () => {
           { !!user ? 
             <ProfileMenu content={
               <div className='d-flex align-items-stretch' style={{color: "white", columnGap: '24px'}}>
-                <div className='d-flex align-items-center'>{balances?.arch ? parseFloat(balances.arch.toFixed(4)) : <SmallLoader />}&nbsp;<ArchDenom /></div>
+                {/* <div className='d-flex align-items-center'>{balances?.arch ? parseFloat(balances.arch.toFixed(4)) : <SmallLoader />}&nbsp;<ArchDenom /></div>
                 <Vr color='#666666' />
-                <div className='d-flex align-items-center' style={{fontSize: '12px'}}>{balances?.credits === undefined ? <SmallLoader /> : balances.credits}&nbsp;Credits</div>
+                <div className='d-flex align-items-center' style={{fontSize: '12px'}}>{balances?.credits === undefined ? <SmallLoader /> : balances.credits}&nbsp;Credits</div> */}
+                <div>
+                  <span>{truncateAddress(user.address)}</span><br />
+                  <div className='d-flex justify-content-between'>
+                    <div style={{fontSize: '12px'}} className='d-flex align-items-center'>{balances?.arch ? balances.arch.toFixed(3) : <SmallLoader />}&nbsp;<ArchDenom /></div>
+                    <div style={{fontSize: '12px'}} className='d-flex align-items-center'>{balances?.credits === undefined ? <SmallLoader /> : balances.credits}&nbsp;Credits</div>
+                  </div>
+                </div>
               </div>
             } />
           :

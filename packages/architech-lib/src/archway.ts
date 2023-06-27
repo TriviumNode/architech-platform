@@ -1,4 +1,5 @@
-import { ArchwayClient, OutstandingRewards, SigningArchwayClient } from "@archwayhq/arch3.js";
+import { ArchwayClient, OutstandingRewards, RewardsMsgEncoder, SigningArchwayClient } from "@archwayhq/arch3.js";
+import Long from "long";
 import { getFee } from "./utils";
 
 
@@ -50,4 +51,16 @@ export const getRewards = async({
         else
             throw err;
     }
+}
+
+export const claimRewards = async({
+    client,
+    address,
+    num_records,
+}:{
+    client: SigningArchwayClient,
+    address: string,
+    num_records: number,
+}) => {
+    return await client.withdrawContractRewards(address, 100, getFee(50_000*num_records));
 }

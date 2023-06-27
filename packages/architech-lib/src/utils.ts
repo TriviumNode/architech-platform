@@ -38,3 +38,8 @@ export const findFloor = (asks: marketplace.Ask[], decimals: number) => {
     const floorAmount = denomToHuman(floor, decimals);
     return floorAmount;
 }
+
+export const truncateAddress = (addr: string) => {
+    console.log('addr', addr.length)
+    return `${addr.slice(0,10)}...${addr.slice(addr.length-6)}`
+}

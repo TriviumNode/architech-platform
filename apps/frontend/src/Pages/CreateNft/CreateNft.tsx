@@ -145,6 +145,7 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
             setStatus("IMPORTING")
             const updateResponse = await refreshCollection(collection.address);
             await sleep(1_000);
+            console.log('updateResponse', updateResponse)
 
             setStatus("COMPLETE")
         } catch(err: any) {

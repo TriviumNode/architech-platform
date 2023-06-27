@@ -14,7 +14,7 @@ import { Coin, Pubkey } from '@cosmjs/amino';
 import { Row, Col } from 'react-bootstrap';
 import Modal from '../Components/Modal';
 import Loader from '../Components/Loader';
-import { CREDIT_ADDRESS, denomToHuman, getCreditBalance } from '@architech/lib';
+import { CREDIT_ADDRESS, denomToHuman, getCreditBalance, getRewards } from '@architech/lib';
 import { GetUserProfileResponse } from '@architech/types';
 
 interface Props {
@@ -34,6 +34,8 @@ interface Balances {
   arch_err?: string;
   credits?: number;
   credits_err?: string;
+  rewards?: number;
+  rewards_records?: number;
 }
 
 export interface UserContextState {
@@ -95,12 +97,30 @@ export const UserProvider = ({ children }: Props): ReactElement => {
       console.error('Error fetching credit balance.', err)
       creditErr = err.toString();
     }
+
+    let rewardsBalance: string | undefined = undefined;
+    let rewards_records: number | undefined = undefined;
+    try {
+      const rewards = await getRewards({
+        client: client,
+        address: addr,
+      });
+      if (rewards) {
+        rewardsBalance = rewards.totalRewards.find(c=>c.denom === process.env.REACT_APP_NETWORK_DENOM)?.amount
+        rewards_records = rewards.totalRecords;
+      }
+    } catch(err:any) {
+      console.error('Error fetching credit balance.', err)
+      creditErr = err.toString();
+    }
     setBalances({
       // arch: archBalance ? parseInt(archBalance.amount) / Math.pow(10, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)) : undefined,
       arch: archBalance ? denomToHuman(archBalance.amount, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)) : undefined,
       credits: creditBalance ? parseInt(creditBalance) : undefined,
+      rewards: rewardsBalance ? denomToHuman(rewardsBalance, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)) : undefined,
       arch_err: archErr,
       credits_err: creditErr,
+      rewards_records,
     })
 
   }
