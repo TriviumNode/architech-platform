@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { PLACEHOLDER_URL, resolveIpfs } from '@architech/lib';
+import { resolveIpfs } from '@architech/lib';
 
 
 export interface ImageProps
@@ -23,7 +23,7 @@ const TokenImage = React.forwardRef<HTMLImageElement, ImageProps>(
     },
     ref,
   ) => {
-    src = resolveIpfs(src || PLACEHOLDER_URL);
+    src = resolveIpfs(src || '/placeholder.png');
     return (
       <img // eslint-disable-line jsx-a11y/alt-text
         ref={ref}

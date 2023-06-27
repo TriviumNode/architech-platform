@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { PLACEHOLDER_URL, resolveIpfs } from '@architech/lib';
+import { resolveIpfs } from '@architech/lib';
 
 
 export interface ImageProps
