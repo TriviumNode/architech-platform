@@ -24,6 +24,7 @@ const PlaceholdImg = React.forwardRef<HTMLImageElement, ImageProps>(
     ref,
   ) => {
     src = resolveIpfs(src || '/placeholder.png');
+    console.log('Placehold or Src?', src);
     return (
       <img // eslint-disable-line jsx-a11y/alt-text
         ref={ref}

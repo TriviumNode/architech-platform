@@ -18,6 +18,8 @@ const TrendingRow: FC<
     const volume = result.volume.find(v=>v.denom === process.env.REACT_APP_NETWORK_DENOM)?.amount || '0';
     const humanVolume = denomToHuman(volume, parseInt(process.env.REACT_APP_NETWORK_DECIMALS))
     const collectionName = getCollectionName(result.collection)
+
+    console.log('Trending Row API URL',result.collection.collectionProfile.profile_image, getApiUrl(`/public/${result.collection.collectionProfile.profile_image}`))
     return(
     <Link to={`/nfts/${result.collection.address}`}
         style={{
