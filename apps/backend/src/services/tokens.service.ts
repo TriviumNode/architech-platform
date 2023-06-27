@@ -166,13 +166,6 @@ async function updateToken(databaseId: string, tokenData: Partial<UpdateTokenDto
   return updateTokenById as unknown as Token;
 }
 
-async function deleteToken(databaseId: string): Promise<Token> {
-  const deleteTokenById: Token = await tokenModel.findByIdAndDelete(databaseId);
-  if (!deleteTokenById) throw new HttpException(404, "Token doesn't exist");
-
-  return deleteTokenById;
-}
-
 export const refreshToken = async (token_id: string, collectionAddress: string) => {
   const tokenData = await findTokenIdInCollection(token_id, collectionAddress);
   const {

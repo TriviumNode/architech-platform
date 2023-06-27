@@ -1,4 +1,4 @@
-import { cw721, TokenModel as TokenModelInterface } from '@architech/types';
+import { cw721, ITokenModel, marketplace } from '@architech/types';
 import { prop, getModelForClass, modelOptions, mongoose, Ref, plugin } from '@typegoose/typegoose';
 import { CollectionClass } from './collections.model';
 import paginate from 'mongoose-paginate-v2';
@@ -22,7 +22,7 @@ export class PaginatedModel {
 
 // @plugin(paginate)
 @modelOptions({ schemaOptions: { collection: 'tokens', timestamps: true } })
-export class TokenClass extends PaginatedModel implements TokenModelInterface {
+export class TokenClass extends PaginatedModel implements ITokenModel {
   @prop({ type: String, required: true })
   public tokenId: string;
 
@@ -49,6 +49,9 @@ export class TokenClass extends PaginatedModel implements TokenModelInterface {
 
   @prop({ required: true })
   public traits!: mongoose.Types.Array<cw721.Trait>;
+
+  @prop({ type: mongoose.Schema.Types.Mixed })
+  public ask?: marketplace.Ask;
 
   public createdAt?: Date;
 

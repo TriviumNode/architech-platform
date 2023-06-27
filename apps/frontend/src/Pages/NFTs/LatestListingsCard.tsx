@@ -40,7 +40,7 @@ const LatestListingsCard: FC<any> = (): ReactElement => {
                         <span>Price</span>
                     </Col>
                 </div>
-                { latest.map((t, k)=>
+                { latest.slice(0,3).map((t, k)=>
                     <div key={t.collection.address} className='wide'>
                         <ListingRow result={t} />
                         {k < 2 && <hr className='mt16' />}

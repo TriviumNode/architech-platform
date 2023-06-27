@@ -6,6 +6,7 @@ import { Link } from "react-router-dom"
 import { getApiUrl } from "../../Utils/backend"
 import { getCollectionName } from "../../Utils/helpers"
 import ArchDenom from "../ArchDenom"
+import PlaceholdImg from "../PlaceholdImg"
 
 import styles from './CollectionTile.module.scss'
 
@@ -24,7 +25,7 @@ const CollectionTile: FC<Props> = ({ fullCollection, style }): ReactElement => {
   return (
     <Link to={`/nfts/${collection.address}`} style={style}>
       <div className={styles.collectionCard}>
-          <img style={{width: '100%'}} src={getApiUrl(`/public/${collection.collectionProfile?.profile_image}`)} alt={collectionName} />
+          <PlaceholdImg style={{width: '100%'}} src={getApiUrl(`/public/${collection.collectionProfile?.profile_image}`)} alt={collectionName} />
           <div className={styles.overlay}>
               <h2>{collectionName}</h2>
               <span style={{display: 'flex', alignItems: 'center'}}>

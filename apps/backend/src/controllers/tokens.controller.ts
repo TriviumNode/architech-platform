@@ -3,13 +3,15 @@ import { queryClient } from '@/utils/chainClients';
 import * as tokenService from '@/services/tokens.service';
 import { cw721, GetLatestListingsResponse, GetTokenResponse, marketplace, RequestWithOptionalUser, SortOption, Token } from '@architech/types';
 
-import { getAllAsks, getAsk, MARKETPLACE_ADDRESS } from '@architech/lib';
+import { getAllAsks, getAllNftInfo, getAsk, getNftInfo, MARKETPLACE_ADDRESS } from '@architech/lib';
 import ViewModel from '@/models/views.model';
 import { View } from '@/interfaces/views.interface';
 import TokenModel from '@/models/tokens.model';
 import { HttpException } from '@/exceptions/HttpException';
 import CollectionModel from '@/models/collections.model';
 import { findFavoritesCount } from '@/services/favorites.service';
+import equal from 'fast-deep-equal';
+import UserModel from '@/models/users.model';
 
 export const getLatestListings = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -118,7 +120,7 @@ export const getCollectionTokenId = async (req: RequestWithOptionalUser, res: Re
       };
 
       await ViewModel.create(view);
-      const updated = await TokenModel.findByIdAndUpdate(tokenData._id, { $inc: { total_views: 1 } }, { new: true });
+      let updated = await TokenModel.findByIdAndUpdate(tokenData._id, { $inc: { total_views: 1 } }, { new: true });
 
       // Get ask from marketplace (if any)
       const ask = await getAsk({
@@ -131,10 +133,25 @@ export const getCollectionTokenId = async (req: RequestWithOptionalUser, res: Re
       // Get number of likes
       const count = await findFavoritesCount(tokenData._id);
 
+      // Get current owner
+      let {
+        access: { owner },
+      } = await getAllNftInfo({ client: queryClient, contract: tokenData.collectionAddress, token_id: tokenData.tokenId });
+      if (owner === MARKETPLACE_ADDRESS) owner = ask.seller;
+
+      // Get owner profile
+      const ownerProfile = await UserModel.findOne({ address: owner }).lean();
+
+      // Update DB if needed
+      if (owner !== tokenData.owner || !equal(ask, tokenData.ask)) {
+        updated = await TokenModel.findByIdAndUpdate(tokenData._id, { owner, ask }, { new: true });
+      }
+
       const response: GetTokenResponse = {
         token: updated as unknown as Token,
         ask: ask as marketplace.Ask,
         favorites: count,
+        ownerName: ownerProfile?.username || tokenData.owner,
       };
 
       res.status(200).json(response);

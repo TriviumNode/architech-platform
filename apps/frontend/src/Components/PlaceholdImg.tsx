@@ -14,7 +14,7 @@ export const propTypes = {
    */
 };
 
-const TokenImage = React.forwardRef<HTMLImageElement, ImageProps>(
+const PlaceholdImg = React.forwardRef<HTMLImageElement, ImageProps>(
   (
     {
       className,
@@ -23,7 +23,7 @@ const TokenImage = React.forwardRef<HTMLImageElement, ImageProps>(
     },
     ref,
   ) => {
-    src = resolveIpfs(src || PLACEHOLDER_URL);
+    src = resolveIpfs(src || '/placeholder.png');
     return (
       <img // eslint-disable-line jsx-a11y/alt-text
         ref={ref}
@@ -37,7 +37,7 @@ const TokenImage = React.forwardRef<HTMLImageElement, ImageProps>(
   },
 );
 
-TokenImage.displayName = 'Image';
-TokenImage.propTypes = propTypes;
+PlaceholdImg.displayName = 'Image';
+PlaceholdImg.propTypes = propTypes;
 
-export default TokenImage;
+export default PlaceholdImg;

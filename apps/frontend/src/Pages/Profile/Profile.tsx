@@ -15,6 +15,7 @@ import CollectionTile from "../../Components/CollectionTile/CollectionTile";
 import PageSelector from "../../Components/PageSelector/PageSelector";
 import EditProfileModal from "./EditProfileModal";
 import LinkButton from "../../Components/LinkButton";
+import PlaceholdImg from "../../Components/PlaceholdImg";
 
 const emptyToUndefined =(str: string) => {
     return str.length ? str : undefined;
@@ -63,7 +64,7 @@ const ProfilePage: FC<any> = (): ReactElement => {
                     :
                         <Col className='card d-flex flex-columnm justify-content-center' style={{textAlign: 'center', padding: '32px 0'}}>
                             <div style={{margin: 'auto'}}>
-                            { (userProfile.profile.address === wallet?.address) ?
+                            { (userAddress === wallet?.address) ?
                                 <>
                                     <h2 className='mb16'>You don't own any NFTs yet.</h2>
                                     <LinkButton to='/nfts'>
@@ -96,7 +97,8 @@ const ProfilePage: FC<any> = (): ReactElement => {
                     :
                         <Col className='card d-flex flex-columnm justify-content-center' style={{textAlign: 'center', padding: '32px 0'}}>
                             <div style={{margin: 'auto'}}>
-                            { (userProfile.profile.address === wallet?.address) ?
+                            {/* `userProfile.profile?.address` should never be undefined if the user has logged in */}
+                            { (userProfile.profile?.address === wallet?.address) ?
                                 <>
                                     <h2 className='mb16'>You haven't created any collections yet.</h2>
                                     <button>
@@ -115,13 +117,13 @@ const ProfilePage: FC<any> = (): ReactElement => {
     }
 
 
-    const displayName = userProfile?.profile?.username || userAddress
-    const displayImage = userProfile.profile.profile_image ? getApiUrl(`/public/${userProfile.profile.profile_image}`) : undefined;
+    const displayName = userProfile.profile?.username || userAddress
+    const displayImage = userProfile.profile?.profile_image ? getApiUrl(`/public/${userProfile.profile.profile_image}`) : undefined;
     return (<>
-                <EditProfileModal open={editProfile} onClose={()=>setEditProfile(false)} userId={userProfile.profile._id} />
+                <EditProfileModal open={editProfile} onClose={()=>setEditProfile(false)} userId={userProfile.profile?._id || ''} />
                 <div className='d-flex mb8' style={{gap: '8px', margin: '0 -8px', maxHeight: '350px'}}>
                     <Col xs={{span: 10, offset: 1}} md={{span: 3, offset: 0}} className='card' style={{aspectRatio: '1 / 1'}}>
-                        <img src={displayImage} alt={ displayName } style={{objectFit: 'cover', width: '100%', height: '100%'}}></img>
+                        <PlaceholdImg src={displayImage} alt={ displayName } style={{objectFit: 'cover', width: '100%', height: '100%'}} />
                     </Col>
                     <Col
                         className='card'
@@ -130,17 +132,16 @@ const ProfilePage: FC<any> = (): ReactElement => {
                             // ...bgStyle,
                         }}
                     >
-                        {/* {!!collection.collectionProfile.banner_image && <img src={getApiUrl(`/public/${collection.collectionProfile.banner_image}`} className='wide imgCover' /> } */}
-                        <div className='d-flex flex-column genOverlay' style={{position: 'absolute', left: '16px', bottom: '16px'}}>
-                            <h1>{displayName}</h1>
-                            <p>{userProfile.profile.bio}</p>
+                        <div className='d-flex flex-column genOverlay' style={{position: 'absolute', left: '16px', bottom: '16px', width: 'calc(100% - 32px)'}}>
+                            <h1 className='oneLineLimit'>{displayName}</h1>
+                            <p>{userProfile.profile?.bio}</p>
                             <div className='d-flex wide justify-content-space-between'>
                                 {/* <CollectionStats collection={collection} /> */}
 
                             </div>
                         </div>
                         <div style={{position: 'absolute', right: '16px', top: '16px'}}>
-                                    { (wallet && wallet.address === userProfile.profile.address) &&
+                                    { (wallet && wallet.address === userProfile.profile?.address) &&
                                         <Col>
                                             <button type="button" onClick={()=>setEditProfile(true)}>Edit</button>
                                         </Col>

@@ -9,6 +9,7 @@ import Badge from "../../Components/Badge";
 import CollectionStats from "../../Components/CollectionStats/CollectionStats";
 import Loader from "../../Components/Loader";
 import ListModal from "../../Components/Modals/ListModal";
+import PlaceholdImg from "../../Components/PlaceholdImg";
 import SocialLinks from "../../Components/Socials";
 import TokenImage from "../../Components/TokenImg";
 import Vr from "../../Components/vr";
@@ -142,7 +143,7 @@ const SingleToken: FC<any> = (): ReactElement => {
       <div className='d-flex gap8' style={{height: '64px', marginBottom: '8px'}}>
         <Col className='tall square br8' xs="auto">
           <Link to={`/nfts/${collection.address}`}>
-            <img alt={collectionName} src={getApiUrl(`/public/${collection.collectionProfile.profile_image}`)} className='tall wide imgCover' />
+            <PlaceholdImg alt={collectionName} src={getApiUrl(`/public/${collection.collectionProfile.profile_image}`)} className='tall wide imgCover' />
           </Link>
         </Col>
         <Col className='card d-flex flex-row justify-content-between align-items-center'>
@@ -165,7 +166,7 @@ const SingleToken: FC<any> = (): ReactElement => {
                   <Badge><span>{category}</span></Badge>
                 )}
               </div>
-              <span className='lightText14'>Owned by&nbsp;</span><Link to={`/profile/${tokenData.token?.owner}`}>{tokenData.token?.owner}</Link>
+              <span className='lightText14'>Owned by&nbsp;</span><Link to={`/profile/${tokenData.token?.owner}`}>{tokenData.ownerName}</Link>
             </div>
             <div className='d-flex align-items-center mr16'>
               <div className="d-flex align-items-stretch" style={{gap: '16px'}}>

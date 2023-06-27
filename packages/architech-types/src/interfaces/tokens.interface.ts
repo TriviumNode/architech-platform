@@ -9,7 +9,7 @@ export interface ITokenModel {
     owner: string;
     averageColor: string;
     total_views: number;
-    // ask?: marketplace.Ask;
+    ask?: marketplace.Ask;
 }
 
 export interface Token extends ITokenModel {
@@ -21,6 +21,7 @@ export interface GetTokenResponse {
     token: Token;
     ask: marketplace.Ask;
     favorites: number;
+    ownerName: string;
 }
 
 export interface GetLatestListingsResponse {

@@ -50,12 +50,11 @@ export const getUserByAddress = async (req: Request, res: Response, next: NextFu
   try {
     const userAddr: string = req.params.address;
 
-    const userData: User = await userModel.findOne({ address: userAddr });
     const ownedTokens: Token[] = await TokenModel.find({ owner: userAddr }).populate('collectionInfo');
     const ownedCollections: Collection[] = await CollectionModel.find({ creator: userAddr });
-
     const fullCollections = await collectionsToResponse(ownedCollections);
-    const favorites = await findUserFavorites(userData.address);
+    const favorites = await findUserFavorites(userAddr);
+    const userData: User | undefined = await userModel.findOne({ address: userAddr }).lean();
 
     const response: GetUserProfileResponse = {
       profile: userData,

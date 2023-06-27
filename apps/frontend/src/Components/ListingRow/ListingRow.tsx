@@ -51,7 +51,7 @@ const ListingRow: FC<
                         marginRight: '16px',
                     }}
                 />
-                <div style={{overflow: "hidden"}}>
+                <div className='d-flex flex-column justify-content-around' style={{overflow: "hidden"}}>
                     <div className='oneLineLimit'>{collectionName}</div>
                     <div className='lightText12 twoLineLimit'>{tokenName}</div>
                 </div>

@@ -22,7 +22,7 @@ export interface User extends UserModel {
 }
 
 export interface GetUserProfileResponse {
-  profile: User;
+  profile?: User;
   tokens: Token[];
   collections: GetCollectionResponse[];
   favorites: [{
