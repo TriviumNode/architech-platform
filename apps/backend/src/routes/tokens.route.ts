@@ -11,7 +11,8 @@ import {
   getTokensByOwner,
   refreshToken,
 } from '@/controllers/tokens.controller';
-import { optionalAuthMiddleware } from '@/middlewares/auth.middleware';
+import authMiddleware, { optionalAuthMiddleware } from '@/middlewares/auth.middleware';
+import { addFavorite, removeFavorite } from '@/controllers/favorites.controller';
 
 class TokensRoute implements Routes {
   public path = '/tokens';
@@ -41,6 +42,12 @@ class TokensRoute implements Routes {
 
     // Get details of tokens owned by specific address
     this.router.get(`${this.path}/owner/:owner`, getTokensByOwner);
+
+    // Favorite a token
+    this.router.post(`${this.path}/favorite/:tokenId`, authMiddleware, addFavorite);
+
+    // Favorite a token
+    this.router.delete(`${this.path}/favorite/:tokenId`, authMiddleware, removeFavorite);
 
     // Refresh token metadata from chain
     // Authentication probably not needed for this...

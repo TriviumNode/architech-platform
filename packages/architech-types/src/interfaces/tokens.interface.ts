@@ -1,7 +1,7 @@
 import { cw721, marketplace } from "../contracts";
 import { Collection } from "./collections.interface";
 
-export interface TokenModel {
+export interface ITokenModel {
     tokenId: string;
     collectionAddress: string;
     metadataUri?: string;
@@ -9,9 +9,10 @@ export interface TokenModel {
     owner: string;
     averageColor: string;
     total_views: number;
+    // ask?: marketplace.Ask;
 }
 
-export interface Token extends TokenModel {
+export interface Token extends ITokenModel {
     _id: string;
     collectionInfo: Collection;
 }
@@ -19,6 +20,7 @@ export interface Token extends TokenModel {
 export interface GetTokenResponse {
     token: Token;
     ask: marketplace.Ask;
+    favorites: number;
 }
 
 export interface GetLatestListingsResponse {

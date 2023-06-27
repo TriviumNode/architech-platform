@@ -13,7 +13,7 @@ import SocialLinks from "../../Components/Socials";
 import TokenImage from "../../Components/TokenImg";
 import Vr from "../../Components/vr";
 import { useUser } from "../../Contexts/UserContext";
-import { getApiUrl, refreshToken } from "../../Utils/backend";
+import { addFavorite, getApiUrl, refreshToken, removeFavorite } from "../../Utils/backend";
 import { getCollectionName } from "../../Utils/helpers";
 
 import styles from './singletoken.module.scss';
@@ -21,14 +21,19 @@ import styles from './singletoken.module.scss';
 type Trait = cw721.Trait;
 
 const SingleToken: FC<any> = (): ReactElement => {
-    const { token: tokenResponse, collection: fullCollection } = useLoaderData() as { token?: GetTokenResponse, collection?: GetCollectionResponse};
+    const { token: tokenResponse, collection: fullCollection } = useLoaderData() as { token: GetTokenResponse, collection: GetCollectionResponse};
     const collection = fullCollection?.collection;
     const [tokenData, setTokenData] = useState<GetTokenResponse | undefined>(tokenResponse);
 
     const [isListing, setIsListing] = useState(false);
 
-    const { user } = useUser()
+    const { user, refreshProfile } = useUser()
     const revalidator = useRevalidator()
+
+    const isFavorite = !user ? false :
+      !user.profile.favorites.length ? false :
+      (user.profile.favorites.findIndex(f=>f.token._id === tokenResponse.token._id)) > -1 ? true : false;
+      console.log('isFavorite',isFavorite)
 
     const handleCancel = async (e: any) => {
       e.preventDefault();
@@ -42,7 +47,7 @@ const SingleToken: FC<any> = (): ReactElement => {
           marketplace_contract: MARKETPLACE_ADDRESS,
           token_id: tokenData.token.tokenId,
         })
-        console.log(result);
+        await refreshProfile();
         revalidator.revalidate();
       } catch(err: any) {
         console.error(err)
@@ -64,11 +69,26 @@ const SingleToken: FC<any> = (): ReactElement => {
           amount: tokenData.ask.price,
           denom: process.env.REACT_APP_NETWORK_DENOM,
         })
-        console.log('Purchase Result',result);
         await refreshToken(tokenData.token.collectionAddress, tokenData.token.tokenId)
         revalidator.revalidate();
       } catch(err: any) {
         console.error(err)
+        toast.error(err.toString())
+      }
+    }
+
+    const handleFavorite = async (e: any) => {
+      e.preventDefault()
+      console.log('Favoriting')
+      if (!tokenData) throw new Error('Token data is not loaded.')
+      try { 
+        if (isFavorite) await removeFavorite(tokenData.token._id)
+        else await addFavorite(tokenData.token._id);
+        console.log('DONE!')
+        await refreshProfile();
+        revalidator.revalidate();
+      } catch (err: any) {
+        console.error('Error adding favorite:', err)
         toast.error(err.toString())
       }
     }
@@ -98,8 +118,6 @@ const SingleToken: FC<any> = (): ReactElement => {
         }
       }
     }
-    console.log('saleAmount', saleAmount)
-
 
     if (!tokenData || !collection)
         return (
@@ -109,7 +127,6 @@ const SingleToken: FC<any> = (): ReactElement => {
               </Col>
             </Row>
         )
-    console.log(tokenData)
     const tokenImage = tokenData.token.metadataExtension?.image || tokenData.token.metadataExtension?.image_data || undefined
     const collectionName = getCollectionName(collection);
     const num = isNaN(tokenData.token.tokenId as any) ? null : '#'
@@ -119,8 +136,6 @@ const SingleToken: FC<any> = (): ReactElement => {
     //   const data = await refreshToken(collection.address, tokenData.token.tokenId);
     //   setTokenData(data);
     // }
-      console.log('user!', user)
-    console.log(collection.collectionProfile)
     return (
       <>
       <ListModal open={isListing} onClose={()=>setIsListing(false)} token={tokenData.token} />
@@ -154,10 +169,10 @@ const SingleToken: FC<any> = (): ReactElement => {
             </div>
             <div className='d-flex align-items-center mr16'>
               <div className="d-flex align-items-stretch" style={{gap: '16px'}}>
-                <div>
-                  <div className={styles.number}><img src='/heart.svg' style={{height: '1.3em'}} />&nbsp;321</div>
+                <button onClick={handleFavorite} disabled={!!!user} className='clearBtn' style={{padding: 0, height: 'unset'}}>
+                  <div className={styles.number}><img alt='' src={isFavorite ? '/red_heart.svg' : '/heart.svg'} style={{height: '1.3em'}} />&nbsp;{tokenData.favorites}</div>
                   <span className={styles.label}>Favorites</span>
-                </div>
+                </button>
                 {/* <div style={{alignSelf: 'stretch'}}> */}
                   <Vr />
                 {/* </div> */}

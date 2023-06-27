@@ -12,6 +12,7 @@ import TokenModel from '@/models/tokens.model';
 import CollectionModel from '@/models/collections.model';
 import { rotateNonce } from '@/services/users.service';
 import { queryDbCollectionsByCreator } from '@/queriers/collection.querier';
+import { findUserFavorites } from '@/services/favorites.service';
 
 export const walletLogin = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -59,6 +60,7 @@ export const walletLogin = async (req: Request, res: Response, next: NextFunctio
     const { tokenData, findUser } = await authService.walletLogin(userData);
     const ownedTokens: Token[] = await TokenModel.find({ owner: findUser.address });
     const ownedCollections = await queryDbCollectionsByCreator(findUser.address);
+    const favorites = await findUserFavorites(userData.address);
 
     // Rotate nonce
     rotateNonce(userData._id);
@@ -67,6 +69,7 @@ export const walletLogin = async (req: Request, res: Response, next: NextFunctio
       profile: findUser,
       tokens: ownedTokens || [],
       collections: ownedCollections || [],
+      favorites: favorites as any,
     };
     // res.setHeader('Set-Cookie', [cookie]);
     res.cookie('Authorization', tokenData.token, {
@@ -103,11 +106,13 @@ export const checkLogin = async (req: RequestWithUser, res: Response, next: Next
       // const createdCollections = await CollectionModel.find({ creator: userAddress });
       const createdCollections = await queryDbCollectionsByCreator(userAddress);
       const ownedTokens = await TokenModel.find({ owner: userAddress }).populate('collectionInfo');
+      const favorites = await findUserFavorites(userData.address);
       const response: GetUserProfileResponse = {
         profile: userData,
         collections: createdCollections,
         //@ts-expect-error idfk
         tokens: ownedTokens,
+        favorites: favorites as any,
       };
       res.status(200).json(response);
     }

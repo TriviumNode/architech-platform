@@ -6,6 +6,7 @@ import validationMiddleware from '@middlewares/validation.middleware';
 import authMiddleware from '@/middlewares/auth.middleware';
 import { upload } from '@/utils/storage';
 import fileUploadMiddleware from '@/middlewares/fileUploadMiddleware';
+import { getFavorites } from '@/controllers/favorites.controller';
 
 class UsersRoute implements Routes {
   public path = '/users';
@@ -18,6 +19,9 @@ class UsersRoute implements Routes {
   private initializeRoutes() {
     // Get public user profile
     this.router.get(`${this.path}/address/:address`, usersController.getUserByAddress);
+
+    // Get public user profile
+    this.router.get(`${this.path}/favorites/:address`, getFavorites);
 
     // Update user profile
     // Requires authentication

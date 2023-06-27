@@ -19,7 +19,6 @@ interface SelectMenuProps {
 }
 
 export default function SelectMenu({ title, options, selected, select, className }: SelectMenuProps) {
-  console.log('options!', options)
 
   const [isOpen, setIsOpen] = useState<boolean>();
 

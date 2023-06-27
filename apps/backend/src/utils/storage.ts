@@ -18,4 +18,11 @@ const storage = multer.diskStorage({
 });
 
 const memStorage = multer.memoryStorage();
-export const upload = multer({ storage: memStorage });
+export const upload = multer({
+  storage: memStorage,
+  limits: {
+    // fieldNameSize: 255,
+    fileSize: 3 * 1000000, //~3mb
+    files: 2,
+  },
+});

@@ -251,18 +251,24 @@ export const editCollection = async(address: string, request: Partial<ImportColl
     
     console.log(formData)
 
-    const {data}: {data: Collection} = await axios(
-        url,
-        {
-            method: 'POST',
-            withCredentials: true,
-            data: formData,
-            headers: {
-                "Content-Type": "multipart/form-data"
-            },
+    try {
+        const {data}: {data: Collection} = await axios(
+            url,
+            {
+                method: 'POST',
+                withCredentials: true,
+                data: formData,
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                },
+            }
+        )
+        return data;
+        } catch(err: any) {
+            const {response} = err;
+            console.log(response.data)
+            throw response.data || err;
         }
-    )
-    return data;
 }
 
 export const editProfile = async(address: string, request: Partial<UpdateProfileData>): Promise<User> => {
@@ -379,6 +385,32 @@ export const refreshCollection = async(collectionAddress: string): Promise<Colle
             headers: {
                 "Content-Type": "application/json"
             },
+        }
+    )
+    return data;
+}
+
+
+
+export const addFavorite = async(tokenId: string): Promise<any> => {
+    const url = getApiUrl(`/tokens/favorite/${tokenId}`);
+    const {data} = await axios(
+        url,
+        {
+            method: 'POST',
+            withCredentials: true,
+        }
+    )
+    return data;
+}
+
+export const removeFavorite = async(tokenId: string): Promise<any> => {
+    const url = getApiUrl(`/tokens/favorite/${tokenId}`);
+    const {data} = await axios(
+        url,
+        {
+            method: 'DELETE',
+            withCredentials: true,
         }
     )
     return data;

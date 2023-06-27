@@ -24,6 +24,7 @@ import CollectionModel from '@/models/collections.model';
 import { isEmpty } from '@/utils/util';
 import { RequestWithImages } from '@/middlewares/fileUploadMiddleware';
 import { collectionsToResponse } from '@/queriers/collection.querier';
+import { findUserFavorites } from '@/services/favorites.service';
 
 // HTTP
 // Return user profile only.
@@ -54,11 +55,13 @@ export const getUserByAddress = async (req: Request, res: Response, next: NextFu
     const ownedCollections: Collection[] = await CollectionModel.find({ creator: userAddr });
 
     const fullCollections = await collectionsToResponse(ownedCollections);
+    const favorites = await findUserFavorites(userData.address);
 
     const response: GetUserProfileResponse = {
       profile: userData,
       tokens: ownedTokens || [],
       collections: fullCollections || [],
+      favorites: favorites as any,
     };
 
     res.status(200).json(response);

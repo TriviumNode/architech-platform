@@ -1,6 +1,6 @@
 import { IsArray, IsBoolean, IsEmail, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 import { cw721 } from '../contracts';
-import { TokenModel } from '../interfaces/tokens.interface';
+import { ITokenModel } from '../interfaces/tokens.interface';
 
 export class UpdateTokenDto {
   @IsOptional() @IsString()
@@ -10,7 +10,7 @@ export class UpdateTokenDto {
   public metadataExtension?: cw721.Metadata;
 }
 
-export class CreateTokenDto implements TokenModel {
+export class CreateTokenDto implements ITokenModel {
   @IsString()
   public tokenId: string;
 

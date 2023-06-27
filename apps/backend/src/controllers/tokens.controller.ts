@@ -9,6 +9,7 @@ import { View } from '@/interfaces/views.interface';
 import TokenModel from '@/models/tokens.model';
 import { HttpException } from '@/exceptions/HttpException';
 import CollectionModel from '@/models/collections.model';
+import { findFavoritesCount } from '@/services/favorites.service';
 
 export const getLatestListings = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -127,9 +128,13 @@ export const getCollectionTokenId = async (req: RequestWithOptionalUser, res: Re
         token_id: tokenData.tokenId,
       });
 
+      // Get number of likes
+      const count = await findFavoritesCount(tokenData._id);
+
       const response: GetTokenResponse = {
         token: updated as unknown as Token,
         ask: ask as marketplace.Ask,
+        favorites: count,
       };
 
       res.status(200).json(response);

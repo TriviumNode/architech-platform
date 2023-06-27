@@ -25,4 +25,9 @@ export interface GetUserProfileResponse {
   profile: User;
   tokens: Token[];
   collections: GetCollectionResponse[];
+  favorites: [{
+    _id: string;
+    user: string;
+    token: Token;
+  }]
 }
