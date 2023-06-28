@@ -7,7 +7,7 @@ import { findCollectionTokenCount, processCollectionTokens, processCollectionTra
 import { Collection, GetCollectionResponse } from '@architech/types';
 import { CreateCollectionData } from '@/interfaces/collections.interface';
 import CollectionModel from '@models/collections.model';
-import { getAllTokens, getCollectionDossier, getContractInfo, getNftInfo, getNumTokens, MARKETPLACE_ADDRESS } from '@architech/lib';
+import { getAllTokens, getCollectionDossier, getContractInfo, getNftInfo, getNumTokens, MARKETPLACE_ADDRESS, resolveIpfs } from '@architech/lib';
 import { ImportCollectionBodyDto } from '@/dtos/collections.dto';
 import { isArray, isBoolean } from 'class-validator';
 import fetch from 'node-fetch';
@@ -267,7 +267,7 @@ const getEnsuredPfp = async (collection: string, tokenList: string[]) => {
 
     // Download image URL and save locally
     // TODO handle IPFS
-    const res = await fetch(imageUrl);
+    const res = await fetch(resolveIpfs(imageUrl));
     const contentType = res.headers.get('Content-Type');
     const extension = mime.extension(contentType);
 
