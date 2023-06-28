@@ -13,16 +13,17 @@ import styles from './CollectionTile.module.scss'
 interface Props {
     fullCollection: GetCollectionResponse,
     style?: CSSProperties,
+    className?: string,
 }
 
-const CollectionTile: FC<Props> = ({ fullCollection, style }): ReactElement => {
+const CollectionTile: FC<Props> = ({ fullCollection, style, className }): ReactElement => {
   const { collection } = fullCollection;
   const collectionName = getCollectionName(collection);
 
   const floor = findFloor(fullCollection.asks, parseInt(process.env.REACT_APP_NETWORK_DECIMALS));
   const imgUrl = collection.collectionProfile?.profile_image ? getApiUrl(`/public/${collection.collectionProfile?.profile_image}`) : undefined;
   return (
-    <Link to={`/nfts/${collection.address}`} style={style}>
+    <Link to={`/nfts/${collection.address}`} style={style} className={className}>
       <div className={styles.collectionCard}>
           <PlaceholdImg style={{width: '100%'}} src={imgUrl} alt={collectionName} />
           <div className={styles.overlay}>

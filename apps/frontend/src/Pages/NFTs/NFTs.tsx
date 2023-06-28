@@ -14,124 +14,53 @@ const NftPage: FC<any> = (): ReactElement => {
     const { collections } = useLoaderData() as { collections: GetCollectionResponse[]};
     return (
         <>
-        {/* <div className={styles.featuredContainer}>
-            <div>
-                <img src='example/featured1.png' alt='AstroKitKats' />
-            </div>
-            <div>
-                <img src='example/featured2.png' alt='AstroKitKats' />
-            </div>
-            <div>
-                <img src='example/featured3.png' alt='AstroKitKats' />
-            </div>
-        </div> */}
-        <div className={`${styles.gridContainer} ${styles.trendingContainer}`}>
-            <TrendingCard />
-            <LatestListingsCard />
-            <div className={styles.infoCard}>
-                    <div style={{display: 'flex', alignItems: 'center'}}>
-                        <img alt='' src='logo_white.svg' style={{maxHeight: '1em', marginRight: '0.5em'}} />
-                        <h2 style={{display: "inline"}}>Architech</h2>
-                    </div>
-                    <div style={{marginTop: 'auto'}}>
-                        <p className={styles.infoText} style={{marginBottom: '36px'}}>
-                            A brand new platform for Web3 Community Management on Archway. Build your DAO, NFTCommunity, manage treasuries and more at the click of a button! 
-                        </p>
-                        <a href='#' className={styles.infoLink}>Learn more about us</a>
-                    </div>
-            </div>
-        </div>
-        <div className={`grayCard wide mb8 d-flex align-items-center`} style={{height: '64px'}}>
-            <h2 style={{marginLeft: '24px'}}>Collections</h2>
-        </div>
-        <div className={styles.collectionsContainer}>
-            <CreateTile />
-            {collections && collections.map((collection: GetCollectionResponse, key: number)=>{
-                const style = key === 0 ? {gridColumn: 1, gridRow: 1} : key === 1 ? {gridColumn: 2, gridRow: 1} : key === 2 ? {gridColumn: 3, gridRow: 1} : undefined;
-                return(
-                    <CollectionTile fullCollection={collection} style={{...style, ...{maxHeight: '350px'}}} key={key} />
-                );
-            })}
-        </div>
+            {/* <div className={styles.featuredRow}>
+                <div>
+                    <img src='example/featured1.png' alt='AstroKitKats' />
+                </div>
+                <div>
+                    <img src='example/featured2.png' alt='AstroKitKats' />
+                </div>
+                <div>
+                    <img src='example/featured3.png' alt='AstroKitKats' />
+                </div>
+            </div> */}
 
-
-
-        {/* <div className={styles.container}>
-            <Row>
-                <Col className={styles.featureCol} xs={12} md={4}>
-                    <Col className={styles.innerCol}>
-                        <h2>Trending</h2>
-                    
-                    </Col>
+            {/* Trending Row */}
+            <div className={`${styles.trendingRow}`}>
+                <Col className={styles.trendingCard}>
+                    <TrendingCard />
                 </Col>
-                <Col className={styles.featureCol} xs={12} md={4}>
-                    <Col className={styles.innerCol}>
-                        <h2>Latest Listings</h2>
-                        <Row style={{width: '100%'}}>
-                            <Col xs={8}>
-                                <span>Project</span>
-                            </Col>
-                            <Col xs={2}>
-                                <span>Floor</span>
-                            </Col>
-                            <Col xs={2}>
-                                <span>Volume</span>
-                            </Col>
-                        </Row>
-                        <Row style={{width: '100%'}}>
-                            <Col xs={8}>
-                                <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
-                                    <img src="logo.svg" className={styles.nftImage} />
-                                    <div>
-                                        <span>Title</span><br />
-                                        <span>Description</span>
-                                    </div>
-                                </div>
-                            </Col>
-                            <Col xs={2}>
-                                <Row style={{justifyContent: "center", alignItems: "center", height: '100%'}}>
-                                    <span style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                    }}>1&nbsp;<ArchDenom /></span>
-                                </Row>
-                            </Col>
-                            <Col xs={2}>
-                                <Row style={{justifyContent: "center", alignItems: "center", height: '100%'}}>
-                                    <span style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                    }}>1&nbsp;<ArchDenom /></span>
-                                </Row>
-                            </Col>
-                        </Row>
-                        <hr />
-                    </Col>
-
+                <Col className={styles.trendingCard}>
+                    <LatestListingsCard />
                 </Col>
-                <Col className={styles.endCol} xs={12} md={4}>
-                    <Col className={styles.innerCol}>
-                        <Row>
-                        <span><img src='logo_white.svg' style={{maxHeight: '100%', marginRight: '0.5em'}} /><h2 style={{display: "inline"}}>Architech</h2></span>
-                        </Row>
-
-                    </Col>
-                </Col>
-            </Row>
-            {collections && collections.map((collection: Collection)=>{
-                const collectionName = collection.collectionProfile.name || collection.cw721_name
-                return(
-                    <div>
-                        <div style={{display: 'flex'}}>
-                            <Link to={`/nfts/${collection.address}`}><h3 style={{margin: 0}}>{collectionName}</h3></Link>
-                            <p style={{paddingLeft: '10px'}}>{collection.totalTokens} Items</p>
+                <Col className={`${styles.infoCard} ${styles.trendingCard}`}>
+                        <div style={{display: 'flex', alignItems: 'center'}}>
+                            <img alt='' src='logo_white.svg' style={{maxHeight: '1em', marginRight: '0.5em'}} />
+                            <h2 style={{display: "inline"}}>Architech</h2>
                         </div>
-                        <h6 style={{margin: 0}}>Created By: {collection.creator}</h6>
-                    </div>
-                
-                );
-            })}
-        </div> */}
+                        <div style={{marginTop: 'auto'}}>
+                            <p className={styles.infoText} style={{marginBottom: '36px'}}>
+                                A brand new platform for Web3 Community Management on Archway. Build your DAO, NFTCommunity, manage treasuries and more at the click of a button! 
+                            </p>
+                            <a href='#' className={styles.infoLink}>Learn more about us</a>
+                        </div>
+                </Col>
+            </div>
+            <div className={`grayCard wide mb8 d-flex align-items-center`} style={{height: '64px'}}>
+                <h2 style={{marginLeft: '24px'}}>Collections</h2>
+            </div>
+            <div className={styles.collectionsContainer}>
+                <CreateTile />
+                {collections && collections.map((collection: GetCollectionResponse, key: number)=>{
+                    // const style = key === 0 ? {gridColumn: 1, gridRow: 1} : key === 1 ? {gridColumn: 2, gridRow: 1} : key === 2 ? {gridColumn: 3, gridRow: 1} : undefined;
+                    const style = {}
+                    const className = key === 0 ? styles.item1 : key === 1 ? styles.item2 : key === 2 ? styles.item3 : undefined;
+                    return(
+                        <CollectionTile fullCollection={collection} className={className} style={{...style, ...{maxHeight: '350px'}}} key={key} />
+                    );
+                })}
+            </div>
         </>
     );
 };
