@@ -95,7 +95,7 @@ const SearchResults: FC<{results: any[], loading: boolean, onClick: ()=>any}> = 
 }
 
 
-export default function SearchBar({style}:{style?: CSSProperties}) {
+export default function SearchBar({style, className}:{style?: CSSProperties, className?: string}) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [searching, setSearching] = useState<boolean>(false);
   const [query, setQuery] = useState<string>('');
@@ -122,10 +122,8 @@ export default function SearchBar({style}:{style?: CSSProperties}) {
     }
   }
 
-  console.log('isOpen', isOpen)
-
   return (
-    <div className={`${styles.menuContainer}`} style={style}>
+    <div className={`${styles.menuContainer} ${className}`} style={style}>
       <Popover
         isOpen={isOpen}
         positions={['bottom', 'left', 'right', 'top']} // preferred positions by priority

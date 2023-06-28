@@ -62,7 +62,7 @@ body {
   max-width: calc(1440px - 32px);
   margin: auto;
   min-height: 100vh;
-  padding: 0 16px;
+  padding: 0 4px;
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
@@ -321,4 +321,11 @@ button:disabled {
   -webkit-line-clamp: 1; /* number of lines to show */
           line-clamp: 1; 
   -webkit-box-orient: vertical;
+}
+
+.noButton {
+  background: #FFFFFF00 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  color: black;
 }
