@@ -12,7 +12,7 @@ import { Col } from "react-bootstrap";
 import PlaceholdImg from "../PlaceholdImg";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faImages } from "@fortawesome/free-solid-svg-icons";
+import { faImages, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "react-tooltip";
 
 const CollectionResult: FC<{collection: Collection, onClick: ()=>any}> = ({ collection, onClick }: {collection: Collection, onClick: ()=>any}): ReactElement => {
@@ -46,7 +46,7 @@ const CollectionResult: FC<{collection: Collection, onClick: ()=>any}> = ({ coll
                 </div>
             </div>
         </Col>
-        <Col style={{color: '#666666', textAlign: 'right'}} className=''>
+        <Col style={{color: '#999999', textAlign: 'right'}} className=''>
           <FontAwesomeIcon
             size='2x'
             icon={faImages}
@@ -133,7 +133,7 @@ export default function SearchBar({style}:{style?: CSSProperties}) {
         onClickOutside={()=>setIsOpen(false)}
         
       >
-        <form id="search-form" role="search" onSubmit={handleSearch}>
+        <form id="search-form" role="search" onSubmit={handleSearch} style={{position: 'relative'}}>
             <input
               id="q"
               aria-label="Search"
@@ -154,6 +154,9 @@ export default function SearchBar({style}:{style?: CSSProperties}) {
               className="sr-only"
               aria-live="polite"
             />
+            <div className={styles.searchButton}>
+              <button type='button' onClick={handleSearch}><FontAwesomeIcon size='xl' icon={faMagnifyingGlass} /></button>
+            </div>
           </form>
         </Popover>
       {/* {isOpen && 
