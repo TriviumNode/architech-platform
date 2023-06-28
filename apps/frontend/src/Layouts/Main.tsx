@@ -1,21 +1,37 @@
 import { CREDIT_ADDRESS, MARKETPLACE_ADDRESS } from "@architech/lib";
+import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import Container from "react-bootstrap/esm/Container";
-import { Link, Outlet } from "react-router-dom";
-import Navbar from "../Components/Navbar/NavBar";
+import { Link, Outlet, useLocation } from "react-router-dom";
+import Navbar, { BurgerMenu, HeaderPage } from "../Components/Navbar/NavBar";
 import { useUser } from "../Contexts/UserContext";
 import styles from './Main.module.scss'
 
 export default function MainLayout() {
+  const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
 
+  const scrollbarWidth = window.innerWidth - document.body.clientWidth
+
+  useEffect(()=>{
+    document.body.style.setProperty("--scrollbarWidth", `${scrollbarWidth}px`)
+    document.body.style.setProperty('--viewportWidth', `calc(100vw - ${scrollbarWidth}px)`);
+  },[scrollbarWidth])
+
+  const page: HeaderPage =
+    location.pathname.toLowerCase().includes('nfts') ? 'NFTS' :
+    location.pathname.toLowerCase().includes('daos') ? 'DAOS' :
+    'HOME';
   return (
-    <>
+  <>
+    <BurgerMenu page={page} open={menuOpen} handleClose={()=>setMenuOpen(false)} />
     <Container fluid style={{
       padding: '0',
     }}>
+
       <header>
-        <Navbar />
-        <div className='lightText10 d-flex justify-content-between'>
+        <Navbar openMenu={()=>setMenuOpen(true)} />
+        <div className='lightText10 d-flex justify-content-between flex-wrap' style={{overflow: "hidden"}}>
           <div>Testnet Mode: {process.env.REACT_APP_CHAIN_ID} {process.env.REACT_APP_RPC_URL}</div>
           <div>Marketplace: {MARKETPLACE_ADDRESS}</div>
           <div>Credits: {CREDIT_ADDRESS}</div>

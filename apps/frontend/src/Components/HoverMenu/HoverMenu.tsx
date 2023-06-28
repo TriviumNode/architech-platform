@@ -79,6 +79,10 @@ export default function ProfileMenu(props: HoverMenuProps) {
         onKeyDown={() => {
           setIsOpen(!isOpen);
         }}
+        style={{
+          fontSize: '16px',
+          lineHeight: '150%',
+        }}
       >
         {content}
         {/* <span aria-hidden>▾</span> */}

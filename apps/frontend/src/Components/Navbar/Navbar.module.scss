@@ -47,30 +47,85 @@
     margin-left: auto;
     height: 100%;
 }
-
 .navbarInternal button {
-    position: relative;
-    right: 0;
-    /* Black/100 */
-    background: #000000;
-    border-radius: 8px;
+// .walletButton {
+    // display: flex;
+    // flex-direction: column;
+    // justify-content: center;
+    // align-items: center;
 
+    height: 100%;
+    margin-left: 16px;
+}
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 0px 24px;
-
-    font-style: normal;
-    font-weight: 400;
+.walletButton {
     font-size: 16px;
     line-height: 150%;
-
-    color: #FFFFFF;
-    height: 100%;
-
-    margin-left: 16px;
-
-    border: 2px solid #000000;
 }
+
+// .burgerMenu {
+//     background: #fff;
+//     padding: 32px;
+//     a {
+//         margin-bottom: 24px;
+//         font-size: 20px;
+//         padding: 8px;
+//         border-radius: 8px;
+//     }
+
+//     button {
+//         background: #FFFFFF00;
+//         padding: 0;
+//         border: 0;
+//         color: #999999;
+//     }
+// }
+
+.menuNav {
+    position: absolute;
+    left: 0;
+    width: 0;
+    overflow: hidden;
+    max-width: 80vw;
+    z-index: 9;
+    font-size: 18px;
+    box-shadow: 0 10px 15px -3px rgb(46 41 51 / 8%), 0 4px 6px -2px rgb(71 63 79 / 16%);
+    transform: translateX(-80vw);
+    transition: transform ease-in-out 0.2s;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    padding: 32px;
+    /* transition: width ease 0.2s; */
+    a {
+        margin-bottom: 24px;
+        font-size: 20px;
+        padding: 8px;
+        border-radius: 8px;
+    }
+
+    button {
+        background: #FFFFFF00;
+        padding: 0;
+        border: 0;
+        color: #999999;
+    }
+
+    .mobileLinks {
+        display: flex;
+        flex-direction: column;
+        row-gap: 16px;
+        a {
+            margin: 0 !important;
+            color: #454545;
+            // text-decoration: underline;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    }
+  }
+  .menuNav.showMenu {
+    width: 100%;
+    transform: translateX(0vw);
+  }

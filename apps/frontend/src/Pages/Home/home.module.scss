@@ -11,11 +11,13 @@
 
 .tagContainer {
     margin-left: 10vw;
+    width: calc(100% - 10vw);
 }
 
 @media (min-width: 768px) {
     .tagContainer {
         margin-left: 20vw;
+        width: calc(100% - 20vw);
     }
 }
 
@@ -30,6 +32,8 @@
 
     .tagContainer {
         margin-left: 0;
+        width: calc(50% - 20px);
+
         p {
             margin-left: 20px;
         }
