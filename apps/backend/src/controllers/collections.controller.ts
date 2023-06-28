@@ -90,6 +90,20 @@ export const getTrendingCollections = async (req: Request, res: Response, next: 
   }
 };
 
+export const searchCollections = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const query: string = req.query.query as string;
+    if (!query) throw new HttpException(400, 'No search query. Try `/search?query=foo`');
+
+    const results = await CollectionModel.find({ $text: { $search: query } });
+    console.log('search results', results);
+    res.status(200).json(results);
+    return;
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getCollectionByAddress = async (req: RequestWithOptionalUser, res: Response, next: NextFunction) => {
   try {
     const userId: string = req.user?._id;

@@ -1,4 +1,4 @@
-import { prop, getModelForClass, modelOptions, mongoose, plugin, Ref } from '@typegoose/typegoose';
+import { prop, getModelForClass, modelOptions, mongoose, plugin, Ref, index } from '@typegoose/typegoose';
 import { CollectionProfile, cw721, CollectionModel as CollectionModelInterface } from '@architech/types';
 import mongoosastic from 'mongoosastic';
 import { esClient } from '@/utils/elasticsearch';
@@ -15,6 +15,15 @@ export class PaginatedModel {
   ) => Promise<PaginateResult<T>>;
 }
 
+@index(
+  { name: 'text', description: 'text' },
+  {
+    weights: {
+      name: 10,
+      description: 5,
+    },
+  },
+)
 class CollectionProfileClass implements CollectionProfile {
   @prop({ type: String })
   public name?: string;
@@ -43,6 +52,17 @@ class CollectionProfileClass implements CollectionProfile {
   public banner_image?: string;
 }
 
+@index(
+  { cw721_name: 'text', creator: 'text', admin: 'text', 'collectionProfile.name': 'text' },
+  {
+    weights: {
+      cw721_name: 8,
+      creator: 1,
+      admin: 1,
+      'collectionProfile.name': 10,
+    },
+  },
+)
 @plugin(mongoosastic, { esClient: esClient }) // ElasticSearch
 @modelOptions({ schemaOptions: { collection: 'collections', timestamps: true } })
 export class CollectionClass extends PaginatedModel {

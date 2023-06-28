@@ -36,7 +36,7 @@ const LatestListingsCard: FC<any> = (): ReactElement => {
                     </Col>
                 </div>
                 { latest.slice(0,3).map((t, k)=>
-                    <div key={t.collection.address} className='wide'>
+                    <div key={`${t.collection.address}-${t.ask.token_id}`} className='wide'>
                         <ListingRow result={t} />
                         {k < 2 && <hr className='mt16' />}
                     </div>

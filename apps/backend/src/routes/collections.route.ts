@@ -10,6 +10,7 @@ import {
   importCollection,
   importCollectionAdmin,
   refreshCollection,
+  searchCollections,
 } from '@/controllers/collections.controller';
 import authMiddleware, { optionalAuthMiddleware } from '@/middlewares/auth.middleware';
 import { upload } from '@/utils/storage';
@@ -28,6 +29,8 @@ class CollectionsRoute implements Routes {
     // TODO: Pagination and Sorting
     // Note: Sort middleware?
     this.router.get(`${this.path}`, getAllCollections);
+
+    this.router.get(`${this.path}/search`, searchCollections);
 
     // Get top viewed collections
     this.router.get(`${this.path}/trending`, getTrendingCollections);

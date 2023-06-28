@@ -13,6 +13,12 @@ export const getApiUrl = (path: string): string => {
 
 
 // ### GET
+export const search = async(query: string): Promise<Collection[]> => {
+    const url = getApiUrl(`/collections/search?query=${query}`)
+    const {data} = await axios.get(url)
+    return data;
+}
+
 export const getCollection = async(contractAddr: string): Promise<GetCollectionResponse> => {
     const url = getApiUrl(`/collections/${contractAddr}`)
     const { data } = await axios.get(url)
@@ -101,16 +107,6 @@ export const walletLogin = async(pubKey: string, signature: string): Promise<Get
         }
     )
     return data
-
-    // const response = await fetch(url, {
-    //     method: "POST", // *GET, POST, PUT, DELETE, etc.
-    //     // credentials: "include", // include, *same-origin, omit
-    //     headers: {
-    //         "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(loginData), // body data type must match "Content-Type" header
-    // })
-    // return response.json()
 }
 
 export const updateProfile = async(userId: string, updateData: UpdateUserDto): Promise<User> => {

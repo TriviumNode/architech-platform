@@ -5,6 +5,7 @@ import { useUser } from "../../Contexts/UserContext";
 
 import styles from './MultiSelect.module.scss';
 import Badge from "../Badge";
+import useOutsideClick from "../../Hooks/useOutsideClick";
 
 interface MultiSelectProps {
     title: string;
@@ -19,6 +20,25 @@ export default function MultiSelect(props: MultiSelectProps) {
   const { title, options, selected, style, className, onChange } = props;
 
   const [isOpen, setIsOpen] = useState<boolean>();
+  const ref = useRef(null);
+
+  const onClickOutside = () => {
+    setIsOpen(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      //@ts-expect-error
+      if (ref.current && !ref.current.contains(event.target)) {
+        onClickOutside && onClickOutside();
+      }
+    };
+    document.addEventListener('click', handleClickOutside, true);
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true);
+    };
+  }, []);
+  
 
   const handleChange = (e: any) => {
     if (e.target.checked) {
@@ -28,6 +48,7 @@ export default function MultiSelect(props: MultiSelectProps) {
       onChange(selected.filter(entry => entry !== e.target.value))
     }
   }
+
 
   return (
     <div className={`${styles.menuContainer} ${className}`} style={style}>
@@ -50,7 +71,7 @@ export default function MultiSelect(props: MultiSelectProps) {
         <span aria-hidden>▾</span>
       </button>
       {isOpen && 
-      <div className={`${styles.menu}`}>
+      <div ref={ref} className={`${styles.menu}`}>
           {options.map((option, key)=>{
             return (
               <>
