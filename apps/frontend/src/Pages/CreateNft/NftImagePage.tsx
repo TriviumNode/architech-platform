@@ -50,6 +50,10 @@ const ImagePage: FC<{
                                     onChange={handleUpload}
                                 />
                             </label>
+                            <div className='lightText11' style={{margin: '4px 8px 0 8px'}}>
+                            Recommended Size: At least 720 x 720<br/>
+                            Accepts JPG, PNG, SVG.&nbsp;&nbsp;Max size: 5 MB
+                        </div>
                         </label>
                     </Col>
                 </div>
