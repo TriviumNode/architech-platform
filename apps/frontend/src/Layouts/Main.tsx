@@ -11,8 +11,7 @@ export default function MainLayout() {
   return (
     <>
     <Container fluid style={{
-      // maxWidth: '1440px',
-      // margin: 'auto',
+      padding: '0',
     }}>
       <header>
         <Navbar />
