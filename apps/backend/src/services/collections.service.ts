@@ -34,9 +34,7 @@ export const getFullCollection = async (collectionAddress: string): Promise<GetC
 
 export async function findCollectionByAddress(address: string): Promise<Collection> {
   if (isEmpty(address)) throw new HttpException(400, 'Contract address is empty');
-  console.log(address);
   const findCollection: Collection = await collectionsModel.findOne({ address: address });
-  console.log(findCollection);
   if (!findCollection) throw new HttpException(404, 'Collection not found');
 
   return findCollection;
@@ -66,7 +64,6 @@ export async function updateCollection(collectionId: mongoose.Types.ObjectId, co
   if (collectionData.collectionProfile) {
     collectionData.collectionProfile = { ...findCollection.collectionProfile, ...collectionData.collectionProfile };
   }
-  console.log('collectionData', collectionData);
 
   const updateCollectionById: Collection = await collectionsModel.findByIdAndUpdate(collectionId, collectionData);
   if (!updateCollectionById) throw new HttpException(404, 'Collection not found');
@@ -209,7 +206,6 @@ export const importCollection = async (
         // checking the type of every item and if it is object it returns true.
         return typeof item !== 'string';
       });
-      console.log('invalid', invalid);
       if (!invalid) categories = tryCat;
     }
   } catch {}
@@ -278,6 +274,6 @@ const getEnsuredPfp = async (collection: string, tokenList: string[]) => {
     saveBuffer(buffer, fileName);
     return fileName;
   } catch (err) {
-    console.log('Failed to ensure PFP', err);
+    console.error('Failed to ensure PFP', err);
   }
 };
