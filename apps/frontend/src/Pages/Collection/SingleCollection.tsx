@@ -22,6 +22,7 @@ import { faArrowRotateRight, faCoffee, faPencil } from '@fortawesome/free-solid-
 import { toast } from "react-toastify";
 import sleep from "../../Utils/sleep";
 import { Tooltip } from "react-tooltip";
+import { ADMINS } from "@architech/lib";
 
 const statusOptions = [
     'For Sale',
@@ -155,7 +156,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
                         </div>
                     </div>
                     <div style={{position: 'absolute', right: '16px', top: '16px'}}>
-                                { (wallet && collection.creator === wallet.address) &&
+                                { (wallet && (collection.creator === wallet.address || ADMINS.includes(wallet.address))) &&
                                 <Col className='d-flex flex-col justify-content-center'>
                                     {/* <button type="button" onClick={()=>setIsEditing(true)}>Edit</button> */}
                                     <button
@@ -176,10 +177,11 @@ const SingleCollection: FC<any> = (): ReactElement => {
 
                                     >
                                         <FontAwesomeIcon
-                                                                                    data-tooltip-id="my-tooltip"
-                                                                                    data-tooltip-content="Edit Collection"
-                                                                                    data-tooltip-place="left"
-                                        size='2x' icon={faPencil} />
+                                            data-tooltip-id="my-tooltip"
+                                            data-tooltip-content="Edit Collection"
+                                            data-tooltip-place="left"
+                                            size='2x' icon={faPencil}
+                                        />
                                     </LinkButton>
                                     <Tooltip id="my-tooltip" />
 

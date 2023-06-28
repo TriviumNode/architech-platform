@@ -5,6 +5,10 @@ export const PLACEHOLDER_URL = 'https://placehold.jp/a2a2a2/ffffff/350x350.png?t
 
 export const LOGIN_STRING = `Login to Architech`
 
+export const ADMINS = [
+    'archway1tmgvz9r9q0nlv00kclksvlk903pz9gjnaz62ng'
+]
+
 export const getLoginString = (nonce: string) => {
     return `${LOGIN_STRING}\n${nonce}`
 }
