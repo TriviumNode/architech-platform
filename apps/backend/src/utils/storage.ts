@@ -26,3 +26,12 @@ export const upload = multer({
     files: 2,
   },
 });
+
+export const upload5mb = multer({
+  storage: memStorage,
+  limits: {
+    // fieldNameSize: 255,
+    fileSize: 5 * 1000000, //~3mb
+    files: 2,
+  },
+});

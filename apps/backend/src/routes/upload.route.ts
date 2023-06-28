@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { Routes } from '@interfaces/routes.interface';
 import authMiddleware from '@/middlewares/auth.middleware';
-import { upload } from '@/utils/storage';
+import { upload, upload5mb } from '@/utils/storage';
 import { uploadImage } from '@/controllers/upload.controller';
 
 class UploadRoute implements Routes {
@@ -14,7 +14,7 @@ class UploadRoute implements Routes {
 
   private initializeRoutes() {
     // Edit User Profile
-    this.router.post(`${this.path}`, upload.single('image'), authMiddleware, uploadImage);
+    this.router.post(`${this.path}`, upload5mb.single('image'), authMiddleware, uploadImage);
   }
 }
 
