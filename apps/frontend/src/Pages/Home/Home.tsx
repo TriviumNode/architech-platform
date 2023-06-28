@@ -12,17 +12,17 @@ const Home: FC<any> = (): ReactElement => {
     return (
         <>
         <div className={styles.headerContainer}>
-            <Col>
-            <h1 className={styles.mainHeader}>ONE STOP SHOP<br/>FOR WEB3<br/>COMMUNITIES</h1>
+            <Col xs={12} lg={6} className='d-flex align-items-center'>
+                <h1 className={styles.mainHeader}>ONE STOP SHOP<br/>FOR WEB3<br/>COMMUNITIES</h1>
             </Col>
-            <Col className='d-flex flex-column justify-content-end' style={{height: '207px'}}>
-            <p className='mb8'>
-                Web3 Community Management on Archway.
-            </p>
-            <p style={{margin: 0}}>
-                Build your DAO, NFTCommunity, manage treasuries<br />
-                and more at the click of a button.
-            </p>
+            <Col xs={12} lg={6} className={`d-flex flex-column justify-content-end ${styles.tagContainer}`}>
+                <p className='mb8'>
+                    Web3 Community Management on Archway.
+                </p>
+                <p className={styles.tagMargin}>
+                    Build your DAO, NFTCommunity, manage treasuries<br />
+                    and more at the click of a button.
+                </p>
             </Col>
         </div>
         <div className={styles.linkRow}>
@@ -39,7 +39,7 @@ const Home: FC<any> = (): ReactElement => {
                 <Link to='/nfts'>
                     <img alt='' src='/placeholder.png' className='imgCover wide tall' />
                     <div className={styles.overlay}>
-                        <h2>Marketplace</h2>
+                        <h2>Market<div className='d-lg-inline' />place</h2>
                         <span>Browse and start collecting</span>
                     </div>
                 </Link>
@@ -53,7 +53,7 @@ const Home: FC<any> = (): ReactElement => {
             </Col>
         </div>
         <div className={styles.trendingRow}>
-            <Col className={styles.trendingCol}>
+            <Col xs={12} md={6} className={styles.trendingCol}>
                 <div style={{margin: '48px'}}>
                     <TrendingCard />
                 </div>
@@ -79,8 +79,8 @@ const Home: FC<any> = (): ReactElement => {
                     </div>
                 </div>
             </Col>
-            <Col className={'card'} style={{maxHeight: '220px'}}>
-                <img alt='' src='/placeholder.png' className='imgCover wide tall' />
+             <Col className={'card'} style={{background: 'url(/placeholder.png)', backgroundPosition: 'center', minHeight: '220px'}}>
+                &nbsp;
             </Col>
         </div>
         </>

@@ -1,7 +1,36 @@
 .headerContainer {
-    height: 320px;
+    // height: 320px;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+}
+
+.tagMargin {
+    margin: 0;
+}
+
+.tagContainer {
+    margin-left: 10vw;
+}
+
+@media (min-width: 768px) {
+    .tagContainer {
+        margin-left: 20vw;
+    }
+}
+
+@media (min-width: 992px) {
+    .headerContainer > div {
+        height: 320px;
+    }
+
+    .tagMargin {
+        margin-bottom: 64px !important;
+    }
+
+    .tagContainer {
+        margin-left: 0;
+    }
 }
 
 .mainHeader {
@@ -14,7 +43,7 @@
 .linkRow {
     display: flex;
     flex-wrap: wrap;
-    height: 513px;
+    // max-height: 513px;
     column-gap: 8px;
     margin-bottom: 8px;
 }
@@ -22,28 +51,47 @@
 .linkCard {
     position: relative;
 }
+@media (min-width: 769px) {
+    .linkCard {
+        aspect-ratio: 1 / 1;
+    }
+}
 
 .overlay {
     position: absolute;
     bottom: 8px;
-    height: calc(92px - 48px);
+    height: calc(100% - 40px);
     color: #fff;
     backdrop-filter: blur(24px) brightness(80%);
     border-radius: 8px;
     margin: 0 8px;
-    padding: 24px;
-    width: calc(100% - 16px - 48px);
+    padding: 12px;
+    width: calc(100% - 16px - 24px);
     font-size: 12px;
 }
 .overlay > h2 {
     margin-bottom: 4px;
 }
 
+@media (min-width: 769px) {
+    .overlay {
+        padding: 24px;
+        height: calc(112px - 48px);
+        width: calc(100% - 16px - 48px);
+    }
+}
+
+@media (min-width: 992px) {
+    .overlay {
+        height: calc(92px - 48px);
+    }
+}
+
 .trendingRow {
     display: flex;
     flex-wrap: wrap;
     // height: 407px;
-    column-gap: 8px;
+    gap: 8px;
     margin-bottom: 8px;
 }
 
@@ -57,9 +105,14 @@
     display: flex;
     flex-wrap: wrap;
     // height: 407px;
-    column-gap: 8px;
+    gap: 8px;
     // max-height: 220px;
 }
+// @media (min-width: 992px) {
+//     .socialRow {
+//         max-height: 220px;
+//     }
+// }
 
 .discordCard {
     color: #fff;
