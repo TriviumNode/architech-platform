@@ -1,24 +1,27 @@
-import { Collection, cw721, GetCollectionResponse, SortOption, Token } from "@architech/types";
-import React, {ReactElement, FC, useState, useEffect, CSSProperties} from "react";
-import { Col, Container, Row, Image } from "react-bootstrap";
-import { Link, useLoaderData, useSearchParams } from "react-router-dom";
+import { cw721, GetCollectionResponse, SortOption, Token } from "@architech/types";
+import {ReactElement, FC, useState, useEffect, CSSProperties} from "react";
+import { Col } from "react-bootstrap";
+import { useLoaderData, useRevalidator, useSearchParams } from "react-router-dom";
 import Badge from "../../Components/Badge";
 import CollectionStats from "../../Components/CollectionStats/CollectionStats";
 import FilterMenu from "../../Components/FilterMenu";
 import { TraitFilterMenu } from "../../Components/FilterMenu/FilterMenu";
 import LinkButton from "../../Components/LinkButton";
-import Modal from "../../Components/Modal";
 import NftTile from "../../Components/NftTile/NftTile";
 import PlaceholdImg from "../../Components/PlaceholdImg";
 import SocialLinks from "../../Components/Socials";
 import SortByButton from "../../Components/SortByButton";
 import { sortOptions } from "../../Components/SortByButton/SortByButton";
 import { useUser } from "../../Contexts/UserContext";
-import { getApiUrl, getTokens } from "../../Utils/backend";
+import { getApiUrl, getTokens, refreshCollection } from "../../Utils/backend";
 import { getCollectionName } from "../../Utils/helpers";
-import BannerModal from "./BannerModal";
 import EditModal from "./EditModal";
-import PictureModal from "./PictureModal";
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowRotateRight, faCoffee, faPencil } from '@fortawesome/free-solid-svg-icons'
+import { toast } from "react-toastify";
+import sleep from "../../Utils/sleep";
+import { Tooltip } from "react-tooltip";
 
 const statusOptions = [
     'For Sale',
@@ -31,6 +34,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
     // useEffect(() => {
     //   const currentParams = Object.fromEntries([...searchParams]);
     // }, [searchParams]);
+    const revalidator = useRevalidator();
     
     const [tokens, setTokens] = useState<Token[]>([])
     const { collection: fullCollection } = useLoaderData() as { collection: GetCollectionResponse};
@@ -38,6 +42,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
     const { user: wallet } = useUser();
 
     const [isEditing, setIsEditing] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     const [statusFilter, setStatusFilter] = useState<string[]>([])
     const [traitFilter, setTraitFilter] = useState<Partial<cw721.Trait>[]>([]);
@@ -91,6 +96,20 @@ const SingleCollection: FC<any> = (): ReactElement => {
         setTokens([...tokens, ...moreTokens]);
     }
 
+    const handleRefresh = async () => {
+        try {
+            setIsRefreshing(true);
+            await refreshCollection(collection.address);
+            await sleep(750)
+            revalidator.revalidate()
+        } catch (err: any) {
+            console.error('Error refreshing collection:', err);
+            toast.error(err.toString())
+        } finally {
+            setIsRefreshing(false);
+        }
+    }
+
     useEffect(()=>{
         if (!collection) return;
 
@@ -137,9 +156,33 @@ const SingleCollection: FC<any> = (): ReactElement => {
                     </div>
                     <div style={{position: 'absolute', right: '16px', top: '16px'}}>
                                 { (wallet && collection.creator === wallet.address) &&
-                                <Col>
+                                <Col className='d-flex flex-col justify-content-center'>
                                     {/* <button type="button" onClick={()=>setIsEditing(true)}>Edit</button> */}
-                                    <LinkButton to={`/nfts/edit/${collection.address}`}>Edit</LinkButton>
+                                    <button
+                                        data-tooltip-id="my-tooltip"
+                                        data-tooltip-content="Refresh Collection"
+                                        data-tooltip-place="left"
+                                        disabled={isRefreshing}
+                                        onClick={()=>handleRefresh()}
+                                        style={{color: '#666666', padding: 0}}
+                                        type='button'
+                                        className='clearButton mr16'
+                                    >
+                                        <FontAwesomeIcon spin={isRefreshing} size='2x' icon={faArrowRotateRight} />
+                                    </button>
+                                    <LinkButton
+                                        style={{color: '#666666', padding: 0, background: '#00000000'}}
+                                        to={`/nfts/edit/${collection.address}`}
+
+                                    >
+                                        <FontAwesomeIcon
+                                                                                    data-tooltip-id="my-tooltip"
+                                                                                    data-tooltip-content="Edit Collection"
+                                                                                    data-tooltip-place="left"
+                                        size='2x' icon={faPencil} />
+                                    </LinkButton>
+                                    <Tooltip id="my-tooltip" />
+
                                 </Col>
                                 }
                             </div>
@@ -218,7 +261,6 @@ const SingleCollection: FC<any> = (): ReactElement => {
 
             </div>
         </div>
-
         </>
     );
 };

@@ -1,15 +1,17 @@
 
-import { FC, ReactElement } from 'react';
+import { CSSProperties, FC, ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './LinkButton.module.scss';
 
 const LinkButton: FC<{
     to: string,
+    className?: string;
     children: any,
-}> = ({to, children}): ReactElement => {
+    style?: CSSProperties;
+}> = ({to, children, className, style}): ReactElement => {
     return(
-        <Link to={to} className={styles.linkButton}>
-            <div className='d-flex tall align-items-center' style={{}}>{children}</div>
+        <Link to={to} className={`${styles.linkButton} ${className}`} style={style}>
+            <div className={`d-flex tall align-items-center`}>{children}</div>
         </Link>
     );
 }

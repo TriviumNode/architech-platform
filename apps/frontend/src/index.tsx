@@ -16,6 +16,7 @@ import NftPage from './Pages/NFTs/NFTs';
 import { allCollectionsLoader, collectionLoader, tokenLoader, userProfileloader } from './Utils/loaders';
 import ProfilePage from './Pages/Profile/Profile';
 
+import 'react-tooltip/dist/react-tooltip.css'
 import 'bootstrap/dist/css/bootstrap-grid.min.css';
 import ImportPage from './Pages/Import';
 import SingleCollection from './Pages/Collection/SingleCollection';
