@@ -27,7 +27,7 @@ const CollectionResult: FC<{collection: Collection, onClick: ()=>any}> = ({ coll
         className={styles.item}
         onClick={()=>onClick()}
     >
-        <Col xs={8}>
+        <Col>
             <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
                 <PlaceholdImg
                     alt=''
@@ -46,7 +46,7 @@ const CollectionResult: FC<{collection: Collection, onClick: ()=>any}> = ({ coll
                 </div>
             </div>
         </Col>
-        <Col style={{color: '#999999', textAlign: 'right'}} className=''>
+        <Col xs='auto' style={{color: '#999999', textAlign: 'right'}} className=''>
           <FontAwesomeIcon
             size='2x'
             icon={faImages}
