@@ -54,6 +54,7 @@
     // justify-content: end;
     align-items: end;
     padding: 12px 16px;
+    row-gap: 12px;
 
     -webkit-box-shadow: 5px 5px 10px #888888;
     box-shadow: 5px 5px 10px #888888;
@@ -66,10 +67,16 @@
   }
 
 .item {
-    width: 100%;
+    width: calc(100% - 16px);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 8px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.item:hover {
+    background: #CCC !important;
 }
 
 .searchButton {
