@@ -1,3 +1,4 @@
+import { CREDIT_ADDRESS, MARKETPLACE_ADDRESS } from "@architech/lib";
 import { Col, Row } from "react-bootstrap";
 import Container from "react-bootstrap/esm/Container";
 import { Link, Outlet } from "react-router-dom";
@@ -15,6 +16,11 @@ export default function MainLayout() {
     }}>
       <header>
         <Navbar />
+        <div className='lightText10 d-flex justify-content-between'>
+          <div>Testnet Mode: {process.env.REACT_APP_CHAIN_ID} {process.env.REACT_APP_RPC_URL}</div>
+          <div>Marketplace: {MARKETPLACE_ADDRESS}</div>
+          <div>Credits: {CREDIT_ADDRESS}</div>
+        </div>
       </header>
       {/* <div id="detail"> */}
           <Outlet />
