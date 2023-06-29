@@ -64,6 +64,7 @@
             .navLinks {
                 flex-direction: row !important;
                 align-items: center;
+                flex-wrap: wrap;
             }
 
             h2 {
@@ -78,14 +79,14 @@
     .navCard {
         .navCardInner {
             
-            margin: 24px 24px 8px 24px;
+            margin: 8px;
             .navLinks {
                 width: 100%;
                 justify-content: center;
             }
 
             h2 {
-                margin-bottom: 16px;
+                margin: 8px 0 16px 12px;
                 // margin-right: auto;
             }
         }

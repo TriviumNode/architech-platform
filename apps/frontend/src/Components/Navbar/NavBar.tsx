@@ -68,7 +68,6 @@ export const BurgerMenu = ({page, open, handleClose}:{page: HeaderPage, open: bo
 const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
   const {user, balances, connectKeplr, loadingConnectWallet} = useUser()
   const location = useLocation();
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const page: HeaderPage =
     location.pathname.toLowerCase().includes('nfts') ? 'NFTS' :
@@ -80,12 +79,10 @@ const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
     if (!connectKeplr) throw new Error("wot")
     await connectKeplr()
   }
-  const something = async(e: any) => {
+  const handleWalletButton = async(e: any) => {
     e.preventDefault();
-    console.log('aaaaa')
-    await connectKeplr()
-    console.log('BBB');
-    return
+    if (!user) await connectKeplr()
+    else openMenu();
   }
 
     return (
@@ -101,7 +98,7 @@ const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
             <button type='button' className='noButton' style={{color: '#777', marginLeft: 'auto'}}>
               <FontAwesomeIcon size='2x' icon={faMagnifyingGlass} />
             </button>
-            <button type='button' className='noButton' style={{color: !!user ? '#0366fc' : '#777', margin: '0 16px'}} onClick={something}>
+            <button type='button' className='noButton' style={{color: !!user ? '#0366fc' : '#777', margin: '0 16px'}} onClick={handleWalletButton}>
               <FontAwesomeIcon size='2x' icon={faWallet} />
             </button>
           </div>
