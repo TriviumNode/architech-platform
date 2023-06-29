@@ -25,6 +25,7 @@ const RewardsPage: FC<{
     const {user} = useUser()
     const [rewardsAddress, setRewardsAddress] = useState<string>()
     const [loadingMetadata, setLoadingMetadata] = useState(true)
+    const [loadMetadataError, setLoadMetadataError] = useState<string>();
 
     useEffect(()=>{
         refreshMetadata();
@@ -32,19 +33,17 @@ const RewardsPage: FC<{
 
     const refreshMetadata = async() => {
         setLoadingMetadata(true);
-        const metadata = await getMetadata({
-            client: QueryClient,
-            contract: contractAddress
-        });
-        setRewardsAddress(metadata.rewardsAddress);
-        setLoadingMetadata(false);
-        if (!user) return;
-        const rewards = await getRewards({
-            client: QueryClient,
-            address: user.address
-        });
-        setRewardsAddress(rewards?.rewardsAddress)
-        setLoadingMetadata(false);
+        try {
+            const metadata = await getMetadata({
+                client: QueryClient,
+                contract: contractAddress
+            });
+            setRewardsAddress(metadata.rewardsAddress);
+        } catch (err: any) {
+            setLoadMetadataError(`Error Fetching: ${err.toString()}`)
+        } finally {
+            setLoadingMetadata(false);
+        }
     }
 
     const updateState = (newState: Partial<RewardsState>) => {
@@ -60,7 +59,7 @@ const RewardsPage: FC<{
                 <p className='mb8'>
                     Archway's incentivized smart contracts allow you to collect a portion of the gas fees paid when your NFTs are sold or transferd. Set the rewards address to begin recieving rewards.<br />
                 </p>
-                <div className='lightText12'>Current rewards address: {loadingMetadata ? <SmallLoader /> : rewardsAddress || <span style={{color: 'red'}}>Not Set</span> }</div>
+                <div className='lightText12'>Current rewards address: {loadingMetadata ? <SmallLoader /> : rewardsAddress || <span style={{color: 'red'}}>{loadMetadataError ? loadMetadataError : 'Not Set'}</span> }</div>
 
             </Col>
 

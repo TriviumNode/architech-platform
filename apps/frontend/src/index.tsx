@@ -25,6 +25,7 @@ import CreateSingleNftPage from './Pages/CreateNft/CreateNft';
 import CreateCollectionPage from './Pages/CreateCollection/CreateCollection';
 import EditCollectionPage from './Pages/CreateCollection/EditCollection';
 import Home from './Pages/Home/Home';
+import { initClients } from './Utils/queryClient';
 
 
 const router = createBrowserRouter([
@@ -102,3 +103,13 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
+const init = async() => {
+  try {
+    initClients();
+  } catch (err: any) {
+    console.error('Failed to initialize query client:', err)
+  }
+}
+
+init();

@@ -15,7 +15,7 @@ const TrendingCard: FC<any> = (): ReactElement => {
             const result = await getTrendingCollections();
             setTrending(result);
         } catch(err: any) {
-            console.error('Error getting trending collections:', err)
+            console.error('Error getting trending collections:', err.toString(), err)
         }
     }
     

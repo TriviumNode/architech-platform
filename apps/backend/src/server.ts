@@ -9,7 +9,7 @@ import UploadRoute from './routes/upload.route';
 import { initClients } from './utils/chainClients';
 
 const main = async () => {
-  await initClients();
+  await initClients().catch(e => console.error('FAILED TO INIT QUERY CLIENT', e));
 
   validateEnv();
 

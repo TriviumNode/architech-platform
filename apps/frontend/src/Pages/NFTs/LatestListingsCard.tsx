@@ -15,7 +15,7 @@ const LatestListingsCard: FC<any> = (): ReactElement => {
             const result = await getLatestListings();
             setLatest(result);
         } catch(err: any) {
-            console.error('Error getting trending collections:', err)
+            console.error('Error getting latest listings:', err.toString(), err)
         }
     }
     
