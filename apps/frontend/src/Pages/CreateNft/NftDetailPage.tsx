@@ -5,7 +5,7 @@ import { Col } from "react-bootstrap";
 import { toast } from "react-toastify";
 import MultiSelect from "../../Components/MultiSelect";
 
-import styles from './create.module.scss'
+import styles from './createNft.module.scss'
 
 export const DefaultTrait: cw721.Trait = {
     trait_type: '',

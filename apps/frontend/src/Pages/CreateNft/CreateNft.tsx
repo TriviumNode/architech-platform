@@ -6,7 +6,7 @@ import Loader from "../../Components/Loader";
 import Modal from "../../Components/Modal";
 import { ImportCollectionData } from "../../Interfaces/interfaces";
 
-import styles from './create.module.scss'
+import styles from './createNft.module.scss'
 import DetailPage, { DetailState, DefaultDetailState } from "./NftDetailPage";
 import { initStandardProject } from "../../Utils/wasm/factory_handles";
 import { importCollection, refreshCollection, uploadImage } from "../../Utils/backend";
@@ -160,15 +160,17 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
         </Row>
     )
     return (<>
-        <div className='d-flex gap8 tallFill'>
-            <Col xs={12} md={4} className='card'>
-                <div style={{margin: '48px'}} className='d-flex flex-column gap8'>
-                    <h2 className='mb24'>Create<br/>NFT</h2>
-                    { Pages.map((p: Page)=>
-                        <button type='button' onClick={()=>{setPage(p)}} disabled={page === p} className={styles.pageButton} key={p}>
-                            {p}
-                        </button>)
-                    }
+        <div className={styles.mainRow}>
+            <Col xs={12} md={4} className={styles.navCard}>
+                <div className={styles.navCardInner}>
+                    <h2>Create<br/>NFT</h2>
+                    <div className={styles.navLinks}>
+                        { Pages.map((p: Page)=>
+                            <button type='button' onClick={()=>{setPage(p)}} disabled={page === p} key={p}>
+                                {p}
+                            </button>)
+                        }
+                    </div>
                 </div>
             </Col>
             <Col

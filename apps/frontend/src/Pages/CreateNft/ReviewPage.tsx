@@ -5,7 +5,7 @@ import MultiSelect from "../../Components/MultiSelect";
 //@ts-expect-error
 import { Switch } from 'react-switch-input';
 
-import styles from './create.module.scss'
+import styles from './createNft.module.scss'
 
 const ReviewNftPage: FC<{
     // onChange: (data: FinishState)=>void;

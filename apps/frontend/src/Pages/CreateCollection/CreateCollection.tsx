@@ -97,15 +97,17 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
         </Row>
     )
     return (<>
-        <div className='d-flex gap8 tallFill'>
-            <Col xs={12} md={4} className='card'>
-                <div style={{margin: '48px'}} className='d-flex flex-column gap8'>
-                    <h2 className='mb24'>New<br/>Collection</h2>
-                    { Pages.map((p: Page)=>
-                        <button type='button' onClick={()=>{setPage(p)}} disabled={page === p} className={styles.pageButton} key={p}>
-                            {p}
-                        </button>)
-                    }
+        <div className={styles.mainRow}>
+            <Col xs={12} md={4} className={styles.navCard}>
+                <div className={styles.navCardInner}>
+                    <h2>New<br/>Collection</h2>
+                    <div className={styles.navLinks}>
+                        { Pages.map((p: Page)=>
+                            <button type='button' onClick={()=>{setPage(p)}} disabled={page === p} key={p}>
+                                {p}
+                            </button>)
+                        }
+                    </div>
                 </div>
             </Col>
             <Col
@@ -141,84 +143,6 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
               </Col>
             </Row>
         </Modal>
-        {/* <Row style={{justifyContent: "center"}}>
-            <Col xs={12} md={6}>
-                <form onSubmit={handleCreate}>
-                    <Row>
-                        <OptionSelector onChange={setCollectionType} value={collectionType} items={[
-                            {
-                                content: `Random Mint Collection`,
-                                value: 'RANDOM',
-                            },
-                            {
-                                content: `Standard Collection`,
-                                value: 'STANDARD',
-                            }
-                        ]} />
-
-                    </Row>
-                    <Row>
-                        <label>
-                            Collection Name:<br />
-                            <input  value={formState.name} onChange={(e)=> updateFormState({name: e.target.value})} />
-                        </label>
-                    </Row>
-                    <Row>
-                        <label>
-                            Collection Symbol:<br />
-                            <input value={formState.symbol} onChange={(e)=> updateFormState({symbol: e.target.value})}  />
-                        </label>
-                    </Row>
-                    <Row>
-                        <label>
-                            Description:<br />
-                            <textarea value={formState.description} onChange={(e)=> updateFormState({description: e.target.value})}  />
-                        </label>
-                    </Row>
-                    <Row>
-                        <label>
-                            Create Hidden:<br />
-                            <input type="checkbox" checked={formState.hidden} onChange={(e)=> updateFormState({hidden: e.target.checked})}  />
-                        </label>
-                    </Row>
-                    <Row>
-                        <Col xs="auto">
-                            <label>
-                                Collection Image:<br />
-                                <input
-                                    type="file"
-                                    onChange={(e)=> {
-                                        if (e.target.files) {
-                                            updateFormState({profileImage: e.target.files[0]})
-                                        }
-                                    }}
-                                    accept="image/*"
-                                />
-                            </label>
-                        </Col>
-                        <Col xs="auto">
-                            <label>
-                                Collection Banner:<br />
-                                <input
-                                    type="file"
-                                    onChange={(e)=> {
-                                        if (e.target.files) {
-                                            updateFormState({bannerImage: e.target.files[0]})
-                                        }
-                                    }}
-                                    accept="image/*"
-                                />
-                            </label>
-                        </Col>
-                    </Row>
-                    <Row style={{marginTop: '20px'}}>
-                        <Col xs="auto">
-                            <button type="submit">Create</button>
-                        </Col>
-                    </Row>
-                </form>
-            </Col>
-        </Row> */}
     </>);
 };
 

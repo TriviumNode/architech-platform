@@ -4,7 +4,7 @@ import { FC, ReactElement, useState } from "react";
 import { Col } from "react-bootstrap";
 import MultiSelect from "../../Components/MultiSelect";
 
-import styles from './create.module.scss'
+import styles from './createNft.module.scss'
 
 const ImagePage: FC<{
     image: File | undefined,

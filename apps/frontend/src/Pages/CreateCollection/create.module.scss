@@ -1,3 +1,103 @@
+// Main Container Stuff //
+
+// Contains page nav and page
+.mainRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+@media (min-width: 768px) {
+    .mainRow {
+        // Height fills page. 64px = navbar; 16px = navbar margin; 8px = bottom margin;
+        min-height: calc(100vh - 64px - 16px - 8px) !important;
+    }
+}
+
+// Navigation Card
+.navCard {
+    background: #FFFFFF;
+    border-radius: 8px;
+    overflow: hidden;
+
+    .navCardInner {
+        margin: 48px;
+        display: flex;
+        flex-direction: column;
+
+        .navLinks {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        h2 {
+            margin-bottom: 24px;;
+        }
+
+        button {
+            border: none;
+            height: 48px;
+            background: #FFFFFF00;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 16px;
+            line-height: 150%;
+            padding: 0 16px;
+            color: #000000;
+            cursor: pointer;
+            align-self: flex-start;
+        }
+        button:disabled {
+            background: rgba(0, 0, 0, 0.08) !important;
+            cursor: default !important;
+            align-self: initial !important;
+        }
+    }
+}
+
+@media (max-width: 767.98px) {
+    .navCard {
+        .navCardInner {
+            margin: 16px;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+
+            .navLinks {
+                flex-direction: row !important;
+                align-items: center;
+            }
+
+            h2 {
+                margin-bottom: 0;
+                margin-right: auto;
+            }
+        }
+    }
+}
+
+@media (max-width: 575.98px) {
+    .navCard {
+        .navCardInner {
+            
+            margin: 24px 24px 8px 24px;
+            .navLinks {
+                width: 100%;
+                justify-content: center;
+            }
+
+            h2 {
+                margin-bottom: 16px;
+                // margin-right: auto;
+            }
+        }
+    }
+}
+
+
+
+
+// Stuff for individual pages
 .form {
     font-weight: 400;
     font-size: 14px;
@@ -76,25 +176,13 @@
     align-self: initial !important;
 }
 
-.pInputContainer {
-    position: relative;
-    float: left;
-}
-.pInputContainer:after {
-    position: absolute;
-    right: -16;
-    top: -16;
-    content: '%';
-}
-
 .percent{
     text-align: right;
     // width: 100%;
     position: relative;
     right: 8px;
     bottom: 32px;
-  }
-
+}
 
 .saveToast {
     border-radius: 8px;

@@ -4,7 +4,7 @@ import { Col } from "react-bootstrap";
 import MultiSelect from "../../Components/MultiSelect";
 import { useUser } from "../../Contexts/UserContext";
 
-import styles from './create.module.scss'
+import styles from './createNft.module.scss'
 
 export interface FinancialState {
     address: string,
