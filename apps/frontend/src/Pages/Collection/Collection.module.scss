@@ -1,0 +1,12 @@
+.picRow {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+    gap: 8px;
+}
+
+@media (min-width: 768px) {
+    .picRow {
+        max-height: '350px'
+    }
+}

@@ -151,6 +151,8 @@ const SingleToken: FC<any> = (): ReactElement => {
     return (
       <>
       <ListModal open={isListing} onClose={()=>setIsListing(false)} token={tokenData.token} />
+
+      {/*  Collection Row */}
       <div className='d-flex gap8' style={{height: '64px', marginBottom: '8px'}}>
         <Col className='tall square br8' xs="auto">
           <Link to={`/nfts/${collection.address}`}>
@@ -158,18 +160,21 @@ const SingleToken: FC<any> = (): ReactElement => {
           </Link>
         </Col>
         <Col className='card d-flex flex-row justify-content-between align-items-center'>
-          <h2 className='ml16'>{collectionName}</h2>
-          <div style={{width: '50%', paddingRight: '24px'}}  className='d-flex justify-content-between align-items-center'>
+          <h2 className='ml16 d-none d-md-block'>{collectionName}</h2>
+          <h4 className='ml16 d-md-none'>{collectionName}</h4>
+          <div style={{paddingRight: '24px'}}  className='d-flex justify-content-between align-items-center'>
             <CollectionStats collection={collection} asks={fullCollection.asks} />
             <SocialLinks discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} website={collection.collectionProfile.website} />
           </div>
         </Col>
       </div>
-      <div className='d-flex colGap8 flex-wrap' style={{minWidth: 0}}>
-        <Col xs={{span: 10, offset: 2}} md={{span: 6, offset: 0}} className={`br8 square`} style={{maxHeight: '630px'}}>
+
+      {/* Main Row */}
+      <div className='d-flex gap8 flex-wrap' style={{minWidth: 0}}>
+        <Col xs={{span: 8, offset: 2}} md={{span: 6, offset: 0}} className={`br8 square`} style={{maxHeight: '630px'}}>
           <TokenImage alt={`${collectionName} ${tokenData.token.tokenId}`} src={tokenImage} className='tall wide imgCover' />
         </Col>
-        <Col className='d-flex flex-column' style={{maxWidth: '712px', minWidth: 0}}>
+        <Col xs={12} md={true} className='d-flex flex-column' style={{maxWidth: '712px', minWidth: 0}}>
           <div className='d-flex card justify-content-between' style={{height: '128px', marginBottom: '8px', overflow: "hidden", minWidth: 0}}>
             <div style={{margin: '24px 0 0 24px', overflow: 'hidden'}}>
               <div className='d-flex align-items-center mb16'>
@@ -225,6 +230,8 @@ const SingleToken: FC<any> = (): ReactElement => {
 
         </Col>
       </div>
+
+      {/* Sale Row */}
       <div className='card d-flex' style={{height: '84px', marginBottom: '8px'}}>
         <div style={{margin: '0 16px'}} className='d-flex align-items-center align-self-stretch justify-content-between wide'>
             <div className='d-flex align-items-center lightText justify-content-between'>
@@ -250,7 +257,7 @@ const SingleToken: FC<any> = (): ReactElement => {
               }
             </div>
             </div>
-          </div>
+      </div>
     </>
     )
 }

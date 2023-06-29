@@ -1,3 +1,14 @@
+.statsContainer {
+    display: flex;
+    width: 100%;
+    gap: 32px;
+}
+@media (max-width: 575.98px) {
+    .statsContainer {
+        gap: 12px;
+    }
+}
+
 .vr {
     // height: 100%;
     border: 1px solid rgba(0, 0, 0, 0.2);

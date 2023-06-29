@@ -44,21 +44,21 @@ const CollectionStats: FC<Props> = ({collection, asks}): ReactElement => {
     },[collection, QueryClient])
 
     return (
-        <div className='d-flex wide' style={{gap: '32px'}}>
-            <div>
+        <div className={styles.statsContainer}>
+            <div className='d-flex flex-column justify-content-center'>
                 <div className={styles.number}>{collection.totalTokens}</div>
                 <span className={styles.label}>Items</span>
             </div>
-            <div>
+            <div className='d-flex flex-column justify-content-center'>
                 <div className={styles.number}>{asks?.length === undefined ? <SmallLoader /> : asks.length}</div>
                 <span className={styles.label}>Listed</span>
             </div>
-            <div className={styles.vr} />
-            <div>
+            <div className={`${styles.vr}  className='d-flex flex-column justify-content-center'`} />
+            <div className='d-flex flex-column justify-content-center'>
                 <div className={`${styles.number} d-flex align-items-center`}>{floorAmount || '--'}&nbsp;<ArchDenom /></div>
                 <span className={styles.label}>Floor</span>
             </div>
-            <div>
+            <div className='d-flex flex-column justify-content-center'>
                 <div className={`${styles.number} d-flex align-items-center`}>{(volume === undefined ? <SmallLoader /> : volume) || '--'}&nbsp;<ArchDenom /></div>
                 <span className={styles.label}>Total Volume</span>
             </div>

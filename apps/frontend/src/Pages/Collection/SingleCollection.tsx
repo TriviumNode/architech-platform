@@ -24,6 +24,8 @@ import sleep from "../../Utils/sleep";
 import { Tooltip } from "react-tooltip";
 import { ADMINS } from "@architech/lib";
 
+import styles from './Collection.module.scss';
+
 const statusOptions = [
     'For Sale',
     // 'Test Option',
@@ -131,70 +133,71 @@ const SingleCollection: FC<any> = (): ReactElement => {
 
     return (
         <>
-            <EditModal open={isEditing} onClose={()=>setIsEditing(false)} collectionId={collection._id.toString()} />
-            <div className='d-flex mb8' style={{gap: '8px', margin: '0 -8px', maxHeight: '350px'}}>
-                <Col xs={{span: 10, offset: 1}} md={{span: 3, offset: 0}} className='card' style={{aspectRatio: '1 / 1'}}>
+            <div className={styles.picRow}>
+                <Col xs={{span: 8, offset: 2}} md={{span: 3, offset: 0}} className='card' style={{aspectRatio: '1 / 1'}}>
                     <PlaceholdImg alt={collectionName} src={collectionImage} style={{objectFit: 'cover', width: '100%', height: '100%'}} />
                 </Col>
                 <Col
+                    xs={12}
+                    md={true}
                     className='card'
                     style={{
                         position: 'relative',
+                        minHeight: '240px',
                         ...bgStyle,
                     }}
                 >
-                    <div className='d-flex flex-column genOverlay' style={{position: 'absolute', left: '16px', bottom: '16px'}}>
-                        <div className='d-flex align-items-center gap8'>
-                            <h1>{collectionName}</h1>
-                            {(collection.categories || []).map(category=>
-                                <Badge><span>{category}</span></Badge>
-                            )}
-                        </div>
-                        <p>{collection.collectionProfile.description}</p>
-                        <div className='d-flex wide justify-content-space-between'>
-                            <CollectionStats collection={collection} asks={fullCollection.asks} />
-                        </div>
-                    </div>
-                    <div style={{position: 'absolute', right: '16px', top: '16px'}}>
-                                { (wallet && (collection.creator === wallet.address || ADMINS.includes(wallet.address))) &&
-                                <Col className='d-flex flex-col justify-content-center'>
-                                    {/* <button type="button" onClick={()=>setIsEditing(true)}>Edit</button> */}
-                                    <button
-                                        data-tooltip-id="my-tooltip"
-                                        data-tooltip-content="Refresh Collection"
-                                        data-tooltip-place="left"
-                                        disabled={isRefreshing}
-                                        onClick={()=>handleRefresh()}
-                                        style={{color: '#666666', padding: 0}}
-                                        type='button'
-                                        className='clearButton mr16'
-                                    >
-                                        <FontAwesomeIcon spin={isRefreshing} size='2x' icon={faArrowRotateRight} />
-                                    </button>
-                                    <LinkButton
-                                        style={{color: '#666666', padding: 0, background: '#00000000'}}
-                                        to={`/nfts/edit/${collection.address}`}
-
-                                    >
-                                        <FontAwesomeIcon
-                                            data-tooltip-id="my-tooltip"
-                                            data-tooltip-content="Edit Collection"
-                                            data-tooltip-place="left"
-                                            size='2x' icon={faPencil}
-                                        />
-                                    </LinkButton>
-                                    <Tooltip id="my-tooltip" />
-
-                                </Col>
-                                }
+                        <div className='d-flex flex-column genOverlay' style={{position: 'absolute', left: '16px', bottom: '16px'}}>
+                            <div className='d-flex align-items-center gap8'>
+                                <h1>{collectionName}</h1>
+                                {(collection.categories || []).map(category=>
+                                    <Badge><span>{category}</span></Badge>
+                                )}
                             </div>
-                    <div style={{position: 'absolute', right: '16px', bottom: '16px'}}>
-                        <SocialLinks discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} website={collection.collectionProfile.website} />
-                    </div>
+                            <p>{collection.collectionProfile.description}</p>
+                            <div className='d-flex wide justify-content-space-between'>
+                                <CollectionStats collection={collection} asks={fullCollection.asks} />
+                            </div>
+                        </div>
+                        <div style={{position: 'absolute', right: '16px', top: '16px'}}>
+                                    { (wallet && (collection.creator === wallet.address || ADMINS.includes(wallet.address))) &&
+                                    <Col className='d-flex flex-col justify-content-center'>
+                                        {/* <button type="button" onClick={()=>setIsEditing(true)}>Edit</button> */}
+                                        <button
+                                            data-tooltip-id="my-tooltip"
+                                            data-tooltip-content="Refresh Collection"
+                                            data-tooltip-place="left"
+                                            disabled={isRefreshing}
+                                            onClick={()=>handleRefresh()}
+                                            style={{color: '#666666', padding: 0}}
+                                            type='button'
+                                            className='clearButton mr16'
+                                        >
+                                            <FontAwesomeIcon spin={isRefreshing} size='2x' icon={faArrowRotateRight} />
+                                        </button>
+                                        <LinkButton
+                                            style={{color: '#666666', padding: 0, background: '#00000000'}}
+                                            to={`/nfts/edit/${collection.address}`}
 
+                                        >
+                                            <FontAwesomeIcon
+                                                data-tooltip-id="my-tooltip"
+                                                data-tooltip-content="Edit Collection"
+                                                data-tooltip-place="left"
+                                                size='2x' icon={faPencil}
+                                            />
+                                        </LinkButton>
+                                        <Tooltip id="my-tooltip" />
+
+                                    </Col>
+                                    }
+                                </div>
+                        <div style={{position: 'absolute', right: '16px', bottom: '16px'}}>
+                            <SocialLinks discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} website={collection.collectionProfile.website} />
+                        </div>
                 </Col>
             </div>
-            <div className='d-flex align-items-start' style={{gap: '8px', margin: '0 -8px'}}>
+            <div className='d-flex align-items-start flex-wrap' style={{gap: '8px'}}>
                 <Col xs={12} md={3} className='card d-flex flex-column'>
                     <div style={{margin: '24px'}}>
                         <FilterMenu title={'Status'} options={statusOptions} selected={statusFilter} setOptions={(selected)=>setStatusFilter(selected)}  />
@@ -262,7 +265,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
                 }
 
             </div>
-        </div>
+            </div>
         </>
     );
 };
