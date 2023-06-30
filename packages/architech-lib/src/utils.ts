@@ -39,6 +39,7 @@ export const findFloor = (asks: marketplace.Ask[], decimals: number) => {
     return floorAmount;
 }
 
-export const truncateAddress = (addr: string) => {
+export const truncateAddress = (addr: string, prefix?: string) => {
+    if (prefix && !addr.startsWith(`${prefix}1`)) return addr;
     return `${addr.slice(0,10)}...${addr.slice(addr.length-6)}`
 }

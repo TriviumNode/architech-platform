@@ -1,5 +1,7 @@
-import { cancelListing, denomToHuman, findDenom, findToken, MARKETPLACE_ADDRESS, purchaseNative } from "@architech/lib";
+import { cancelListing, denomToHuman, findDenom, findToken, MARKETPLACE_ADDRESS, purchaseNative, truncateAddress } from "@architech/lib";
 import { Collection, Token, cw721, GetTokenResponse, GetCollectionResponse, Denom } from "@architech/types";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FC, ReactElement, useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { Link, useLoaderData, useRevalidator } from "react-router-dom";
@@ -30,6 +32,8 @@ const SingleToken: FC<any> = (): ReactElement => {
 
     const [isListing, setIsListing] = useState(false);
     const [loadingTx, setLoadingTx] = useState(false);
+
+    const [activeItem, setActiveItem] = useState('item1')
 
     const { user, refreshProfile } = useUser()
     const revalidator = useRevalidator()
@@ -170,63 +174,100 @@ const SingleToken: FC<any> = (): ReactElement => {
       </div>
 
       {/* Main Row */}
-      <div className='d-flex gap8 flex-wrap' style={{minWidth: 0}}>
+      <div className='d-flex gap8 mb8 flex-wrap' style={{minWidth: 0}}>
         <Col xs={{span: 8, offset: 2}} md={{span: 6, offset: 0}} className={`br8 square`} style={{maxHeight: '630px'}}>
           <TokenImage alt={`${collectionName} ${tokenData.token.tokenId}`} src={tokenImage} className='tall wide imgCover' />
         </Col>
-        <Col xs={12} md={true} className='d-flex flex-column' style={{maxWidth: '712px', minWidth: 0}}>
-          <div className='d-flex card justify-content-between' style={{height: '128px', marginBottom: '8px', overflow: "hidden", minWidth: 0}}>
-            <div style={{margin: '24px 0 0 24px', overflow: 'hidden'}}>
-              <div className='d-flex align-items-center mb16'>
-                <h1 className='mr8' style={{lineHeight: 1}}>{num}{tokenData.token?.tokenId}</h1>
-                {(collection.categories || []).map(category=>
-                  <Badge><span>{category}</span></Badge>
-                )}
-              </div>
-              <span className='lightText14'>Owned by&nbsp;</span><Link  style={{overflow: "hidden"}} to={`/profile/${tokenData.token?.owner}`}>{tokenData.ownerName}</Link>
-            </div>
-            <div className='d-flex align-items-center mr16'>
-              <div className="d-flex align-items-stretch" style={{gap: '16px'}}>
-                <button onClick={handleFavorite} disabled={!!!user} className='clearBtn' style={{padding: 0, height: 'unset'}}>
-                  <div className={styles.number}><img alt='' src={isFavorite ? '/red_heart.svg' : '/heart.svg'} style={{height: '1.3em'}} />&nbsp;{tokenData.favorites}</div>
-                  <span className={styles.label}>Favorites</span>
-                </button>
-                {/* <div style={{alignSelf: 'stretch'}}> */}
-                  <Vr />
-                {/* </div> */}
-                <div className='mr16'>
-                  <div className={`${styles.number} d-flex align-items-center`}><img src='/eye.svg' style={{height: '1.3em'}} />&nbsp;{tokenData.token?.total_views}</div>
-                  <span className={styles.label}>Views</span>
+
+        {/* Accordian */}
+        <Col xs={12} md={true} className={styles.accordionCol}>
+          <div className={`${styles.accordionItem} ${activeItem === 'item1' && styles.activeItem} ${styles.firstItem}`}  onClick={()=>setActiveItem('item1')}>
+            <div className='d-flex justify-content-between' style={{margin: '32px 32px 16px 32px', height: 'fit-content', width: 'calc(100% - 64px)'}}>
+              <div>
+                <div className='d-flex align-items-center mb16'>
+                  <h1 className='mr8' style={{lineHeight: 1}}>{num}{tokenData.token?.tokenId}</h1>
+                  {(collection.categories || []).map(category=>
+                    <Badge><span>{category}</span></Badge>
+                  )}
                 </div>
+                <span className='lightText14'>Owned by&nbsp;</span>
+                <Link style={{overflow: "hidden"}} to={`/profile/${tokenData.token?.owner}`}>
+                  {truncateAddress(tokenData.ownerName, process.env.REACT_APP_NETWORK_PREFIX)}
+                </Link>
               </div>
-          </div>
-          </div>
-
-          <div className='d-flex card flex-column' style={{minHeight: '300px', marginBottom: '8px'}}>
-            <div style={{margin: '32px'}}>
-              <div className='d-flex align-items-center lightText14'>
-                <img alt='' src='/database.svg' style={{height: '1.2em'}} className='mr8' />Price History
+              <div className='d-flex align-items-center'>
+                <div className="d-flex align-items-stretch" style={{gap: '16px'}}>
+                  <button onClick={handleFavorite} disabled={!!!user} className='clearBtn' style={{padding: 0, height: 'unset'}}>
+                    <div className={styles.number}><img alt='' src={isFavorite ? '/red_heart.svg' : '/heart.svg'} style={{height: '1.3em'}} />&nbsp;{tokenData.favorites}</div>
+                    <span className={styles.label}>Favorites</span>
+                  </button>
+                  <Vr />
+                  <div style={{marginRight: '32px'}}>
+                    <div className={`${styles.number} d-flex align-items-center`}><img alt='' src='/eye.svg' style={{height: '1.3em'}} />&nbsp;{tokenData.token?.total_views}</div>
+                    <span className={styles.label}>Views</span>
+                  </div>
+                </div>
+                <FontAwesomeIcon icon={faChevronRight} />
               </div>
-
+            </div>
+            <div className='d-flex flex-column' style={{flexGrow: 1 }} >
+              { !!tokenData.token.metadataExtension?.description &&
+                <div style={{margin: '0 48px 12px 48px', width: 'fit-content', maxWidth: 'calc(100% - 96px)'}}>
+                  <span className='lightText12'>Description</span>
+                  <p style={{margin: '8px 0 0 0 ', fontSize: '12px', padding: '0 8px'}}>{tokenData.token.metadataExtension?.description}</p>
+                </div>
+              }
+              { (tokenData.token.metadataExtension?.attributes && tokenData.token.metadataExtension.attributes.length) &&
+                <div style={{margin: '0 48px 12px 48px', width: 'fit-content', maxWidth: 'calc(100% - 96px)'}}>
+                  <div className='lightText12 mb8'>Traits</div>
+                  <div className='d-flex flex-wrap gap8' style={{margin: '0 8px', width: 'calc(100% - 16px)'}}>
+                  {tokenData.token.metadataExtension.attributes.map(a=>{
+                    return (
+                      <div className={`${styles.trait} grayCard`}>
+                        <span className={styles.type}>{a.trait_type}</span>
+                        <hr />
+                        <span className={styles.value}>{a.value}</span>
+                      </div>
+                    )
+                  })}
+                  </div>
+                </div>
+              }
+              <div style={{margin: 'auto 32px 12px 0', width: 'fit-content', maxWidth: 'calc(100% - 96px)', alignSelf: 'flex-end'}}>
+                <span className='lightText12'>Created by <Link style={{color: '#000'}} to={`/profile/${tokenData.token.collectionInfo.creator}`}>{truncateAddress(tokenData.token.collectionInfo.creator, process.env.REACT_APP_NETWORK_PREFIX)}</Link></span>
+              </div>
             </div>
           </div>
-          <div className='d-flex card flex-column' style={{height: '89px', marginBottom: '8px'}}>
-            <div style={{margin: '32px'}}>
-              <div className='d-flex align-items-center lightText14'>
-                <img alt='' src='/database.svg' style={{height: '1.2em'}} className='mr8' /><span>Listings</span>
-              </div>
 
-            </div>
-          </div>
-          <div className='d-flex card flex-column' style={{height: '89px', marginBottom: '8px'}}>
+          <div className={`${styles.accordionItem} ${activeItem === 'item2' && styles.activeItem} flex-column`} /*onClick={()=>setActiveItem('item2')}*/ >
             <div style={{margin: '32px'}}>
-              <div className='d-flex align-items-center lightText14'>
-                <img alt='' src='/database.svg' style={{height: '1.2em'}} className='mr8' /><span>Offers</span>
+              <div className={`${styles.itemTitle} lightText14`}>
+                <span className='d-flex align-items-center'><img alt='' src='/database.svg' style={{height: '1.2em'}} className='mr8' />Price History</span>
+                {/* <FontAwesomeIcon icon={faChevronRight} /> */}
+                <span>Coming Soon</span>
               </div>
-
             </div>
           </div>
 
+          <div className={`${styles.accordionItem} ${activeItem === 'item3' && styles.activeItem} flex-column`} /*onClick={()=>setActiveItem('item3')}*/ >
+            <div style={{margin: '32px'}}>
+              <div className={`${styles.itemTitle} lightText14`}>
+                <span className='d-flex align-items-center'><img alt='' src='/crosshair.svg' style={{height: '1.2em'}} className='mr8' />Listings</span>
+                {/* <FontAwesomeIcon icon={faChevronRight} /> */}
+                <span>Coming Soon</span>
+              </div>
+            </div>
+          </div>
+
+          <div className={`${styles.accordionItem} ${activeItem === 'item4' && styles.activeItem} flex-column`} style={{marginBottom: 0}} /*onClick={()=>setActiveItem('item4')}*/ >
+            <div style={{margin: '32px'}}>
+              <div className={`${styles.itemTitle} lightText14`}>
+                <span className='d-flex align-items-center'><img alt='' src='/zap.svg' style={{height: '1.2em'}} className='mr8' />Offers</span>
+                {/* <FontAwesomeIcon icon={faChevronRight} /> */}
+                <span>Coming Soon</span>
+              </div>
+            </div>
+          </div>
 
         </Col>
       </div>

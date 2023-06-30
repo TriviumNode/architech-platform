@@ -122,7 +122,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
             <Row className="px-4 pt-4">
                 <Col style={{textAlign: 'center'}}>
                     { status === "CREATING" && <><p>Deploying collection...</p><Loader /></>}
-                    { status === "IMPORTING" && <><p>Importing collection into Aerchitech...</p><Loader /></>}
+                    { status === "IMPORTING" && <><p>Importing collection into Architech...</p><Loader /></>}
                     { status === "COMPLETE" && <p>{detailState.name} has been created. <Link to={`/nfts/${collectionAddress}`}>View your collection.</Link></p>}
                     { status === "ERROR" && <>
                         <h3>Error</h3>
