@@ -53,7 +53,6 @@ export async function findCollectionTokens(
       byTrait[t.trait_type] = [t];
     }
   });
-  console.log('byTrait', byTrait);
 
   const andFilters = [];
   Object.keys(byTrait).forEach(key => {
@@ -67,7 +66,6 @@ export async function findCollectionTokens(
         $and: andFilters,
       }
     : {};
-  console.log('fullFilter', fullFilter);
 
   // const filter = buildOrFilter(traitFilter);
 
@@ -246,15 +244,28 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
         console.error(`Error determining average color.\nCollection: ${collectionAddress}\nToken: ${tokenId}`, err);
       }
     }
+    const cleanAttributes = [];
+    if (metadataExtension.attributes)
+      metadataExtension.attributes.forEach(a => {
+        if ((!a.trait_type || a.trait_type === '') && (!a.value || a.value === '')) return;
+        cleanAttributes.push({
+          trait_type: a.trait_type || '',
+          value: a.value || '',
+          display_type: a.display_type,
+        });
+      });
 
     const newTokenData: TokenClass = {
       tokenId,
       collectionAddress: collectionAddress,
       collectionInfo: collection._id,
       owner,
-      metadataExtension,
+      metadataExtension: {
+        ...metadataExtension,
+        attributes: cleanAttributes,
+      },
       metadataUri,
-      traits: metadataExtension.attributes || [],
+      traits: cleanAttributes,
       averageColor,
       total_views: 0,
     };

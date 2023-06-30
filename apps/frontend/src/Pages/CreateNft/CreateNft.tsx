@@ -72,15 +72,13 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
             (!attribute.trait_type && attribute.value) || (attribute.trait_type && !attribute.value)
         )
 
-        const filteredAttributes = detailState.attributes.filter((attribute: cw721.Trait)=> attribute.trait_type && attribute.value)
-
+        const filteredAttributes = detailState.attributes.filter((attribute: cw721.Trait)=> (attribute.trait_type && attribute.trait_type !== '') && (attribute.value && attribute.value !== ''))
         const cleanedDetails = { ...detailState, image, attributes: filteredAttributes };
 
         // Remove unfilled attributes
         Object.keys(cleanedDetails).forEach((key: any) => 
             //@ts-expect-error
             (cleanedDetails[key]?.trait_type === '' && cleanedDetails[key]?.value === '') && delete cleanedDetails[key]);
-
         //verify required data
         if (!cleanedDetails.name || !cleanedDetails.tokenId || !cleanedDetails.image || badAttributes.length) {
             setStatus("ERROR")
@@ -133,13 +131,14 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
                     name: cleanedDetails.name,
                     description: cleanedDetails.description || undefined,
                     image: `ipfs://${cid}`,
-                    attributes: cleanedDetails.attributes.length ? detailState.attributes : undefined,
+                    attributes: cleanedDetails.attributes.length ? cleanedDetails.attributes : undefined,
                     external_url: cleanedDetails.externalLink || undefined,
                     royalty_payment_address: financialState.address || undefined,
                     royalty_percentage: financialState.percent ? parseInt(financialState.percent) : undefined,
                 },
                 owner: wallet.address,
             })
+            console.log('Mint Result', result)
             
             setStatus("IMPORTING")
             const updateResponse = await refreshCollection(collection.address);

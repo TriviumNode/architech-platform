@@ -89,14 +89,11 @@ export async function deleteCollection(collectionId: string): Promise<Collection
 
 // Refresh collection list of token IDs
 const refreshCollectionTokenList = async (collectionId: string, collectionData: Collection, numTokens: number) => {
-  // Known IDs
-  let workingTokens = [...collectionData.tokenIds];
-  console.log('workingTokens', workingTokens);
+  let workingTokens = [];
 
   // Loop while we know less tokens than the total
-  while (workingTokens.length < collectionData.totalTokens) {
+  while (workingTokens.length < numTokens) {
     const start_after = workingTokens.length ? workingTokens[workingTokens.length - 1] : undefined;
-
     const tokenResponse = await getAllTokens({
       client,
       contract: collectionData.address,
