@@ -1,4 +1,4 @@
-import { cancelListing, denomToHuman, findDenom, findToken, MARKETPLACE_ADDRESS, purchaseNative, truncateAddress } from "@architech/lib";
+import { cancelListing, denomToHuman, findDenom, findToken, getAllAsks, MARKETPLACE_ADDRESS, purchaseNative, truncateAddress } from "@architech/lib";
 import { Collection, Token, cw721, GetTokenResponse, GetCollectionResponse, Denom } from "@architech/types";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,6 +20,7 @@ import { useUser } from "../../Contexts/UserContext";
 import { addFavorite, getApiUrl, refreshToken, removeFavorite } from "../../Utils/backend";
 import { getPrice } from "../../Utils/data";
 import { getCollectionName } from "../../Utils/helpers";
+import sleep from "../../Utils/sleep";
 
 import styles from './singletoken.module.scss';
 
@@ -28,7 +29,6 @@ type Trait = cw721.Trait;
 const SingleToken: FC<any> = (): ReactElement => {
     const { token: tokenResponse, collection: fullCollection } = useLoaderData() as { token: GetTokenResponse, collection: GetCollectionResponse};
     const collection = fullCollection?.collection;
-    const [tokenData, setTokenData] = useState<GetTokenResponse | undefined>(tokenResponse);
 
     const [isListing, setIsListing] = useState(false);
     const [loadingTx, setLoadingTx] = useState(false);
@@ -38,6 +38,7 @@ const SingleToken: FC<any> = (): ReactElement => {
     const { user, refreshProfile } = useUser()
     const revalidator = useRevalidator()
 
+    console.log('tokenResponse', tokenResponse)
     const isFavorite = !user ? false :
       !user.profile.favorites.length ? false :
       (user.profile.favorites.findIndex(f=>f.token._id === tokenResponse.token._id)) > -1 ? true : false;
@@ -45,16 +46,18 @@ const SingleToken: FC<any> = (): ReactElement => {
     const handleCancel = async (e: any) => {
       e.preventDefault();
       setLoadingTx(true);
+
       try {
         if (!user) throw new Error('Wallet is not connected.')
-        if (!tokenData) throw new Error('Token data is not loaded.')
+        if (!tokenResponse) throw new Error('Token data is not loaded.')
         const result = await cancelListing({
           client: user.client,
           signer: user.address,
-          cw721_contract: tokenData?.token.collectionAddress,
+          cw721_contract: tokenResponse?.token.collectionAddress,
           marketplace_contract: MARKETPLACE_ADDRESS,
-          token_id: tokenData.token.tokenId,
+          token_id: tokenResponse.token.tokenId,
         })
+        console.log('TX Result', result);
         await refreshProfile();
         revalidator.revalidate();
       } catch(err: any) {
@@ -70,17 +73,17 @@ const SingleToken: FC<any> = (): ReactElement => {
       setLoadingTx(true);
       try {
         if (!user) throw new Error('Wallet is not connected.')
-        if (!tokenData) throw new Error('Token data is not loaded.')
+        if (!tokenResponse) throw new Error('Token data is not loaded.')
         const result = await purchaseNative({
           client: user.client,
           signer: user.address,
-          cw721_contract: tokenData?.token.collectionAddress,
+          cw721_contract: tokenResponse?.token.collectionAddress,
           marketplace_contract: MARKETPLACE_ADDRESS,
-          token_id: tokenData.token.tokenId,
-          amount: tokenData.ask.price,
+          token_id: tokenResponse.token.tokenId,
+          amount: tokenResponse.ask.price,
           denom: process.env.REACT_APP_NETWORK_DENOM,
         })
-        await refreshToken(tokenData.token.collectionAddress, tokenData.token.tokenId);
+        await refreshToken(tokenResponse.token.collectionAddress, tokenResponse.token.tokenId);
         revalidator.revalidate();
       } catch(err: any) {
         console.error(err)
@@ -92,10 +95,10 @@ const SingleToken: FC<any> = (): ReactElement => {
 
     const handleFavorite = async (e: any) => {
       e.preventDefault()
-      if (!tokenData) throw new Error('Token data is not loaded.')
+      if (!tokenResponse) throw new Error('Token data is not loaded.')
       try { 
-        if (isFavorite) await removeFavorite(tokenData.token._id)
-        else await addFavorite(tokenData.token._id);
+        if (isFavorite) await removeFavorite(tokenResponse.token._id)
+        else await addFavorite(tokenResponse.token._id);
         await refreshProfile();
         revalidator.revalidate();
       } catch (err: any) {
@@ -104,10 +107,6 @@ const SingleToken: FC<any> = (): ReactElement => {
       }
     }
 
-    useEffect(()=>{
-      setTokenData(tokenResponse);
-    },[tokenResponse])
-
     let saleAmount: string = '--';
     let usdAmount: string = '--';
     let saleDenom: Denom = {
@@ -115,27 +114,27 @@ const SingleToken: FC<any> = (): ReactElement => {
       displayDenom: 'UNKNOWN',
       image: 'arch.svg',
     };
-    if (tokenData?.ask) {
-      if (tokenData.ask.cw20_contract) {
-        const denom = findToken(tokenData.ask.cw20_contract);
+    if (tokenResponse?.ask) {
+      if (tokenResponse.ask.cw20_contract) {
+        const denom = findToken(tokenResponse.ask.cw20_contract);
         if (denom) {
           saleDenom = denom;
-          const num = denomToHuman(tokenData.ask.price, denom.decimals)
-          saleAmount = num.toString()
-          usdAmount = getPrice(saleDenom.displayDenom, num).toFixed(2);
+          const num = denomToHuman(tokenResponse.ask.price, denom.decimals)
+          saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+          usdAmount = getPrice(saleDenom.displayDenom, num).toLocaleString("en-US", { maximumFractionDigits: 2 });
         }
       } else {
         const denom = findDenom(process.env.REACT_APP_NETWORK_DENOM);
         if (denom) {
           saleDenom = denom;
-          const num = denomToHuman(tokenData.ask.price, denom.decimals)
-          saleAmount = num.toString()
-          usdAmount = getPrice(saleDenom.displayDenom, num).toFixed(2);
+          const num = denomToHuman(tokenResponse.ask.price, denom.decimals)
+          saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+          usdAmount = getPrice(saleDenom.displayDenom, num).toLocaleString("en-US", { maximumFractionDigits: 2 });
         }
       }
     }
 
-    if (!tokenData || !collection)
+    if (!tokenResponse || !collection)
         return (
             <Row>
               <Col xs="auto" className="justify-content-center">
@@ -143,18 +142,18 @@ const SingleToken: FC<any> = (): ReactElement => {
               </Col>
             </Row>
         )
-    const tokenImage = tokenData.token.metadataExtension?.image || tokenData.token.metadataExtension?.image_data || undefined
+    const tokenImage = tokenResponse.token.metadataExtension?.image || tokenResponse.token.metadataExtension?.image_data || undefined
     const collectionName = getCollectionName(collection);
-    const num = isNaN(tokenData.token.tokenId as any) ? null : '#'
+    const num = isNaN(tokenResponse.token.tokenId as any) ? null : '#'
 
     // const handleRefresh = async (e: any) => {
     //   e.preventDefault()
-    //   const data = await refreshToken(collection.address, tokenData.token.tokenId);
-    //   setTokenData(data);
+    //   const data = await refreshToken(collection.address, tokenResponse.token.tokenId);
+    //   settokenResponse(data);
     // }
     return (
       <>
-      <ListModal open={isListing} onClose={()=>setIsListing(false)} token={tokenData.token} />
+      <ListModal open={isListing} onClose={()=>setIsListing(false)} token={tokenResponse.token} onList={()=>revalidator.revalidate()} />
 
       {/*  Collection Row */}
       <div className='d-flex gap8' style={{height: '64px', marginBottom: '8px'}}>
@@ -176,7 +175,7 @@ const SingleToken: FC<any> = (): ReactElement => {
       {/* Main Row */}
       <div className='d-flex gap8 mb8 flex-wrap' style={{minWidth: 0}}>
         <Col xs={{span: 8, offset: 2}} md={{span: 6, offset: 0}} className={`br8 square`} style={{maxHeight: '630px'}}>
-          <TokenImage alt={`${collectionName} ${tokenData.token.tokenId}`} src={tokenImage} className='tall wide imgCover' />
+          <TokenImage alt={`${collectionName} ${tokenResponse.token.tokenId}`} src={tokenImage} className='tall wide imgCover' />
         </Col>
 
         {/* Accordian */}
@@ -185,25 +184,25 @@ const SingleToken: FC<any> = (): ReactElement => {
             <div className='d-flex justify-content-between' style={{margin: '32px 32px 16px 32px', height: 'fit-content', width: 'calc(100% - 64px)'}}>
               <div>
                 <div className='d-flex align-items-center mb16'>
-                  <h1 className='mr8' style={{lineHeight: 1}}>{num}{tokenData.token?.tokenId}</h1>
+                  <h1 className='mr8' style={{lineHeight: 1}}>{num}{tokenResponse.token?.tokenId}</h1>
                   {(collection.categories || []).map(category=>
-                    <Badge><span>{category}</span></Badge>
+                    <Badge className='mr8'><span>{category}</span></Badge>
                   )}
                 </div>
                 <span className='lightText14'>Owned by&nbsp;</span>
-                <Link style={{overflow: "hidden"}} to={`/profile/${tokenData.token?.owner}`}>
-                  {truncateAddress(tokenData.ownerName, process.env.REACT_APP_NETWORK_PREFIX)}
+                <Link style={{overflow: "hidden"}} to={`/profile/${tokenResponse.token?.owner}`}>
+                  {truncateAddress(tokenResponse.ownerName, process.env.REACT_APP_NETWORK_PREFIX)}
                 </Link>
               </div>
               <div className='d-flex align-items-center'>
                 <div className="d-flex align-items-stretch" style={{gap: '16px'}}>
                   <button onClick={handleFavorite} disabled={!!!user} className='clearBtn' style={{padding: 0, height: 'unset'}}>
-                    <div className={styles.number}><img alt='' src={isFavorite ? '/red_heart.svg' : '/heart.svg'} style={{height: '1.3em'}} />&nbsp;{tokenData.favorites}</div>
+                    <div className={styles.number}><img alt='' src={isFavorite ? '/red_heart.svg' : '/heart.svg'} style={{height: '1.3em'}} />&nbsp;{tokenResponse.favorites}</div>
                     <span className={styles.label}>Favorites</span>
                   </button>
                   <Vr />
                   <div style={{marginRight: '32px'}}>
-                    <div className={`${styles.number} d-flex align-items-center`}><img alt='' src='/eye.svg' style={{height: '1.3em'}} />&nbsp;{tokenData.token?.total_views}</div>
+                    <div className={`${styles.number} d-flex align-items-center`}><img alt='' src='/eye.svg' style={{height: '1.3em'}} />&nbsp;{tokenResponse.token?.total_views}</div>
                     <span className={styles.label}>Views</span>
                   </div>
                 </div>
@@ -211,17 +210,17 @@ const SingleToken: FC<any> = (): ReactElement => {
               </div>
             </div>
             <div className='d-flex flex-column' style={{flexGrow: 1 }} >
-              { !!tokenData.token.metadataExtension?.description &&
+              { !!tokenResponse.token.metadataExtension?.description &&
                 <div style={{margin: '0 48px 12px 48px', width: 'fit-content', maxWidth: 'calc(100% - 96px)'}}>
                   <span className='lightText12'>Description</span>
-                  <p style={{margin: '8px 0 0 0 ', fontSize: '12px', padding: '0 8px'}}>{tokenData.token.metadataExtension?.description}</p>
+                  <p style={{margin: '8px 0 0 0 ', fontSize: '12px', padding: '0 8px'}}>{tokenResponse.token.metadataExtension?.description}</p>
                 </div>
               }
-              { (tokenData.token.metadataExtension?.attributes && tokenData.token.metadataExtension.attributes.length) &&
+              { (tokenResponse.token.metadataExtension?.attributes && tokenResponse.token.metadataExtension.attributes.length) &&
                 <div style={{margin: '0 48px 12px 48px', width: 'fit-content', maxWidth: 'calc(100% - 96px)'}}>
                   <div className='lightText12 mb8'>Traits</div>
                   <div className='d-flex flex-wrap gap8' style={{margin: '0 8px', width: 'calc(100% - 16px)'}}>
-                  {tokenData.token.metadataExtension.attributes.map(a=>{
+                  {tokenResponse.token.metadataExtension.attributes.map(a=>{
                     return (
                       <div className={`${styles.trait} grayCard`}>
                         <span className={styles.type}>{a.trait_type}</span>
@@ -234,7 +233,7 @@ const SingleToken: FC<any> = (): ReactElement => {
                 </div>
               }
               <div style={{margin: 'auto 32px 12px 0', width: 'fit-content', maxWidth: 'calc(100% - 96px)', alignSelf: 'flex-end'}}>
-                <span className='lightText12'>Created by <Link style={{color: '#000'}} to={`/profile/${tokenData.token.collectionInfo.creator}`}>{truncateAddress(tokenData.token.collectionInfo.creator, process.env.REACT_APP_NETWORK_PREFIX)}</Link></span>
+                <span className='lightText12'>Created by <Link style={{color: '#000'}} to={`/profile/${tokenResponse.token.collectionInfo.creator}`}>{truncateAddress(tokenResponse.token.collectionInfo.creator, process.env.REACT_APP_NETWORK_PREFIX)}</Link></span>
               </div>
             </div>
           </div>
@@ -276,24 +275,24 @@ const SingleToken: FC<any> = (): ReactElement => {
       <div className='card d-flex' style={{height: '84px', marginBottom: '8px'}}>
         <div style={{margin: '0 16px'}} className='d-flex align-items-center align-self-stretch justify-content-between wide'>
             <div className='d-flex align-items-center lightText justify-content-between'>
-              <h2>{num}{tokenData.token?.tokenId}</h2>
+              <h2>{num}{tokenResponse.token?.tokenId}</h2>
             </div>
             <div className='d-flex align-items-center' style={{gap: '24px'}}>
-              { tokenData.ask ? 
+              { tokenResponse.ask ? 
               <>
                 <div>
                   <div style={{fontSize: '28px'}}>{saleAmount.toString()} <DenomImg denom={saleDenom} size='medium' /></div>
                   <div className='lightText12'>~ ${usdAmount}</div>
                 </div>
                 {
-                  tokenData.token.owner === user?.address ? 
-                    <button disabled={loadingTx} type='button' onClick={handleCancel}>{loadingTx && <><SmallLoader />&nbsp;</>}Cancel Listing</button>
+                  tokenResponse.token.owner === user?.address ? 
+                    <button disabled={loadingTx} type='button' onClick={handleCancel}>Cancel Listing{loadingTx && <>&nbsp;<SmallLoader /></>}</button>
                   :
-                    <button disabled={loadingTx} type='button' onClick={handleBuy}>{loadingTx && <><SmallLoader />&nbsp;</>}Buy now</button>
+                    <button disabled={loadingTx} type='button' onClick={handleBuy}>Buy now{loadingTx && <>&nbsp;<SmallLoader /></>}</button>
                 }
               </>
               :
-                tokenData.token.owner === user?.address && 
+                tokenResponse.token.owner === user?.address && 
                 <button type='button' onClick={()=>setIsListing(true)}>List for sale</button>
               }
             </div>

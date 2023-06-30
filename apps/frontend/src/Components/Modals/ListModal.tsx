@@ -10,10 +10,12 @@ import { ImportCollectionData } from "../../Interfaces/interfaces";
 import { editCollection, importCollection, updateCollectionImage } from "../../Utils/backend";
 import { DenomImg } from "../ArchDenom";
 import SelectMenu, { SelectOption } from "../SelectMenu/SelectMenu";
+import SmallLoader from "../SmallLoader";
 
 interface Props {
     open: boolean;
     onClose: () => any;
+    onList: () => any;
     token: Token;
 }
 
@@ -42,12 +44,12 @@ const defaultState: State = {
 }
 
 
-export default function ListModal({open, token, onClose}: Props) {
-    const revalidator = useRevalidator();
+export default function ListModal({open, token, onClose, onList}: Props) {
     const { user } = useUser()
 
     const [selectedOption, setSelectedOption] = useState<SelectOption>(selectOptions[0])
     const [formState, setFormState] = useState<State>(defaultState);
+    const [loading, setLoading] = useState(false);
 
     const handleSelect = (selected: SelectOption) => {
         setSelectedOption(selected);
@@ -72,7 +74,7 @@ export default function ListModal({open, token, onClose}: Props) {
                 marketplace_contract: MARKETPLACE_ADDRESS,              
             });
             console.log('TX Result', response)
-            revalidator.revalidate();
+            onList();
             onClose();
         } catch (err: any) {
             console.error(err)
@@ -100,7 +102,7 @@ export default function ListModal({open, token, onClose}: Props) {
             </Row>
             <Row style={{marginTop: '20px', justifyContent: 'flex-end'}}>
                 <Col xs="auto">
-                    <button type="submit">List for sale</button>
+                    <button type="submit" disabled={loading}>List for sale{loading && <SmallLoader /> }</button>
                 </Col>
             </Row>
             </form>

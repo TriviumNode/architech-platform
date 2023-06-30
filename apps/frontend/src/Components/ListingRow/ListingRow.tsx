@@ -50,6 +50,7 @@ const ListingRow: FC<
                         borderRadius: '16px',
                         marginRight: '16px',
                     }}
+                    className='coverImg'
                 />
                 <div className='d-flex flex-column justify-content-around' style={{overflow: "hidden"}}>
                     <div className='oneLineLimit'>{collectionName}</div>
@@ -57,8 +58,8 @@ const ListingRow: FC<
                 </div>
             </div>
         </Col>
-        <Col xs={2} className='d-flex flex-column justify-content-center' style={{textAlign: 'right'}}>
-            <span>{parseFloat(humanAmount.toFixed(2))}<DenomImg className='ml8' denom={denom} /></span>
+        <Col xs={'auto'} className='d-flex flex-column justify-content-center' style={{textAlign: 'right'}}>
+            <span>{parseFloat(humanAmount.toFixed(2)).toLocaleString()}<DenomImg className='ml8' denom={denom} /></span>
         </Col>
     </Link>
     )

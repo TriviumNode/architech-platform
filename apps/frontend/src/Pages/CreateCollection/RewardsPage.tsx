@@ -1,4 +1,5 @@
 import { getMetadata, getRewards } from "@architech/lib";
+import { ContractMetadata } from "@archwayhq/arch3.js/build";
 import { FC, ReactElement, useEffect, useState } from "react";
 import { Col } from "react-bootstrap";
 import MultiSelect from "../../Components/MultiSelect";
@@ -20,31 +21,12 @@ const RewardsPage: FC<{
     state: RewardsState,
     onChange: (data: RewardsState)=>void;
     contractAddress: string;
+    metadata: ContractMetadata | undefined;
+    loadingMetadata: boolean;
+    loadingMetadataError: string | undefined;
     // next: ()=>void;
-}> = ({state, contractAddress, onChange}): ReactElement => {
+}> = ({state, contractAddress, onChange, metadata, loadingMetadata, loadingMetadataError}): ReactElement => {
     const {user} = useUser()
-    const [rewardsAddress, setRewardsAddress] = useState<string>()
-    const [loadingMetadata, setLoadingMetadata] = useState(true)
-    const [loadMetadataError, setLoadMetadataError] = useState<string>();
-
-    useEffect(()=>{
-        refreshMetadata();
-    },[user])
-
-    const refreshMetadata = async() => {
-        setLoadingMetadata(true);
-        try {
-            const metadata = await getMetadata({
-                client: QueryClient,
-                contract: contractAddress
-            });
-            setRewardsAddress(metadata.rewardsAddress);
-        } catch (err: any) {
-            setLoadMetadataError(`Error Fetching: ${err.toString()}`)
-        } finally {
-            setLoadingMetadata(false);
-        }
-    }
 
     const updateState = (newState: Partial<RewardsState>) => {
         onChange({...state, ...newState})
@@ -57,9 +39,9 @@ const RewardsPage: FC<{
             </div>
             <Col  xs={{span: 12, offset: 0}} md={{span: 10, offset: 1}} className='mb32'>
                 <p className='mb8'>
-                    Archway's incentivized smart contracts allow you to collect a portion of the gas fees paid when your NFTs are sold or transferd. Set the rewards address to begin recieving rewards.<br />
+                    Archway's incentivized smart contracts allow you to collect a portion of the gas fees paid when your NFTs are sold or transferred. Set the rewards address to begin recieving rewards.<br />
                 </p>
-                <div className='lightText12'>Current rewards address: {loadingMetadata ? <SmallLoader /> : rewardsAddress || <span style={{color: 'red'}}>{loadMetadataError ? loadMetadataError : 'Not Set'}</span> }</div>
+                <div className='lightText12'>Current rewards address: {loadingMetadata ? <SmallLoader /> : metadata?.rewardsAddress || <span style={{color: 'red'}}>{loadingMetadataError ? loadingMetadataError : 'Not Set. You are not earning rewards!'}</span> }</div>
 
             </Col>
 
@@ -72,15 +54,6 @@ const RewardsPage: FC<{
                         </label>
                         <div style={{textAlign: 'right', cursor: 'pointer'}} className={`${styles.spanButton} wide`} onClick={()=>updateState({address: user?.address || ''})}>Use my address</div>
                     </Col>
-                    {/* <Col xs={{span: 6, offset: 0}} md={{span: 6, offset: 0}} >
-                        <label>
-                            Pending Rewards
-                            <input disabled={true} value={state.address} onChange={e=>updateState({address: e.target.value})} placeholder='todo...' />
-                        </label>
-                        <div style={{textAlign: 'right'}}>
-                            <button className='mt8'>Claim</button>
-                        </div>
-                    </Col> */}
                 </div>
             </form>
         </div>

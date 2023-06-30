@@ -17,8 +17,10 @@ import { GetCollectionResponse } from "@architech/types";
 import { toast } from "react-toastify";
 import equal from "fast-deep-equal";
 import RewardsPage, { DefaultRewardsState, RewardsState } from "./RewardsPage";
-import { setRewardsMetadata } from "@architech/lib";
+import { getMetadata, setRewardsMetadata } from "@architech/lib";
 import SmallLoader from "../../Components/SmallLoader";
+import { QueryClient } from "../../Utils/queryClient";
+import { ContractMetadata } from "@archwayhq/arch3.js/build";
 
 export type Page = 'Details' | 'Rewards' | 'Links'
 
@@ -58,12 +60,42 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
 
     const [unsaved, setUnsaved] = useState(false);
     const [saving, setSaving] = useState(false);
+
+    
+    const [metadata, setMetadata] = useState<ContractMetadata>()
+    const [loadingMetadata, setLoadingMetadata] = useState(true)
+    const [loadMetadataError, setLoadMetadataError] = useState<string>();
+
+    useEffect(()=>{
+        refreshMetadata();
+    },[QueryClient])
+
+    const refreshMetadata = async() => {
+        if (!QueryClient) return;
+        setLoadingMetadata(true);
+        try {
+            const metadata = await getMetadata({
+                client: QueryClient,
+                contract: collection.address
+            });
+            setMetadata(metadata);
+        } catch (err: any) {
+            if (!err.toString().includes('metadata for the contract: not found: key not found')) {
+                console.error('Error loading metadata', err)
+                setLoadMetadataError(`Error Fetching: ${err.toString()}`)
+            }
+        } finally {
+            setLoadingMetadata(false);
+        }
+    }
       
     useEffect(()=>{
         if ((!equal(currentDetail, detailState) || !equal(currentLinks, linkState)) || rewardsState.address){
             setUnsaved(true);
         }
-        else setUnsaved(false)
+        else {
+            setUnsaved(false)
+        }
     },[detailState, linkState, rewardsState])
 
     const handleDetailChange = (data: DetailState) => {
@@ -77,7 +109,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
             case 'Links':
                 return <LinksPage state={linkState} onChange={(newState) => setLinkState(newState)} next={()=>setPage('Rewards')} />
             case 'Rewards':
-                return <RewardsPage state={rewardsState} onChange={(data) => setRewardsState(data)} contractAddress={collection.address} />
+                return <RewardsPage state={rewardsState} onChange={(data) => setRewardsState(data)} contractAddress={collection.address} metadata={metadata} loadingMetadata={loadingMetadata} loadingMetadataError={loadMetadataError} />
             default:
                 return <div style={{margin: '32px', textAlign: 'center'}}><h2 style={{color: 'red'}}>Something went wrong</h2><p>The application encounted an error: `Tried to navigate to undefined page.`<br />Please try to navigate to another page using the menu on the left.</p></div>
         }
@@ -94,16 +126,18 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                 }
                 const response = await editCollection(collection._id.toString(), importData);
                 revalidator.revalidate();
+                setUnsaved(false);
                 toast.success('Saved collection profile')
-            } else if (rewardsState.address) {
+            } else if (rewardsState.address && rewardsState.address !== metadata?.rewardsAddress) {
                 const result = await setRewardsMetadata({
                     client: wallet.client,
                     signer: wallet.address,
                     contract: fullCollection.collection.address,
                     rewards_address: rewardsState.address,
                 })
-                setUnsaved(false)
-                toast.success('Saved rewards address')
+                console.log('TX Result', result);
+                setUnsaved(false);
+                toast.success('Saved rewards address');
             }
             refreshProfile()
         } catch(err: any) {
@@ -155,31 +189,6 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                 <button disabled={saving} onClick={()=>handleSave()}>{saving ? <SmallLoader /> : 'Save'}</button>
             </div>
         }
-        {/* <Modal open={!!status} locked={true} onClose={()=>{}} >
-            <Row className="px-4 pt-4">
-                <Col style={{textAlign: 'center'}}>
-                    { status === "CREATING" && <><p>Deploying collection...</p><Loader /></>}
-                    { status === "IMPORTING" && <><p>Importing collection into Architech...</p><Loader /></>}
-                    { status === "COMPLETE" && <p>{detailState.name} has been created. <Link to={`/nfts/${collectionAddress}`}>View your collection.</Link></p>}
-                    { status === "ERROR" && <>
-                        <h3>Error</h3>
-                        { !!collectionAddress &&
-                        <p>
-                            Your collection was deployed on chain successfully, but we were unable to import it into Architech due to the error below.<br />
-                            You can try again now, or come back later and import it manually on our <Link to='nfts/import'>import page</Link>.<br />
-                            Please write down your collection address:<br />
-                            {collectionAddress}
-                        </p>
-}
-                        <p>{error || 'Unknown error.'}</p>
-                        
-                        <button type="button" onClick={()=>setStatus(undefined)}>Close</button>
-                        <button type="button" onClick={()=>handleCreate(undefined)}>Retry</button>
-                    </>
-                    }
-              </Col>
-            </Row>
-        </Modal> */}
     </>);
 };
 

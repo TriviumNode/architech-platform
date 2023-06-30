@@ -281,15 +281,16 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
   ) {
     // Update DB
     console.log('Updating token in DB');
+    const handleAsk = ask ? { ask } : { $unset: { ask: '' } };
     const newTokenData: Partial<Token> = {
       owner,
       metadataExtension,
       metadataUri,
       traits: metadataExtension.attributes,
-      ask,
+      ...handleAsk,
     };
 
-    const updatedToken = await TokenModel.findByIdAndUpdate(findToken._id, newTokenData);
+    const updatedToken = await TokenModel.findByIdAndUpdate(findToken._id, newTokenData, { new: true });
     const populated = updatedToken.populate('collectionInfo');
     console.log('Returning Updated token!');
     return populated;

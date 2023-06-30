@@ -101,7 +101,7 @@ export const listToken = async({
         }
     }
 
-    await sendNft({
+    return await sendNft({
         client,
         signer,
         contract: cw721_contract,

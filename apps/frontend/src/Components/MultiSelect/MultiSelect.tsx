@@ -23,7 +23,6 @@ export default function MultiSelect(props: MultiSelectProps) {
   const ref = useRef(null);
 
   const onClickOutside = () => {
-    console.log('CLICK OUTSIDE!!')
     setIsOpen(false);
   };
 
