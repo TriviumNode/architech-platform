@@ -143,9 +143,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
         setUser(newUser)
         localStorage.setItem(KEY, 'true');
         return;
-      } catch (err: any){
-        console.error('Check Login Failure:', err)
-      }
+      } catch (err: any){ }
       try {
         const nonceResponse = await requestNonce(address, pubKey)
 

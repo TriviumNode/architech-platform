@@ -19,10 +19,11 @@ interface MultiSelectProps {
 export default function MultiSelect(props: MultiSelectProps) {
   const { title, options, selected, style, className, onChange } = props;
 
-  const [isOpen, setIsOpen] = useState<boolean>();
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const ref = useRef(null);
 
   const onClickOutside = () => {
+    console.log('CLICK OUTSIDE!!')
     setIsOpen(false);
   };
 
@@ -51,7 +52,7 @@ export default function MultiSelect(props: MultiSelectProps) {
 
 
   return (
-    <div className={`${styles.menuContainer} ${className}`} style={style}>
+    <div ref={ref} className={`${styles.menuContainer} ${className}`} style={style}>
       <button
         type='button'
         onClick={() => {
@@ -62,8 +63,8 @@ export default function MultiSelect(props: MultiSelectProps) {
         {selected.length ? 
           <div className='d-flex gap8'>
             {selected.map(item=>
-              <Badge>{item}</Badge>
-              )}
+              <Badge key={item} >{item}</Badge>
+            )}
           </div>
         :
           <span>{title}</span>
@@ -71,20 +72,20 @@ export default function MultiSelect(props: MultiSelectProps) {
         <span aria-hidden>▾</span>
       </button>
       {isOpen && 
-      <div ref={ref} className={`${styles.menu}`}>
+      <div className={`${styles.menu}`}>
           {options.map((option, key)=>{
             return (
-              <>
-              <div className={styles.item}>
-                <div>
-                  {option}
+              <React.Fragment key={option}>
+                <div className={styles.item}>
+                  <div>
+                    {option}
+                  </div>
+                  <div style={{minWidth: '24px'}}>
+                    <input className='wide' type="checkbox" checked={selected.includes(option)} value={option} onChange={handleChange} />
+                  </div>
                 </div>
-                <div style={{minWidth: '24px'}}>
-                  <input className='wide' type="checkbox" checked={selected.includes(option)} value={option} onChange={handleChange} />
-                </div>
-              </div>
-              { key < options.length - 1 && <hr />}
-              </>
+                { key < options.length - 1 ? <hr /> : undefined}
+              </React.Fragment>
             )
           })}
       </div>
