@@ -12,6 +12,7 @@ import { useRevalidator } from 'react-router-dom'
 import { AxiosError } from "axios";
 import Loader from "../Components/Loader";
 import { ImportCollectionData } from "../Interfaces/interfaces";
+import ConnectWallet from "../Components/ConnectWallet";
 
 const emptyToUndefined =(str: string) => {
     return str.length ? str : undefined;
@@ -75,9 +76,7 @@ const ImportPage: FC<any> = (): ReactElement => {
     }
 
     if (!user) return (
-        <Row>
-            Your wallet must be connected and authenticated to import a collection.
-        </Row>
+        <ConnectWallet text='Connect your wallet to import a collection' />
     )
 
     return (<>

@@ -11,8 +11,8 @@ import DetailPage, { DetailState, DefaultDetailState } from "./DetailPage";
 import FinishPage, { DefaultFinishState, FinishState } from "./FinishPage";
 import { initStandardProject } from "../../Utils/wasm/factory_handles";
 import { importCollection } from "../../Utils/backend";
-import AdminPage, { AdminState, DefaultAdminState } from "./AdminPage";
 import LinksPage, { DefaultLinksState, LinkState } from "./LinksPage";
+import ConnectWallet from "../../Components/ConnectWallet";
 
 export type Page = 'Details' | 'Finish' | 'Links'
 
@@ -92,9 +92,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
     }
 
     if (!wallet) return (
-        <Row>
-            Your wallet must be connected and authenticated to create a collection.
-        </Row>
+        <ConnectWallet text='Connect your wallet to create a collection' />
     )
     return (<>
         <div className={styles.mainRow}>

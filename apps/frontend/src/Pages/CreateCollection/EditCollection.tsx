@@ -21,6 +21,7 @@ import { getMetadata, setRewardsMetadata } from "@architech/lib";
 import SmallLoader from "../../Components/SmallLoader";
 import { QueryClient } from "../../Utils/queryClient";
 import { ContractMetadata } from "@archwayhq/arch3.js/build";
+import ConnectWallet from "../../Components/ConnectWallet";
 
 export type Page = 'Details' | 'Rewards' | 'Links'
 
@@ -155,9 +156,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     }
 
     if (!wallet) return (
-        <Row>
-            Your wallet must be connected and authenticated to edit a collection.
-        </Row>
+        <ConnectWallet text='Connect your wallet to edit this collection' />
     )
     return (<>
         <div className='d-flex gap8 tallFill'>

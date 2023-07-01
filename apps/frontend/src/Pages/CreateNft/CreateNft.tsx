@@ -17,6 +17,7 @@ import CollectionPage from "./CollectionPage";
 import { Collection, cw721, GetCollectionResponse } from "@architech/types";
 import FinancialPage, { DefaultFinancialState, FinancialState } from "./FinancialsPage";
 import sleep from "../../Utils/sleep";
+import ConnectWallet from "../../Components/ConnectWallet";
 
 export type Page = 'Collection' | 'Details' | 'Image' | 'Review' | 'Financials'
 
@@ -154,9 +155,7 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
     }
 
     if (!wallet) return (
-        <Row>
-            Your wallet must be connected and authenticated to create an NFT.
-        </Row>
+        <ConnectWallet text='Connect your wallet to create an NFT' />
     )
     return (<>
         <div className={styles.mainRow}>
