@@ -106,7 +106,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     const getPage = () => {
         switch(page) {
             case 'Details':
-                return <DetailPage state={detailState} isEditing={true} onChange={handleDetailChange} next={()=>setPage('Links')} />
+                return <DetailPage current={currentDetail} state={detailState} isEditing={true} onChange={handleDetailChange} next={()=>setPage('Links')} />
             case 'Links':
                 return <LinksPage state={linkState} onChange={(newState) => setLinkState(newState)} next={()=>setPage('Rewards')} />
             case 'Rewards':
@@ -159,18 +159,20 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
         <ConnectWallet text='Connect your wallet to edit this collection' />
     )
     return (<>
-        <div className='d-flex gap8 tallFill'>
-            <Col xs={12} md={4} className='card'>
-                <div style={{margin: '48px'}} className='d-flex flex-column gap8'>
-                    <div className='mb24 d-flex align-items-center'>
+        <div className={styles.mainRow}>
+            <Col xs={12} md={4} className={styles.navCard}>
+                <div className={styles.navCardInner}>
+                    <div className='d-flex align-items-center'>
                         <button className='clearBtn' style={{padding: '0'}} onClick={()=>navigate(-1)} ><img alt='Back' src='/arrow-left.svg' /></button>
                         <h2 className='d-inline-block ml16'>Edit<br/>Collection</h2>
                     </div>
-                    { Pages.map((p: Page)=>
-                        <button type='button' onClick={()=>{setPage(p)}} disabled={page === p} className={styles.pageButton} key={p}>
-                            {p}
-                        </button>)
-                    }
+                    <div className={styles.navLinks}>
+                        { Pages.map((p: Page)=>
+                            <button type='button' onClick={()=>{setPage(p)}} disabled={page === p} key={p}>
+                                {p}
+                            </button>)
+                        }
+                    </div>
                 </div>
             </Col>
             <Col

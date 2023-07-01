@@ -214,12 +214,11 @@ export const editCollection = async(address: string, request: Partial<ImportColl
     const url = getApiUrl(`/collections/edit/${address}`);
 
     const formData = new FormData();
-
     if (request.name)
         formData.append('name', request.name);
     if (request.description)
         formData.append('description', request.description);
-    if (request.hidden)
+    if (typeof request.hidden === 'boolean')
         formData.append('hidden', request.hidden.toString());
     if (request.categories && request.categories.length)
         formData.append('categories', JSON.stringify(request.categories));

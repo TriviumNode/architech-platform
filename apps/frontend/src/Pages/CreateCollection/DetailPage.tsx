@@ -3,6 +3,8 @@ import { FC, ReactElement, useState } from "react";
 import { Col } from "react-bootstrap";
 import { toast } from "react-toastify";
 import MultiSelect from "../../Components/MultiSelect";
+//@ts-expect-error
+import { Switch } from 'react-switch-input';
 
 import styles from './create.module.scss'
 
@@ -26,10 +28,11 @@ export const DefaultDetailState: DetailState = {
 
 const DetailPage: FC<{
     state: DetailState,
+    current: DetailState,
     isEditing: boolean,
     onChange: (detail: DetailState)=>void;
     next: ()=>void;
-}> = ({state, isEditing, onChange, next}): ReactElement => {
+}> = ({state, current, isEditing, onChange, next}): ReactElement => {
     const [errors, setErrors] = useState<Partial<DetailState>>()
 
     const updateDetailState = (newDetailState: Partial<DetailState>) => {
@@ -76,12 +79,14 @@ const DetailPage: FC<{
                         </label>
                     </Col>
                     { isEditing ?
+                        <>
                         <Col xs={6}>
                             <label>
                                 Category
-                                <MultiSelect title={'Select...'} style={{marginTop: '8px'}} options={CATEGORIES} selected={state.categories} onChange={(selected) => updateDetailState({ categories: selected })} />
+                                <MultiSelect title={'Select...'} style={{ marginTop: '8px' }} options={CATEGORIES} selected={state.categories} onChange={(selected) => updateDetailState({ categories: selected })} />
                             </label>
                         </Col>
+                    </>
                     :
                         <Col>
                             <label>
@@ -97,8 +102,8 @@ const DetailPage: FC<{
                     }
 
                 </div>
-                <div className='d-flex mb24'>
-                    <Col>
+                <div className='d-flex mb24 flex-wrap'>
+                    <Col xs={12} md={true}>
                         <label>
                             Collection Image
                             <label className={styles.customfileupload}>
@@ -142,15 +147,29 @@ const DetailPage: FC<{
                         </div>
                     </Col>
                 </div>
-                {!isEditing &&
+                {!isEditing ?
                     <div className='d-flex mb24'>
-                        <Col xs={6}>
+                        <Col xs={12} md={6}>
                             <label>
                                 Category
                                 <MultiSelect title={'Select...'} style={{marginTop: '8px'}} options={CATEGORIES} selected={state.categories} onChange={(selected) => updateDetailState({ categories: selected })} />
                             </label>
                         </Col>
                     </div>
+                : current.hidden === true &&
+                <Col>
+                    <div className='d-flex align-items-center mb24'>
+                        <Switch
+                            checked={state.hidden}
+                            onChange={(e: any) => updateDetailState({ hidden: e.target.checked })}
+                        />
+                        <div className='ml16'>
+                            <span>Hide Collection</span><br />
+                            <span className='lightText10'>Turn off to reveal your collection on Architech. </span>
+                            <span className='lightText10' style={{textDecoration: 'underline'}}>This can not be undone.</span>
+                        </div>
+                    </div>
+                </Col>
                 }
                 <div className='d-flex'>
                     <Col>

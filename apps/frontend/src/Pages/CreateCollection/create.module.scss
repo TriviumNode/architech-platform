@@ -66,11 +66,12 @@
             .navLinks {
                 flex-direction: row !important;
                 align-items: center;
+                margin-left: auto;
             }
 
             h2 {
                 margin-bottom: 0;
-                margin-right: auto;
+                // margin-right: auto;
             }
         }
     }
