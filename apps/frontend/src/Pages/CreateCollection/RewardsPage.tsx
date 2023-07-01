@@ -39,7 +39,7 @@ const RewardsPage: FC<{
             </div>
             <Col  xs={{span: 12, offset: 0}} md={{span: 10, offset: 1}} className='mb32'>
                 <p className='mb8'>
-                    Archway's incentivized smart contracts allow you to collect a portion of the gas fees paid when your NFTs are sold or transferred. Set the rewards address to begin recieving rewards.<br />
+                    Archway's incentivized smart contracts allow you to collect a portion of the gas fees paid when NFTs in this collection are sold or transferred. Set the rewards address to begin recieving rewards.<br />
                 </p>
                 <div className='lightText12'>Current rewards address: {loadingMetadata ? <SmallLoader /> : metadata?.rewardsAddress || <span style={{color: 'red'}}>{loadingMetadataError ? loadingMetadataError : 'Not Set. You are not earning rewards!'}</span> }</div>
 
