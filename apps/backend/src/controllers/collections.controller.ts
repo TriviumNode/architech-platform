@@ -42,6 +42,7 @@ export const getTrendingCollections = async (req: Request, res: Response, next: 
       {
         $match: {
           createdAt: { $gte: new Date(new Date().valueOf() - SEVEN_DAYS) },
+          hidden: false,
         },
       },
       {
@@ -95,7 +96,7 @@ export const searchCollections = async (req: Request, res: Response, next: NextF
     const query: string = req.query.query as string;
     if (!query) throw new HttpException(400, 'No search query. Try `/search?query=foo`');
 
-    const results = await CollectionModel.find({ $text: { $search: query } });
+    const results = await CollectionModel.find({ $text: { $search: query }, hidden: false });
     console.log('search results', results);
     res.status(200).json(results);
     return;
@@ -112,6 +113,13 @@ export const getCollectionByAddress = async (req: RequestWithOptionalUser, res: 
     const fullCollection = await queryDbCollectionByAddress(collectionAddress);
 
     if (fullCollection) {
+      if (
+        fullCollection.collection.hidden &&
+        fullCollection.collection.creator !== req.user?.address &&
+        fullCollection.collection.admin !== req.user?.address
+      )
+        throw new HttpException(404, 'Collection not found.');
+
       // Increment view count
       const updated = await addCollectionView({
         collectionRef: fullCollection.collection._id,

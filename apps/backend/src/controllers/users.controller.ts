@@ -5,6 +5,7 @@ import {
   GetUserProfileResponse,
   NonceRequestDto,
   NonceResponseDto,
+  RequestWithOptionalUser,
   RequestWithUser,
   Token,
   UpdateUserDto,
@@ -46,11 +47,13 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
 // HTTP
 // Return full user profile including owned tokens and created collections.
 // Does not error if user is not found.
-export const getUserByAddress = async (req: Request, res: Response, next: NextFunction) => {
+export const getUserByAddress = async (req: RequestWithOptionalUser, res: Response, next: NextFunction) => {
   try {
     const userAddr: string = req.params.address;
 
-    const ownedTokens: Token[] = await TokenModel.find({ owner: userAddr }).populate('collectionInfo');
+    const hideHiddenUnlessOwner = userAddr === req.user?.address ? {} : { hidden: false };
+
+    const ownedTokens: Token[] = await TokenModel.find({ owner: userAddr, ...hideHiddenUnlessOwner }).populate('collectionInfo');
     const ownedCollections: Collection[] = await CollectionModel.find({ creator: userAddr });
     const fullCollections = await collectionsToResponse(ownedCollections);
     const favorites = await findUserFavorites(userAddr);

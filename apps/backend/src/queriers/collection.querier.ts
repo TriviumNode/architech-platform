@@ -39,12 +39,16 @@ export const collectionsToResponse = async (collections: Collection[]): Promise<
 
 export async function queryDbCollections(query = {}, page = 1, limit = 30): Promise<GetCollectionResponse[]> {
   console.log('Query Start', page, limit);
-  const { docs } = await collectionsModel.paginate(query, {
-    page,
-    limit,
-    lean: true,
-    // sort: sortFilter,
-  });
+  const hideHidden = { hidden: false };
+  const { docs } = await collectionsModel.paginate(
+    { ...hideHidden, ...query },
+    {
+      page,
+      limit,
+      lean: true,
+      // sort: sortFilter,
+    },
+  );
   console.log('Query End');
   const response = await collectionsToResponse(docs as unknown as Collection[]);
   return response;
