@@ -28,7 +28,7 @@ const Home: FC<any> = (): ReactElement => {
         <div className={styles.linkRow}>
             <Col className={`card ${styles.linkCard}`}>
                 <Link to='/nfts/createcollection'>
-                    <img alt='' src='/placeholder.png' className='imgCover wide tall' />
+                    <img alt='' src='/nft.png' className='imgCover wide tall' />
                     <div className={styles.overlay}>
                         <h2>Create an NFT</h2>
                         <span>Create your own NFT collection now</span>
@@ -37,7 +37,7 @@ const Home: FC<any> = (): ReactElement => {
             </Col>
             <Col className={`card ${styles.linkCard}`}>
                 <Link to='/nfts'>
-                    <img alt='' src='/placeholder.png' className='imgCover wide tall' />
+                    <img alt='' src='/marketplace.png' className='imgCover wide tall' />
                     <div className={styles.overlay}>
                         <h2>Market<div className='d-lg-inline' />place</h2>
                         <span>Browse and start collecting</span>
@@ -45,7 +45,7 @@ const Home: FC<any> = (): ReactElement => {
                 </Link>
             </Col>
             <Col className={`card ${styles.linkCard}`}>
-                <img alt='' src='/placeholder.png' className='imgCover wide tall' />
+                <img alt='' src='/dao.png' className='imgCover wide tall' />
                 <div className={styles.overlay}>
                     <h2>Create a DAO</h2>
                     <span>Coming soon</span>
@@ -79,7 +79,7 @@ const Home: FC<any> = (): ReactElement => {
                     </div>
                 </div>
             </Col>
-             <Col className={'card'} style={{background: 'url(/placeholder.png)', backgroundPosition: 'center', minHeight: '220px'}}>
+             <Col className={'card'} style={{background: 'url(/newsletter.png)', backgroundPosition: 'center', minHeight: '220px'}}>
                 &nbsp;
             </Col>
         </div>
