@@ -149,7 +149,7 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
         } catch(err: any) {
             console.error(err)
             setStatus("ERROR")
-            setError(err.toString());
+            setError(err.response?.data || err.message || err.toString());
         } finally {
         }
     }

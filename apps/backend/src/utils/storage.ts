@@ -18,12 +18,20 @@ const storage = multer.diskStorage({
 });
 
 const memStorage = multer.memoryStorage();
+
 export const upload = multer({
   storage: memStorage,
   limits: {
     // fieldNameSize: 255,
     fileSize: 3 * 1000000, //~3mb
     files: 2,
+  },
+  fileFilter: function (req, file, callback) {
+    const ext = path.extname(file.originalname);
+    if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg' && ext !== '.svg') {
+      return callback(new Error('Only images are allowed'));
+    }
+    callback(null, true);
   },
 });
 
@@ -33,5 +41,12 @@ export const upload5mb = multer({
     // fieldNameSize: 255,
     fileSize: 5 * 1000000, //~3mb
     files: 2,
+  },
+  fileFilter: function (req, file, callback) {
+    const ext = path.extname(file.originalname);
+    if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg' && ext !== '.svg') {
+      return callback(new Error('Only images are allowed'));
+    }
+    callback(null, true);
   },
 });
