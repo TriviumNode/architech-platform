@@ -41,7 +41,7 @@ const NftTile: FC<any> = ({token}: Props): ReactElement => {
               style={{width: '105%', objectFit: "cover"}}
               className={styles.fadeImg}
           />
-          <div className='imgOverlay d-flex align-items-center' style={{height: '64px', background: saturated, color: '#FFF' }}><h3 style={{margin: '0 0 0 24px'}}>{num}{token.tokenId}</h3></div>
+          <div className='imgOverlay d-flex align-items-center' style={{height: '64px', background: saturated, color: '#FFF' }}><h3 style={{margin: '0 0 0 24px'}} className='oneLineLimit'>{num}{token.tokenId} {!!token.metadataExtension?.name && <span> - {token.metadataExtension?.name}</span>}</h3></div>
         {/* </div> */}
       </Link>
     // </Col>
