@@ -217,7 +217,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
                 </Col>
                 
                 {tokens.length ?
-                    <Col className='grid-4 wide'>
+                    <Col className={styles.nftsContainer}>
                         {tokens.map(token=>{
                             return (
                                 <NftTile collectionName={collectionName} token={token} key={token.tokenId} />

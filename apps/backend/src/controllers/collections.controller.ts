@@ -42,7 +42,6 @@ export const getTrendingCollections = async (req: Request, res: Response, next: 
       {
         $match: {
           createdAt: { $gte: new Date(new Date().valueOf() - SEVEN_DAYS) },
-          hidden: false,
         },
       },
       {
@@ -55,7 +54,9 @@ export const getTrendingCollections = async (req: Request, res: Response, next: 
     ]);
     await CollectionModel.populate(trending, { path: '_id' });
 
-    const collections: Collection[] = trending.map(t => t._id);
+    const raw_collections: Collection[] = trending.map(t => t._id);
+    const collections = raw_collections.filter(c => !c.hidden);
+
     const collectionsResponse = await collectionsToResponse(collections);
 
     // Append counts
