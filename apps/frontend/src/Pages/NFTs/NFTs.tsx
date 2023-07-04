@@ -43,7 +43,7 @@ const NftPage: FC<any> = (): ReactElement => {
                             <p className={styles.infoText} style={{marginBottom: '36px'}}>
                                 A brand new platform for Web3 Community Management on Archway. Build your DAO, NFTCommunity, manage treasuries and more at the click of a button! 
                             </p>
-                            <a href='#' className={styles.infoLink}>Learn more about us</a>
+                            {/* <a href='#' className={styles.infoLink}>Learn more about us</a> */}
                         </div>
                 </Col>
             </div>
