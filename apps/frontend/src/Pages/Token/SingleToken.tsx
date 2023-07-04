@@ -275,7 +275,7 @@ const SingleToken: FC<any> = (): ReactElement => {
       <div className='card d-flex' style={{height: '84px', marginBottom: '8px'}}>
         <div style={{margin: '0 16px'}} className='d-flex align-items-center align-self-stretch justify-content-between wide'>
             <div className='d-flex align-items-center lightText justify-content-between'>
-              <h2>{num}{tokenResponse.token?.tokenId}</h2>
+              <h2>{!!tokenResponse.token.metadataExtension?.name ? tokenResponse.token.metadataExtension.name : `${num}${tokenResponse.token?.tokenId}`}</h2>
             </div>
             <div className='d-flex align-items-center' style={{gap: '24px'}}>
               { tokenResponse.ask ? 
