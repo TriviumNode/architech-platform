@@ -94,7 +94,10 @@ const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
             <button type='button' className='noButton' style={{color: '#777'}} onClick={()=>openMenu()}>
               <FontAwesomeIcon size='2x' icon={faBars} />
             </button>
-            <img alt='Architech' src='/logo.svg' style={{position: "absolute", top: '50%', left: '50%', transform: 'translate(-50%, -50%)'}} />
+            <div style={{position: "absolute", top: '50%', left: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center'}}>
+              <img alt='Architech' src='/logo.svg' />
+              <h5 className='ml8' style={{fontSize: '18px', fontWeight: '400'}}>Beta</h5>
+            </div>
             <button type='button' className='noButton' style={{color: '#777', marginLeft: 'auto'}}>
               <FontAwesomeIcon size='2x' icon={faMagnifyingGlass} />
             </button>
@@ -102,7 +105,7 @@ const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
               <FontAwesomeIcon size='2x' icon={faWallet} />
             </button>
           </div>
-            <Link to="/" className={`${styles.logoLink} d-none d-md-flex`}><img src='/logo.svg' alt="Architech"/></Link>
+            <Link to="/" className={`${styles.logoLink} d-none d-md-flex align-items-center`} style={{color: '#666 !important'}}><img src='/logo.svg' alt="Architech"/><h5 className='ml8' style={{fontSize: '18px', fontWeight: '400'}}>Beta</h5></Link>
             <Link to={`nfts`} className={`${page === 'NFTS' ? styles.activeLink : undefined} d-none d-md-flex`}>NFTs</Link>
             <SearchBar style={{marginLeft: 'auto'}} className='d-none d-md-block' />
             <div style={{width: 'auto', height: '100%'}} className='d-none d-md-block'>
