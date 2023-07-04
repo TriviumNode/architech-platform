@@ -216,7 +216,7 @@ const SingleToken: FC<any> = (): ReactElement => {
                   <p style={{margin: '8px 0 0 0 ', fontSize: '12px', padding: '0 8px'}}>{tokenResponse.token.metadataExtension?.description}</p>
                 </div>
               }
-              { (tokenResponse.token.metadataExtension?.attributes && tokenResponse.token.metadataExtension.attributes.length) &&
+              { !!(tokenResponse.token.metadataExtension?.attributes && tokenResponse.token.metadataExtension.attributes.length) &&
                 <div style={{margin: '0 48px 12px 48px', width: 'fit-content', maxWidth: 'calc(100% - 96px)'}}>
                   <div className='lightText12 mb8'>Traits</div>
                   <div className='d-flex flex-wrap gap8' style={{margin: '0 8px', width: 'calc(100% - 16px)'}}>
