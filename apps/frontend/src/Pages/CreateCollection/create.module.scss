@@ -52,6 +52,11 @@
             cursor: default !important;
             align-self: initial !important;
         }
+
+        .unclickableBtn {
+            cursor: default !important;
+            background: #FFFFFF00 !important;
+        }
     }
 }
 
@@ -116,6 +121,10 @@
     line-height: 120%;
     color: #666666;
     padding: 0 16px;
+}
+.form input:disabled {
+    border: 1px solid #cfccc9;
+    background: #cfccc9;
 }
 .form textarea {
     width: calc(100% - 32px);
@@ -198,4 +207,12 @@
     left: 50%;
     transform: translate(-50%, 0);
     bottom: 32px
+}
+
+
+.modalLink {
+    text-decoration: underline;
+}
+.modalLink:hover {
+    color: #666666;
 }

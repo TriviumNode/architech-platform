@@ -3,13 +3,30 @@ import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import Container from "react-bootstrap/esm/Container";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 import Navbar, { BurgerMenu, HeaderPage } from "../Components/Navbar/NavBar";
 import { useUser } from "../Contexts/UserContext";
+import { initClients } from "../Utils/queryClient";
 import styles from './Main.module.scss'
 
 export default function MainLayout() {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const init = async() => {
+    try {
+      await initClients();
+    } catch (err: any) {
+      toast.error('Failed to query chain. Some features may not work as expected.', { autoClose: false})
+      console.error('Failed to initialize query client:', err)
+    console.log('aaa')
+
+    }
+  }
+  
+  useEffect(()=>{
+    init();
+  },[])
 
   const scrollbarWidth = window.innerWidth - document.body.clientWidth
 

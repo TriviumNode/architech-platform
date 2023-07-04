@@ -1,4 +1,5 @@
 import { ArchwayClient } from "@archwayhq/arch3.js";
+import { toast } from "react-toastify";
 
 export let QueryClient: ArchwayClient;
 

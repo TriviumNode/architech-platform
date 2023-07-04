@@ -169,7 +169,10 @@ export const UserProvider = ({ children }: Props): ReactElement => {
           toast.error('Keplr Wallet was not found. Ensure it is enabled and unlocked.')
           break;
         default:
-          toast.error(err.message)
+          console.error('Error connecting wallet: ', err)
+          if (err.message.includes('NetworkError when attempting to fetch resource.'))
+            toast.error(`Error connecting wallet: Failed to query chain`)
+          else toast.error(`Error connecting wallet: ${err.message}`)
           break;
       }
     }

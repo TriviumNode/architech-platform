@@ -29,15 +29,18 @@ export const DefaultDetailState: DetailState = {
 const DetailPage: FC<{
     state: DetailState,
     current: DetailState,
-    isEditing: boolean,
+    isEditing?: boolean,
+    isImporting?: boolean,
     onChange: (detail: DetailState)=>void;
     next: ()=>void;
-}> = ({state, current, isEditing, onChange, next}): ReactElement => {
+}> = ({state, current, isEditing, isImporting, onChange, next}): ReactElement => {
     const [errors, setErrors] = useState<Partial<DetailState>>()
 
     const updateDetailState = (newDetailState: Partial<DetailState>) => {
         onChange({...state, ...newDetailState})
     }
+
+    console.log('Innder Detail state', state)
 
     const handleNext = (e: any) => {
         e.preventDefault();
@@ -91,7 +94,7 @@ const DetailPage: FC<{
                         <Col>
                             <label>
                                 Collection Symbol
-                                <input value={state.symbol} onChange={(e)=>updateDetailState({symbol: e.target.value})}  className={errors?.symbol && 'error'} />
+                                <input value={state.symbol} disabled={isImporting} onChange={(e)=>updateDetailState({symbol: e.target.value})}  className={errors?.symbol && 'error'} />
                                 {!!errors?.symbol &&
                                     <div className='inputAlert'>
                                         <img alt='alert' src='/alert.svg' style={{height:'1.5em'}} />
