@@ -78,6 +78,11 @@ const router = createBrowserRouter([
         loader: collectionLoader,
       },
       {
+        path: "/nfts/edit/:contractAddr/:page",
+        element: <EditCollectionPage />,
+        loader: collectionLoader,
+      },
+      {
         path: "/profile/:userAddress",
         element: <ProfilePage />,
         loader: userProfileloader

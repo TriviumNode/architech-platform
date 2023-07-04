@@ -1,6 +1,6 @@
 import {ReactElement, FC, useState, useRef, useEffect} from "react";
 import { Col, Row } from "react-bootstrap";
-import { Link, useLoaderData, useNavigate, useRevalidator } from "react-router-dom";
+import { Link, useLoaderData, useLocation, useNavigate, useParams, useRevalidator } from "react-router-dom";
 import { useUser } from "../../Contexts/UserContext";
 import Loader from "../../Components/Loader";
 import Modal from "../../Components/Modal";
@@ -35,6 +35,11 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     const { user: wallet, refreshProfile } = useUser();
     const { collection: fullCollection } = useLoaderData() as { collection: GetCollectionResponse};
     const navigate = useNavigate();
+    const params = useParams()
+    console.log('paramss', params)
+    const findPage = Pages.find(p=>p.toLowerCase() === params.page?.toLowerCase()) || Pages[0]
+
+    
     const revalidator = useRevalidator();
     const {collection} = fullCollection;
 
@@ -57,7 +62,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     const [linkState, setLinkState] = useState<LinkState>(currentLinks);
     const [rewardsState, setRewardsState] = useState<RewardsState>(DefaultRewardsState);
 
-    const [page, setPage] = useState<Page>(Pages[0])
+    const [page, setPage] = useState<Page>(findPage)
 
     const [unsaved, setUnsaved] = useState(false);
     const [saving, setSaving] = useState(false);
