@@ -3,6 +3,7 @@ import { ArchwayClient } from "@archwayhq/arch3.js";
 import { toast } from "react-toastify";
 
 export const { CREDIT_ADDRESS, MARKETPLACE_ADDRESS, CW721_CODE_ID } = getAddresses(process.env.REACT_APP_CHAIN_ID)
+console.log('frontend addresses', { CREDIT_ADDRESS, MARKETPLACE_ADDRESS, CW721_CODE_ID })
 
 export let QueryClient: ArchwayClient;
 

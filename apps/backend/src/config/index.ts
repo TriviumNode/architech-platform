@@ -19,3 +19,4 @@ export const {
 } = process.env;
 
 export const { MARKETPLACE_ADDRESS, CREDIT_ADDRESS, CW721_CODE_ID } = getAddresses(CHAIN_ID);
+console.log('Backend Addresses', { MARKETPLACE_ADDRESS, CREDIT_ADDRESS, CW721_CODE_ID });
