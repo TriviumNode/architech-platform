@@ -122,7 +122,7 @@ export default function EditModal({open, collectionId, onClose}: Props) {
                 </Col>
             </Row>
             <div className='lightText12' style={{margin: '4px 8px 0 8px'}}>
-                File types supported: JPG, PNG, SVG. Max size: 2 MB<br />
+                File types supported: JPG, PNG, SVG, WEBP. Max size: 2 MB<br />
                 Banner: 1080 x 350
             </div>
             <Row style={{marginTop: '20px'}}>

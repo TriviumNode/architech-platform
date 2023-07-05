@@ -125,7 +125,7 @@ const DetailPage: FC<{
                         </label>
                         <div className='lightText11' style={{margin: '4px 8px 0 8px'}}>
                             Recommended Size: 350 x 350<br/>
-                            Accepts JPG, PNG, SVG.&nbsp;&nbsp;Max size: 2 MB
+                            Accepts JPG, PNG SVG, WEBP.&nbsp;&nbsp;Max size: 2 MB
                         </div>
                     </Col>
                     <Col>
