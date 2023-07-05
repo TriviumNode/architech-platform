@@ -47,11 +47,13 @@ export default function MainLayout() {
 
       <header>
         <Navbar openMenu={()=>setMenuOpen(true)} />
-        <div className='lightText10 d-flex justify-content-between flex-wrap' style={{overflow: "hidden"}}>
-          <div>Testnet Mode: {process.env.REACT_APP_CHAIN_ID} {process.env.REACT_APP_RPC_URL}</div>
-          <div>Marketplace: {MARKETPLACE_ADDRESS}</div>
-          <div>Credits: {CREDIT_ADDRESS}</div>
-        </div>
+        { !process.env.REACT_APP_CHAIN_ID.startsWith('archway-') &&
+          <div className='lightText10 d-flex justify-content-between flex-wrap' style={{overflow: "hidden"}}>
+            <div>Testnet Mode: {process.env.REACT_APP_CHAIN_ID} {process.env.REACT_APP_RPC_URL}</div>
+            <div>Marketplace: {MARKETPLACE_ADDRESS}</div>
+            <div>Credits: {CREDIT_ADDRESS}</div>
+          </div>
+        }
       </header>
       {/* <div id="detail"> */}
           <Outlet />
