@@ -151,7 +151,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
                             <div className='d-flex align-items-center gap8'>
                                 <h1>{collectionName}</h1>
                                 {(collection.categories || []).map(category=>
-                                    <Badge><span>{category}</span></Badge>
+                                    <Badge key={category}><span>{category}</span></Badge>
                                 )}
                             </div>
                             <p>{collection.collectionProfile.description}</p>
@@ -160,38 +160,38 @@ const SingleCollection: FC<any> = (): ReactElement => {
                             </div>
                         </div>
                         <div style={{position: 'absolute', right: '16px', top: '16px'}}>
-                                    { (wallet && (collection.creator === wallet.address || ADMINS.includes(wallet.address))) &&
-                                    <Col className='d-flex flex-col justify-content-center'>
-                                        {/* <button type="button" onClick={()=>setIsEditing(true)}>Edit</button> */}
-                                        <button
+                            { (wallet && (collection.creator === wallet.address || ADMINS.includes(wallet.address))) &&
+                                <Col className='d-flex flex-col justify-content-center'>
+                                    {/* <button type="button" onClick={()=>setIsEditing(true)}>Edit</button> */}
+                                    <button
+                                        data-tooltip-id="my-tooltip"
+                                        data-tooltip-content="Refresh Collection"
+                                        data-tooltip-place="left"
+                                        disabled={isRefreshing}
+                                        onClick={()=>handleRefresh()}
+                                        style={{color: '#666666', padding: 0}}
+                                        type='button'
+                                        className='clearButton mr16'
+                                    >
+                                        <FontAwesomeIcon spin={isRefreshing} size='2x' icon={faArrowRotateRight} />
+                                    </button>
+                                    <LinkButton
+                                        style={{color: '#666666', padding: 0, background: '#00000000'}}
+                                        to={`/nfts/edit/${collection.address}`}
+
+                                    >
+                                        <FontAwesomeIcon
                                             data-tooltip-id="my-tooltip"
-                                            data-tooltip-content="Refresh Collection"
+                                            data-tooltip-content="Edit Collection"
                                             data-tooltip-place="left"
-                                            disabled={isRefreshing}
-                                            onClick={()=>handleRefresh()}
-                                            style={{color: '#666666', padding: 0}}
-                                            type='button'
-                                            className='clearButton mr16'
-                                        >
-                                            <FontAwesomeIcon spin={isRefreshing} size='2x' icon={faArrowRotateRight} />
-                                        </button>
-                                        <LinkButton
-                                            style={{color: '#666666', padding: 0, background: '#00000000'}}
-                                            to={`/nfts/edit/${collection.address}`}
+                                            size='2x' icon={faPencil}
+                                        />
+                                    </LinkButton>
+                                    <Tooltip id="my-tooltip" />
 
-                                        >
-                                            <FontAwesomeIcon
-                                                data-tooltip-id="my-tooltip"
-                                                data-tooltip-content="Edit Collection"
-                                                data-tooltip-place="left"
-                                                size='2x' icon={faPencil}
-                                            />
-                                        </LinkButton>
-                                        <Tooltip id="my-tooltip" />
-
-                                    </Col>
-                                    }
-                                </div>
+                                </Col>
+                            }
+                        </div>
                         <div style={{position: 'absolute', right: '16px', bottom: '16px'}}>
                             <SocialLinks discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} website={collection.collectionProfile.website} />
                         </div>
@@ -206,7 +206,6 @@ const SingleCollection: FC<any> = (): ReactElement => {
                         { collection.traitTypes.map(type=>{
                             const traits = collection.traits.filter((trait: cw721.Trait)=>trait.trait_type === type);
                             const selected = traitFilter.filter((trait: Partial<cw721.Trait>)=>trait.trait_type === type);
-                            const values = traits.map(t=>t.value);
                             return (
                                 <div key={type} className='mb8'>
                                     <TraitFilterMenu trait_type={type} traits={traits} selected_traits={selected} onCheck={(trait)=>addTraitFilter(trait)} onUncheck={(trait)=>removeTraitFilter(trait)}  />

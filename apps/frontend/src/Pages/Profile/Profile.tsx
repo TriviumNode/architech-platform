@@ -1,13 +1,9 @@
-import { GetUserProfileResponse, Token, User } from "@architech/types";
-import React, {ReactElement, FC, useState, useEffect, ChangeEvent} from "react";
+import { GetUserProfileResponse } from "@architech/types";
+import {ReactElement, FC, useState} from "react";
 import { Col, Row } from "react-bootstrap";
-import Container from "react-bootstrap/esm/Container";
-import { Link, useLoaderData, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import FileInput from "../../Components/FileInput";
-import ImageDropzone from "../../Components/ImageDropzone";
+import { useLoaderData, useParams } from "react-router-dom";
 import { useUser } from "../../Contexts/UserContext";
-import { getApiUrl, getTokens, updateProfile, updateProfileImage } from "../../Utils/backend";
+import { getApiUrl } from "../../Utils/backend";
 import { useRevalidator } from 'react-router-dom'
 import Loader from "../../Components/Loader";
 import NftTile from "../../Components/NftTile/NftTile";
@@ -16,6 +12,7 @@ import PageSelector from "../../Components/PageSelector/PageSelector";
 import EditProfileModal from "./EditProfileModal";
 import LinkButton from "../../Components/LinkButton";
 import PlaceholdImg from "../../Components/PlaceholdImg";
+import styles from './Profile.module.scss';
 
 const emptyToUndefined =(str: string) => {
     return str.length ? str : undefined;
@@ -52,7 +49,7 @@ const ProfilePage: FC<any> = (): ReactElement => {
             case "Owned NFTs": 
                 return (
                     userProfile.tokens.length ?
-                        <Col className='grid-4 wide'>
+                        <Col className={styles.nftsContainer}>
                             {userProfile.tokens.map(token=>{
                                 return (
                                     <NftTile token={token} />
@@ -85,7 +82,7 @@ const ProfilePage: FC<any> = (): ReactElement => {
             case "Created Collections":
                 return (
                     userProfile.collections.length ?
-                        <Col className='grid-4 wide'>
+                        <Col className={styles.nftsContainer}>
                             {userProfile.collections.map(collection=>{
                                 return (
                                     <CollectionTile fullCollection={collection} />
@@ -119,11 +116,13 @@ const ProfilePage: FC<any> = (): ReactElement => {
     const displayImage = userProfile.profile?.profile_image ? getApiUrl(`/public/${userProfile.profile.profile_image}`) : undefined;
     return (<>
                 <EditProfileModal open={editProfile} onClose={()=>setEditProfile(false)} userId={userProfile.profile?._id || ''} />
-                <div className='d-flex mb8' style={{gap: '8px', margin: '0 -8px', maxHeight: '350px'}}>
-                    <Col xs={{span: 10, offset: 1}} md={{span: 3, offset: 0}} className='card' style={{aspectRatio: '1 / 1'}}>
-                        <PlaceholdImg src={displayImage} alt={ displayName } style={{objectFit: 'cover', width: '100%', height: '100%'}} />
+                <div className={styles.picRow}>
+                    <Col xs={{span: 8, offset: 2}} md={{span: 3, offset: 0}} className='card square'>
+                        <PlaceholdImg src={displayImage} alt={ displayName } className='tall wide imgCover' />
                     </Col>
                     <Col
+                        xs={12}
+                        md={true}
                         className='card'
                         style={{
                             position: 'relative',
@@ -139,35 +138,25 @@ const ProfilePage: FC<any> = (): ReactElement => {
                             </div>
                         </div>
                         <div style={{position: 'absolute', right: '16px', top: '16px'}}>
-                                    { (wallet && wallet.address === userProfile.profile?.address) &&
-                                        <Col>
-                                            <button type="button" onClick={()=>setEditProfile(true)}>Edit</button>
-                                        </Col>
-                                    }
-                                </div>
+                            { (wallet && wallet.address === userProfile.profile?.address) &&
+                                <Col>
+                                    <button type="button" onClick={()=>setEditProfile(true)}>Edit</button>
+                                </Col>
+                            }
+                        </div>
                         <div style={{position: 'absolute', right: '16px', bottom: '16px'}}>
                             {/* <SocialLinks discord={userProfile.profile.} twitter={collection.collectionProfile.twitter} website={collection.collectionProfile.website} /> */}
                         </div>
 
                     </Col>
                 </div>
-                <div className='d-flex' style={{gap: '8px', margin: '0 -8px', alignItems: 'stretch'}}>
+                <div className='d-flex flex-wrap' style={{gap: '8px', alignItems: 'stretch'}}>
                     <Col xs={12} md={3} className='card d-flex flex-column'>
                         <div style={{margin: '24px'}}>
                             <PageSelector pages={Pages} current={page} setPage={(newPage: any)=>setPage(newPage)} />
                         </div>
                     </Col>
-                    
                     {getPage(page)}
-                    {/* <Col className='d-flex flex-wrap gx-5'>
-                    {
-                                    tokens.map(token=>{
-                                        return (
-                                            <NftTile collectionName={collectionName} token={token} />
-                                        );
-                                    })
-                                }
-                    </Col> */}
                 </div>
 
     </>
