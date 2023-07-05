@@ -1,4 +1,4 @@
-import { cancelListing, denomToHuman, findDenom, findToken, purchaseNative, truncateAddress } from "@architech/lib";
+import { cancelListing, denomToHuman, findDenom, findToken, purchaseNative, truncateAddress, unknownDenom } from "@architech/lib";
 import { Collection, Token, cw721, GetTokenResponse, GetCollectionResponse, Denom } from "@architech/types";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -110,11 +110,7 @@ const SingleToken: FC<any> = (): ReactElement => {
 
     let saleAmount: string = '--';
     let usdAmount: string = '--';
-    let saleDenom: Denom = {
-      decimals: 0,
-      displayDenom: 'UNKNOWN',
-      image: 'arch.svg',
-    };
+    let saleDenom: Denom = unknownDenom;
     if (tokenResponse?.ask) {
       if (tokenResponse.ask.cw20_contract) {
         const denom = findToken(tokenResponse.ask.cw20_contract);

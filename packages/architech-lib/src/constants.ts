@@ -27,9 +27,15 @@ export const DENOMS: Denom[] = [
         displayDenom: 'CONST',
         image: 'arch.svg'
     },
+    {
+        nativeDenom: 'aarch',
+        decimals: 18,
+        displayDenom: 'ARCH',
+        image: 'arch.svg'
+    },
 ]
 
-const unknownDenom: Denom = {
+export const unknownDenom: Denom = {
     decimals: 0,
     displayDenom: 'UNKNOWN',
     image: 'arch.svg',
