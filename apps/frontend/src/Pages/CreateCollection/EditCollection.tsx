@@ -142,6 +142,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                     rewards_address: rewardsState.address,
                 })
                 console.log('TX Result', result);
+                refreshMetadata();
                 setUnsaved(false);
                 toast.success('Saved rewards address');
             }
