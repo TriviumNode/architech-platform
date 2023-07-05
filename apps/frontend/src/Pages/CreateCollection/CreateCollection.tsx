@@ -141,7 +141,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
 }
                         <p>{error || 'Unknown error.'}</p>
                         
-                        <button type="button" onClick={()=>setStatus(undefined)}>Close</button>
+                        <button className='mr8' type="button" onClick={()=>setStatus(undefined)}>Close</button>
                         <button type="button" onClick={()=>handleCreate(undefined)}>Retry</button>
                     </>
                     }

@@ -158,7 +158,7 @@ const ImportCollectionPage: FC<any> = (): ReactElement => {
                         <h3>Error</h3>
                         <p>{error || 'Unknown error.'}</p>
                         
-                        <button type="button" onClick={()=>setStatus(undefined)}>Close</button>
+                        <button className='mr8' type="button" onClick={()=>setStatus(undefined)}>Close</button>
                         <button type="button" onClick={()=>handleImport(undefined)}>Retry</button>
                     </>
                     }
