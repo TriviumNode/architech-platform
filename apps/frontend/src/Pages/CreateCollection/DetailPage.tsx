@@ -40,8 +40,6 @@ const DetailPage: FC<{
         onChange({...state, ...newDetailState})
     }
 
-    console.log('Innder Detail state', state)
-
     const handleNext = (e: any) => {
         e.preventDefault();
         if (validateForm()) {
