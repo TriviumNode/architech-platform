@@ -36,7 +36,6 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     const { collection: fullCollection } = useLoaderData() as { collection: GetCollectionResponse};
     const navigate = useNavigate();
     const params = useParams()
-    console.log('paramss', params)
     const findPage = Pages.find(p=>p.toLowerCase() === params.page?.toLowerCase()) || Pages[0]
 
     
