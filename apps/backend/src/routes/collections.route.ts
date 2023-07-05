@@ -50,8 +50,6 @@ class CollectionsRoute implements Routes {
       fileUploadMiddleware,
       importCollection,
     );
-    this.router.get(`${this.path}/adminimport/:contractAddr`, importCollectionAdmin);
-    this.router.post(`${this.path}/adminimport/:contractAddr`, importCollectionAdmin);
 
     // Refresh collection
     // TODO: Require authentication?

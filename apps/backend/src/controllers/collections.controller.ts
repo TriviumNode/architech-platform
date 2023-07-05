@@ -142,24 +142,6 @@ export const getCollectionByAddress = async (req: RequestWithOptionalUser, res: 
   }
 };
 
-export const importCollectionAdmin = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const contractAddress: string = req.params.contractAddr;
-
-    if (contractAddress.length !== CONTRACT_ADDR_LENGTH || !contractAddress.startsWith(process.env.PREFIX)) {
-      res.status(400).send('Invalid contract address.');
-      return;
-    }
-    console.log('Admin Importing ', contractAddress);
-
-    const importResponse = await collectionService.importCollection(contractAddress, { name: '', hidden: 'true', categories: '[]' });
-
-    res.status(200).json(importResponse);
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const editCollection = async (req: RequestWithImages, res: Response, next: NextFunction) => {
   try {
     const collectionId: string = req.params.id;
