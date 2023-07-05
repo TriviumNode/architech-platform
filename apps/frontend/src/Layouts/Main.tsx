@@ -48,10 +48,19 @@ export default function MainLayout() {
       <header>
         <Navbar openMenu={()=>setMenuOpen(true)} />
         { !process.env.REACT_APP_CHAIN_ID.startsWith('archway-') &&
-          <div className='lightText10 d-flex justify-content-between flex-wrap' style={{overflow: "hidden"}}>
-            <div>Testnet Mode: {process.env.REACT_APP_CHAIN_ID} {process.env.REACT_APP_RPC_URL}</div>
-            <div>Marketplace: {MARKETPLACE_ADDRESS}</div>
-            <div>Credits: {CREDIT_ADDRESS}</div>
+          <div className='lightText10 d-flex flex-wrap card mb8 align-items-center justify-content-between mb8' style={{overflow: "hidden", minHeight: '48px', background: 'orange', padding: '0 16px'}}>
+            <div className='d-flex'>
+              <h3 style={{color: '#222'}}>Testnet Mode  </h3>
+              <div className='ml16'>
+                <div>{process.env.REACT_APP_CHAIN_ID}</div>
+                <div>{process.env.REACT_APP_RPC_URL}</div>
+              </div>
+            </div>
+
+            <div>
+              <div>Marketplace: {MARKETPLACE_ADDRESS}</div>
+              <div>Credits: {CREDIT_ADDRESS}  </div>
+            </div>
           </div>
         }
       </header>
