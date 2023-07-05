@@ -11,6 +11,7 @@ export const sendNft = async({
     tokenId,
     recipient,
     subMsg,
+    gas = 500_000,
 }:{
     client: SigningArchwayClient,
     signer: string,
@@ -18,6 +19,7 @@ export const sendNft = async({
     tokenId: string;
     recipient: string;
     subMsg: any;
+    gas?: number;
 }) => {
     const msg: ExecuteMsg = {
         send_nft: {
@@ -32,7 +34,7 @@ export const sendNft = async({
         signer,
         contract,
         msg,
-        getFee(500_000),
+        getFee(gas),
     )
     return result;
 

@@ -1,4 +1,4 @@
-import { cw721 } from "@architech/types";
+import { cw2981, cw721 } from "@architech/types";
 import type { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js/build";
 
 export const getContractInfo = async ({
@@ -57,27 +57,32 @@ export const getAllNftInfo = async ({
     return result;
 }
 
-// export const getRoyalty = async ({
-//     client,
-//     contract,
-//     token_id,
-//     sale_price,
-// }:{
-//     client: SigningArchwayClient | ArchwayClient,
-//     contract: string,
-//     token_id: string,
-//     sale_price: string;
-// }) => {
-//     const query: cw721.Cw2981QueryMsg = {
-//         royalty_info: {
-//             sale_price,
-//             token_id
-//         }
-//     };
+export const getRoyalty = async ({
+    client,
+    contract,
+    token_id,
+    sale_price,
+}:{
+    client: SigningArchwayClient | ArchwayClient,
+    contract: string,
+    token_id: string,
+    sale_price: string;
+}) => {
+    const extension_msg: cw2981.Cw2981QueryMsg = {
+        royalty_info: {
+            sale_price,
+            token_id
+        }
+    };
+    const query: cw721.QueryMsg = {
+        extension: {
+            msg: extension_msg
+        },
+    }
 
-//     const result = await client.queryContractSmart(contract, query);
-//     return result;
-// }
+    const result = await client.queryContractSmart(contract, query);
+    return result;
+}
 
 // export const checkRoyalty = async ({
 //     client,

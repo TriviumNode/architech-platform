@@ -108,6 +108,7 @@ export const listToken = async({
         tokenId: token_id,
         recipient: marketplace_contract,
         subMsg: listMsg,
+        gas: 400_000
     })
 }
 
@@ -135,7 +136,7 @@ export const cancelListing = async({
         signer,
         marketplace_contract,
         msg,
-        getFee(500_000),
+        getFee(400_000),
         undefined,
     )
 }
