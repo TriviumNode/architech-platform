@@ -9,8 +9,8 @@ export const getAddresses = (chainId: string) => {
             break;
         case "localnet":
             return {
-                MARKETPLACE_ADDRESS: 'archway13we0myxwzlpx8l5ark8elw5gj5d59dl6cjkzmt80c5q5cv5rt54quagxpp',
-                CREDIT_ADDRESS: 'archway10qt8wg0n7z740ssvf3urmvgtjhxpyp74hxqvqt7z226gykuus7eqzla6h5',
+                MARKETPLACE_ADDRESS: 'archway1n7z2amw7aqfugt966qkygvnjum7pm2pm7xfj2fstv8qc5dgy4csqa0twzn',
+                CREDIT_ADDRESS: 'archway1893q8ale82yk7s55zztx3p94yn5yyn32puf5y67pqeesf9a9qvxsq0c3ph',
                 CW721_CODE_ID: 9,
             };
             break;

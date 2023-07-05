@@ -54,7 +54,7 @@ export const getTrendingCollections = async (req: Request, res: Response, next: 
     ]);
     await CollectionModel.populate(trending, { path: '_id' });
 
-    const raw_collections: Collection[] = trending.map(t => t._id);
+    const raw_collections: Collection[] = trending.slice(0, 10).map(t => t._id);
     const collections = raw_collections.filter(c => !c.hidden);
 
     const collectionsResponse = await collectionsToResponse(collections);
