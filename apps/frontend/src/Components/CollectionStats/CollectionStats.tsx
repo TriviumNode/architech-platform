@@ -1,8 +1,8 @@
-import { denomToHuman, getVolume, MARKETPLACE_ADDRESS } from "@architech/lib";
+import { denomToHuman, getVolume } from "@architech/lib";
 import { Collection, marketplace } from "@architech/types"
 import { FC, ReactElement, useEffect, useState } from "react"
 import { useUser } from "../../Contexts/UserContext";
-import { QueryClient } from "../../Utils/queryClient";
+import { MARKETPLACE_ADDRESS, QueryClient } from "../../Utils/queryClient";
 import ArchDenom from "../ArchDenom";
 import SmallLoader from "../SmallLoader";
 

@@ -1,8 +1,9 @@
-import { getBatchCollectionDossier, MARKETPLACE_ADDRESS } from '@/../../../packages/architech-lib/dist';
+import { getBatchCollectionDossier } from '@architech/lib';
 import collectionsModel from '@/models/collections.model';
 import TokenModel from '@/models/tokens.model';
 import { queryClient } from '@/utils/chainClients';
 import { Collection, GetCollectionResponse } from '@architech/types';
+import { MARKETPLACE_ADDRESS } from '@/config';
 
 export const collectionsToResponse = async (collections: Collection[]): Promise<GetCollectionResponse[]> => {
   // Get array of cw721 addresses

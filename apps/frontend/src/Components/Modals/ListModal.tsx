@@ -1,4 +1,4 @@
-import { findDenom, humanToDenom, listToken, MARKETPLACE_ADDRESS } from "@architech/lib";
+import { findDenom, humanToDenom, listToken } from "@architech/lib";
 import { Denom, Token } from "@architech/types";
 import { useState, ChangeEvent, useEffect } from "react";
 import { Row, Col } from "react-bootstrap";
@@ -8,6 +8,7 @@ import Modal from "../../Components/Modal";
 import { useUser } from "../../Contexts/UserContext";
 import { ImportCollectionData } from "../../Interfaces/interfaces";
 import { editCollection, importCollection, updateCollectionImage } from "../../Utils/backend";
+import { MARKETPLACE_ADDRESS } from "../../Utils/queryClient";
 import { DenomImg } from "../ArchDenom";
 import SelectMenu, { SelectOption } from "../SelectMenu/SelectMenu";
 import SmallLoader from "../SmallLoader";

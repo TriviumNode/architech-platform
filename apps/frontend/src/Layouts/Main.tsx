@@ -1,4 +1,3 @@
-import { CREDIT_ADDRESS, MARKETPLACE_ADDRESS } from "@architech/lib";
 import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import Container from "react-bootstrap/esm/Container";
@@ -6,7 +5,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import Navbar, { BurgerMenu, HeaderPage } from "../Components/Navbar/NavBar";
 import { useUser } from "../Contexts/UserContext";
-import { initClients } from "../Utils/queryClient";
+import { CREDIT_ADDRESS, initClients, MARKETPLACE_ADDRESS } from "../Utils/queryClient";
 import styles from './Main.module.scss'
 
 export default function MainLayout() {

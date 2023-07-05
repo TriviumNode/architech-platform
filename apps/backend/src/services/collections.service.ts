@@ -7,13 +7,14 @@ import { findCollectionTokenCount, processCollectionTokens, processCollectionTra
 import { Collection, GetCollectionResponse } from '@architech/types';
 import { CreateCollectionData } from '@/interfaces/collections.interface';
 import CollectionModel from '@models/collections.model';
-import { getAllTokens, getCollectionDossier, getContractInfo, getNftInfo, getNumTokens, MARKETPLACE_ADDRESS, resolveIpfs } from '@architech/lib';
+import { getAllTokens, getCollectionDossier, getContractInfo, getNftInfo, getNumTokens, resolveIpfs } from '@architech/lib';
 import { ImportCollectionBodyDto } from '@/dtos/collections.dto';
 import { isArray, isBoolean } from 'class-validator';
 import fetch from 'node-fetch';
 import { hashBuffer, saveBuffer } from '@/middlewares/fileUploadMiddleware';
 import mime from 'mime-types';
 import mongoose from 'mongoose';
+import { MARKETPLACE_ADDRESS } from '@/config';
 
 export const getFullCollection = async (collectionAddress: string): Promise<GetCollectionResponse> => {
   const collectionData: Collection = await CollectionModel.findOne({ address: collectionAddress });

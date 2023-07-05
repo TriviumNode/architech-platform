@@ -1,4 +1,4 @@
-import { cancelListing, denomToHuman, findDenom, findToken, getAllAsks, MARKETPLACE_ADDRESS, purchaseNative, truncateAddress } from "@architech/lib";
+import { cancelListing, denomToHuman, findDenom, findToken, purchaseNative, truncateAddress } from "@architech/lib";
 import { Collection, Token, cw721, GetTokenResponse, GetCollectionResponse, Denom } from "@architech/types";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,6 +20,7 @@ import { useUser } from "../../Contexts/UserContext";
 import { addFavorite, getApiUrl, refreshToken, removeFavorite } from "../../Utils/backend";
 import { getPrice } from "../../Utils/data";
 import { getCollectionName } from "../../Utils/helpers";
+import { MARKETPLACE_ADDRESS } from "../../Utils/queryClient";
 import sleep from "../../Utils/sleep";
 
 import styles from './singletoken.module.scss';

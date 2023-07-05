@@ -9,9 +9,10 @@ import { cw721 } from '@architech/types';
 import equal from 'fast-deep-equal';
 import { updateCollection } from './collections.service';
 import { getAverageColor } from 'fast-average-color-node';
-import { getAllNftInfo, getAsk, MARKETPLACE_ADDRESS } from '@architech/lib';
+import { getAllNftInfo, getAsk } from '@architech/lib';
 import TokenModel from '@models/tokens.model';
 import CollectionModel from '@/models/collections.model';
+import { MARKETPLACE_ADDRESS } from '@/config';
 
 export async function findAllTokens(): Promise<Token[]> {
   const tokens: Token[] = await tokenModel.find();

@@ -3,7 +3,7 @@ import { queryClient } from '@/utils/chainClients';
 import * as tokenService from '@/services/tokens.service';
 import { cw721, GetLatestListingsResponse, GetTokenResponse, RequestWithOptionalUser, SortOption, Token } from '@architech/types';
 
-import { getAllAsks, MARKETPLACE_ADDRESS } from '@architech/lib';
+import { getAllAsks } from '@architech/lib';
 import TokenModel from '@/models/tokens.model';
 import { HttpException } from '@/exceptions/HttpException';
 import CollectionModel from '@/models/collections.model';
@@ -11,6 +11,7 @@ import { findFavoritesCount } from '@/services/favorites.service';
 import UserModel from '@/models/users.model';
 import mongoose from 'mongoose';
 import { addTokenView } from '@/services/view.service';
+import { MARKETPLACE_ADDRESS } from '@/config';
 
 // TODO cache this!!
 export const getLatestListings = async (req: Request, res: Response, next: NextFunction) => {

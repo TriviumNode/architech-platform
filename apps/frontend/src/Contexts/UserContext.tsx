@@ -14,8 +14,9 @@ import { Coin, Pubkey } from '@cosmjs/amino';
 import { Row, Col } from 'react-bootstrap';
 import Modal from '../Components/Modal';
 import Loader from '../Components/Loader';
-import { CREDIT_ADDRESS, denomToHuman, getCreditBalance, getRewards } from '@architech/lib';
+import { denomToHuman, getCreditBalance, getRewards } from '@architech/lib';
 import { GetUserProfileResponse } from '@architech/types';
+import { CREDIT_ADDRESS } from '../Utils/queryClient';
 
 interface Props {
   children: ReactNode;
