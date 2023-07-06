@@ -24,7 +24,7 @@ const NftTile: FC<any> = ({token}: Props): ReactElement => {
   return (
       // <Col xs={6} md={3} className='p-3'>
       <Link
-        to={`/nfts/${token.collectionAddress}/${token.tokenId}`}
+        to={encodeURIComponent(`/nfts/${token.collectionAddress}/${token.tokenId}`)}
         style={{
           display: 'flex',
           backgroundColor: token.averageColor,
