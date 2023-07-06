@@ -120,7 +120,13 @@ const ImportCollectionPage: FC<any> = (): ReactElement => {
                     <h2>Import<br/>Collection</h2>
                     <div className={styles.navLinks}>
                         { Pages.map((p: Page)=>
-                            <button className={page==='Collection' ? styles.unclickableBtn : undefined} type='button' onClick={page==='Collection' ? undefined : ()=>{setPage(p)}} disabled={page === p} key={p}>
+                            <button
+                                type='button'
+                                key={p}
+                                disabled={page === p}
+                                className={page==='Collection' ? styles.unclickableBtn : undefined}
+                                onClick={page==='Collection' ? undefined : ()=>{setPage(p)}}
+                            >
                                 {p}
                             </button>)
                         }

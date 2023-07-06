@@ -43,3 +43,9 @@ export const truncateAddress = (addr: string, prefix?: string) => {
     if (prefix && !addr.startsWith(`${prefix}1`)) return addr;
     return `${addr.slice(0,10)}...${addr.slice(addr.length-6)}`
 }
+
+export function randomString(length: number, chars = '0123456789abcdefghijklmnopqrstuvwxyz') {
+    var result = '';
+    for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+    return result;
+}

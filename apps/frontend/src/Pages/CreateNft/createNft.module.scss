@@ -100,7 +100,7 @@
     line-height: 120%;
     color: #666666;
 }
-.form input {
+.form input[type=text],input:not([type]) {
     width: calc(100% - 32px);
     height: 48px;
     border: 1px solid #cfccc9;
@@ -191,6 +191,17 @@
     height: 1.5em;
 }
 
+.selectAlert {
+    text-align: right;
+    // width: 100%;
+    position: relative;
+    right: 32px;
+    bottom: 36px;
+    display: flex;
+    justify-content: flex-end;
+    height: 1.5em;
+}
+
 .lightButton {
     display: flex;
     flex-direction: column;
@@ -217,6 +228,7 @@
 
 .error {
     border: 2px solid rgba(250, 20, 20, 0.75) !important;
+    border-radius: 8px;
 }
 
 .spanButton {

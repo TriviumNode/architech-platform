@@ -32,6 +32,7 @@ const CollectionPage: FC<{
 }> = ({collection, onChange, next}): ReactElement => {
     const { user } = useUser();
     const [selected, setSelected] = useState<SelectOption | undefined>(collection ? collectionOption(collection) : undefined)
+    const [error, setError] = useState(false);
 
     // useEffect(()=>{
 
@@ -43,7 +44,13 @@ const CollectionPage: FC<{
     }
 
     const handleNext = (e: any) => {
-        next();
+        if (!collection) {
+            setError(true);
+            toast.error('Please select a collection.');
+        } else {
+            setError(false);
+            next();
+        }
     }
 
 
@@ -63,8 +70,14 @@ const CollectionPage: FC<{
                     <Col>
                         <label>
                             NFT Collection
-                            <SelectMenu selected={selected} options={options} select={(a)=>handleSelect(a)} title="Select a collection" />
+                            <SelectMenu selected={selected} options={options} select={(a)=>handleSelect(a)} title="Select a collection" className={error ? styles.error : undefined} />
+                            {error &&
+                                <div style={{textAlign: 'right', color: 'red'}}>
+                                    Select a collection
+                                </div>
+                            }
                         </label>
+
                     </Col>
                 </div>
             </form>

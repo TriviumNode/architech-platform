@@ -54,7 +54,7 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
             case 'Collection':
                 return <CollectionPage collection={collection} onChange={(data) => setCollection(data)} next={()=>setPage('Details')} />
             case 'Details':
-                return <DetailPage state={detailState} onChange={(data) => setDetailState(data)} next={()=>setPage('Image')} />
+                return <DetailPage state={detailState} onChange={(data) => setDetailState(data)} next={()=>setPage('Image')} collection={collection as Collection} />
             case 'Image':
                 return <ImagePage image={image} preview={preview} onChange={(data, preview) => {setImage(data); setPreview(preview)}} next={()=>setPage('Financials')} />
             case 'Financials':
@@ -164,7 +164,13 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
                     <h2>Create<br/>NFT</h2>
                     <div className={styles.navLinks}>
                         { Pages.map((p: Page)=>
-                            <button type='button' onClick={()=>{setPage(p)}} disabled={page === p} key={p}>
+                            <button
+                                type='button'
+                                key={p}
+                                disabled={page === p}
+                                className={page==='Collection' ? styles.unclickableBtn : undefined}
+                                onClick={page==='Collection' ? undefined : ()=>{setPage(p)}}
+                            >
                                 {p}
                             </button>)
                         }
@@ -185,7 +191,7 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
                     { status === "UPLOADING" && <><p>Uploading image to IPFS...</p><Loader /></>}
                     { status === "MINTING" && <><p>Minting NFT on chain...<br />Please approve the transaction in your wallet.</p><Loader /></>}
                     { status === "IMPORTING" && <><p>Importing collection into Architech...</p><Loader /></>}
-                    { status === "COMPLETE" && <p>{detailState.name} has been created. <Link to={`/nfts/${collection?.address}/${detailState.tokenId}`}>View your NFT.</Link></p>}
+                    { status === "COMPLETE" && <p>{detailState.name} has been created. <Link to={`/nfts/${collection?.address}/${encodeURIComponent(detailState.tokenId)}`}>View your NFT.</Link></p>}
                     { status === "ERROR" && <>
                         <h3>Error</h3>
                         <div>{error || 'Unknown error.'}</div>
