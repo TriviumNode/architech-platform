@@ -261,7 +261,10 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
       total_views: 0,
     };
     console.log('Creating new token document for', tokenId, 'on', collectionAddress);
-    const newToken = await TokenModel.updateOne({ tokenId, collectionAddress }, newTokenData, { upsert: true, new: true }).populate('collectionInfo');
+    const newToken = await TokenModel.findOneAndUpdate({ tokenId, collectionAddress }, newTokenData, { upsert: true, new: true })
+      .populate('collectionInfo')
+      .lean();
+    console.log('New Token Response', newToken.collectionInfo);
     return newToken;
   } else if (
     !equal(
