@@ -90,7 +90,6 @@ export async function findCollectionTokens(
     default:
       sortFilter = {};
   }
-  console.log('sortFilter', sort, sortFilter);
   const { docs }: { docs: any[] } = await tokenModel.paginate(
     {
       collectionAddress: collectionAddress,
@@ -136,22 +135,10 @@ export async function findTokenIdInCollection(tokenId: string, collectionAddress
   return findToken;
 }
 
-export async function createToken(tokenData: TokenClass): Promise<Token> {
-  if (isEmpty(tokenData)) throw new HttpException(400, 'tokenData is empty');
-
-  const findToken: Token = await tokenModel.findOne({ collectionAddress: tokenData.collectionAddress, tokenId: tokenData.tokenId });
-  if (findToken) throw new HttpException(409, `This Token ID ${tokenData.tokenId} in collection ${tokenData.collectionAddress} already exists`);
-  console.log('Creating token with data ', tokenData);
-  const createTokenData = await tokenModel.create(tokenData);
-  await createTokenData.populate('collectionInfo');
-
-  return createTokenData as unknown as Token; //why typescript
-}
-
 export const processCollectionTokens = async (collection: Collection, tokenList: string[]) => {
   for (let i = 0; i < tokenList.length; i++) {
     const token_id = tokenList[i];
-    console.log('Processing', token_id);
+    console.log('Processing', token_id, 'on', collection.address);
 
     await ensureToken(collection.address, token_id);
     await sleep(300);
@@ -242,7 +229,10 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
       try {
         averageColor = await processAverageColor(metadataExtension.image);
       } catch (err: any) {
-        console.error(`Error determining average color.\nCollection: ${collectionAddress}\nToken: ${tokenId}`, err);
+        console.error(
+          `\nError determining average color.\nCollection: ${collectionAddress}\nToken: ${tokenId}\nImage: ${metadataExtension.image}\nErr:`,
+          err,
+        );
       }
     }
     const cleanAttributes = [];
@@ -258,7 +248,7 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
 
     const newTokenData: TokenClass = {
       tokenId,
-      collectionAddress: collectionAddress,
+      collectionAddress,
       collectionInfo: collection._id,
       owner,
       metadataExtension: {
@@ -270,11 +260,9 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
       averageColor,
       total_views: 0,
     };
-    console.log('CREATING NEW TOKEN DOCUMENT');
-    const newToken = await TokenModel.create(newTokenData);
-    const populated = await newToken.populate('collectionInfo');
-    // await newToken.populate('traits');
-    return populated;
+    console.log('Creating new token document for', tokenId, 'on', collectionAddress);
+    const newToken = await TokenModel.updateOne({ tokenId, collectionAddress }, newTokenData, { upsert: true, new: true }).populate('collectionInfo');
+    return newToken;
   } else if (
     !equal(
       {
@@ -292,7 +280,7 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
     )
   ) {
     // Update DB
-    console.log('Updating token in DB');
+    console.log('Updating token in DB for', tokenId, 'on', collectionAddress);
     const handleAsk = ask ? { ask } : { $unset: { ask: '' } };
     const newTokenData: Partial<Token> = {
       owner,
@@ -307,7 +295,6 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
     console.log('Returning Updated token!');
     return populated;
   } else {
-    console.log('Returning DB token');
     return findToken;
   }
 };

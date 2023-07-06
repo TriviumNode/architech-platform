@@ -15,7 +15,7 @@ export async function walletLogin(userData: CreateUserDto) /*: Promise<{ cookie:
 
   // Validate signature somewhere
 
-  const tokenData = createToken(findUser);
+  const tokenData = createAuthToken(findUser);
   const cookie = createCookie(tokenData);
 
   // return { cookie, findUser };
@@ -32,7 +32,7 @@ export async function logout(userData: User): Promise<User> {
   return findUser;
 }
 
-export function createToken(user: User): TokenData {
+export function createAuthToken(user: User): TokenData {
   const dataStoredInToken: DataStoredInToken = { _id: user._id };
   const secretKey: string = SECRET_KEY;
   const expiresIn: number = 24 * 60 * 60 * 1000;
