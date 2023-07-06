@@ -12,21 +12,6 @@ export default function MainLayout() {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const init = async() => {
-    try {
-      await initClients();
-    } catch (err: any) {
-      toast.error('Failed to query chain. Some features may not work as expected.', { autoClose: false})
-      console.error('Failed to initialize query client:', err)
-    console.log('aaa')
-
-    }
-  }
-  
-  useEffect(()=>{
-    init();
-  },[])
-
   const scrollbarWidth = window.innerWidth - document.body.clientWidth
 
   useEffect(()=>{

@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import './preload.css';
 import reportWebVitals from './reportWebVitals';
 import {
   createBrowserRouter,
@@ -8,7 +9,7 @@ import {
 import MainLayout from './Layouts/Main';
 import ErrorPage from './Pages/Error';
 
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { UserProvider } from './Contexts/UserContext';
@@ -18,7 +19,6 @@ import ProfilePage from './Pages/Profile/Profile';
 
 import 'react-tooltip/dist/react-tooltip.css'
 import 'bootstrap/dist/css/bootstrap-grid.min.css';
-import ImportPage from './Pages/Import';
 import SingleCollection from './Pages/Collection/SingleCollection';
 import SingleToken from './Pages/Token/SingleToken';
 import CreateSingleNftPage from './Pages/CreateNft/CreateNft';
@@ -103,14 +103,33 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
-root.render(
+
+const init = async () => {
+  root.render(
+    <UserProvider>
+      <ToastContainer />
+      <div className="loading">Loading&#8230;</div>
+    </UserProvider>
+  );
+
+  try {
+    await initClients();
+  } catch (err: any) {
+    toast.error('Failed to query chain. Some features may not work as expected.', { autoClose: false})
+    console.error('Failed to initialize query client:', err)
+  }
+
+  root.render(
     <UserProvider>
       <ToastContainer />
       <RouterProvider router={router} />
     </UserProvider>
-);
+  );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+  // If you want to start measuring performance in your app, pass a function
+  // to log results (for example: reportWebVitals(console.log))
+  // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+  reportWebVitals();
+}
+
+init();
