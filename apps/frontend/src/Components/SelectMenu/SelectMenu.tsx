@@ -51,7 +51,7 @@ export default function SelectMenu({ title, options, selected, select, className
       <div className={`${styles.menu}`}>
           {options.map(option=>{
             return (
-              <button type='button' className={`${styles.menuOption}`} onClick={()=>handleClick(option)}>
+              <button key={option.value} type='button' className={`${styles.menuOption}`} onClick={()=>handleClick(option)}>
                   {option.content}
               </button>
             )

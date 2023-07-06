@@ -397,3 +397,36 @@ export const removeFavorite = async(tokenId: string): Promise<any> => {
     )
     return data;
 }
+
+export const purgeCollection = async(collectionAddress: string): Promise<any> => {
+    const url = getApiUrl(`/admin/purge_collection/${collectionAddress}`);
+    const response = await axios(
+        url,
+        {
+            method: 'POST',
+            withCredentials: true,
+            data: {},
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }
+    )
+    return response;
+}
+
+export const purgeTokens = async(collectionAddress: string): Promise<any> => {
+    const url = getApiUrl(`/admin/purge_tokens/${collectionAddress}`);
+    const response = await axios(
+        url,
+        {
+            method: 'POST',
+            withCredentials: true,
+            data: {},
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }
+    )
+    console.log('Purge Tokens Response', response);
+    return response;
+}

@@ -141,7 +141,7 @@ export const processCollectionTokens = async (collection: Collection, tokenList:
     console.log('Processing', token_id, 'on', collection.address);
 
     await ensureToken(collection.address, token_id);
-    await sleep(300);
+    await sleep(500);
   }
   processCollectionTraits(collection);
 };

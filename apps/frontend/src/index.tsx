@@ -27,6 +27,7 @@ import EditCollectionPage from './Pages/CreateCollection/EditCollection';
 import Home from './Pages/Home/Home';
 import { initClients } from './Utils/queryClient';
 import ImportCollectionPage from './Pages/CreateCollection/ImportCollection';
+import AdminDashboard from './Pages/Admin/AdminDashboard';
 
 
 const router = createBrowserRouter([
@@ -86,6 +87,10 @@ const router = createBrowserRouter([
         path: "/profile/:userAddress",
         element: <ProfilePage />,
         loader: userProfileloader
+      },
+      {
+        path: "/admindash",
+        element: <AdminDashboard />,
       },
     ],
   },

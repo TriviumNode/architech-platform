@@ -8,7 +8,6 @@ import {
   getCollectionByAddress,
   getTrendingCollections,
   importCollection,
-  importCollectionAdmin,
   refreshCollection,
   searchCollections,
 } from '@/controllers/collections.controller';
