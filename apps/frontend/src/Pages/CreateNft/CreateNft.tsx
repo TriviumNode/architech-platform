@@ -168,8 +168,15 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
                                 type='button'
                                 key={p}
                                 disabled={page === p}
-                                className={page==='Collection' ? styles.unclickableBtn : undefined}
-                                onClick={page==='Collection' ? undefined : ()=>{setPage(p)}}
+                                className={
+                                    page==='Collection' && !collection ? 'unclickable' :
+                                    page==='Details' && p!=='Collection' ? 'unclickable' :
+                                    undefined
+                                }
+                                onClick={
+                                    page==='Collection' && !collection ? undefined :
+                                    page==='Details' && p!=='Collection' ? undefined :
+                                    ()=>{setPage(p)}}
                             >
                                 {p}
                             </button>)

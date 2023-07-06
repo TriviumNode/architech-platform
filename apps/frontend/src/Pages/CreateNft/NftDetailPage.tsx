@@ -151,31 +151,29 @@ const DetailPage: FC<{
                 <button type='button' onClick={handleNext}>Next</button>
             </div>
             <form className={styles.form}>
-                <div className='d-flex mb24'>
-                    <Col>
+                <div className='d-flex flex-wrap mb24'>
+                    <Col xs={12} md={6} lg={8}>
                         <label>
                             Item Name
-                            <div className='d-flex flex-column wide'>
-                                <div className='lightText10' style={{margin: '4px 8px 0 8px'}}>
-                                    Display name for this NFT. Does not have to be unique.
+                            <div className='lightText10' style={{margin: '4px 8px 0 8px', minHeight: '2em', lineHeight: '100%'}}>
+                                Display name for this NFT. Does not have to be unique.
+                            </div>
+                            <input type='text' disabled={!state.customName} value={state.name} onChange={(e)=>updateDetailState({name: e.target.value})} className={errors?.name && styles.error} />
+                            {!!errors?.name &&
+                                <div className={styles.alert}>
+                                    <img alt='Alert' src='/alert.svg' style={{height:'1.5em'}} />
                                 </div>
-                                <input type='text' disabled={!state.customName} value={state.name} onChange={(e)=>updateDetailState({name: e.target.value})} className={errors?.name && styles.error} />
-                                {!!errors?.name &&
-                                    <div className={styles.alert}>
-                                        <img alt='Alert' src='/alert.svg' style={{height:'1.5em'}} />
-                                    </div>
-                                }
-                                <div style={{textAlign: 'right'}}>
-                                    <input type='checkbox' checked={state.customName} onChange={()=>updateDetailState({customName: !state.customName})} />Customize Name
-                                </div>
+                            }
+                            <div style={{textAlign: 'right'}}>
+                                <input type='checkbox' checked={state.customName} onChange={()=>updateDetailState({customName: !state.customName})} />Customize Name
                             </div>
                         </label>
                     </Col>
-                    <Col>
+                    <Col xs={12} md={true}>
                         <label>
                             Token ID
-                            <div className='lightText10' style={{margin: '4px 8px 0 8px'}}>
-                                Unique ID for this NFT. May only contain letters and numbers.
+                            <div className='lightText10' style={{margin: '4px 8px 0 8px', minHeight: '2em', lineHeight: '100%'}}>
+                                Unique ID for this NFT.<br/>May only contain letters and numbers.
                             </div>
                             <input type='text' disabled={!state.customId} value={state.tokenId} onChange={(e)=>updateTokenId(e.target.value)} className={errors?.tokenId && styles.error}  />
                             {!!errors?.tokenId &&
