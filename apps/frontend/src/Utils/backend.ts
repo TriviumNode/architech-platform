@@ -44,7 +44,7 @@ export const getTokens = async(contractAddr: string, query?: URLSearchParams, so
 }
 
 export const getToken = async(contractAddr: string, tokenId: string): Promise<GetTokenResponse> => {
-    const url = getApiUrl(`/tokens/collection/${contractAddr}/${tokenId}`)
+    const url = getApiUrl(`/tokens/collection/${contractAddr}/${encodeURIComponent(tokenId)}`)
     const {data} = await axios.get(url)
     return data;
 }
@@ -56,7 +56,7 @@ export const getOwnedTokens = async(ownerAddr: string) => {
 }
 
 export const refreshToken = async(contractAddr: string, tokenId: string): Promise<Token> => {
-    const url = getApiUrl(`/tokens/refresh/${contractAddr}/${tokenId}`)
+    const url = getApiUrl(`/tokens/refresh/${contractAddr}/${encodeURIComponent(tokenId)}`)
     const {data} = await axios.get(url)
     return data;
 }
@@ -375,7 +375,7 @@ export const refreshCollection = async(collectionAddress: string): Promise<Colle
 
 
 export const addFavorite = async(tokenId: string): Promise<any> => {
-    const url = getApiUrl(`/tokens/favorite/${tokenId}`);
+    const url = getApiUrl(`/tokens/favorite/${encodeURIComponent(tokenId)}`);
     const {data} = await axios(
         url,
         {
@@ -387,7 +387,7 @@ export const addFavorite = async(tokenId: string): Promise<any> => {
 }
 
 export const removeFavorite = async(tokenId: string): Promise<any> => {
-    const url = getApiUrl(`/tokens/favorite/${tokenId}`);
+    const url = getApiUrl(`/tokens/favorite/${encodeURIComponent(tokenId)}`);
     const {data} = await axios(
         url,
         {
