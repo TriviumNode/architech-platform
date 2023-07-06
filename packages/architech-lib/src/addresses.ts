@@ -7,18 +7,18 @@ export const getAddresses = (chainId: string) => {
                 CW721_CODE_ID: 44,
             };
             break;
-        case "localnet":
-            return {
-                MARKETPLACE_ADDRESS: 'archway1n7z2amw7aqfugt966qkygvnjum7pm2pm7xfj2fstv8qc5dgy4csqa0twzn',
-                CREDIT_ADDRESS: 'archway1893q8ale82yk7s55zztx3p94yn5yyn32puf5y67pqeesf9a9qvxsq0c3ph',
-                CW721_CODE_ID: 9,
-            };
-            break;
         case 'constantine-3':
             return {
                 MARKETPLACE_ADDRESS: 'archway13f8fv36qm87kaj3hfl9fspyv2p6jusvu92z59z3f0vgs975xjy4qwdg4cg',
                 CREDIT_ADDRESS: 'archway16p73xs5u5zusmukpejsnyjfzffqwlqltwqwmthy4ta9twuyxm7cqgy3s03',
                 CW721_CODE_ID: 219,
+            };
+            break;
+        case "localnet":
+            return {
+                MARKETPLACE_ADDRESS: 'archway1nc5tatafv6eyq7llkr2gv50ff9e22mnf70qgjlv737ktmt4eswrqgj33g6',
+                CREDIT_ADDRESS: 'archway14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sy85n2u',
+                CW721_CODE_ID: 3,
             };
             break;
         default:
