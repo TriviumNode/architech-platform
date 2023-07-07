@@ -37,7 +37,7 @@ const Home: FC<any> = (): ReactElement => {
             </Col>
             <Col className={`card ${styles.linkCard}`}>
                 <Link to='/nfts'>
-                    <img alt='' src='/marketplace.png' className='imgCover wide tall' />
+                    <img alt='' src='/home/marketplace.jpg' className='imgCover wide tall' />
                     <div className={styles.overlay}>
                         <h2>Market<div className='d-lg-inline' />place</h2>
                         <span>Browse and start collecting</span>
