@@ -28,7 +28,7 @@ const Home: FC<any> = (): ReactElement => {
         <div className={styles.linkRow}>
             <Col className={`card ${styles.linkCard}`}>
                 <Link to='/nfts/createcollection'>
-                    <img alt='' src='/nft.png' className='imgCover wide tall' />
+                    <img alt='' src='/home/first.jpg' className='imgCover wide tall' />
                     <div className={styles.overlay}>
                         <h2>Create an NFT</h2>
                         <span>Create your own NFT collection now</span>
