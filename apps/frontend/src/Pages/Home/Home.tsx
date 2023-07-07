@@ -45,7 +45,7 @@ const Home: FC<any> = (): ReactElement => {
                 </Link>
             </Col>
             <Col className={`card ${styles.linkCard}`}>
-                <img alt='' src='/dao.png' className='imgCover wide tall' />
+                <img alt='' src='/home/dao.jpg' className='imgCover wide tall' />
                 <div className={styles.overlay}>
                     <h2>Create a DAO</h2>
                     <span>Coming soon</span>
