@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import * as collectionService from '@services/collections.service';
-import { CONTRACT_ADDR_LENGTH, queryClient } from '@/utils/chainClients';
+import { CONTRACT_ADDR_LENGTH, isContract, queryClient } from '@/utils/chainClients';
 import {
   Collection,
   CollectionProfile,
@@ -202,7 +202,7 @@ export const importCollection = async (req: RequestWithImages, res: Response, ne
     const contractAddress: string = req.params.contractAddr;
 
     // Validate contract address
-    if (contractAddress.length !== CONTRACT_ADDR_LENGTH || !contractAddress.startsWith(process.env.PREFIX)) {
+    if (!isContract(contractAddress)) {
       res.status(400).send('Invalid contract address.');
       return;
     }
@@ -225,7 +225,7 @@ export const importCollection = async (req: RequestWithImages, res: Response, ne
 
     await validate(validator);
 
-    const importResponse = await collectionService.importCollection(contractAddress, validator, profile_image, banner_image);
+    const importResponse = await collectionService.importCollection(contractAddress, validator, req.user, profile_image, banner_image);
 
     res.status(200).json(importResponse);
   } catch (error) {

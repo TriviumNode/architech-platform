@@ -356,6 +356,28 @@ export const uploadImage = async(file: File): Promise<any> => {
     return data.cid;
 }
 
+export const uploadBatch = async(files: File[]): Promise<any> => {
+    const url = getApiUrl(`/upload/batch`);
+
+    const formData = new FormData();
+    files.forEach(file=>{
+        formData.append('images', file);
+    });
+
+    const {data}: {data: {cid: string}} = await axios(
+        url,
+        {
+            method: 'POST',
+            withCredentials: true,
+            data: formData,
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+        }
+    )
+    return data;
+}
+
 export const refreshCollection = async(collectionAddress: string): Promise<Collection> => {
     const url = getApiUrl(`/collections/refresh/${collectionAddress}`);
     const {data}: {data: Collection} = await axios(

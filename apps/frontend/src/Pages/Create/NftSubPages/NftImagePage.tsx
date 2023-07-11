@@ -1,10 +1,7 @@
-import { CATEGORIES } from "@architech/lib";
-import { cw721 } from "@architech/types";
-import { FC, ReactElement, useState } from "react";
+import { FC, ReactElement } from "react";
 import { Col } from "react-bootstrap";
-import MultiSelect from "../../Components/MultiSelect";
 
-import styles from './createNft.module.scss'
+import styles from '../create.module.scss'
 
 const ImagePage: FC<{
     image: File | undefined,

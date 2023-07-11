@@ -2,6 +2,30 @@ import { cw721, marketplace } from "../contracts";
 import { Token } from "./tokens.interface";
 import { Ref } from '@typegoose/typegoose';
 import mongoose from "mongoose";
+import { MinterType, PaymentType } from "..";
+
+export interface CollectionMinterI {
+  minter_address: string;
+  minter_type: MinterType;
+  minter_admin: string;
+  beneficiary: string;
+  payment_type: PaymentType;
+  payment_token?: string;
+  payment_denom?: string;
+  payment_amount: string;
+
+  // Epoch
+  launch_time?: string;
+
+  // Epoch
+  end_time?: string;
+
+  // Epoch
+  whitelist_launch_time?: string;
+
+  // For copy minters
+  mint_limit?: number;
+}
 
 export interface CollectionProfile {
   name?: string;
@@ -35,6 +59,7 @@ export interface CollectionModel {
   hidden: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  collectionMinter?: CollectionMinterI;
 }
 
 export interface Collection extends CollectionModel {

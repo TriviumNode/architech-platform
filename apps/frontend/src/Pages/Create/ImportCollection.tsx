@@ -7,16 +7,17 @@ import Modal from "../../Components/Modal";
 import { ImportCollectionData } from "../../Interfaces/interfaces";
 
 import styles from './create.module.scss'
-import DetailPage, { DetailState, DefaultDetailState } from "./DetailPage";
-import FinishPage, { DefaultFinishState, FinishState } from "./FinishPage";
+import CollectionDetailPage, { DetailState, DefaultDetailState } from "./CollectionSubPages/CollectionDetailPage";
+import FinishPage, { DefaultFinishState, FinishState } from "./CollectionSubPages/FinishPage";
 import { initStandardProject } from "../../Utils/wasm/factory_handles";
 import { getTokenCount, importCollection } from "../../Utils/backend";
-import LinksPage, { DefaultLinksState, LinkState } from "./LinksPage";
+import LinksPage, { DefaultLinksState, LinkState } from "./CollectionSubPages/LinksPage";
 import ConnectWallet from "../../Components/ConnectWallet";
-import CollectionAddressPage from "./CollectionAddressPage";
+import CollectionAddressPage from "./CollectionSubPages/CollectionAddressPage";
 import { getContractInfo } from "@architech/lib";
 import { QueryClient } from "../../Utils/queryClient";
 import { Collection } from "@architech/types";
+import { DefaultFinancialState } from "./CommonSubPages/FinancialsPage";
 
 export type Page = 'Details' | 'Finish' | 'Links' | 'Collection'
 
@@ -50,11 +51,11 @@ const ImportCollectionPage: FC<any> = (): ReactElement => {
             case 'Collection':
                 return <CollectionAddressPage handleLookup={handleLookup} state={{address: collectionAddress}} onChange={({address}) => setCollectionAddress(address)} next={()=>setPage('Details')} />
             case 'Details':
-                return <DetailPage current={detailState} isImporting={true} state={detailState} onChange={(data) => setDetailState(data)} next={()=>setPage('Links')} />
+                return <CollectionDetailPage current={detailState} isImporting={true} state={detailState} onChange={(data) => setDetailState(data)} next={()=>setPage('Links')} />
             case 'Links':
                 return <LinksPage state={linkState} onChange={(newState) => setLinkState(newState)} next={()=>setPage('Finish')} />
             case 'Finish':
-                return <FinishPage data={finishState} onChange={(data) => setFinishState(data)} onClick={handleImport}/>
+                return <FinishPage finishType='Import' details={detailState} data={finishState} onChange={(data) => setFinishState(data)} onClick={handleImport}/>
             default:
                 return <div style={{margin: '32px', textAlign: 'center'}}><h2 style={{color: 'red'}}>Something went wrong</h2><p>The application encounted an error: `Tried to navigate to undefined page.`<br />Please try to navigate to another page using the menu on the left.</p></div>
         }

@@ -16,6 +16,7 @@ export const {
   FILEBASE_S3_KEY_ID,
   FILEBASE_S3_KEY,
   CHAIN_ID,
+  RPC_URL,
 } = process.env;
 
 export const { MARKETPLACE_ADDRESS, CREDIT_ADDRESS, CW721_CODE_ID } = getAddresses(CHAIN_ID);

@@ -3,17 +3,17 @@ import { Collection, cw721 } from "@architech/types";
 import { FC, ReactElement, useEffect, useState } from "react";
 import { Col } from "react-bootstrap";
 import { toast } from "react-toastify";
-import MultiSelect from "../../Components/MultiSelect";
-import { QueryClient } from "../../Utils/queryClient";
+import MultiSelect from "../../../Components/MultiSelect";
+import { QueryClient } from "../../../Utils/queryClient";
 
-import styles from './createNft.module.scss'
+import styles from '../create.module.scss'
 
 export const DefaultTrait: cw721.Trait = {
     trait_type: '',
     value: ''
 }
 
-export interface DetailState {
+export interface NftDetailState {
     tokenId: string,
     name: string,
     description: string;
@@ -24,7 +24,7 @@ export interface DetailState {
     customName: boolean,
 }
 
-export const DefaultDetailState: DetailState = {
+export const DefaultNftDetailState: NftDetailState = {
     tokenId: '',
     name: '',
     description: '',
@@ -34,19 +34,24 @@ export const DefaultDetailState: DetailState = {
     customName: false,
 }
 
-const DetailPage: FC<{
-    state: DetailState,
-    collection: Collection,
-    onChange: (detail: DetailState)=>void;
+const NftDetailPage: FC<{
+    state: NftDetailState,
+    collection?: Collection,
+    isCollection?: boolean,
+    onChange: (detail: NftDetailState)=>void;
     next: ()=>void;
-}> = ({state, collection, onChange, next}): ReactElement => {
-    const [errors, setErrors] = useState<Partial<DetailState>>()
+}> = ({state, collection, isCollection, onChange, next}): ReactElement => {
+    const [errors, setErrors] = useState<Partial<NftDetailState>>()
 
     const [defaultId, setDefaultId] = useState<string>();
 
-    const updateDetailState = (newDetailState: Partial<DetailState>) => {
+    const updateDetailState = (newDetailState: Partial<NftDetailState>) => {
         onChange({...state, ...newDetailState})
     }
+
+    useEffect(()=>{
+        if (isCollection) updateDetailState({customName: true})
+    })
 
     const updateTokenId = (newId: string) => {
         const filtered = newId//.replace(/[^a-zA-Z0-9]/gi, '');
@@ -81,7 +86,7 @@ const DetailPage: FC<{
     }
 
     const validateForm = () => {
-        const errors: Partial<DetailState> = {}
+        const errors: Partial<NftDetailState> = {}
         if (!state.name) errors.name='true';
         if (!state.tokenId) errors.tokenId='true';
         if(Object.keys(errors).length){
@@ -92,34 +97,40 @@ const DetailPage: FC<{
     }
 
     const getDefaultId = async() => {
+        if (isCollection) return;
+        if (!collection && !isCollection) throw new Error('Collection data not loaded or collection not selected');
         let toSet = randomString(6);
         let maybe;
         try {
-            const numTokens = await getNumTokens({client: QueryClient, contract: collection.address})
+            //@ts-expect-error `getDefaultId` is not called if `collection` is undefined
+            const numTokens = await getNumTokens({client: QueryClient, contract: collection?.address})
             maybe = (numTokens + 1).toString();
-            const check = await getNftInfo({ client: QueryClient, contract: collection.address, token_id: maybe })
+            //@ts-expect-error `getDefaultId` is not called if `collection` is undefined
+            const check = await getNftInfo({ client: QueryClient, contract: collection?.address, token_id: maybe })
             if (!check) toSet = maybe;
         } catch (err: any) {
             if (err.toString().includes('not found: query wasm contract failed: invalid request') && maybe)
                 toSet = maybe;
             else {
-                console.error('Error getting default ID for', collection.address, err);
+                console.error('Error getting default ID for', collection?.address, err);
             }
         }
         setDefaultId(toSet)
         let update = {}
         // if (!customName) updateDetailState({name: `${collection.collectionProfile.name || collection.cw721_name} #${toSet}`})
         // if (!customId) updateDetailState({tokenId: toSet})
-        if (!state.customName) update = { name: `${collection.collectionProfile.name || collection.cw721_name} #${toSet}` }
+        if (!state.customName) update = { name: `${collection?.collectionProfile.name || collection?.cw721_name} #${toSet}` }
         if (!state.customId) update = { ...update, tokenId: toSet }
         if (Object.keys(update).length) updateDetailState(update);
     }
 
     const validateId = async () => {
+        if (isCollection) return;
+        if (!collection) throw new Error('Collection data not loaded or collection not selected');
         try {
             const nftInfo = await getNftInfo({ client: QueryClient, contract: collection.address, token_id: state.tokenId })
             if (nftInfo){
-                const newErrors: Partial<DetailState> = { ...errors, tokenId: 'Token ID is already in use.' }
+                const newErrors: Partial<NftDetailState> = { ...errors, tokenId: 'Token ID is already in use.' }
                 setErrors(newErrors);
             }
         } catch (err: any) {
@@ -129,17 +140,19 @@ const DetailPage: FC<{
     }
 
     useEffect(()=>{
+        if (isCollection) return;
         getDefaultId()
     },[])
 
     useEffect(()=>{
-        if (state.customId) return;
+        if (state.customId || isCollection) return;
         if (!defaultId) getDefaultId()
         else updateTokenId(defaultId);
     },[state.customId])
 
     useEffect(()=>{
-        if (state.customName) return;
+        if (state.customName || isCollection) return;
+        if (!collection) throw new Error('Collection data not loaded or collection not selected');
         if (!defaultId) getDefaultId()
         else updateDetailState({name: `${collection.collectionProfile.name || collection.cw721_name} #${defaultId}`})
     },[state.customName])
@@ -152,7 +165,7 @@ const DetailPage: FC<{
             </div>
             <form className={styles.form}>
                 <div className='d-flex flex-wrap mb24'>
-                    <Col xs={12} md={6} lg={8}>
+                    <Col xs={12} md={isCollection ? 12 : 6} lg={isCollection ? 12 : 8}>
                         <label>
                             Item Name
                             <div className='lightText10' style={{margin: '4px 8px 0 8px', minHeight: '2em', lineHeight: '100%'}}>
@@ -164,71 +177,41 @@ const DetailPage: FC<{
                                     <img alt='Alert' src='/alert.svg' style={{height:'1.5em'}} />
                                 </div>
                             }
-                            <div style={{textAlign: 'right'}}>
-                                <input type='checkbox' checked={state.customName} onChange={()=>updateDetailState({customName: !state.customName})} />Customize Name
-                            </div>
-                        </label>
-                    </Col>
-                    <Col xs={12} md={true}>
-                        <label>
-                            Token ID
-                            <div className='lightText10' style={{margin: '4px 8px 0 8px', minHeight: '2em', lineHeight: '100%'}}>
-                                Unique ID for this NFT.<br/>May only contain letters and numbers.
-                            </div>
-                            <input type='text' disabled={!state.customId} value={state.tokenId} onChange={(e)=>updateTokenId(e.target.value)} className={errors?.tokenId && styles.error}  />
-                            {!!errors?.tokenId &&
-                                <div className={styles.alert}>
-                                    <img alt='Alert' src='/alert.svg' style={{height:'1.5em'}} />
+                            {!isCollection &&
+                                <div style={{textAlign: 'right'}}>
+                                    <input type='checkbox' checked={state.customName} onChange={()=>updateDetailState({customName: !state.customName})} />Customize Name
                                 </div>
                             }
-                            <div style={{textAlign: 'right'}}>
-                                <input type='checkbox' checked={state.customId} onChange={()=>updateDetailState({customId: !state.customId})} />Customize ID
-                            </div>
                         </label>
                     </Col>
+                    {!isCollection &&
+                        <Col xs={12} md={true}>
+                            <label>
+                                Token ID
+                                <div className='lightText10' style={{margin: '4px 8px 0 8px', minHeight: '2em', lineHeight: '100%'}}>
+                                    Unique ID for this NFT.<br/>May only contain letters and numbers.
+                                </div>
+                                <input type='text' disabled={!state.customId} value={state.tokenId} onChange={(e)=>updateTokenId(e.target.value)} className={errors?.tokenId && styles.error}  />
+                                {!!errors?.tokenId &&
+                                    <div className={styles.alert}>
+                                        <img alt='Alert' src='/alert.svg' style={{height:'1.5em'}} />
+                                    </div>
+                                }
+                                    <div style={{textAlign: 'right'}}>
+                                        <input type='checkbox' checked={state.customId} onChange={()=>updateDetailState({customId: !state.customId})} />Customize ID
+                                    </div>
+                                
+                            </label>
+                        </Col>
+                    }
                 </div>
-                {/* <div className='d-flex mb24'>
-                    <Col>
-                        <label>
-                            Collection Image
-                            <label className={styles.customfileupload}>
-                                <div className='ml16'>
-                                    { state.profileImage ? state.profileImage.name : 'Select a file' }
-                                </div>
-                                <img src='/upload.svg' style={{maxHeight: '1em' }} className='mr16' />
-                                <input
-                                    type='file'
-                                    accept="image/*"
-                                    onChange={(e)=>{
-                                        if (e.target.files) updateDetailState({profileImage: e.target.files[0]})
-                                    }}
-                                />
-                            </label>
-                        </label>
-                    </Col>
-                    <Col>
-                        <label>
-                            Collection Banner
-                            <label className={styles.customfileupload}>
-                                <div className='ml16'>
-                                    { state.bannerImage ? state.bannerImage.name : 'Select a file' }
-                                </div>
-                                <img src='/upload.svg' style={{maxHeight: '1em' }} className='mr16' />
-                                <input
-                                    type='file'
-                                    accept="image/*"
-                                    onChange={(e)=>{
-                                        if (e.target.files) updateDetailState({bannerImage: e.target.files[0]})
-                                    }}
-                                />
-                            </label>
-                        </label>
-                    </Col>
-                </div> */}
                 <div className='d-flex mb24'>
                     <Col>
                         <label>
                             External Link
+                            <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
+                                Optional. A link to view the NFT on your own website.
+                            </div>
                             <input type='text' placeholder='http://' value={state.externalLink} onChange={(e)=>updateDetailState({externalLink: e.target.value})} />
                         </label>
                     </Col>
@@ -294,4 +277,4 @@ const DetailPage: FC<{
     )
 }
 
-export default DetailPage;
+export default NftDetailPage;

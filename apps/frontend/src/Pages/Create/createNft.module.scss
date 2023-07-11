@@ -1,3 +1,5 @@
+
+
 // Contains page nav and page
 .mainRow {
     display: flex;
@@ -49,6 +51,11 @@
             background: rgba(0, 0, 0, 0.08) !important;
             cursor: default !important;
             align-self: initial !important;
+        }
+
+        .unclickableBtn {
+            cursor: default !important;
+            background: #FFFFFF00 !important;
         }
     }
 }

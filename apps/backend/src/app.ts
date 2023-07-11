@@ -8,7 +8,7 @@ import morgan from 'morgan';
 import { connect, set } from 'mongoose';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { NODE_ENV, PORT, LOG_FORMAT, ORIGIN, CREDENTIALS } from '@config';
+import { NODE_ENV, PORT, LOG_FORMAT, ORIGIN, CREDENTIALS, RPC_URL } from '@config';
 import { dbConnection } from '@databases';
 import { Routes } from '@interfaces/routes.interface';
 import errorMiddleware from '@middlewares/error.middleware';
@@ -17,24 +17,106 @@ import { logger, stream } from '@utils/logger';
 import proxy from 'express-http-proxy';
 import bodyParser from 'body-parser';
 import NodeCache from 'node-cache';
+import { RawData, WebSocket } from 'ws';
+import { ensureToken } from './services/tokens.service';
 
 export const cache = new NodeCache({ stdTTL: 15 });
+
+const WS_URL = `${RPC_URL.replace(/\/$/, '').replace('https', 'wss').replace('http', 'ws')}/websocket`;
 
 class App {
   public app: express.Application;
   public env: string;
   public port: string | number;
 
+  // Tendermint RPC Websocket connection
+  public ws: WebSocket;
+  // Websocket Timeout to detect dead connection
+  public wsTimeout: any;
+
   constructor(routes: Routes[]) {
     this.app = express();
     this.env = NODE_ENV || 'development';
     this.port = PORT || 3000;
+    this.ws = new WebSocket(WS_URL);
 
     this.connectToDatabase();
     this.initializeMiddlewares();
     this.initializeRoutes(routes);
     this.initializeSwagger();
     this.initializeErrorHandling();
+
+    // Subscribe to mint events when websocket connects
+    // Will re-run when websocket is re-created
+    this.ws.on('open', function open() {
+      console.log('New Websocket Opened.');
+      const subscribe = {
+        jsonrpc: '2.0',
+        method: 'subscribe',
+        id: 0,
+        params: {
+          query: "wasm.architech_action='mint'",
+          // query: "tm.event='NewBlock'",
+        },
+      };
+      this.send(JSON.stringify(subscribe));
+      console.log('WS Subscribed.');
+    });
+
+    // Log websocket errors
+    this.ws.on('error', console.error);
+    // Resets websocket timeout. Server regularly sends pings.
+    this.ws.on('ping', this.handleWsHeartbeat);
+    // Creates new websocket when websocket closes.
+    this.ws.on('close', this.handleWsClose);
+    // Handle Websocket messages
+    this.ws.on('message', this.handleWsMessage);
+  }
+
+  public handleWsHeartbeat(data: Buffer) {
+    clearTimeout(this.wsTimeout);
+
+    // `WebSocket#terminate()` immediately destroys the connection,
+    // instead of `WebSocket#close()`, which waits for the close timer.
+    // Delay should be equal to the interval at which your server
+    // sends out pings plus a conservative assumption of the latency.
+    this.wsTimeout = setTimeout(() => {
+      console.log('Websocket expired.');
+      this.ws.terminate();
+    }, 30000 + 1000);
+  }
+
+  public handleWsClose(data: number) {
+    console.log('Websocket closed.');
+    this.ws = new WebSocket(WS_URL);
+  }
+
+  public handleWsMessage(data: RawData, isBinary: boolean) {
+    if (isBinary) {
+      console.log('WS returned binaey data???:', data);
+      return;
+    }
+
+    const object = JSON.parse(data.toString());
+    if (typeof object !== 'object') {
+      console.log('WS returned unknown data:', object);
+      return;
+    }
+
+    if (Object.keys(object.result).length) {
+      switch (object.result.query) {
+        case `wasm.architech_action='mint'`:
+          // Handle Mint
+          const recipient: string = object.result.events['wasm.recipient'][0];
+          const collectionAddress: string = object.result.events['wasm.collection'][0];
+          const mintedTokenId: string = object.result.events['wasm.token_id'][0];
+          const architechApp: string = object.result.events['wasm.architech_app'][0];
+          console.log(`Token ID ${mintedTokenId} minted for ${recipient} on collection ${collectionAddress} using app ${architechApp}!`);
+          // Todo: Update collection or ensure ensureToken updates the collection. Make sure to prevent race conditions.
+          ensureToken(collectionAddress, mintedTokenId);
+          break;
+      }
+    }
   }
 
   public listen() {

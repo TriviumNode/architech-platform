@@ -1,5 +1,5 @@
 import { prop, getModelForClass, modelOptions, mongoose, plugin, Ref, index } from '@typegoose/typegoose';
-import { CollectionProfile, cw721, CollectionModel as CollectionModelInterface } from '@architech/types';
+import { CollectionProfile, cw721, CollectionModel as CollectionModelInterface, MinterType, PaymentType, CollectionMinterI } from '@architech/types';
 import mongoosastic from 'mongoosastic';
 import { esClient } from '@/utils/elasticsearch';
 import paginate from 'mongoose-paginate-v2';
@@ -13,6 +13,48 @@ export class PaginatedModel {
     options?: PaginateOptions,
     callback?: (err: Error, result: PaginateResult<T>) => void,
   ) => Promise<PaginateResult<T>>;
+}
+
+export class CollectionMinterClass implements CollectionMinterI {
+  @prop({ type: String, required: true })
+  public minter_address: string;
+
+  @prop({ type: String, required: true })
+  public minter_type: MinterType;
+
+  @prop({ type: String, required: true })
+  public minter_admin: string;
+
+  @prop({ type: String, required: true })
+  public beneficiary: string;
+
+  @prop({ type: String, required: true })
+  public payment_type: PaymentType;
+
+  @prop({ type: String })
+  public payment_token?: string;
+
+  @prop({ type: String })
+  public payment_denom?: string;
+
+  @prop({ type: String, required: true })
+  public payment_amount: string;
+
+  // Epoch
+  @prop({ type: String })
+  public launch_time?: string;
+
+  // Epoch
+  @prop({ type: String })
+  public end_time?: string;
+
+  // Epoch
+  @prop({ type: String })
+  public whitelist_launch_time?: string;
+
+  // For copy minters
+  @prop({ type: Number })
+  public mint_limit?: number;
 }
 
 @index(
@@ -116,6 +158,9 @@ export class CollectionClass extends PaginatedModel {
 
   @prop({ type: Number, required: true, default: 0 })
   public total_views: number;
+
+  @prop()
+  public collectionMinter?: CollectionMinterClass;
 
   public createdAt?: Date;
 

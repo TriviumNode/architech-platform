@@ -108,9 +108,11 @@
     font-weight: 400;
     font-size: 14px;
     line-height: 120%;
-    color: #666666;
+    label {
+        color: #666666;
+    }
 }
-.form input {
+.form input[type=text],input:not([type]) {
     width: calc(100% - 32px);
     height: 48px;
     border: 1px solid #cfccc9;
@@ -122,7 +124,7 @@
     color: #666666;
     padding: 0 16px;
 }
-.form input:disabled {
+.form input[type=text]:disabled,input:not([type]):disabled {
     border: 1px solid #cfccc9;
     background: #cfccc9;
 }
@@ -215,4 +217,147 @@
 }
 .modalLink:hover {
     color: #666666;
+}
+
+.selectTypeCard {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    height: calc(100vh - 64px - 16px - 8px);
+    width: 100%;
+
+    .inner {
+        margin: 64px;
+        position: relative;
+        height: calc(100% - 128px);
+
+        .buttonRow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            justify-content: center;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        button {
+            padding: 24px 12px;
+            background: rgb(0,0,0,0.05);
+            color: #000;
+            // border: 1px solid rgb(0,0,0,0.05);
+            height: 100%;
+            width: 212px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.1s ease-in-out;
+            -webkit-box-shadow: 0 0 5px rgb(0,0,0,0.3);
+            box-shadow: 0 0 5px rgb(0,0,0,0.3);
+            p {
+                flex-grow: 1;
+                display: flex;
+                align-items: center;
+            }
+        }
+        button:hover {
+            background: rgb(0,0,0,0.15);
+            p {
+                color: #000;
+            }
+        }
+    }
+
+
+}
+
+
+
+
+
+// FROM NFT
+
+.alert {
+    text-align: right;
+    // width: 100%;
+    position: relative;
+    right: 8px;
+    bottom: 36px;
+    display: flex;
+    justify-content: flex-end;
+    height: 1.5em;
+}
+
+.selectAlert {
+    text-align: right;
+    // width: 100%;
+    position: relative;
+    right: 32px;
+    bottom: 36px;
+    display: flex;
+    justify-content: flex-end;
+    height: 1.5em;
+}
+
+.lightButton {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 16px;
+    
+    // width: 48px;
+    height: 48px;
+    
+    /* White/100 */
+    
+    background: #FFFFFF;
+    /* Button */
+    
+    box-shadow: 3px 9px 32px -4px rgba(0, 0, 0, 0.07);
+    border-radius: 8px;
+    border: 1px solid #DDDDDD;
+
+    font-size: 16px;
+    line-height: 150%;
+    color: #000000;
+}
+
+.error {
+    border: 2px solid rgba(250, 20, 20, 0.75) !important;
+    border-radius: 8px;
+}
+
+.spanButton {
+    font-size: 12px;
+    margin-top: 4px;
+    cursor: pointer;
+}
+
+.spanButton:hover {
+    text-decoration: underline;
+}
+
+
+input[type="datetime-local"] {
+    width: calc(100% - 32px);
+    height: 48px;
+    border: 1px solid #cfccc9;
+    border-radius: 8px;
+    margin-top: 8px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 120%;
+    color: #666666;
+    padding: 0 16px;
+}
+
+.reviewBox {
+    gap: 8px;
+    h6,h5,h4 {
+        font-family: 'TWK Everett' !important
+    }
 }

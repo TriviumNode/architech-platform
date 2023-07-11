@@ -1,13 +1,17 @@
 import { HttpException } from '@exceptions/HttpException';
-import collectionsModel from '@models/collections.model';
+import collectionsModel, { CollectionClass, CollectionMinterClass } from '@models/collections.model';
+
 import { isEmpty } from '@utils/util';
-import { queryClient as client, queryClient } from '@/utils/chainClients';
+import { isContract, queryClient as client, queryClient } from '@/utils/chainClients';
+
 import equal from 'fast-deep-equal';
 import { findCollectionTokenCount, processCollectionTokens, processCollectionTraits } from './tokens.service';
-import { Collection, GetCollectionResponse } from '@architech/types';
+import { Collection, CollectionMinterI, copyMinter, GetCollectionResponse, minter, User } from '@architech/types';
+
 import { CreateCollectionData } from '@/interfaces/collections.interface';
 import CollectionModel from '@models/collections.model';
-import { getAllTokens, getCollectionDossier, getContractInfo, getNftInfo, getNumTokens, resolveIpfs } from '@architech/lib';
+import { ADMINS, getAllTokens, getCollectionDossier, getConfig, getContractInfo, getNftInfo, getNumTokens, resolveIpfs } from '@architech/lib';
+
 import { ImportCollectionBodyDto } from '@/dtos/collections.dto';
 import { isArray, isBoolean } from 'class-validator';
 import fetch from 'node-fetch';
@@ -15,6 +19,9 @@ import { hashBuffer, saveBuffer } from '@/middlewares/fileUploadMiddleware';
 import mime from 'mime-types';
 import mongoose from 'mongoose';
 import { MARKETPLACE_ADDRESS } from '@/config';
+
+const removeNullUndefined = (obj: any) => Object.entries(obj).reduce((a, [k, v]) => (v == null ? a : ((a[k] = v), a)), {});
+const removeId = (obj: any) => Object.entries(obj).reduce((a, [k, v]) => (k == '_id' ? a : ((a[k] = v), a)), {});
 
 export const getFullCollection = async (collectionAddress: string): Promise<GetCollectionResponse> => {
   const collectionData: Collection = await CollectionModel.findOne({ address: collectionAddress });
@@ -35,7 +42,7 @@ export const getFullCollection = async (collectionAddress: string): Promise<GetC
 
 export async function findCollectionByAddress(address: string): Promise<Collection> {
   if (isEmpty(address)) throw new HttpException(400, 'Contract address is empty');
-  const findCollection: Collection = await collectionsModel.findOne({ address: address });
+  const findCollection: Collection = await collectionsModel.findOne({ address: address }).lean();
   if (!findCollection) throw new HttpException(404, 'Collection not found');
 
   return findCollection;
@@ -66,7 +73,7 @@ export async function updateCollection(collectionId: mongoose.Types.ObjectId, co
     collectionData.collectionProfile = { ...findCollection.collectionProfile, ...collectionData.collectionProfile };
   }
 
-  const updateCollectionById: Collection = await collectionsModel.findByIdAndUpdate(collectionId, collectionData);
+  const updateCollectionById: Collection = await collectionsModel.findByIdAndUpdate(collectionId, collectionData, { new: true });
   if (!updateCollectionById) throw new HttpException(404, 'Collection not found');
 
   return updateCollectionById;
@@ -121,22 +128,28 @@ export const refreshCollection = async (contract: string) => {
 
   // Query collection info from chain
   const numTokens = await getNumTokens({ client, contract });
-  const { admin } = await client.getContract(contract);
+  const { admin, creator } = await client.getContract(contract);
 
   // Get processed tokens from DB
   const processedTokens = await findCollectionTokenCount(contract);
   console.log('Processed Tokens', processedTokens);
+
+  // Check for minter info
+  const { minter, actual_creator } = await getMinterInfo(creator);
+  const cleanNew = removeNullUndefined(minter);
+  const cleanOld = removeId(removeNullUndefined(knownCollectionData.collectionMinter));
 
   // Check if update is needed
   if (
     !equal(knownCollectionData.totalTokens, numTokens) ||
     !equal(knownCollectionData.admin, admin) ||
     !equal(knownCollectionData.totalTokens, knownCollectionData.tokenIds.length) ||
+    !equal(cleanOld, cleanNew) ||
     knownCollectionData.tokenIds.length < numTokens ||
     processedTokens < numTokens ||
     !knownCollectionData.collectionProfile.profile_image
   ) {
-    console.log('Refreshing!');
+    console.log('Refreshing Collection!');
 
     // ensure pfp
     let pfp = knownCollectionData.collectionProfile.profile_image;
@@ -154,6 +167,7 @@ export const refreshCollection = async (contract: string) => {
       collectionProfile: {
         profile_image: pfp,
       },
+      collectionMinter: minter,
     };
     const updatedCollection = await updateCollection(knownCollectionData._id, updateData);
 
@@ -168,12 +182,14 @@ export const refreshCollection = async (contract: string) => {
   }
 
   // Return what we already know if nothing else was returned
+  console.log('No Refresh needed. Returning DB Collection.');
   return knownCollectionData;
 };
 
 export const importCollection = async (
   contractAddress: string,
   importBody: ImportCollectionBodyDto,
+  user: User,
   profile_image?: string,
   banner_image?: string,
 ) => {
@@ -186,6 +202,22 @@ export const importCollection = async (
   const { admin, creator } = await client.getContract(contractAddress);
   const tokenIdList = await getAllTokens({ client, contract: contractAddress });
   console.log('cw721 stuff', { cw721_name, cw721_symbol, admin, creator, tokenIdList });
+
+  // Check if there is an Architech minter contract for this collection
+  // let minter: CollectionMinterClass;
+  // let actual_creator = creator;
+  const minterResponse = await getMinterInfo(creator);
+
+  // Only allow creator to import
+  if (
+    user.address !== admin &&
+    user.address !== creator &&
+    user.address !== minterResponse?.minter?.beneficiary &&
+    user.address !== minterResponse?.minter?.minter_admin &&
+    // Allow Architech admins to import anything
+    !ADMINS.includes(user.address)
+  )
+    throw new HttpException(403, 'Collections can only be imported by the collection creator or admin.');
 
   // Ensure profile image
   if (!profile_image) {
@@ -222,7 +254,7 @@ export const importCollection = async (
     admin: admin,
     cw721_name,
     cw721_symbol,
-    creator: creator,
+    creator: minterResponse?.actual_creator || creator,
     collectionProfile: {
       name: importBody.name || cw721_name,
       description: importBody.description,
@@ -240,6 +272,7 @@ export const importCollection = async (
     uniqueTraits: 0,
     hidden: hidden,
     tokenIds: tokenIdList,
+    collectionMinter: minterResponse?.minter,
   };
   console.log('collectionProfile', newCollection.collectionProfile);
   const result = await createCollection(newCollection);
@@ -273,5 +306,75 @@ const getEnsuredPfp = async (collection: string, tokenList: string[]) => {
     return fileName;
   } catch (err) {
     console.error('Failed to ensure PFP', err);
+  }
+};
+
+const getMinterInfo = async (creator: string) => {
+  if (isContract(creator)) {
+    try {
+      // This query will fail allowing us to identify the contract
+      const invalidQuery = {
+        show_me_some_identification: {},
+      };
+      await queryClient.queryContractSmart(creator, invalidQuery);
+    } catch (e) {
+      // Extract the QueryMsg enum including package name
+      const LOOKFOR = 'Error parsing into type ';
+      const LOOKFOR2 = ': unknown variant';
+
+      if (e.toString().includes(LOOKFOR)) {
+        const index = e.toString().indexOf(LOOKFOR);
+        const index2 = e.toString().indexOf(LOOKFOR2);
+        const subStr = e.toString().slice(index + LOOKFOR.length, index2);
+
+        // Handle random minter
+        if (subStr === 'random_minter::msg::QueryMsg') {
+          // Get minter config
+          const { config }: { config: minter.Config } = await getConfig({ client: queryClient, contract: creator });
+
+          // Set minter data
+          const minter: CollectionMinterClass = {
+            minter_address: creator,
+            minter_type: 'RANDOM',
+            minter_admin: config.admin,
+            beneficiary: config.beneficiary,
+            launch_time: config.launch_time,
+            whitelist_launch_time: config.whitelist_limit_time,
+            //@ts-expect-error idk
+            payment_type: config.price.native_payment ? 'NATIVE' : 'CW20',
+            //@ts-expect-error idk
+            payment_denom: config.price.native_payment?.denom,
+            //@ts-expect-error idk
+            payment_token: config.price.cw20_payment?.token,
+            //@ts-expect-error idk
+            payment_amount: config.price.native_payment?.amount || config.price.cw20_payment?.amount,
+          };
+          const actual_creator = config.admin;
+          return { minter, actual_creator };
+        }
+
+        // Handle copy minter
+        else if (subStr === 'copy_minter::msg::QueryMsg') {
+          // // Get minter config
+          // const { config }: { config: copyMinter.Config } = await getConfig({ client: queryClient, contract: creator });
+          // // Set minter data
+          // minter = {
+          //   minter_address: creator,
+          //   minter_type: 'COPY',
+          //   minter_admin: config.admin,
+          //   beneficiary: config.beneficiary,
+          //   launch_time: config.launch_time,
+          //   end_time: config.end_time,
+          //   //@ts-expect-error idk
+          //   payment_type: config.price.native_payment ? 'NATIVE' : 'CW20',
+          //   //@ts-expect-error idk
+          //   payment_denom: config.price.native_payment?.denom,
+          //   //@ts-expect-error idk
+          //   payment_token: config.price.cw20_payment?.token,
+          // };
+        }
+      }
+    }
+    return { minter: undefined, actual_creator: creator };
   }
 };

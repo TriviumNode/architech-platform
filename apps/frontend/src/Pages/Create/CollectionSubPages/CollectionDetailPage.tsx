@@ -2,11 +2,11 @@ import { CATEGORIES } from "@architech/lib";
 import { FC, ReactElement, useState } from "react";
 import { Col } from "react-bootstrap";
 import { toast } from "react-toastify";
-import MultiSelect from "../../Components/MultiSelect";
+import MultiSelect from "../../../Components/MultiSelect";
 //@ts-expect-error
 import { Switch } from 'react-switch-input';
 
-import styles from './create.module.scss'
+import styles from '../create.module.scss'
 
 export interface DetailState {
     name: string,
@@ -26,7 +26,7 @@ export const DefaultDetailState: DetailState = {
     hidden: true,
 }
 
-const DetailPage: FC<{
+const CollectionDetailPage: FC<{
     state: DetailState,
     current: DetailState,
     isEditing?: boolean,
@@ -185,4 +185,4 @@ const DetailPage: FC<{
     )
 }
 
-export default DetailPage;
+export default CollectionDetailPage;
