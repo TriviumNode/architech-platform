@@ -79,8 +79,11 @@ const Home: FC<any> = (): ReactElement => {
                     </div>
                 </div>
             </Col>
-             <Col className={'card'} style={{background: 'url(/newsletter.png)', backgroundPosition: 'center', minHeight: '220px'}}>
+             {/* <Col className={'card'} style={{background: 'url(/home/cat.jpg)', backgroundPosition: 'center' minHeight: '220px'}}>
                 &nbsp;
+            </Col> */}
+            <Col className={'card'} style={{maxHeight: '220px'}}>
+                <img alt='' src='/home/cat4.jpg' className='imgCover wide tall' />
             </Col>
         </div>
         </>
