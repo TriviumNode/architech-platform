@@ -1,0 +1,47 @@
+.selectWalletContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .walletTile {
+        display: flex;
+        flex-direction: column;
+        // align-content: stretch;
+        align-content: flex-end;
+    
+        button {
+            // flex-grow: 1;
+            background: rgb(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            height: fit-content;
+            padding: 12px;
+            gap: 24px;
+            color: #333;
+            transition: all 0.2s ease-in-out;
+
+            img {
+                height: 64px;
+            }
+        }
+        button:disabled {
+            background: rgb(0,0,0,0.5) !important;
+            color: #333 !important;
+        }
+        button:hover {
+            color: #111;
+            background: rgb(0,0,0,0.3);
+        }
+
+        a {
+            width: fit-content;
+            align-self: flex-end;
+            color: #444;
+            font-size: 12px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    }
+}   
+

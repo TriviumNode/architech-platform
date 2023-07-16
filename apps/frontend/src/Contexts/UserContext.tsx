@@ -12,11 +12,13 @@ import { toast } from 'react-toastify';
 import { checkLogin, getUserProfile, requestNonce, walletLogin } from '../Utils/backend';
 import { Coin, Pubkey } from '@cosmjs/amino';
 import { Row, Col } from 'react-bootstrap';
-import Modal from '../Components/Modal';
 import Loader from '../Components/Loader';
 import { denomToHuman, getCreditBalance, getRewards } from '@architech/lib';
 import { GetUserProfileResponse } from '@architech/types';
 import { CREDIT_ADDRESS } from '../Utils/queryClient';
+import ModalV2 from '../Components/ModalV2';
+
+import styles from './WalletModal.module.scss';
 
 interface Props {
   children: ReactNode;
@@ -42,9 +44,8 @@ interface Balances {
 export interface UserContextState {
   user: User | undefined;
   balances: Balances | undefined;
-  loadingConnectWallet: boolean
-  // authenticated: boolean;
-  connectKeplr: (()=>Promise<void>)
+  walletStatus: STATUS;
+  connectWallet: (()=>void)
   refreshProfile: (()=>Promise<void>)
 }
 
@@ -52,10 +53,9 @@ const whatever = async() => {}
 
 // created context with no default values
 const UserContext = createContext<UserContextState>({
-  loadingConnectWallet: false,
-  // authenticated: false,
+  walletStatus: 'DISCONNECTED',
   balances: undefined,
-  connectKeplr: whatever,
+  connectWallet: whatever,
   refreshProfile: whatever,
   user: undefined,
 });
@@ -64,12 +64,12 @@ const KEY = 'KEPLR_CONNECTED_ARCHITECH';
 
 const connectedKeplr = localStorage.getItem(KEY);
 
+type STATUS = 'DISCONNECTED' | 'SELECT' | 'LOADING_CONNECT' | 'LOADING_SIG' | 'LOADING_LOGIN' | 'CONNECTED' | 'ERROR'
+
 export const UserProvider = ({ children }: Props): ReactElement => {
   const [user, setUser] = useState<User>();
-  const [loadingConnectWallet, setLoadingConnectWallet] = useState<boolean>(false);
-  // const [authenticated, setAuthenticated] = useState<boolean>(false);
-  const [waitingForSig, setWaitingForSig] = useState(false);
   const [balances, setBalances] = useState<Balances>();
+  const [walletStatus, setWalletStatus] = useState<STATUS>('DISCONNECTED');
 
 
   // useEffect(()=>{   
@@ -127,9 +127,13 @@ export const UserProvider = ({ children }: Props): ReactElement => {
 
   }
 
+  const connectWallet = () => {
+    setWalletStatus('SELECT')
+  }
+
   const connectKeplr = async () => {
     try {
-      setLoadingConnectWallet(true);
+      setWalletStatus('LOADING_CONNECT');
       const { client, address, pubKey } = await connectKeplrWallet();
       getBalances(client, address)
 
@@ -142,15 +146,18 @@ export const UserProvider = ({ children }: Props): ReactElement => {
         const response = await checkLogin(address);
         const newUser: User = {client, address, pubKey, wallet_type: 'Keplr', profile: response}
         setUser(newUser)
+        setWalletStatus('CONNECTED');
         localStorage.setItem(KEY, 'true');
         return;
       } catch (err: any){ }
+
+      // Try Login with Architech
       try {
         const nonceResponse = await requestNonce(address, pubKey)
 
-        setWaitingForSig(true);
+        setWalletStatus('LOADING_SIG');
         const signResult = await signLoginPermit(nonceResponse.nonce, address)
-        setWaitingForSig(false);
+        setWalletStatus('LOADING_LOGIN');
 
 
         const loginResult = await walletLogin(JSON.stringify(signResult.pub_key), signResult.signature)
@@ -159,10 +166,11 @@ export const UserProvider = ({ children }: Props): ReactElement => {
 
         setUser(newUser)
         localStorage.setItem(KEY, 'true');
+        setWalletStatus('CONNECTED');
+
       }catch(err: any){
-        toast.error(err.message);
-      } finally {
-        setWaitingForSig(false);
+        toast.error(err.message); 
+        setWalletStatus('DISCONNECTED');
       }
     } catch(err: any){
       switch(err.message){
@@ -177,7 +185,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
           break;
       }
     }
-    setLoadingConnectWallet(false);
+    setWalletStatus('DISCONNECTED');
   }
 
   const refreshProfile = async() => {
@@ -187,25 +195,92 @@ export const UserProvider = ({ children }: Props): ReactElement => {
     setUser(newUser)
   }
 
-  const values = {
+  const values: UserContextState = {
     user,
     balances,
-    loadingConnectWallet,
-    // authenticated,
-    connectKeplr,
+    walletStatus,
+    connectWallet,
     refreshProfile
   };
 
+  const LoadingModal = ({msg}: {msg: string}) =>
+    <Row className="px-4 pt-4">
+      <Col style={{textAlign: 'center'}}>
+        {msg}<br />
+        <Loader />
+      </Col>
+    </Row>
+
+  const modalContent = () => {
+    switch(walletStatus){
+      case 'SELECT':
+        return (
+          <div className={styles.selectWalletContainer}>
+            <Col className={styles.walletTile}>
+              <button onClick={()=>connectKeplr()} disabled={typeof window.keplr === "undefined"}>
+                <img src='/images/wallets/keplr.png' />
+                <div>
+                  <h2>Keplr</h2>
+                </div>
+              </button>
+              { typeof window.keplr === "undefined" ?
+                <a href='https://www.keplr.app/download'>Get Keplr Wallet</a> : <div style={{height: '1em'}} />
+              }
+            </Col>
+
+            <Col className={styles.walletTile}>
+              {/* @ts-expect-error */}
+              <button onClick={()=>connectKeplr()} disabled={typeof window.archx === "undefined"}>
+                <img src='/images/wallets/archx.svg' />
+                <div>
+                  <h2>ArchX</h2>
+                </div>
+              </button>
+              {/* @ts-expect-error */}
+              { typeof window.archx === "undefined" ?
+                <a href='https://example.com'>Get ArchX Wallet</a> : <div style={{height: '1em'}} />
+              }
+            </Col>
+            <Col className={styles.walletTile}>
+              {/* @ts-expect-error */}
+              <button onClick={()=>connectKeplr()} disabled={typeof window.leap === "undefined"}>
+                <img src='/images/wallets/leap.svg' />
+                <div>
+                  <h2>Leap Wallet</h2>
+                </div>
+              </button>
+              {/* @ts-expect-error */}
+              { typeof window.leap === "undefined" ?
+                <a href='https://www.leapwallet.io/download'>Get Leap Wallet</a> : <div style={{height: '1em'}} />
+              }
+            </Col>
+          </div>
+        )
+      case 'LOADING_SIG':
+        return (
+          <LoadingModal msg='Please sign the permit with your wallet' />
+        )
+      case 'LOADING_CONNECT':
+        return (
+          <LoadingModal msg='Please allow the connection with your wallet' />
+        )
+      case 'LOADING_LOGIN':
+        return (
+          <LoadingModal msg='Authenticating your wallet with Architech' />
+        )
+    }
+  }
+
   // add values to provider to reach them out from another component
   return <UserContext.Provider value={values}>
-          <Modal open={waitingForSig} locked={true} onClose={()=>{}} >
-            <Row className="px-4 pt-4">
-              <Col style={{textAlign: 'center'}}>
-                Please sign the permit with your wallet.<br />
-                <Loader />
-              </Col>
-            </Row>
-        </Modal>
+          <ModalV2
+            open={walletStatus !== 'CONNECTED' && walletStatus !== 'DISCONNECTED' }
+            locked={true}
+            onClose={()=>{}}
+            title='Connect Wallet'
+          >
+            {modalContent()}
+        </ModalV2>
     {children}</UserContext.Provider>;
 };
 

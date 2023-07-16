@@ -14,7 +14,7 @@ interface HoverMenuProps {
 
 export default function ProfileMenu(props: HoverMenuProps) {
   let { content } = props;
-  const {user, balances, loadingConnectWallet} = useUser()
+  const {user, balances} = useUser()
 
   let [isOverButton, setIsOverButton] = useState(false);
   let [isOverList, setIsOverList] = useState(false);

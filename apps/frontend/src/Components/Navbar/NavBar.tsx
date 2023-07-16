@@ -66,7 +66,7 @@ export const BurgerMenu = ({page, open, handleClose}:{page: HeaderPage, open: bo
 }
 
 const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
-  const {user, balances, connectKeplr, loadingConnectWallet} = useUser()
+  const {user, balances, connectWallet, walletStatus} = useUser()
   const location = useLocation();
 
   const page: HeaderPage =
@@ -76,12 +76,12 @@ const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
 
   const handleConnect = async (e: any) => {
     e.preventDefault();
-    if (!connectKeplr) throw new Error("wot")
-    await connectKeplr()
+    if (!connectWallet) throw new Error("wot")
+    connectWallet()
   }
   const handleWalletButton = async(e: any) => {
     e.preventDefault();
-    if (!user) await connectKeplr()
+    if (!user) await connectWallet()
     else openMenu();
   }
 
@@ -125,7 +125,7 @@ const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
                 </div>
               } />
             :
-              <button onClick={handleConnect} disabled={loadingConnectWallet} className={styles.walletButton}>Connect Wallet</button>
+              <button onClick={handleConnect} disabled={walletStatus !== 'DISCONNECTED'} className={styles.walletButton}>Connect Wallet</button>
             }
           </div>
         </div>
