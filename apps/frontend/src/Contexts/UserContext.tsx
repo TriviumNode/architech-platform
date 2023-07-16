@@ -238,7 +238,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
               </button>
               {/* @ts-expect-error */}
               { typeof window.archx === "undefined" ?
-                <a href='https://example.com'>Get ArchX Wallet</a> : <div style={{height: '1em'}} />
+                <a href='https://archx.io'>Get ArchX Wallet</a> : <div style={{height: '1em'}} />
               }
             </Col>
             <Col className={styles.walletTile}>
