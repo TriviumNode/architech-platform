@@ -25,10 +25,11 @@ const TrendingRow: FC<
     <Link to={`/nfts/${result.collection.address}`}
         style={{
             display: 'flex',
+            gap: '16px'
         }}
         className='wide'
     >
-        <Col xs={8}>
+        <Col xs={true}>
             <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
                 <PlaceholdImg
                     alt=''
@@ -47,10 +48,10 @@ const TrendingRow: FC<
                 </div>
             </div>
         </Col>
-        <Col xs={2} className='d-flex flex-column justify-content-center' style={{textAlign: 'center'}}>
+        <Col xs={'auto'} className='d-flex flex-column justify-content-center' style={{textAlign: 'center'}}>
             <span>{floor || '--'}&nbsp;<ArchDenom /></span>
         </Col>
-        <Col xs={2} className='d-flex flex-column justify-content-center' style={{textAlign: 'center'}}>
+        <Col xs={'auto'} className='d-flex flex-column justify-content-center' style={{textAlign: 'center'}}>
             <span>{humanVolume ? parseFloat(humanVolume.toFixed(2)) : '--'}&nbsp;<ArchDenom /></span>
         </Col>
     </Link>

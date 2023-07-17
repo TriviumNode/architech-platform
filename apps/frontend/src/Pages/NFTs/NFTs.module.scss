@@ -45,7 +45,8 @@
 }
 @media (max-width: 575.98px) {
     .trendingCard {
-        width: calc(100% - 64px) !important;
+        width: calc(100% - 32px) !important;
+        padding: 16px !important;
         flex: 0 0 auto !important;
     }
 }

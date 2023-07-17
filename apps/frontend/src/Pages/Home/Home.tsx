@@ -54,12 +54,12 @@ const Home: FC<any> = (): ReactElement => {
         </div>
         <div className={styles.trendingRow}>
             <Col xs={12} md={6} className={styles.trendingCol}>
-                <div style={{margin: '48px'}}>
+                <div className={styles.trendingInternal}>
                     <TrendingCard />
                 </div>
             </Col>
             <Col className={styles.trendingCol}>
-                <div style={{margin: '48px'}}>
+                <div className={styles.trendingInternal}>
                     <LatestListingsCard />
                 </div>
             </Col>
