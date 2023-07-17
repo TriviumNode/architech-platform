@@ -28,7 +28,7 @@ export const upload = multer({
     files: 2,
   },
   fileFilter: function (req, file, callback) {
-    const ext = path.extname(file.originalname);
+    const ext = path.extname(file.originalname).toLowerCase();
     if (ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg' && ext !== '.svg' && ext !== '.webp') {
       return callback(new HttpException(400, `Only images are allowed. Got: ${ext}`));
     }
@@ -40,11 +40,11 @@ export const upload5mb = multer({
   storage: memStorage,
   limits: {
     // fieldNameSize: 255,
-    fileSize: 5 * 1000000, //~3mb
+    fileSize: 5 * 1000000, //~5mb
     files: 2,
   },
   fileFilter: function (req, file, callback) {
-    const ext = path.extname(file.originalname);
+    const ext = path.extname(file.originalname).toLowerCase();
     if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg' && ext !== '.svg' && ext !== '.webp') {
       return callback(new HttpException(400, `Only images are allowed. Got: ${ext}`));
     }
