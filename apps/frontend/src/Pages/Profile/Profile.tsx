@@ -123,7 +123,7 @@ const ProfilePage: FC<any> = (): ReactElement => {
                     <Col
                         xs={12}
                         md={true}
-                        className='card'
+                        className={`card ${styles.profileCard}`}
                         style={{
                             position: 'relative',
                             // ...bgStyle,
