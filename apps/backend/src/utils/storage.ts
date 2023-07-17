@@ -2,6 +2,7 @@ import multer from 'multer';
 import path from 'path';
 import crypto from 'crypto';
 import fs from 'fs';
+import { HttpException } from '@/exceptions/HttpException';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -29,7 +30,7 @@ export const upload = multer({
   fileFilter: function (req, file, callback) {
     const ext = path.extname(file.originalname);
     if (ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg' && ext !== '.svg' && ext !== '.webp') {
-      return callback(new Error('Only images are allowed'));
+      return callback(new HttpException(400, `Only images are allowed. Got: ${ext}`));
     }
     callback(null, true);
   },
@@ -45,7 +46,7 @@ export const upload5mb = multer({
   fileFilter: function (req, file, callback) {
     const ext = path.extname(file.originalname);
     if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg' && ext !== '.svg' && ext !== '.webp') {
-      return callback(new Error('Only images are allowed'));
+      return callback(new HttpException(400, `Only images are allowed. Got: ${ext}`));
     }
     callback(null, true);
   },
