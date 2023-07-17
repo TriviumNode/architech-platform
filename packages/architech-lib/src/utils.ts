@@ -29,6 +29,13 @@ export const humanToDenom = (amount: number | string, decimals: number): string 
     return denomAmount.toFixed();
 }
 
+export const calculateFee = (amount: number | string, fee: number): string => {
+    amount = parseFloat(amount.toString());
+    const result = amount * fee
+    const feeAmount = BigNumber(result)
+    return feeAmount.toFixed();
+}
+
 export const findFloor = (asks: marketplace.Ask[], decimals: number) => {
     const floor: string = asks &&
         asks.length ?
