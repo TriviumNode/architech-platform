@@ -25,13 +25,15 @@ export const DENOMS: Denom[] = [
         nativeDenom: 'aconst',
         decimals: 18,
         displayDenom: 'CONST',
-        image: 'arch.svg'
+        image: 'arch.svg',
+        coingeckoId: 'archway',
     },
     {
         nativeDenom: 'aarch',
         decimals: 18,
         displayDenom: 'ARCH',
-        image: 'arch.svg'
+        image: 'arch.svg',
+        coingeckoId: 'archway',
     },
 ]
 

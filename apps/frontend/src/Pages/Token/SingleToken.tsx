@@ -27,19 +27,25 @@ import styles from './singletoken.module.scss';
 
 type Trait = cw721.Trait;
 
+type Prices = {
+  denom: Denom;
+  displayAmount: string;
+  displayUsd: string;
+}
+
 const SingleToken: FC<any> = (): ReactElement => {
     const { token: tokenResponse, collection: fullCollection } = useLoaderData() as { token: GetTokenResponse, collection: GetCollectionResponse};
     const collection = fullCollection?.collection;
 
     const [isListing, setIsListing] = useState(false);
     const [loadingTx, setLoadingTx] = useState(false);
+    const [prices, setPrices] = useState<Prices>();
 
     const [activeItem, setActiveItem] = useState('item1')
 
     const { user, refreshProfile } = useUser()
     const revalidator = useRevalidator()
 
-    console.log('tokenResponse', tokenResponse)
     const isFavorite = !user ? false :
       !user.profile.favorites.length ? false :
       (user.profile.favorites.findIndex(f=>f.token._id === tokenResponse.token._id)) > -1 ? true : false;
@@ -108,28 +114,39 @@ const SingleToken: FC<any> = (): ReactElement => {
       }
     }
 
-    let saleAmount: string = '--';
-    let usdAmount: string = '--';
-    let saleDenom: Denom = unknownDenom;
-    if (tokenResponse?.ask) {
-      if (tokenResponse.ask.cw20_contract) {
-        const denom = findToken(tokenResponse.ask.cw20_contract);
-        if (denom) {
-          saleDenom = denom;
-          const num = denomToHuman(tokenResponse.ask.price, denom.decimals)
-          saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
-          usdAmount = getPrice(saleDenom.displayDenom, num).toLocaleString("en-US", { maximumFractionDigits: 2 });
-        }
-      } else {
-        const denom = findDenom(process.env.REACT_APP_NETWORK_DENOM);
-        if (denom) {
-          saleDenom = denom;
-          const num = denomToHuman(tokenResponse.ask.price, denom.decimals)
-          saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
-          usdAmount = getPrice(saleDenom.displayDenom, num).toLocaleString("en-US", { maximumFractionDigits: 2 });
+    const calculatePrices = async () => {
+      let saleAmount: string = '--';
+      let usdAmount: string = '--';
+      let saleDenom: Denom = unknownDenom;
+      if (tokenResponse?.ask) {
+        if (tokenResponse.ask.cw20_contract) {
+          const denom = findToken(tokenResponse.ask.cw20_contract);
+          if (denom) {
+            saleDenom = denom;
+            const num = denomToHuman(tokenResponse.ask.price, denom.decimals)
+            saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+            usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+          }
+        } else {
+          const denom = findDenom(process.env.REACT_APP_NETWORK_DENOM);
+          if (denom) {
+            saleDenom = denom;
+            const num = denomToHuman(tokenResponse.ask.price, denom.decimals)
+            saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+            usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+          }
         }
       }
+      setPrices({
+        denom: saleDenom,
+        displayAmount: saleAmount,
+        displayUsd: usdAmount,
+      })
     }
+
+    useEffect(()=>{
+      calculatePrices()
+    },[])
 
     if (!tokenResponse || !collection)
         return (
@@ -277,10 +294,16 @@ const SingleToken: FC<any> = (): ReactElement => {
             <div className='d-flex align-items-center' style={{gap: '24px'}}>
               { tokenResponse.ask ? 
               <>
+                {prices ? 
                 <div>
-                  <div style={{fontSize: '28px'}}>{saleAmount.toString()} <DenomImg denom={saleDenom} size='medium' /></div>
-                  <div className='lightText12'>~ ${usdAmount}</div>
+                  <div style={{fontSize: '28px'}}>{prices.displayAmount} <DenomImg denom={prices.denom} size='medium' /></div>
+                  <div className='lightText12'>~ ${prices.displayUsd}</div>
                 </div>
+                :
+                <div>
+                  <Loader />
+                </div>
+                }
                 {
                   tokenResponse.token.owner === user?.address ? 
                     <button disabled={loadingTx} type='button' onClick={handleCancel}>Cancel Listing{loadingTx && <>&nbsp;<SmallLoader /></>}</button>

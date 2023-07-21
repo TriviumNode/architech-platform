@@ -4,4 +4,5 @@ export interface Denom {
     decimals: number;
     displayDenom: string;
     image: string;
+    coingeckoId?: string;
 }
