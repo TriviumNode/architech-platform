@@ -1,10 +1,4 @@
-import { mintNft } from "@architech/lib";
-import { FC, ReactElement, useState } from "react";
-import { Row } from "react-bootstrap";
-import { useUser } from "../../Contexts/UserContext";
-import DetailPage, { DetailState, DefaultDetailState } from "../../Pages/CreateNft/NftDetailPage";
-import ImagePage from "../../Pages/CreateNft/NftImagePage";
-import ReviewNftPage from "../../Pages/CreateNft/ReviewPage";
+import { FC, ReactElement } from "react";
 import styles from './PageSelector.module.scss'
 
 interface Props {

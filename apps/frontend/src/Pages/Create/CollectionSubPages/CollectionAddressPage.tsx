@@ -1,7 +1,7 @@
 import { FC, ReactElement, useState } from "react";
 import { Col } from "react-bootstrap";
 
-import styles from './create.module.scss'
+import styles from '../create.module.scss'
 
 export interface State {
     address: string;

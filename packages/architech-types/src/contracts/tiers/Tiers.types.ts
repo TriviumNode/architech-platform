@@ -26,7 +26,6 @@ export interface FeeStructure {
   pay_token_addr: Addr;
   premium_arch_id_cost: Uint128;
   premium_partner_cost: Uint128;
-  royalty_customization_cost: Uint128;
   [k: string]: unknown;
 }
 export interface Cw20ReceiveMsg {
@@ -63,8 +62,7 @@ export interface Plan {
 }
 export interface Tier {
   arch_id_lvl: ArchIDLevel;
-  custom_royalties: boolean;
-  devenue_control: boolean;
+  dao_devenue_control: boolean;
   partner_lvl: PartnerLevel;
   [k: string]: unknown;
 }

@@ -1,4 +1,4 @@
-// Main Container Stuff //
+
 
 // Contains page nav and page
 .mainRow {
@@ -71,12 +71,12 @@
             .navLinks {
                 flex-direction: row !important;
                 align-items: center;
-                margin-left: auto;
+                flex-wrap: wrap;
             }
 
             h2 {
                 margin-bottom: 0;
-                // margin-right: auto;
+                margin-right: auto;
             }
         }
     }
@@ -86,14 +86,14 @@
     .navCard {
         .navCardInner {
             
-            margin: 24px 24px 8px 24px;
+            margin: 8px;
             .navLinks {
                 width: 100%;
                 justify-content: center;
             }
 
             h2 {
-                margin-bottom: 16px;
+                margin: 8px 0 16px 12px;
                 // margin-right: auto;
             }
         }
@@ -101,30 +101,23 @@
 }
 
 
-
-
-// Stuff for individual pages
 .form {
     font-weight: 400;
     font-size: 14px;
     line-height: 120%;
     color: #666666;
 }
-.form input {
+.form input[type=text],input:not([type]) {
     width: calc(100% - 32px);
     height: 48px;
     border: 1px solid #cfccc9;
     border-radius: 8px;
-    margin-top: 8px;
+    // margin-top: 8px;
     font-weight: 400;
     font-size: 14px;
     line-height: 120%;
     color: #666666;
     padding: 0 16px;
-}
-.form input:disabled {
-    border: 1px solid #cfccc9;
-    background: #cfccc9;
 }
 .form textarea {
     width: calc(100% - 32px);
@@ -194,25 +187,63 @@
     bottom: 32px;
 }
 
-.saveToast {
-    border-radius: 8px;
-    padding: 8px;
-    background: rgba(0, 0, 0, 0.20);
-    backdrop-filter: blur(12px);
-    color: #000;
-    width: auto;
+.alert {
+    text-align: right;
+    // width: 100%;
+    position: relative;
+    right: 8px;
+    bottom: 36px;
     display: flex;
+    justify-content: flex-end;
+    height: 1.5em;
+}
+
+.selectAlert {
+    text-align: right;
+    // width: 100%;
+    position: relative;
+    right: 32px;
+    bottom: 36px;
+    display: flex;
+    justify-content: flex-end;
+    height: 1.5em;
+}
+
+.lightButton {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    position: fixed;
-    left: 50%;
-    transform: translate(-50%, 0);
-    bottom: 32px
+    padding: 0px 16px;
+    
+    // width: 48px;
+    height: 48px;
+    
+    /* White/100 */
+    
+    background: #FFFFFF;
+    /* Button */
+    
+    box-shadow: 3px 9px 32px -4px rgba(0, 0, 0, 0.07);
+    border-radius: 8px;
+    border: 1px solid #DDDDDD;
+
+    font-size: 16px;
+    line-height: 150%;
+    color: #000000;
 }
 
+.error {
+    border: 2px solid rgba(250, 20, 20, 0.75) !important;
+    border-radius: 8px;
+}
 
-.modalLink {
+.spanButton {
+    font-size: 12px;
+    margin-top: 4px;
+    cursor: pointer;
+}
+
+.spanButton:hover {
     text-decoration: underline;
-}
-.modalLink:hover {
-    color: #666666;
 }

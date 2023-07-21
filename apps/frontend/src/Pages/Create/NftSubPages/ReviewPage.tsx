@@ -1,11 +1,7 @@
-import { CATEGORIES } from "@architech/lib";
 import { FC, ReactElement } from "react";
 import { Col } from "react-bootstrap";
-import MultiSelect from "../../Components/MultiSelect";
-//@ts-expect-error
-import { Switch } from 'react-switch-input';
 
-import styles from './createNft.module.scss'
+import styles from '../create.module.scss'
 
 const ReviewNftPage: FC<{
     // onChange: (data: FinishState)=>void;

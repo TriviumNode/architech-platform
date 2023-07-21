@@ -39,13 +39,14 @@ class CollectionsRoute implements Routes {
     this.router.get(`${this.path}/:contractAddr`, optionalAuthMiddleware, getCollectionByAddress);
 
     // Import collection
-    // TODO: Require authentication. Only allow owner to import.
+    // Only allows owner or admin to import.
     this.router.post(
       `${this.path}/import/:contractAddr`,
       upload.fields([
         { name: 'profile', maxCount: 1 },
         { name: 'banner', maxCount: 1 },
       ]),
+      authMiddleware,
       fileUploadMiddleware,
       importCollection,
     );

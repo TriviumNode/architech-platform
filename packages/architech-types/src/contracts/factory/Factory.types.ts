@@ -5,15 +5,32 @@
 */
 
 export type ExecuteMsg = {
-  init_project: {
+  init_random_project: {
+    beneficiary: Addr;
     collection_admin: Addr;
     contract_name: string;
     label: string;
     launch_time?: Timestamp | null;
     mint_price: Payment;
     nft_symbol: string;
+    reward_admin: string;
     whitelist_launch_time?: Timestamp | null;
     whitelisted?: string[] | null;
+  };
+} | {
+  init_copy_project: {
+    beneficiary: Addr;
+    end_time?: Uint64 | null;
+    launch_time?: Uint64 | null;
+    metadata: Metadata;
+    mint_limit?: number | null;
+    mint_price?: Payment | null;
+    minter_admin: Addr;
+    minter_label: string;
+    nft_admin: Addr;
+    nft_label: string;
+    nft_name: string;
+    nft_symbol: string;
   };
 } | {
   change_admin: {
@@ -27,11 +44,37 @@ export type ExecuteMsg = {
 export type Addr = string;
 export type Timestamp = Uint64;
 export type Uint64 = string;
+export type Payment = {
+  cw20_payment: {
+    amount: Uint128;
+    token: Addr;
+    [k: string]: unknown;
+  };
+} | {
+  native_payment: {
+    amount: Uint128;
+    denom: string;
+    [k: string]: unknown;
+  };
+};
 export type Uint128 = string;
-export interface Payment {
-  amount: Uint128;
-  token: Addr;
-  [k: string]: unknown;
+export interface Metadata {
+  animation_url?: string | null;
+  attributes?: Trait[] | null;
+  background_color?: string | null;
+  description?: string | null;
+  external_url?: string | null;
+  image?: string | null;
+  image_data?: string | null;
+  name?: string | null;
+  royalty_payment_address?: string | null;
+  royalty_percentage?: number | null;
+  youtube_url?: string | null;
+}
+export interface Trait {
+  display_type?: string | null;
+  trait_type: string;
+  value: string;
 }
 export interface Fee {
   decimal_places: number;
@@ -42,9 +85,23 @@ export interface Fee {
 export interface InstantiateMsg {
   admin: string;
   admin_fee: Fee;
+  copy_mint_code_id: Uint64;
   credit_contract_addr: string;
-  nft_contract_code_id: number;
+  flat_fee: Coin;
+  nft_contract_code_id: Uint64;
   nois_proxy: string;
-  random_mint_code_id: number;
+  random_mint_code_id: Uint64;
 }
-export type QueryMsg = string;
+export interface Coin {
+  amount: Uint128;
+  denom: string;
+  [k: string]: unknown;
+}
+export type QueryMsg = {
+  minters: {};
+};
+export type ArrayOfMinter = Minter[];
+export interface Minter {
+  minter_address: string;
+  [k: string]: unknown;
+}

@@ -51,3 +51,19 @@ export const upload5mb = multer({
     callback(null, true);
   },
 });
+
+export const uploadBatch = multer({
+  storage: memStorage,
+  limits: {
+    // fieldNameSize: 255,
+    fileSize: 5 * 1000000, //~5mb
+    files: 500,
+  },
+  fileFilter: function (req, file, callback) {
+    const ext = path.extname(file.originalname);
+    if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg' && ext !== '.svg' && ext !== '.webp') {
+      return callback(new Error('Only images are allowed'));
+    }
+    callback(null, true);
+  },
+});

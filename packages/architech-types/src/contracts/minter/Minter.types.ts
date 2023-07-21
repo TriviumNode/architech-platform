@@ -5,9 +5,19 @@
 */
 
 export type ExecuteMsg = {
+  mint: {};
+} | {
   set_launch_time: {
     launch_time?: Timestamp | null;
     whitelist_launch_time?: Timestamp | null;
+  };
+} | {
+  set_beneficiary: {
+    new_beneficiary: Addr;
+  };
+} | {
+  set_admin: {
+    new_admin: Addr;
   };
 } | {
   preload_data: {
@@ -22,6 +32,7 @@ export type ExecuteMsg = {
 };
 export type Timestamp = Uint64;
 export type Uint64 = string;
+export type Addr = string;
 export type Uint128 = string;
 export type Binary = string;
 export type HexBinary = string;
@@ -34,6 +45,8 @@ export interface Metadata {
   image?: string | null;
   image_data?: string | null;
   name?: string | null;
+  royalty_payment_address?: string | null;
+  royalty_percentage?: number | null;
   youtube_url?: string | null;
 }
 export interface Trait {
@@ -52,18 +65,31 @@ export interface NoisCallback {
   published: Timestamp;
   randomness: HexBinary;
 }
-export type Addr = string;
+export type Payment = {
+  cw20_payment: {
+    amount: Uint128;
+    token: Addr;
+    [k: string]: unknown;
+  };
+} | {
+  native_payment: {
+    amount: Uint128;
+    denom: string;
+    [k: string]: unknown;
+  };
+};
 export interface InstantiateMsg {
-  admin: Addr;
   admin_fee: Fee;
+  beneficiary: Addr;
   contract_name: string;
-  contract_version: string;
   credit_contract: string;
   launch_time?: Timestamp | null;
   mint_price: Payment;
   nft_code_id: number;
   nft_symbol: string;
   nois_proxy: string;
+  operator: Addr;
+  reward_admin: string;
   whitelist_launch_time?: Timestamp | null;
   whitelisted?: string[] | null;
 }
@@ -73,16 +99,28 @@ export interface Fee {
   recipient: string;
   [k: string]: unknown;
 }
-export interface Payment {
-  amount: Uint128;
-  token: Addr;
-  [k: string]: unknown;
-}
 export type QueryMsg = {
   get_price: {};
 } | {
   get_mint_status: {};
+} | {
+  get_beneficiary: {};
+} | {
+  get_nft_addr: {};
+} | {
+  get_config: {};
 };
+export interface GetConfigResponse {
+  config: Config;
+}
+export interface Config {
+  admin: Addr;
+  beneficiary: Addr;
+  launch_time?: Timestamp | null;
+  price: Payment;
+  whitelist_limit_time?: Timestamp | null;
+  [k: string]: unknown;
+}
 export interface MintStatus {
   launch_time?: Timestamp | null;
   remaining: number;

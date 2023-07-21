@@ -14,6 +14,11 @@ export type ExecuteMsg = {
     address: Addr;
   };
 } | {
+  edit_operator_permissions: {
+    add_perms: boolean;
+    address: Addr;
+  };
+} | {
   edit_credit_rewards: {
     new_rewards: Config;
   };

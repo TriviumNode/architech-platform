@@ -1,7 +1,7 @@
 import { cw721, GetCollectionResponse, SortOption, Token } from "@architech/types";
 import {ReactElement, FC, useState, useEffect, CSSProperties} from "react";
 import { Col } from "react-bootstrap";
-import { useLoaderData, useRevalidator, useSearchParams } from "react-router-dom";
+import { Link, useLoaderData, useRevalidator, useSearchParams } from "react-router-dom";
 import Badge from "../../Components/Badge";
 import CollectionStats from "../../Components/CollectionStats/CollectionStats";
 import FilterMenu from "../../Components/FilterMenu";
@@ -217,6 +217,24 @@ const SingleCollection: FC<any> = (): ReactElement => {
                 
                 {tokens.length ?
                     <Col className={styles.nftsContainer}>
+                        {!!collection.collectionMinter && 
+                            <Link
+                              to={`/nfts/mint/${collection.address}`}
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                backgroundColor: '#666666',
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                position: 'relative',
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                              }}
+                            >
+                                <h4>Minting Now</h4>
+                                <p>Click to see Minter</p>
+                            </Link>
+                        }
                         {tokens.map(token=>{
                             return (
                                 <NftTile collectionName={collectionName} token={token} key={token.tokenId} />

@@ -3,11 +3,11 @@ import { Collection, cw721 } from "@architech/types";
 import { FC, ReactElement, useState } from "react";
 import { Col } from "react-bootstrap";
 import { toast } from "react-toastify";
-import MultiSelect from "../../Components/MultiSelect";
-import SelectMenu, { SelectOption } from "../../Components/SelectMenu/SelectMenu";
-import { useUser } from "../../Contexts/UserContext";
+import MultiSelect from "../../../Components/MultiSelect";
+import SelectMenu, { SelectOption } from "../../../Components/SelectMenu/SelectMenu";
+import { useUser } from "../../../Contexts/UserContext";
 
-import styles from './createNft.module.scss'
+import styles from '../create.module.scss'
 
 export const DefaultTrait: cw721.Trait = {
     trait_type: '',

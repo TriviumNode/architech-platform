@@ -11,8 +11,7 @@ module.exports = function override (config, env) {
         "stream": require.resolve("stream-browserify"),
         // "util": require.resolve("util/"),
         "crypto": require.resolve("crypto-browserify"),
-        
-        // "url": require.resolve("url-browserify"),
+        // "url": require.resolve("url"),
     }
     
     return config

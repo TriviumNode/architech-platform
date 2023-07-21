@@ -1,23 +1,22 @@
 import {ReactElement, FC, useState} from "react";
 import { Col, Row } from "react-bootstrap";
-import { Link, useLoaderData, useParams } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import { useUser } from "../../Contexts/UserContext";
 import Loader from "../../Components/Loader";
 import Modal from "../../Components/Modal";
-import { ImportCollectionData } from "../../Interfaces/interfaces";
 
-import styles from './createNft.module.scss'
-import DetailPage, { DetailState, DefaultDetailState } from "./NftDetailPage";
-import { initStandardProject } from "../../Utils/wasm/factory_handles";
-import { importCollection, refreshCollection, uploadImage } from "../../Utils/backend";
-import ImagePage from "./NftImagePage";
-import ReviewNftPage from "./ReviewPage";
+import NftDetailPage, { NftDetailState, DefaultNftDetailState } from "./NftSubPages/NftDetailPage";
+import { refreshCollection, uploadImage } from "../../Utils/backend";
+import ImagePage from "./NftSubPages/NftImagePage";
+import ReviewNftPage from "./NftSubPages/ReviewPage";
 import { mintNft } from '@architech/lib';
-import CollectionPage from "./CollectionPage";
+import CollectionPage from "./NftSubPages/CollectionPage";
 import { Collection, cw721, GetCollectionResponse } from "@architech/types";
-import FinancialPage, { DefaultFinancialState, FinancialState } from "./FinancialsPage";
+import FinancialPage, { DefaultFinancialState, FinancialState } from "./CommonSubPages/FinancialsPage";
 import sleep from "../../Utils/sleep";
 import ConnectWallet from "../../Components/ConnectWallet";
+
+import styles from './create.module.scss'
 
 export type Page = 'Collection' | 'Details' | 'Image' | 'Review' | 'Financials'
 
@@ -33,10 +32,10 @@ type Status = 'UPLOADING' | 'MINTING' | 'IMPORTING' | 'COMPLETE' | 'ERROR';
 const CreateSingleNftPage: FC<any> = (): ReactElement => {
     const { collection: fullCollection } = useLoaderData() as { collection?: GetCollectionResponse};
     const { user: wallet } = useUser();
-    const [detailState, setDetailState] = useState<DetailState>(DefaultDetailState);
+    const [detailState, setDetailState] = useState<NftDetailState>(DefaultNftDetailState);
     const [financialState, setFinancialState] = useState<FinancialState>({
-        address: wallet?.address || '',
-        percent: '',
+        ...DefaultFinancialState,
+        royalty_address: wallet?.address || '',
     });
     const [image, setImage] = useState<File>();
     const [preview, setPreview] = useState<any>();
@@ -54,7 +53,7 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
             case 'Collection':
                 return <CollectionPage collection={collection} onChange={(data) => setCollection(data)} next={()=>setPage('Details')} />
             case 'Details':
-                return <DetailPage state={detailState} onChange={(data) => setDetailState(data)} next={()=>setPage('Image')} collection={collection as Collection} />
+                return <NftDetailPage state={detailState} onChange={(data) => setDetailState(data)} next={()=>setPage('Image')} collection={collection as Collection} />
             case 'Image':
                 return <ImagePage image={image} preview={preview} onChange={(data, preview) => {setImage(data); setPreview(preview)}} next={()=>setPage('Financials')} />
             case 'Financials':
@@ -134,8 +133,8 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
                     image: `ipfs://${cid}`,
                     attributes: cleanedDetails.attributes.length ? cleanedDetails.attributes : undefined,
                     external_url: cleanedDetails.externalLink || undefined,
-                    royalty_payment_address: financialState.address || undefined,
-                    royalty_percentage: financialState.percent ? parseInt(financialState.percent) : undefined,
+                    royalty_payment_address: financialState.royalty_address || undefined,
+                    royalty_percentage: financialState.royalty_percent ? parseInt(financialState.royalty_percent) : undefined,
                 },
                 owner: wallet.address,
             })

@@ -1,9 +1,9 @@
 import { CATEGORIES } from "@architech/lib";
 import { FC, ReactElement } from "react";
 import { Col } from "react-bootstrap";
-import MultiSelect from "../../Components/MultiSelect";
+import MultiSelect from "../../../Components/MultiSelect";
 
-import styles from './create.module.scss'
+import styles from '../create.module.scss'
 
 export interface AdminState {
     address: string,

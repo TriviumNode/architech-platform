@@ -6,11 +6,13 @@ import styles from './create.module.scss'
 import ConnectWallet from "../../Components/ConnectWallet";
 import AdminTasksPage from "./TasksPage";
 import { ADMINS } from "@architech/lib";
+import AdminRewardsPage from "./RewardsPage";
 
-export type Page = 'Tasks'
+export type Page = 'Tasks' | 'Rewards'
 
 export const Pages: Page[] = [
     'Tasks',
+    'Rewards',
 ]
 
 const AdminDashboard: FC<any> = (): ReactElement => {
@@ -22,6 +24,8 @@ const AdminDashboard: FC<any> = (): ReactElement => {
         switch(page) {
             case 'Tasks':
                 return <AdminTasksPage />
+            case 'Rewards':
+                return <AdminRewardsPage />
             default:
                 return <div style={{margin: '32px', textAlign: 'center'}}><h2 style={{color: 'red'}}>Something went wrong</h2><p>The application encounted an error: `Tried to navigate to undefined page.`<br />Please try to navigate to another page using the menu on the left.</p></div>
         }

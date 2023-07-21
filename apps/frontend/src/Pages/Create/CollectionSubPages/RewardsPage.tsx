@@ -2,12 +2,12 @@ import { getMetadata, getRewards } from "@architech/lib";
 import { ContractMetadata } from "@archwayhq/arch3.js/build";
 import { FC, ReactElement, useEffect, useState } from "react";
 import { Col } from "react-bootstrap";
-import MultiSelect from "../../Components/MultiSelect";
-import SmallLoader from "../../Components/SmallLoader";
-import { useUser } from "../../Contexts/UserContext";
-import { QueryClient } from "../../Utils/queryClient";
+import MultiSelect from "../../../Components/MultiSelect";
+import SmallLoader from "../../../Components/SmallLoader";
+import { useUser } from "../../../Contexts/UserContext";
+import { QueryClient } from "../../../Utils/queryClient";
 
-import styles from './create.module.scss'
+import styles from '../create.module.scss'
 
 export interface RewardsState {
     address: string,

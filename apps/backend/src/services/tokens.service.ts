@@ -172,6 +172,7 @@ export const processCollectionTraits = async (collection: Collection) => {
 };
 
 export const ensureToken = async (collectionAddress: string, tokenId: string) => {
+  console.log('Ensuring tokenId', tokenId);
   // Check if already imported
   const findToken = await TokenModel.findOne({ collectionAddress, tokenId }).populate('collectionInfo').lean();
 
@@ -179,20 +180,26 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
   if (!findToken) {
     // Ensure collection exists for unknown token, collection must be imported first
     collection = await CollectionModel.findOne({ address: collectionAddress }).lean();
-    if (!collection) return undefined;
+    if (!collection) {
+      console.log(`Skipping import of token ID '${tokenId}' for unknown collection '${collectionAddress}'`);
+      return undefined;
+    }
   }
-
+  console.log('TBBB');
   let ask: marketplace.Ask;
   let owner = findToken?.owner;
   let metadataExtension = findToken?.metadataExtension;
   let metadataUri = findToken?.metadataUri;
 
+  console.log('TCCC', findToken);
   // Get NFT Info
   try {
+    console.log('AAAA', { client: queryClient, contract: collectionAddress, token_id: tokenId });
     const {
       info: { extension, token_uri },
       access,
     } = await getAllNftInfo({ client: queryClient, contract: collectionAddress, token_id: tokenId });
+    console.log('BBB', { access, extension });
     owner = access.owner;
     metadataExtension = extension;
     metadataUri = token_uri;
