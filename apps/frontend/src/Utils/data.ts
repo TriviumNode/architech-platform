@@ -1,7 +1,7 @@
 import axios from "axios";
 
 
-export const getPrice = async (coingeckoId: string | undefined, amount: number) => {
+export const getPrice = async (coingeckoId: string | undefined, amount: number): Promise<number> => {
     if (!coingeckoId) return 0;
     if (coingeckoId.toLowerCase() === 'archway' || coingeckoId.toLowerCase() === 'arch' || coingeckoId.toLowerCase() === 'const') return await getArchPrice(amount);
 

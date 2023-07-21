@@ -23,6 +23,7 @@ import { getPrice } from "../../Utils/data";
 import { getCollectionName } from "../../Utils/helpers";
 import { MARKETPLACE_ADDRESS } from "../../Utils/queryClient";
 import sleep from "../../Utils/sleep";
+import { Prices } from "../Token/SingleToken";
 
 import styles from './minter.module.scss';
 
@@ -35,8 +36,9 @@ const SingleMinter: FC<any> = (): ReactElement => {
 
     const [isListing, setIsListing] = useState(false);
     const [loadingTx, setLoadingTx] = useState(false);
+    const [prices, setPrices] = useState<Prices>();
 
-    const { user, refreshProfile, connectKeplr } = useUser()
+    const { user, refreshProfile } = useUser()
     const revalidator = useRevalidator()
 
     // const isFavorite = !user ? false :
@@ -85,6 +87,41 @@ const SingleMinter: FC<any> = (): ReactElement => {
       // }
     }
 
+    const calculatePrices = async () => {
+      if (!collection.collectionMinter) return;
+      let saleAmount: string = '--';
+      let usdAmount: string = '--';
+      let saleDenom: Denom = unknownDenom;
+      if (collection.collectionMinter.payment_token) {
+        const denom = findToken(collection.collectionMinter.payment_token);
+        if (denom) {
+          saleDenom = denom;
+          const num = denomToHuman(collection.collectionMinter.payment_amount, denom.decimals)
+          saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+          usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+        }
+      } else if (collection.collectionMinter.payment_denom) {
+        const denom = findDenom(collection.collectionMinter.payment_denom);
+        if (denom) {
+          saleDenom = denom;
+          const num = denomToHuman(collection.collectionMinter.payment_amount, denom.decimals)
+          saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+          usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+        }
+      } else {
+        throw new Error('Invalid Minter Config: No payment type.');
+      }
+      setPrices({
+        denom: saleDenom,
+        displayAmount: saleAmount,
+        displayUsd: usdAmount,
+      })
+    }
+
+    useEffect(()=>{
+      calculatePrices()
+    },[])
+
     if (!collection)
       return (
           <Row>
@@ -109,26 +146,26 @@ const SingleMinter: FC<any> = (): ReactElement => {
     //   settokenResponse(data);
     // }
 
-    let saleAmount: string = '--';
-    let usdAmount: string = '--';
-    let saleDenom: Denom = unknownDenom;
-      if (collection.collectionMinter.payment_token) {
-        const denom = findToken(collection.collectionMinter.payment_token);
-        if (denom) {
-          saleDenom = denom;
-          const num = denomToHuman(collection.collectionMinter.payment_amount, denom.decimals)
-          saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(denom.decimals.toString()) })
-          usdAmount = getPrice(saleDenom.displayDenom, num).toLocaleString("en-US", { maximumFractionDigits: 2 });
-        }
-      } else {
-        const denom = findDenom(process.env.REACT_APP_NETWORK_DENOM);
-        if (denom) {
-          saleDenom = denom;
-          const num = denomToHuman(collection.collectionMinter.payment_amount, denom.decimals)
-          saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(denom.decimals.toString()) })
-          usdAmount = getPrice(saleDenom.displayDenom, num).toLocaleString("en-US", { maximumFractionDigits: 2 });
-        }
-    }
+    // let saleAmount: string = '--';
+    // let usdAmount: string = '--';
+    // let saleDenom: Denom = unknownDenom;
+    //   if (collection.collectionMinter.payment_token) {
+    //     const denom = findToken(collection.collectionMinter.payment_token);
+    //     if (denom) {
+    //       saleDenom = denom;
+    //       const num = denomToHuman(collection.collectionMinter.payment_amount, denom.decimals)
+    //       saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(denom.decimals.toString()) })
+    //       usdAmount = await getPrice(saleDenom.displayDenom, num).toLocaleString("en-US", { maximumFractionDigits: 2 });
+    //     }
+    //   } else {
+    //     const denom = findDenom(process.env.REACT_APP_NETWORK_DENOM);
+    //     if (denom) {
+    //       saleDenom = denom;
+    //       const num = denomToHuman(collection.collectionMinter.payment_amount, denom.decimals)
+    //       saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(denom.decimals.toString()) })
+    //       usdAmount = await getPrice(saleDenom.displayDenom, num).toLocaleString("en-US", { maximumFractionDigits: 2 });
+    //     }
+    // }
 
     const Stats = (): {title: string; value: string}[] => {
       switch (collection.collectionMinter?.minter_type) {
@@ -258,10 +295,17 @@ const SingleMinter: FC<any> = (): ReactElement => {
               <h2>{collectionName}</h2>
             </div>
             <div className='d-flex align-items-center' style={{gap: '24px'}}>
+              {prices ?
                 <div>
-                  <div style={{fontSize: '28px'}}>{saleAmount.toString()} <DenomImg denom={saleDenom} size='medium' /></div>
-                  <div className='lightText12'>~ ${usdAmount}</div>
+                  <div style={{fontSize: '28px'}}>{prices.displayAmount} <DenomImg denom={prices.denom} size='medium' /></div>
+                  <div className='lightText12'>~ ${prices.displayUsd}</div>
                 </div>
+              :
+              <div>
+                <Loader />
+              </div>
+              }
+
                   <button disabled={loadingTx} type='button' onClick={handleMint}>Mint now{loadingTx && <>&nbsp;<SmallLoader /></>}</button>
             </div>
             </div>

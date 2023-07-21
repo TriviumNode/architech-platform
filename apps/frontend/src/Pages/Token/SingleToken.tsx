@@ -27,7 +27,7 @@ import styles from './singletoken.module.scss';
 
 type Trait = cw721.Trait;
 
-type Prices = {
+export type Prices = {
   denom: Denom;
   displayAmount: string;
   displayUsd: string;
