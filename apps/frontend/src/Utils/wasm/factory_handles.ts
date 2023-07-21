@@ -96,7 +96,7 @@ export const initCopyProject = async({
         signer,
         contract,
         msg,
-        getFee(1_200_000),
+        getFee(700_000),
     )
     // Find instantiated Minter address
     const minterAddress = result.logs[0].events.find(e=>e.type==='reply')?.attributes.find(a=>a.key.includes('contract_address'))?.value;

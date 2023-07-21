@@ -337,6 +337,7 @@ export const updateCollectionBanner = async(collectionId: string, file: File): P
 }
 
 export const uploadImage = async(file: File): Promise<any> => {
+    if (!file) throw new Error('No File to upload!')
     const url = getApiUrl(`/upload`);
 
     const formData = new FormData();

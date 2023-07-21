@@ -64,7 +64,7 @@ const KEY = 'KEPLR_CONNECTED_ARCHITECH';
 
 const connectedKeplr = localStorage.getItem(KEY);
 
-type STATUS = 'DISCONNECTED' | 'SELECT' | 'LOADING_CONNECT' | 'LOADING_SIG' | 'LOADING_LOGIN' | 'CONNECTED' | 'ERROR'
+type STATUS = 'DISCONNECTED' | 'SELECT' | 'LOADING_CONNECT' | 'LOADING_NONCE' | 'LOADING_SIG' | 'LOADING_LOGIN' | 'CONNECTED' | 'ERROR'
 
 export const UserProvider = ({ children }: Props): ReactElement => {
   const [user, setUser] = useState<User>();
@@ -142,6 +142,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
       
       // Check if already logged in
       // TODO handle error
+      setWalletStatus('LOADING_NONCE');
       try {
         const response = await checkLogin(address);
         const newUser: User = {client, address, pubKey, wallet_type: 'Keplr', profile: response}
@@ -263,6 +264,10 @@ export const UserProvider = ({ children }: Props): ReactElement => {
       case 'LOADING_CONNECT':
         return (
           <LoadingModal msg='Please allow the connection with your wallet' />
+        )
+      case 'LOADING_NONCE':
+        return (
+          <LoadingModal msg='Preparing to authenticate with Architech' />
         )
       case 'LOADING_LOGIN':
         return (

@@ -92,9 +92,29 @@ export type QueryMsg = {
   get_beneficiary: {};
 } | {
   get_nft_addr: {};
+} | {
+  get_config: {};
 };
 export interface GetBeneficiaryResponse {
   beneficiary: Addr;
+}
+export type Timestamp = Uint64;
+export interface GetConfigResponse {
+  config: Config;
+}
+export interface Config {
+  admin_fee: Fee;
+  beneficiary: Addr;
+  creator: Addr;
+  credit_contract?: string | null;
+  end_time?: Timestamp | null;
+  launch_time?: Timestamp | null;
+  metadata: Metadata;
+  mint_limit?: number | null;
+  mint_price?: Payment | null;
+  minter_admin: Addr;
+  nft_admin: Addr;
+  [k: string]: unknown;
 }
 export interface GetMintStatusResponse {
   status: MintStatus;

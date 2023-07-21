@@ -286,8 +286,9 @@ export const importCollection = async (
 const getEnsuredPfp = async (collection: string, tokenList: string[]) => {
   try {
     // Get random token's image to use as profile image
-    const random_token = tokenList[Math.floor(Math.random() * tokenList.length)];
+    let random_token = tokenList[Math.floor(Math.random() * tokenList.length)];
     console.log('Random ID', random_token);
+    if (!random_token) random_token = tokenList[0];
     const tokenInfo = await getNftInfo({ client, contract: collection, token_id: random_token });
     const imageUrl = tokenInfo.extension?.image;
     if (!imageUrl) throw new Error(); //break
@@ -355,23 +356,27 @@ const getMinterInfo = async (creator: string) => {
 
         // Handle copy minter
         else if (subStr === 'copy_minter::msg::QueryMsg') {
-          // // Get minter config
-          // const { config }: { config: copyMinter.Config } = await getConfig({ client: queryClient, contract: creator });
-          // // Set minter data
-          // minter = {
-          //   minter_address: creator,
-          //   minter_type: 'COPY',
-          //   minter_admin: config.admin,
-          //   beneficiary: config.beneficiary,
-          //   launch_time: config.launch_time,
-          //   end_time: config.end_time,
-          //   //@ts-expect-error idk
-          //   payment_type: config.price.native_payment ? 'NATIVE' : 'CW20',
-          //   //@ts-expect-error idk
-          //   payment_denom: config.price.native_payment?.denom,
-          //   //@ts-expect-error idk
-          //   payment_token: config.price.cw20_payment?.token,
-          // };
+          // Get minter config
+          const { config }: { config: copyMinter.Config } = await getConfig({ client: queryClient, contract: creator });
+          // Set minter data
+          const minter: CollectionMinterClass = {
+            minter_address: creator,
+            minter_type: 'COPY',
+            minter_admin: config.minter_admin as string,
+            beneficiary: config.beneficiary,
+            launch_time: config.launch_time,
+            end_time: config.end_time,
+            //@ts-expect-error idk
+            payment_type: config.price?.cw20_payment ? 'CW20' : 'NATIVE',
+            //@ts-expect-error idk
+            payment_denom: config.price?.native_payment?.denom,
+            //@ts-expect-error idk
+            payment_token: config.price?.cw20_payment?.token,
+            //@ts-expect-error idk
+            payment_amount: config.price?.cw20_payment?.payment_amount || config.price?.native_payment?.payment_amount || '0',
+          };
+          const actual_creator = config.minter_admin;
+          return { minter, actual_creator };
         }
       }
     }

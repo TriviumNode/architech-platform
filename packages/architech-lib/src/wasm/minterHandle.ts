@@ -50,11 +50,13 @@ export const mintWithMinter = async({
     signer,
     minter_contract,
     funds,
+    gas = 400_000,
 }:{
     client: SigningArchwayClient,
     signer: string,
     minter_contract: string,
     funds?: { amount: string, denom: string}[],
+    gas?: number,
 }) => {
     const msg: ExecuteMsg = {
         mint: {}
@@ -64,7 +66,7 @@ export const mintWithMinter = async({
         signer,
         minter_contract,
         msg,
-        getFee(400_000),
+        getFee(gas),
         undefined,
         funds,
     )

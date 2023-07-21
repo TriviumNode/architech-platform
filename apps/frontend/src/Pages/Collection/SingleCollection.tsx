@@ -215,7 +215,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
                     </div>
                 </Col>
                 
-                {tokens.length ?
+                {tokens.length || collection.collectionMinter ?
                     <Col className={styles.nftsContainer}>
                         {!!collection.collectionMinter && 
                             <Link

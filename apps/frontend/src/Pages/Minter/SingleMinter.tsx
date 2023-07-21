@@ -1,4 +1,4 @@
-import { cancelListing, denomToHuman, findDenom, findToken, mintWithMinter, purchaseNative, truncateAddress, unknownDenom } from "@architech/lib";
+import { cancelListing, denomToHuman, findDenom, findToken, mintWithMinter, noDenom, purchaseNative, truncateAddress, unknownDenom } from "@architech/lib";
 import { Collection, Token, cw721, GetTokenResponse, GetCollectionResponse, Denom } from "@architech/types";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -50,21 +50,26 @@ const SingleMinter: FC<any> = (): ReactElement => {
       try {
         if (!user) throw new Error('Wallet is not connected.')
         if (!collection.collectionMinter) throw new Error('Minter not found for this collection.')
-        if (!collection.collectionMinter.payment_denom) throw new Error('Non-native payments are not supported.')
-
+        if (collection.collectionMinter.payment_token) throw new Error('Non-native payments are not supported.')
         setLoadingTx(true);
         const result = await mintWithMinter({
           client: user.client,
           signer: user.address,
           minter_contract: collection.collectionMinter.minter_address,
-          funds: [{amount: collection.collectionMinter.payment_amount, denom: collection.collectionMinter.payment_denom}]
+          funds: collection.collectionMinter.payment_denom ? [{amount: collection.collectionMinter.payment_amount, denom: collection.collectionMinter.payment_denom}] : [],
+          gas: collection.collectionMinter.minter_type === "COPY" ? 600_000 : undefined,
         })
         console.log('Mint Result', result);
-        waitForMint({
-          collectionContract: collection.address,
-          collectionName: getCollectionName(collection),
-          minterContract: collection.collectionMinter?.minter_address
-        })
+        if (collection.collectionMinter.minter_type === "RANDOM")
+          waitForMint({
+            collectionContract: collection.address,
+            collectionName: getCollectionName(collection),
+            minterContract: collection.collectionMinter?.minter_address
+          })
+        else {
+          refreshProfile();
+          toast.success('Successfully minted!')
+        }
       } catch(err: any) {
         console.error(err)
         toast.error(err.toString())
@@ -109,7 +114,9 @@ const SingleMinter: FC<any> = (): ReactElement => {
           usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
         }
       } else {
-        throw new Error('Invalid Minter Config: No payment type.');
+        saleAmount = 'Free';
+        usdAmount = '';
+        saleDenom = noDenom;
       }
       setPrices({
         denom: saleDenom,
@@ -298,7 +305,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
               {prices ?
                 <div>
                   <div style={{fontSize: '28px'}}>{prices.displayAmount} <DenomImg denom={prices.denom} size='medium' /></div>
-                  <div className='lightText12'>~ ${prices.displayUsd}</div>
+                  {!!prices.displayUsd && <div className='lightText12'>~ ${prices.displayUsd}</div>}
                 </div>
               :
               <div>

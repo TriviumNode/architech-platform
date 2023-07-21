@@ -38,7 +38,11 @@ const s3 = new AWS.S3({
 // });
 
 export const uploadImage = async (req: RequestWithUser, res: Response, next: NextFunction) => {
-  console.log(req.files);
+  console.log('Upload req.file', req.file);
+  if (!req.file) {
+    res.status(400).send('No files uploaded');
+    return;
+  }
   const buffer = req.file.buffer;
 
   // Create hash using file buffer

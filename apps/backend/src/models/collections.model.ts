@@ -25,8 +25,8 @@ export class CollectionMinterClass implements CollectionMinterI {
   @prop({ type: String, required: true })
   public minter_admin: string;
 
-  @prop({ type: String, required: true })
-  public beneficiary: string;
+  @prop({ type: String })
+  public beneficiary?: string;
 
   @prop({ type: String, required: true })
   public payment_type: PaymentType;

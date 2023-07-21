@@ -20,10 +20,11 @@ interface DenomProps {
 
 export const DenomImg: FC<DenomProps> = ({denom, size,className}): ReactElement => {
     const px = size === 'medium' ?  '24px' : size === 'large' ? '48px' : '12px'
+    if (!denom.image && !denom.displayDenom) return <></>
     return (
             <img
                 src={`/${denom.image}`}
-                alt={`/${denom.displayDenom}`}
+                alt={`${denom.displayDenom}`}
                 style={{ height: px }}
                 className={className}
             />

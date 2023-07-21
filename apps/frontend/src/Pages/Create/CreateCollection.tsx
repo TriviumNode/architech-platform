@@ -9,8 +9,8 @@ import { ImportCollectionData } from "../../Interfaces/interfaces";
 import styles from './create.module.scss'
 import CollectionDetailPage, { DetailState, DefaultDetailState } from "./CollectionSubPages/CollectionDetailPage";
 import FinishPage, { DefaultFinishState, FinishState } from "./CollectionSubPages/FinishPage";
-import { initRandomProject, initStandardProject } from "../../Utils/wasm/factory_handles";
-import { importCollection } from "../../Utils/backend";
+import { initCopyProject, initRandomProject, initStandardProject } from "../../Utils/wasm/factory_handles";
+import { importCollection, uploadImage } from "../../Utils/backend";
 import LinksPage, { DefaultLinksState, LinkState } from "./CollectionSubPages/LinksPage";
 import ConnectWallet from "../../Components/ConnectWallet";
 import FinancialPage, { DefaultFinancialState, FinancialState } from "./CommonSubPages/FinancialsPage";
@@ -19,10 +19,15 @@ import TimesPage, { DefaultTimesState, TimesState } from "./CollectionSubPages/T
 import WhitelistPage, { DefaultWhitelistState, WhitelistState } from "./CollectionSubPages/WhitelistPage";
 import { NFT_FACTORY_ADDRESS } from "../../Utils/queryClient";
 import { humanToDenom, randomString } from "@architech/lib";
+import secureRandom from "secure-random";
+import ImagePage from "./NftSubPages/NftImagePage";
+import { cw721 } from "@architech/types";
+import { toast } from "react-toastify";
+import {Buffer} from 'buffer';
 
 export type StdPage = 'Details' | 'Links' | 'Finish'
 export type RandomPage = 'Details' | 'Links' | 'Financials' | 'Launch Time' | 'Whitelist' | 'Finish'
-export type CopyPage = 'Collection Details' | 'Links' | 'Financials' | 'NFT Details' | 'Times & Limits' | 'Finish'
+export type CopyPage = 'Collection Details' | 'Links' | 'Financials' | 'NFT Details' | 'NFT Image' | 'Times & Limits' | 'Finish'
 export type Page = StdPage | RandomPage | CopyPage
 
 export const StdPages: StdPage[] = [
@@ -45,6 +50,7 @@ export const CopyPages: CopyPage[] = [
     'Links',
     'Financials',
     'NFT Details',
+    'NFT Image',
     'Times & Limits',
     'Finish',
 ]
@@ -71,6 +77,8 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
 
     // State used by copy minter
     const [nftDetailState, setNftDetailState] = useState<NftDetailState>(DefaultNftDetailState);
+    const [nftImage, setNftImage] = useState<File>();
+    const [preview, setPreview] = useState<any>();
 
     // Used by both minters
     const [timesState, setTimesState] = useState<TimesState>(DefaultTimesState);
@@ -129,6 +137,13 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     onChange={(newState)=>setNftDetailState(newState)}
                     next={()=>setPage(pages[pages.findIndex(p=>p==='NFT Details')+1])}
                 />
+            case 'NFT Image':
+                return <ImagePage
+                    image={nftImage}
+                    preview={preview}
+                    onChange={(data, preview) => {setNftImage(data); setPreview(preview)}}
+                    next={()=>setPage(pages[pages.findIndex(p=>p==='NFT Image')+1])}
+                />
             case 'Links':
                 return <LinksPage
                     state={linkState}
@@ -166,7 +181,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
         if (e) e.preventDefault();
         try {
             if (!wallet) throw new Error('Wallet is not connected.')
-            let nftAddress = collectionAddress;
+            let newNftAddr = collectionAddress;
             if (!collectionAddress){
                 setStatus("CREATING")
 
@@ -181,9 +196,9 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     console.log('Init Result', result);
                     const { contractAddress } = result;
                     setCollectionAddress(contractAddress)
-                    nftAddress = contractAddress;
+                    newNftAddr = contractAddress;
                 } else if (collectionType === 'RANDOM') {
-                    const {minterAddress, nftAddress: collectionAddress} = await initRandomProject({
+                    const {minterAddress, nftAddress} = await initRandomProject({
                         client: wallet.client, signer: wallet.address,
                         contract: NFT_FACTORY_ADDRESS,
                         nft_admin: wallet.address,
@@ -191,7 +206,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                         beneficiary: financialState.beneficiary_address,
                         nft_name: detailState.name,
                         nft_symbol: detailState.symbol,
-                        minter_label: `${detailState.name}_Minter_${randomString(6)}`,
+                        minter_label: `${detailState.name}_Random_Minter_${randomString(6)}`,
                         launch_time: timesState.launch_time ? timesState.launch_time.valueOf().toString() + '000000' : undefined,
                         whitelist_launch_time: timesState.whitelist_launch_time ? timesState.whitelist_launch_time.valueOf().toString() + '000000' : undefined,
                         mint_price: financialState.denom.nativeDenom ? 
@@ -218,16 +233,87 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                         ,
                         whitelisted: [],
                     })
-                    console.log('Init Result', {minterAddress, collectionAddress})
-                    setCollectionAddress(collectionAddress)
-                    nftAddress = collectionAddress;
+                    console.log('Init Result', {minterAddress, nftAddress})
+                    setCollectionAddress(nftAddress)
+                    newNftAddr = nftAddress;
                 } else if (collectionType === 'COPY') {
 
+                    // Clean NFT Attributes
+                    const badAttributes = nftDetailState.attributes.filter((attribute: cw721.Trait)=>
+                        (!attribute.trait_type && attribute.value) || (attribute.trait_type && !attribute.value)
+                    )
+                    const filteredAttributes = nftDetailState.attributes.filter((attribute: cw721.Trait)=> (attribute.trait_type && attribute.trait_type !== '') && (attribute.value && attribute.value !== ''))
+
+                    // CLean NFT Details
+                    const cleanedDetails = { ...nftDetailState, nftImage, attributes: filteredAttributes };
+
+                    // Remove unfilled attributes
+                    Object.keys(cleanedDetails).forEach((key: any) => 
+                        //@ts-expect-error
+                        (cleanedDetails[key]?.trait_type === '' && cleanedDetails[key]?.value === '') && delete cleanedDetails[key]);
+
+
+                    //verify required data
+                    console.log('cleanedDetails', cleanedDetails)
+                    let err = false;
+                    if (!cleanedDetails.name) {toast.error('Please enter a name for the NFT.'); err=true;}
+                    if (!cleanedDetails.nftImage) {toast.error('Please upload an image for the NFT.'); err=true;}
+                    if (badAttributes.length) {toast.error('Please complete Type and Value for all Attributes.'); err=true;}
+                    if (!detailState.name) {toast.error('Please enter a name for the Collection.'); err=true;}
+                    if (!detailState.symbol) {toast.error('Please enter a symbol for the Collection.'); err=true;}
+                    setStatus(undefined);
+                    if (err) return;
+                    
+                    //@ts-expect-error
+                    const cid = await uploadImage(cleanedDetails.nftImage);
+
+                    const {minterAddress, nftAddress} = await initCopyProject({
+                        client: wallet.client, signer: wallet.address,
+                        contract: NFT_FACTORY_ADDRESS,
+
+                        nft_admin: wallet.address,
+                        minter_admin: wallet.address,
+                        beneficiary: financialState.beneficiary_address,
+
+                        end_time: timesState.end_time ? timesState.end_time.getSeconds().toString() : undefined,
+                        launch_time: timesState.launch_time ? timesState.launch_time.getSeconds().toString() : undefined,
+                        mint_limit: timesState.mint_limit ? parseInt(timesState.mint_limit) : undefined,
+
+                        nft_name: detailState.name,
+                        nft_symbol: detailState.symbol,
+                        minter_label: `${detailState.name}_Copy_Minter_${randomString(6)}`,
+                        nft_label: `Architech_Copy_Collection_${detailState.name.trim()}_${Buffer.from(secureRandom(8, { type: "Uint8Array" })).toString("base64")}}`,
+                        metadata: {
+                            name: cleanedDetails.name,
+                            description: cleanedDetails.description,
+                            attributes: cleanedDetails.attributes,
+                            external_url: cleanedDetails.externalLink,
+                            royalty_payment_address: financialState.royalty_address,
+                            royalty_percentage: financialState.royalty_percent ? parseInt(financialState.royalty_percent) : undefined,
+                            image: `ipfs://${cid}`,
+                        },
+                        mint_price: financialState.amount ?
+                            financialState.denom.cw20Contract ?
+                                { cw20_payment: {
+                                    amount: financialState.amount,
+                                    token: financialState.denom.cw20Contract,
+                                }}
+                            : financialState.denom.nativeDenom ?
+                                { native_payment: {
+                                    amount: financialState.amount,
+                                    denom: financialState.denom.nativeDenom,
+                                }}
+                                : undefined
+                            : undefined,
+                    });
+                    console.log('Init Result', {minterAddress, nftAddress})
+                    setCollectionAddress(nftAddress)
+                    newNftAddr = nftAddress;
                 } else {
                     throw new Error(`Unknown collection type ${collectionType}`)
                 }
             }
-            console.log('NFT Address', nftAddress)
+            console.log('NFT Address', newNftAddr)
             
             setStatus("IMPORTING")
             const importData: ImportCollectionData = {
@@ -235,7 +321,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                 ...finishState,
                 ...linkState,
             }
-            const response = await importCollection(nftAddress as string, importData);
+            const response = await importCollection(newNftAddr as string, importData);
             if (!refreshProfile) throw 'WOT'
             await refreshProfile()
             console.log('Import Response', response)

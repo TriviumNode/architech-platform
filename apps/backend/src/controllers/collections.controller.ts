@@ -201,7 +201,7 @@ export const importCollection = async (req: RequestWithImages, res: Response, ne
     const contractAddress: string = req.params.contractAddr;
 
     // Validate contract address
-    if (!isContract(contractAddress)) {
+    if (!contractAddress || !isContract(contractAddress)) {
       res.status(400).send('Invalid contract address.');
       return;
     }

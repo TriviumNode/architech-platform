@@ -18,7 +18,6 @@ export interface NftDetailState {
     name: string,
     description: string;
     attributes: cw721.Trait[];
-    image?: File,
     externalLink: string,
     customId: boolean,
     customName: boolean,
