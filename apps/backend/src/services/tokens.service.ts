@@ -185,21 +185,17 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
       return undefined;
     }
   }
-  console.log('TBBB');
   let ask: marketplace.Ask;
   let owner = findToken?.owner;
   let metadataExtension = findToken?.metadataExtension;
   let metadataUri = findToken?.metadataUri;
 
-  console.log('TCCC', findToken);
   // Get NFT Info
   try {
-    console.log('AAAA', { client: queryClient, contract: collectionAddress, token_id: tokenId });
     const {
       info: { extension, token_uri },
       access,
     } = await getAllNftInfo({ client: queryClient, contract: collectionAddress, token_id: tokenId });
-    console.log('BBB', { access, extension });
     owner = access.owner;
     metadataExtension = extension;
     metadataUri = token_uri;

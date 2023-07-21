@@ -7,6 +7,7 @@ import styles from './hoverMenu.module.scss';
 import SmallLoader from "../SmallLoader";
 import { toast } from "react-toastify";
 import { claimRewards } from "@architech/lib";
+import ArchDenom from "../ArchDenom";
 
 interface HoverMenuProps {
     content: any;
@@ -115,15 +116,16 @@ export default function ProfileMenu(props: HoverMenuProps) {
             }}>
                 <div style={{
                   margin: '8px',
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: 'center'
                 }}>
-                  <div>
-                    <span className='lightText12'>Arch Rewards</span><br/>
-                    <span>{balances?.rewards.toFixed(3) || 0} ARCH</span>
+                  <span className='lightText12'>Arch Rewards</span><br/>
+                  <div style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: 'center'
+                  }}>
+                    <span className='d-flex align-items-center'>{balances?.rewards.toFixed(3) || 0}&nbsp;<ArchDenom /></span> {/* </div><span style={{fontSize: '11px'}}>ARCH</span></span> */}
+                    <button style={{height: 'unset', padding: '12px'}} disabled={claiming} onClick={()=>handleClaimRewards()}>{claiming ? <SmallLoader /> : 'Claim'}</button>
                   </div>
-                  <button style={{height: 'unset', padding: '12px'}} disabled={claiming} onClick={()=>handleClaimRewards()}>{claiming ? <SmallLoader /> : 'Claim'}</button>
 
                 </div>
             </div>

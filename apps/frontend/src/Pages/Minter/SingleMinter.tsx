@@ -1,28 +1,20 @@
-import { cancelListing, denomToHuman, findDenom, findToken, mintWithMinter, noDenom, purchaseNative, truncateAddress, unknownDenom } from "@architech/lib";
-import { Collection, Token, cw721, GetTokenResponse, GetCollectionResponse, Denom } from "@architech/types";
-import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { denomToHuman, findDenom, findToken, mintWithMinter, noDenom, truncateAddress, unknownDenom } from "@architech/lib";
+import { cw721, GetCollectionResponse, Denom } from "@architech/types";
 import { FC, ReactElement, useEffect, useState } from "react";
-import { Col, Container, Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import { Link, useLoaderData, useRevalidator } from "react-router-dom";
 import { toast } from "react-toastify";
-import ArchDenom, { DenomImg } from "../../Components/ArchDenom";
+import { DenomImg } from "../../Components/ArchDenom";
 import Badge from "../../Components/Badge";
-import CollectionStats from "../../Components/CollectionStats/CollectionStats";
 import Loader from "../../Components/Loader";
-import ListModal from "../../Components/Modals/ListModal";
-import PlaceholdImg from "../../Components/PlaceholdImg";
 import SmallLoader from "../../Components/SmallLoader";
-import SocialLinks from "../../Components/Socials";
 import TokenImage from "../../Components/TokenImg";
 import Vr from "../../Components/vr";
 import { useMint } from "../../Contexts/MintContext";
 import { useUser } from "../../Contexts/UserContext";
-import { addFavorite, getApiUrl, refreshToken, removeFavorite } from "../../Utils/backend";
+import { getApiUrl } from "../../Utils/backend";
 import { getPrice } from "../../Utils/data";
 import { getCollectionName } from "../../Utils/helpers";
-import { MARKETPLACE_ADDRESS } from "../../Utils/queryClient";
-import sleep from "../../Utils/sleep";
 import { Prices } from "../Token/SingleToken";
 
 import styles from './minter.module.scss';
@@ -241,7 +233,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
                 </div>
                 <span className='lightText14'>Created by&nbsp;</span>
                 <Link style={{overflow: "hidden"}} to={`/profile/${collection.creator}`}>
-                  {truncateAddress(collection.creator, process.env.REACT_APP_NETWORK_PREFIX)}
+                  {truncateAddress(fullCollection.full_creator.display, process.env.REACT_APP_NETWORK_PREFIX)}
                 </Link>
               </div>
               <div className='d-flex align-items-center'>

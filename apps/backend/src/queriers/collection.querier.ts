@@ -1,9 +1,10 @@
-import { getBatchCollectionDossier } from '@architech/lib';
+import { getBatchCollectionDossier, resolveArchId } from '@architech/lib';
 import collectionsModel from '@/models/collections.model';
 import TokenModel from '@/models/tokens.model';
 import { queryClient } from '@/utils/chainClients';
 import { Collection, GetCollectionResponse } from '@architech/types';
-import { MARKETPLACE_ADDRESS } from '@/config';
+import { ARCHID_ADDRESS, MARKETPLACE_ADDRESS } from '@/config';
+import UserModel from '@/models/users.model';
 
 export const collectionsToResponse = async (collections: Collection[]): Promise<GetCollectionResponse[]> => {
   // Get array of cw721 addresses
@@ -18,22 +19,44 @@ export const collectionsToResponse = async (collections: Collection[]): Promise<
     });
 
     // Build Collection Responses
-    const result: GetCollectionResponse[] = collections.map(function (collection, key) {
-      return {
+    // const result: GetCollectionResponse[] = collections.map(function (collection, key) {
+    const result: GetCollectionResponse[] = [];
+    for (let i = 0; i < collections.length; i++) {
+      const collection = collections[i];
+      const c = collection.collectionMinter?.minter_admin || collection.creator;
+      const user = await UserModel.findOne({ address: c }).lean();
+
+      let display = user.username || c;
+
+      if (collections.length === 1) {
+        const archId = await resolveArchId(queryClient, ARCHID_ADDRESS, c);
+        if (archId) display = archId;
+      }
+
+      result.push({
         collection,
-        asks: dossiers[key].asks,
-        volume: dossiers[key].volume,
-      };
-    });
+        asks: dossiers[i].asks,
+        volume: dossiers[i].volume,
+        full_creator: {
+          address: c,
+          display,
+        },
+      });
+    }
     return result;
   } catch (err: any) {
     // Handle query error
     console.error('ERROR QUERYING MARKETPLACE', err);
 
     // Build result with empty dossier data
-    const result: GetCollectionResponse[] = collections.map(function (collection, key) {
-      return { collection, asks: [], volume: [] };
-    });
+    // const result: GetCollectionResponse[] = collections.map(function (collection, key) {
+    const result: GetCollectionResponse[] = [];
+    for (let i = 0; i < collections.length; i++) {
+      const collection = collections[i];
+      const c = collection.collectionMinter?.minter_admin || collection.creator;
+      const user = await UserModel.findOne({ address: c }).lean();
+      result.push({ collection, asks: [], volume: [], full_creator: { address: c, display: user.username || c } });
+    }
     return result;
   }
 };

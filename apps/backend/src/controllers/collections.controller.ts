@@ -1,19 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import * as collectionService from '@services/collections.service';
-import { CONTRACT_ADDR_LENGTH, isContract, queryClient } from '@/utils/chainClients';
-import {
-  Collection,
-  CollectionProfile,
-  GetCollectionResponse,
-  GetTrendingCollectionResponse,
-  RequestWithOptionalUser,
-  RequestWithUser,
-  updateCollectionDto,
-} from '@architech/types';
+import { CONTRACT_ADDR_LENGTH, isContract } from '@/utils/chainClients';
+import { Collection, CollectionProfile, GetTrendingCollectionResponse, RequestWithOptionalUser } from '@architech/types';
 import { EditCollectionBodyDto, ImportCollectionBodyDto } from '@/dtos/collections.dto';
 import { validate } from 'class-validator';
-import { StartImportData } from '@/interfaces/collections.interface';
-import { View } from '@/interfaces/views.interface';
 import ViewModel from '@/models/views.model';
 import CollectionModel from '@/models/collections.model';
 import mongoose from 'mongoose';

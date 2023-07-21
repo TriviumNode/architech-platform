@@ -9,3 +9,6 @@ export * from './creditQuery';
 
 export * from './minterHandle';
 export * from './minterQuery';
+
+
+export * from './archId';

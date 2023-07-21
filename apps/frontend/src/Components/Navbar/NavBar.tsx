@@ -24,7 +24,6 @@ export const BurgerMenu = ({page, open, handleClose}:{page: HeaderPage, open: bo
     handleClose()
   }
 
-  // NOTE: You also need to provide styles, see https://github.com/negomi/react-burger-menu#styling
   return (
     <div
       // isOpen={ open }
@@ -43,7 +42,7 @@ export const BurgerMenu = ({page, open, handleClose}:{page: HeaderPage, open: bo
       
       {!!user &&
         <div className='mb8 ml16' style={{width: 'fit-content'}}>
-          <span>{truncateAddress(user.address)}</span>
+          <span>{truncateAddress(user.profile.display_name, process.env.REACT_APP_NETWORK_PREFIX)}</span>
           <div className='d-flex justify-content-between'>
                       <div style={{fontSize: '12px'}} className='d-flex align-items-center'>{balances?.arch ? balances.arch.toFixed(3) : <SmallLoader />}&nbsp;<ArchDenom /></div>
                       <div style={{fontSize: '12px'}} className='d-flex align-items-center'>{balances?.credits === undefined ? <SmallLoader /> : balances.credits}&nbsp;Credits</div>
@@ -116,9 +115,9 @@ const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
                   <Vr color='#666666' />
                   <div className='d-flex align-items-center' style={{fontSize: '12px'}}>{balances?.credits === undefined ? <SmallLoader /> : balances.credits}&nbsp;Credits</div> */}
                   <div>
-                    <span>{truncateAddress(user.address)}</span><br />
+                    <span>{truncateAddress(user.profile.display_name, process.env.REACT_APP_NETWORK_PREFIX)}</span><br />
                     <div className='d-flex justify-content-between'>
-                      <div style={{fontSize: '12px'}} className='d-flex align-items-center'>{balances?.arch ? balances.arch.toFixed(3) : <SmallLoader />}&nbsp;<ArchDenom /></div>
+                      <div style={{fontSize: '12px'}} className='d-flex align-items-center mr16'>{balances?.arch ? balances.arch.toFixed(3) : <SmallLoader />}&nbsp;<ArchDenom /></div>
                       <div style={{fontSize: '12px'}} className='d-flex align-items-center'>{balances?.credits === undefined ? <SmallLoader /> : balances.credits}&nbsp;Credits</div>
                     </div>
                   </div>

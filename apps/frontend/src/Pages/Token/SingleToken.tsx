@@ -247,7 +247,12 @@ const SingleToken: FC<any> = (): ReactElement => {
                 </div>
               }
               <div style={{margin: 'auto 32px 12px 0', width: 'fit-content', maxWidth: 'calc(100% - 96px)', alignSelf: 'flex-end'}}>
-                <span className='lightText12'>Created by <Link style={{color: '#000'}} to={`/profile/${tokenResponse.token.collectionInfo.creator}`}>{truncateAddress(tokenResponse.token.collectionInfo.creator, process.env.REACT_APP_NETWORK_PREFIX)}</Link></span>
+                <span className='lightText12'>
+                  Created by&nbsp;
+                  <Link style={{color: '#000'}} to={`/profile/${fullCollection.full_creator.address}`}>
+                    {truncateAddress(fullCollection.full_creator.display, process.env.REACT_APP_NETWORK_PREFIX)}
+                  </Link>
+                </span>
               </div>
             </div>
           </div>

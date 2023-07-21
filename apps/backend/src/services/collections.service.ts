@@ -1,16 +1,26 @@
 import { HttpException } from '@exceptions/HttpException';
-import collectionsModel, { CollectionClass, CollectionMinterClass } from '@models/collections.model';
+import collectionsModel, { CollectionMinterClass } from '@models/collections.model';
 
 import { isEmpty } from '@utils/util';
 import { isContract, queryClient as client, queryClient } from '@/utils/chainClients';
 
 import equal from 'fast-deep-equal';
 import { findCollectionTokenCount, processCollectionTokens, processCollectionTraits } from './tokens.service';
-import { Collection, CollectionMinterI, copyMinter, GetCollectionResponse, minter, User } from '@architech/types';
+import { Collection, copyMinter, GetCollectionResponse, minter, User } from '@architech/types';
 
 import { CreateCollectionData } from '@/interfaces/collections.interface';
 import CollectionModel from '@models/collections.model';
-import { ADMINS, getAllTokens, getCollectionDossier, getConfig, getContractInfo, getNftInfo, getNumTokens, resolveIpfs } from '@architech/lib';
+import {
+  ADMINS,
+  getAllTokens,
+  getCollectionDossier,
+  getConfig,
+  getContractInfo,
+  getNftInfo,
+  getNumTokens,
+  resolveArchId,
+  resolveIpfs,
+} from '@architech/lib';
 
 import { ImportCollectionBodyDto } from '@/dtos/collections.dto';
 import { isArray, isBoolean } from 'class-validator';
@@ -18,7 +28,8 @@ import fetch from 'node-fetch';
 import { hashBuffer, saveBuffer } from '@/middlewares/fileUploadMiddleware';
 import mime from 'mime-types';
 import mongoose from 'mongoose';
-import { MARKETPLACE_ADDRESS } from '@/config';
+import { ARCHID_ADDRESS, MARKETPLACE_ADDRESS } from '@/config';
+import UserModel from '@/models/users.model';
 
 const removeNullUndefined = (obj: any) => Object.entries(obj).reduce((a, [k, v]) => (v == null ? a : ((a[k] = v), a)), {});
 const removeId = (obj: any) => Object.entries(obj).reduce((a, [k, v]) => (k == '_id' ? a : ((a[k] = v), a)), {});
@@ -33,10 +44,22 @@ export const getFullCollection = async (collectionAddress: string): Promise<GetC
     collection: collectionAddress,
   });
 
+  const creator = collectionData.collectionMinter?.minter_admin || collectionData.creator;
+  let display = await resolveArchId(queryClient, ARCHID_ADDRESS, creator);
+
+  if (!display) {
+    const user = await UserModel.findOne({ address: creator }).lean();
+    if (user && user.username) display = user.username;
+  }
+
   return {
     collection: collectionData,
     asks: dossier.asks,
     volume: dossier.volume,
+    full_creator: {
+      display,
+      address: creator,
+    },
   };
 };
 

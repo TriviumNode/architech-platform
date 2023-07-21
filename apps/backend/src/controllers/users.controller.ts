@@ -26,6 +26,9 @@ import { isEmpty } from '@/utils/util';
 import { RequestWithImages } from '@/middlewares/fileUploadMiddleware';
 import { collectionsToResponse } from '@/queriers/collection.querier';
 import { findUserFavorites } from '@/services/favorites.service';
+import { resolveArchId } from '@/../../../packages/architech-lib/dist';
+import { queryClient } from '@/utils/chainClients';
+import { ARCHID_ADDRESS } from '@/config';
 
 // HTTP
 // Return user profile only.
@@ -59,8 +62,11 @@ export const getUserByAddress = async (req: RequestWithOptionalUser, res: Respon
     const favorites = await findUserFavorites(userAddr);
     const userData: User | undefined = await userModel.findOne({ address: userAddr }).lean();
 
+    const archId = await resolveArchId(queryClient, ARCHID_ADDRESS, userAddr);
+
     const response: GetUserProfileResponse = {
       profile: userData,
+      display_name: archId || userData.username || userAddr,
       tokens: ownedTokens || [],
       collections: fullCollections || [],
       favorites: favorites as any,

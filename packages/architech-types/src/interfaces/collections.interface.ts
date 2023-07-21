@@ -8,7 +8,7 @@ export interface CollectionMinterI {
   minter_address: string;
   minter_type: MinterType;
   minter_admin: string;
-  beneficiary: string;
+  beneficiary?: string;
   payment_type: PaymentType;
   payment_token?: string;
   payment_denom?: string;
@@ -74,6 +74,10 @@ export interface GetCollectionResponse {
   collection: Collection;
   asks: marketplace.Ask[];
   volume: marketplace.Volume[];
+  full_creator: {
+    display: string;
+    address: string;
+  };
 }
 
 export type GetTrendingCollectionResponse = TrendingCollectionResult[];
