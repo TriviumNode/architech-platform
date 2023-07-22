@@ -55,7 +55,7 @@ const CollectionPage: FC<{
 
 
     const collections = user?.profile.collections || []
-    const options: SelectOption[] = collections.map(collection=>{
+    const options: SelectOption[] = collections.filter(c=>!c.collection.collectionMinter).map(collection=>{
         return (collectionOption(collection.collection))
     });
 

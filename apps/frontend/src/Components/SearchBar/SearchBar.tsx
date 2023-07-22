@@ -14,6 +14,7 @@ import PlaceholdImg from "../PlaceholdImg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImages, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "react-tooltip";
+import { parseError } from "@architech/lib";
 
 const CollectionResult: FC<{collection: Collection, onClick: ()=>any}> = ({ collection, onClick }: {collection: Collection, onClick: ()=>any}): ReactElement => {
   const collectionName = getCollectionName(collection)
@@ -116,7 +117,7 @@ export default function SearchBar({style, className}:{style?: CSSProperties, cla
       console.log('RESULTS', searchResults)
     } catch(err: any) {
         console.error('Error searching:', err);
-        toast.error(err.toString());
+        toast.error(parseError(err));
     } finally {
       setSearching(false);
     }

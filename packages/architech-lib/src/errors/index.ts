@@ -22,6 +22,8 @@ export const parseError = (error: any) => {
             console.log('Error', error.message);
         }
     } else {
+        if (error.toString().includes('decoding bech32 failed')) return('Invalid contract address.')        
+        else if (error.toString().includes('contract: not found'))  return('Contract not found.')   
         return error.toString()
     }
 }

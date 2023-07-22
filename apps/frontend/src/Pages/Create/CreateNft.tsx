@@ -1,6 +1,6 @@
 import {ReactElement, FC, useState} from "react";
 import { Col, Row } from "react-bootstrap";
-import { Link, useLoaderData } from "react-router-dom";
+import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import { useUser } from "../../Contexts/UserContext";
 import Loader from "../../Components/Loader";
 import Modal from "../../Components/Modal";
@@ -19,6 +19,7 @@ import ConnectWallet from "../../Components/ConnectWallet";
 import styles from './create.module.scss'
 import { mintAndList } from "../../Utils/wasm/multi_handles";
 import TasksModal, { Task } from "./TasksModal/TasksModal";
+import { getCollectionName } from "../../Utils/helpers";
 
 export type Page = 'Collection' | 'Details' | 'Image' | 'Review' | 'Financials'
 
@@ -34,6 +35,7 @@ type Status = 'UPLOADING' | 'MINTING' | 'IMPORTING' | 'COMPLETE' | 'ERROR';
 const CreateSingleNftPage: FC<any> = (): ReactElement => {
     const { collection: fullCollection } = useLoaderData() as { collection?: GetCollectionResponse};
     const { user: wallet } = useUser();
+    const navigate = useNavigate();
     const [detailState, setDetailState] = useState<NftDetailState>(DefaultNftDetailState);
     const [financialState, setFinancialState] = useState<FinancialState>({
         ...DefaultFinancialState,
@@ -199,6 +201,18 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
         }
     }
 
+    const finishTask: Task = {
+        content: 'View your NFT',
+        onClick: ()=>navigate(`/nfts/${collection?.address}/${detailState.tokenId}`)
+    }
+    const finishTitle = (
+        <p>
+            <h4>{detailState.name}</h4>
+            <span className='lightText12'>has been minted on Collection</span>
+            <h5>{collection ? getCollectionName(collection) : ''}</h5>
+        </p>
+    )
+
     if (!wallet) return (
         <ConnectWallet text='Connect your wallet to create an NFT' />
     )
@@ -255,7 +269,7 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
               </Col>
             </Row>
         </Modal>
-        <TasksModal open={status==='ERROR'} close={()=>setStatus(undefined)} tasks={errorTasks} content={errorTaskMessage} />
+        <TasksModal open={status==='ERROR' || status==='COMPLETE'} close={()=>setStatus(undefined)} tasks={status==='ERROR' ? errorTasks : [finishTask]} content={status==='ERROR' ? errorTaskMessage : finishTitle} />
     </>);
 };
 

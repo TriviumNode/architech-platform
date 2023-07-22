@@ -26,7 +26,7 @@ export const collectionsToResponse = async (collections: Collection[]): Promise<
       const c = collection.collectionMinter?.minter_admin || collection.creator;
       const user = await UserModel.findOne({ address: c }).lean();
 
-      let display = user.username || c;
+      let display = user?.username || c;
 
       if (collections.length === 1) {
         const archId = await resolveArchId(queryClient, ARCHID_ADDRESS, c);

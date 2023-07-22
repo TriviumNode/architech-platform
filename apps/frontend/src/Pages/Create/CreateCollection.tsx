@@ -1,6 +1,6 @@
 import {ReactElement, FC, useState} from "react";
 import { Col, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../../Contexts/UserContext";
 import Loader from "../../Components/Loader";
 import Modal from "../../Components/Modal";
@@ -18,7 +18,7 @@ import NftDetailPage, { DefaultNftDetailState, NftDetailState } from "./NftSubPa
 import TimesPage, { DefaultTimesState, TimesState } from "./CollectionSubPages/TimesPage";
 import WhitelistPage, { DefaultWhitelistState, WhitelistState } from "./CollectionSubPages/WhitelistPage";
 import { NFT_FACTORY_ADDRESS } from "../../Utils/queryClient";
-import { humanToDenom, randomString } from "@architech/lib";
+import { humanToDenom, parseError, randomString } from "@architech/lib";
 import secureRandom from "secure-random";
 import ImagePage from "./NftSubPages/NftImagePage";
 import { cw721 } from "@architech/types";
@@ -57,9 +57,10 @@ export const CopyPages: CopyPage[] = [
 ]
 
 export type CollectionType = 'STANDARD' | 'RANDOM' | 'COPY'
-type Status = 'CREATING' | 'IMPORTING' | 'COMPLETE' | 'ERROR';
+type Status = 'CREATING' | 'IMPORTING' | 'COMPLETE' | 'TASKS' | 'ERROR';
 const CreateCollectionPage: FC<any> = (): ReactElement => {
     const { user: wallet, refreshProfile } = useUser();
+    const navigate = useNavigate();
     const [collectionType, setCollectionType] = useState<CollectionType>()
     const [pages, setPages] = useState<Page[]>(StdPages)
     const [page, setPage] = useState<Page>(StdPages[0])
@@ -95,7 +96,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
     const [error, setError] = useState<string>()
 
     const [errorTasks, setErrorTasks] = useState<Task[]>([])
-    const [errorTaskMessage, setErrorTaskMessage] = useState<any>()
+    const [taskMessage, setTaskMessage] = useState<any>()
 
 
 
@@ -189,8 +190,8 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                 <h3>Required information is missing</h3>
             )
             setErrorTasks(newErrorTasks);
-            setErrorTaskMessage(newErrorContent);
-            setStatus("ERROR")
+            setTaskMessage(newErrorContent);
+            setStatus("TASKS")
             return true;
         } else return false;
     }
@@ -224,7 +225,9 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                 }
 
 
-
+                // ################
+                // Standard Project
+                // ################
                 if (collectionType === "STANDARD") {
                     if (checkErrors(newErrorTasks)) return;
                     const result = await initStandardProject({
@@ -238,7 +241,12 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     const { contractAddress } = result;
                     setCollectionAddress(contractAddress)
                     newNftAddr = contractAddress;
+
+
                 } else if (collectionType === 'RANDOM') {
+                // ##############
+                // Random Project
+                // ##############
                     if (!financialState.amount || !financialState.beneficiary_address){
                         newErrorTasks.push({
                             content: `Enter a ${
@@ -295,40 +303,32 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     console.log('Init Result', {minterAddress, nftAddress})
                     setCollectionAddress(nftAddress)
                     newNftAddr = nftAddress;
-                } else if (collectionType === 'COPY') {
+                
+                
 
+                } else if (collectionType === 'COPY') {
+                // ############
+                // Copy Project
+                // ############
+    
                     // Clean NFT Attributes
                     const badAttributes = nftDetailState.attributes.filter((attribute: cw721.Trait)=>
                         (!attribute.trait_type && attribute.value) || (attribute.trait_type && !attribute.value)
                     )
-                    const filteredAttributes = nftDetailState.attributes.filter((attribute: cw721.Trait)=> (attribute.trait_type && attribute.trait_type !== '') && (attribute.value && attribute.value !== ''))
-
+                    const goodAttributes = nftDetailState.attributes.filter(a=>!!a.trait_type && !!a.value);
+                    
                     // CLean NFT Details
-                    const cleanedDetails = { ...nftDetailState, attributes: filteredAttributes };
-
-                    // Remove unfilled attributes
-                    Object.keys(cleanedDetails).forEach((key: any) => 
-                        //@ts-expect-error
-                        (cleanedDetails[key]?.trait_type === '' && cleanedDetails[key]?.value === '') && delete cleanedDetails[key]);
-
+                    const cleanedNftDetails = { ...nftDetailState, attributes: goodAttributes };
 
                     //verify required data
-                    // console.log('cleanedDetails', cleanedDetails)
-                    // let err = false;
-                    // if (!cleanedDetails.name) {toast.error('Please enter a name for the NFT.'); err=true;}
-                    // if (!cleanedDetails.image) {toast.error('Please upload an image for the NFT.'); err=true;}
-                    // if (badAttributes.length) {toast.error('Please complete Type and Value for all Attributes.'); err=true;}
-                    // if (!detailState.name) {toast.error('Please enter a name for the Collection.'); err=true;}
-                    // if (!detailState.symbol) {toast.error('Please enter a symbol for the Collection.'); err=true;}
-                    // setStatus(undefined);
-                    // if (err) return;
-                    if (!cleanedDetails.name){
+                    console.log(cleanedNftDetails)
+                    if (!cleanedNftDetails.name){
                         newErrorTasks.push({
                             content: `Enter a Name for the NFT`,
                             onClick: ()=>setPage('NFT Details')
                         })
                     }
-                    if (!cleanedDetails.image) {
+                    if (!cleanedNftDetails.image) {
                         newErrorTasks.push({
                             content: `Select an Image for the NFT`,
                             onClick: ()=>setPage('NFT Details')
@@ -347,10 +347,9 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                         })
                     }
                     if (checkErrors(newErrorTasks)) return;
-                    if (checkErrors(newErrorTasks)) return;
 
                     //@ts-expect-error
-                    const cid = await uploadImage(cleanedDetails.nftImage);
+                    const cid = await uploadImage(cleanedNftDetails.image);
 
                     const {minterAddress, nftAddress} = await initCopyProject({
                         client: wallet.client, signer: wallet.address,
@@ -369,10 +368,10 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                         minter_label: `${detailState.name}_Copy_Minter_${randomString(6)}`,
                         nft_label: `Architech_Copy_Collection_${detailState.name.trim()}_${Buffer.from(secureRandom(8, { type: "Uint8Array" })).toString("base64")}}`,
                         metadata: {
-                            name: cleanedDetails.name,
-                            description: cleanedDetails.description,
-                            attributes: cleanedDetails.attributes,
-                            external_url: cleanedDetails.externalLink,
+                            name: cleanedNftDetails.name,
+                            description: cleanedNftDetails.description,
+                            attributes: cleanedNftDetails.attributes,
+                            external_url: cleanedNftDetails.externalLink,
                             royalty_payment_address: financialState.royalty_address,
                             royalty_percentage: financialState.royalty_percent ? parseInt(financialState.royalty_percent) : undefined,
                             image: `ipfs://${cid}`,
@@ -411,13 +410,34 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
             await refreshProfile()
             console.log('Import Response', response)
             setStatus("COMPLETE")
+            setTaskMessage(<p><h5 className='d-inline'>{detailState.name}</h5> has been created.<br />Here's some things to do next:</p>)
         } catch(err: any) {
             console.error(err)
             setStatus("ERROR")
-            setError(err.toString());
+            setError(parseError(err));
         } finally {
         }
     }
+
+    const finishTasks: Task[] = [
+        {
+            content: 'View your Collection',
+            onClick: ()=>navigate(`/nfts/${collectionAddress}`)
+        },
+
+    ]
+    if (collectionType === 'COPY') finishTasks.push({
+        content: 'View your Minter',
+        onClick: ()=>navigate(`/nfts/mint/${collectionAddress}`)
+    })
+    if (collectionType === 'RANDOM') finishTasks.push({
+        content: 'Preload NFTs into the Minter',
+        onClick: ()=>navigate(`/nfts/edit/${collectionAddress}/preload`)
+    })
+    if (collectionType === 'STANDARD') finishTasks.push({
+        content: 'Setup Archway Rewards',
+        onClick: ()=>navigate(`/nfts/edit/${collectionAddress}/rewards`)
+    });
 
     if (!wallet) return (
         <ConnectWallet text='Connect your wallet to create a collection' />
@@ -484,15 +504,15 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                 {getPage()}
             </Col>
         </div>
-        <TasksModal open={status==='ERROR'} close={()=>setStatus(undefined)} tasks={errorTasks} content={errorTaskMessage} />
-        <Modal open={!!status && status!=='ERROR'} locked={true} onClose={()=>{}} >
+        <TasksModal open={status==='TASKS' || status==='COMPLETE'} close={()=>setStatus(undefined)} tasks={status==='TASKS' ? errorTasks : finishTasks} content={taskMessage} />
+        <Modal open={!!status && status!=='TASKS' && status!=='COMPLETE'} locked={true} onClose={()=>{}} >
             <Row className="px-4 pt-4">
                 <Col style={{textAlign: 'center'}}>
                     { status === "CREATING" && <><p>Deploying collection...</p><Loader /></>}
                     { status === "IMPORTING" && <><p>Importing collection into Architech...</p><Loader /></>}
                     { status === "COMPLETE" && 
                     <>
-                        <p>{detailState.name} has been created.<br />Here's some things to do next:</p>
+                        <p><h5>{detailState.name}</h5> has been created.<br />Here's some things to do next:</p>
                         { collectionType === 'RANDOM' ?
                         <div className='mb16'><Link className={styles.modalLink} to={`/nfts/edit/${collectionAddress}/preload`}>Load Items into the Random Minter</Link></div>
                     :

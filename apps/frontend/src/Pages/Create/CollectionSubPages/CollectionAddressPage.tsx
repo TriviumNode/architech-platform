@@ -1,3 +1,4 @@
+import { parseError } from "@architech/lib";
 import { FC, ReactElement, useState } from "react";
 import { Col } from "react-bootstrap";
 
@@ -32,9 +33,7 @@ const CollectionAddressPage: FC<{
             next();
         } catch (err: any) {
             console.error(`Failed to lookup collection ${state.address}`, err)
-            if (err.toString().includes('decoding bech32 failed')) setError('Invalid contract address.')        
-            else if (err.toString().includes('contract: not found'))  setError('Contract not found.')   
-            else setError(err.toString())
+            setError(parseError(err));
         } finally {
             setLoading(false);
         }

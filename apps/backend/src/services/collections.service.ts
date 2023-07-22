@@ -343,65 +343,69 @@ const getMinterInfo = async (creator: string) => {
       };
       await queryClient.queryContractSmart(creator, invalidQuery);
     } catch (e) {
-      // Extract the QueryMsg enum including package name
-      const LOOKFOR = 'Error parsing into type ';
-      const LOOKFOR2 = ': unknown variant';
+      try {
+        // Extract the QueryMsg enum including package name
+        const LOOKFOR = 'Error parsing into type ';
+        const LOOKFOR2 = ': unknown variant';
 
-      if (e.toString().includes(LOOKFOR)) {
-        const index = e.toString().indexOf(LOOKFOR);
-        const index2 = e.toString().indexOf(LOOKFOR2);
-        const subStr = e.toString().slice(index + LOOKFOR.length, index2);
+        if (e.toString().includes(LOOKFOR)) {
+          const index = e.toString().indexOf(LOOKFOR);
+          const index2 = e.toString().indexOf(LOOKFOR2);
+          const subStr = e.toString().slice(index + LOOKFOR.length, index2);
 
-        // Handle random minter
-        if (subStr === 'random_minter::msg::QueryMsg') {
-          // Get minter config
-          const { config }: { config: minter.Config } = await getConfig({ client: queryClient, contract: creator });
+          // Handle random minter
+          if (subStr === 'random_minter::msg::QueryMsg') {
+            // Get minter config
+            const { config }: { config: minter.Config } = await getConfig({ client: queryClient, contract: creator });
 
-          // Set minter data
-          const minter: CollectionMinterClass = {
-            minter_address: creator,
-            minter_type: 'RANDOM',
-            minter_admin: config.admin,
-            beneficiary: config.beneficiary,
-            launch_time: config.launch_time,
-            whitelist_launch_time: config.whitelist_limit_time,
-            //@ts-expect-error idk
-            payment_type: config.price.native_payment ? 'NATIVE' : 'CW20',
-            //@ts-expect-error idk
-            payment_denom: config.price.native_payment?.denom,
-            //@ts-expect-error idk
-            payment_token: config.price.cw20_payment?.token,
-            //@ts-expect-error idk
-            payment_amount: config.price.native_payment?.amount || config.price.cw20_payment?.amount,
-          };
-          const actual_creator = config.admin;
-          return { minter, actual_creator };
+            // Set minter data
+            const minter: CollectionMinterClass = {
+              minter_address: creator,
+              minter_type: 'RANDOM',
+              minter_admin: config.admin,
+              beneficiary: config.beneficiary,
+              launch_time: config.launch_time,
+              whitelist_launch_time: config.whitelist_limit_time,
+              //@ts-expect-error idk
+              payment_type: config.price.native_payment ? 'NATIVE' : 'CW20',
+              //@ts-expect-error idk
+              payment_denom: config.price.native_payment?.denom,
+              //@ts-expect-error idk
+              payment_token: config.price.cw20_payment?.token,
+              //@ts-expect-error idk
+              payment_amount: config.price.native_payment?.amount || config.price.cw20_payment?.amount,
+            };
+            const actual_creator = config.admin;
+            return { minter, actual_creator };
+          }
+
+          // Handle copy minter
+          else if (subStr === 'copy_minter::msg::QueryMsg') {
+            // Get minter config
+            const { config }: { config: copyMinter.Config } = await getConfig({ client: queryClient, contract: creator });
+            // Set minter data
+            const minter: CollectionMinterClass = {
+              minter_address: creator,
+              minter_type: 'COPY',
+              minter_admin: config.minter_admin as string,
+              beneficiary: config.beneficiary,
+              launch_time: config.launch_time,
+              end_time: config.end_time,
+              //@ts-expect-error idk
+              payment_type: config.price?.cw20_payment ? 'CW20' : 'NATIVE',
+              //@ts-expect-error idk
+              payment_denom: config.price?.native_payment?.denom,
+              //@ts-expect-error idk
+              payment_token: config.price?.cw20_payment?.token,
+              //@ts-expect-error idk
+              payment_amount: config.price?.cw20_payment?.payment_amount || config.price?.native_payment?.payment_amount || '0',
+            };
+            const actual_creator = config.minter_admin;
+            return { minter, actual_creator };
+          }
         }
-
-        // Handle copy minter
-        else if (subStr === 'copy_minter::msg::QueryMsg') {
-          // Get minter config
-          const { config }: { config: copyMinter.Config } = await getConfig({ client: queryClient, contract: creator });
-          // Set minter data
-          const minter: CollectionMinterClass = {
-            minter_address: creator,
-            minter_type: 'COPY',
-            minter_admin: config.minter_admin as string,
-            beneficiary: config.beneficiary,
-            launch_time: config.launch_time,
-            end_time: config.end_time,
-            //@ts-expect-error idk
-            payment_type: config.price?.cw20_payment ? 'CW20' : 'NATIVE',
-            //@ts-expect-error idk
-            payment_denom: config.price?.native_payment?.denom,
-            //@ts-expect-error idk
-            payment_token: config.price?.cw20_payment?.token,
-            //@ts-expect-error idk
-            payment_amount: config.price?.cw20_payment?.payment_amount || config.price?.native_payment?.payment_amount || '0',
-          };
-          const actual_creator = config.minter_admin;
-          return { minter, actual_creator };
-        }
+      } catch (error) {
+        console.error('Error getting minter info:', error);
       }
     }
   }
