@@ -24,6 +24,7 @@ import ImagePage from "./NftSubPages/NftImagePage";
 import { cw721 } from "@architech/types";
 import { toast } from "react-toastify";
 import {Buffer} from 'buffer';
+import TasksModal, { Task } from "./TasksModal/TasksModal";
 
 export type StdPage = 'Details' | 'Links' | 'Finish'
 export type RandomPage = 'Details' | 'Links' | 'Financials' | 'Launch Time' | 'Whitelist' | 'Finish'
@@ -50,7 +51,7 @@ export const CopyPages: CopyPage[] = [
     'Links',
     'Financials',
     'NFT Details',
-    'NFT Image',
+    // 'NFT Image',
     'Times & Limits',
     'Finish',
 ]
@@ -77,8 +78,8 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
 
     // State used by copy minter
     const [nftDetailState, setNftDetailState] = useState<NftDetailState>(DefaultNftDetailState);
-    const [nftImage, setNftImage] = useState<File>();
-    const [preview, setPreview] = useState<any>();
+    // const [nftImage, setNftImage] = useState<File>();
+    // const [preview, setPreview] = useState<any>();
 
     // Used by both minters
     const [timesState, setTimesState] = useState<TimesState>(DefaultTimesState);
@@ -93,6 +94,11 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
 
     const [error, setError] = useState<string>()
 
+    const [errorTasks, setErrorTasks] = useState<Task[]>([])
+    const [errorTaskMessage, setErrorTaskMessage] = useState<any>()
+
+
+
     const selectType = (type: CollectionType) => {
         setCollectionType(type);
         const newPages = 
@@ -103,7 +109,6 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
         setPages(newPages)
         setPage(newPages[0])
     }
-
 
     const getPage = () => {
         switch(page) {
@@ -137,13 +142,13 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     onChange={(newState)=>setNftDetailState(newState)}
                     next={()=>setPage(pages[pages.findIndex(p=>p==='NFT Details')+1])}
                 />
-            case 'NFT Image':
-                return <ImagePage
-                    image={nftImage}
-                    preview={preview}
-                    onChange={(data, preview) => {setNftImage(data); setPreview(preview)}}
-                    next={()=>setPage(pages[pages.findIndex(p=>p==='NFT Image')+1])}
-                />
+            // case 'NFT Image':
+            //     return <ImagePage
+            //         image={nftImage}
+            //         preview={preview}
+            //         onChange={(data, preview) => {setNftImage(data); setPreview(preview)}}
+            //         next={()=>setPage(pages[pages.findIndex(p=>p==='NFT Image')+1])}
+            //     />
             case 'Links':
                 return <LinksPage
                     state={linkState}
@@ -177,6 +182,19 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
         }
     }
 
+    const checkErrors = (newErrorTasks: Task[]) => {
+        // Show modal if errors are found
+        if (newErrorTasks.length){
+            const newErrorContent = (
+                <h3>Required information is missing</h3>
+            )
+            setErrorTasks(newErrorTasks);
+            setErrorTaskMessage(newErrorContent);
+            setStatus("ERROR")
+            return true;
+        } else return false;
+    }
+
     const handleCreate = async (e: any) => {
         if (e) e.preventDefault();
         try {
@@ -185,7 +203,30 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
             if (!collectionAddress){
                 setStatus("CREATING")
 
+                // #############################################
+                // Verify Required Data for ALL Collection Types
+                // #############################################
+                const newErrorTasks: Task[] = []
+                if (!detailState.name || !detailState.symbol){
+                    newErrorTasks.push({
+                        content:  `Enter a ${
+                            !detailState.name ?
+                                !detailState.symbol ?
+                                    'Name and Symbol'
+                                :
+                                    'Name'
+                            : !detailState.symbol ?
+                                'Symbol'
+                            : 'UNKNOWN'
+                        } for the collection`,
+                        onClick: ()=>setPage('Details')
+                    })
+                }
+
+
+
                 if (collectionType === "STANDARD") {
+                    if (checkErrors(newErrorTasks)) return;
                     const result = await initStandardProject({
                         client: wallet.client,
                         signer: wallet.address,
@@ -198,6 +239,24 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     setCollectionAddress(contractAddress)
                     newNftAddr = contractAddress;
                 } else if (collectionType === 'RANDOM') {
+                    if (!financialState.amount || !financialState.beneficiary_address){
+                        newErrorTasks.push({
+                            content: `Enter a ${
+                                !financialState.amount ?
+                                    !financialState.beneficiary_address ?
+                                        'Sale Amount and Beneficiary'
+                                    :
+                                        'Sale Amount'
+                                : !financialState.beneficiary_address ?
+                                    'Beneficiary'
+                                : 'UNKNOWN'
+                            } on the Financials page`,
+                            onClick: ()=>setPage('Financials')
+                        })
+                    }
+                    if (checkErrors(newErrorTasks)) return;
+
+
                     const {minterAddress, nftAddress} = await initRandomProject({
                         client: wallet.client, signer: wallet.address,
                         contract: NFT_FACTORY_ADDRESS,
@@ -245,7 +304,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     const filteredAttributes = nftDetailState.attributes.filter((attribute: cw721.Trait)=> (attribute.trait_type && attribute.trait_type !== '') && (attribute.value && attribute.value !== ''))
 
                     // CLean NFT Details
-                    const cleanedDetails = { ...nftDetailState, nftImage, attributes: filteredAttributes };
+                    const cleanedDetails = { ...nftDetailState, attributes: filteredAttributes };
 
                     // Remove unfilled attributes
                     Object.keys(cleanedDetails).forEach((key: any) => 
@@ -254,16 +313,42 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
 
 
                     //verify required data
-                    console.log('cleanedDetails', cleanedDetails)
-                    let err = false;
-                    if (!cleanedDetails.name) {toast.error('Please enter a name for the NFT.'); err=true;}
-                    if (!cleanedDetails.nftImage) {toast.error('Please upload an image for the NFT.'); err=true;}
-                    if (badAttributes.length) {toast.error('Please complete Type and Value for all Attributes.'); err=true;}
-                    if (!detailState.name) {toast.error('Please enter a name for the Collection.'); err=true;}
-                    if (!detailState.symbol) {toast.error('Please enter a symbol for the Collection.'); err=true;}
-                    setStatus(undefined);
-                    if (err) return;
-                    
+                    // console.log('cleanedDetails', cleanedDetails)
+                    // let err = false;
+                    // if (!cleanedDetails.name) {toast.error('Please enter a name for the NFT.'); err=true;}
+                    // if (!cleanedDetails.image) {toast.error('Please upload an image for the NFT.'); err=true;}
+                    // if (badAttributes.length) {toast.error('Please complete Type and Value for all Attributes.'); err=true;}
+                    // if (!detailState.name) {toast.error('Please enter a name for the Collection.'); err=true;}
+                    // if (!detailState.symbol) {toast.error('Please enter a symbol for the Collection.'); err=true;}
+                    // setStatus(undefined);
+                    // if (err) return;
+                    if (!cleanedDetails.name){
+                        newErrorTasks.push({
+                            content: `Enter a Name for the NFT`,
+                            onClick: ()=>setPage('NFT Details')
+                        })
+                    }
+                    if (!cleanedDetails.image) {
+                        newErrorTasks.push({
+                            content: `Select an Image for the NFT`,
+                            onClick: ()=>setPage('NFT Details')
+                        })
+                    }
+                    if (badAttributes.length) {
+                        newErrorTasks.push({
+                            content: `Make sure all Attributes have a Type and Value`,
+                            onClick: ()=>setPage('NFT Details')
+                        })
+                    }
+                    if (financialState.amount && !financialState.beneficiary_address){
+                        newErrorTasks.push({
+                            content: `Enter a Beneficiary to receive the funds`,
+                            onClick: ()=>setPage('Financials')
+                        })
+                    }
+                    if (checkErrors(newErrorTasks)) return;
+                    if (checkErrors(newErrorTasks)) return;
+
                     //@ts-expect-error
                     const cid = await uploadImage(cleanedDetails.nftImage);
 
@@ -345,27 +430,27 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     <h1>New Collection Type</h1>
                 </div>
                 <div className={styles.buttonRow}>
-                <Col xs='auto'>
+                <Col>
                     <button type='button' onClick={()=>selectType('STANDARD')} >
-                        <h3>Standard<br/>Collection</h3>
+                        <h3>Standard Collection</h3>
                         <p className='lightText12'>
                             Create NFTs one at a time. Create more in the same collection any time. 
                             Great for small collections and one-off art.
                         </p>
                     </button>
                 </Col>
-                <Col xs='auto'>
+                <Col>
                     <button type='button' onClick={()=>selectType('RANDOM')} >
-                        <h3>Random<br/>Collection</h3>
+                        <h3>Random Minter</h3>
                         <p className='lightText12'>
                             Preload NFTs in bulk, then distribute them one at a time randomly. 
                             Great for PFP collectons.
                         </p>
                     </button>
                 </Col>
-                <Col xs='auto'>
+                <Col>
                     <button type='button' onClick={()=>selectType('COPY')} >
-                        <h3>Copy<br/>Collection</h3>
+                        <h3>Copy Minter</h3>
                         <p className='lightText12'>
                             Sell or give away copies of an NFT. Optionally limit by number of copies or time. 
                             Great for tickets and limited edition art.
@@ -399,7 +484,8 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                 {getPage()}
             </Col>
         </div>
-        <Modal open={!!status} locked={true} onClose={()=>{}} >
+        <TasksModal open={status==='ERROR'} close={()=>setStatus(undefined)} tasks={errorTasks} content={errorTaskMessage} />
+        <Modal open={!!status && status!=='ERROR'} locked={true} onClose={()=>{}} >
             <Row className="px-4 pt-4">
                 <Col style={{textAlign: 'center'}}>
                     { status === "CREATING" && <><p>Deploying collection...</p><Loader /></>}

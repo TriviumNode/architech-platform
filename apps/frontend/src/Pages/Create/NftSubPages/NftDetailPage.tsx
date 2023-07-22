@@ -4,6 +4,7 @@ import { FC, ReactElement, useEffect, useState } from "react";
 import { Col } from "react-bootstrap";
 import { toast } from "react-toastify";
 import MultiSelect from "../../../Components/MultiSelect";
+import PlaceholdImg from "../../../Components/PlaceholdImg";
 import { QueryClient } from "../../../Utils/queryClient";
 
 import styles from '../create.module.scss'
@@ -21,6 +22,8 @@ export interface NftDetailState {
     externalLink: string,
     customId: boolean,
     customName: boolean,
+    image: File | undefined,
+    preview: any,
 }
 
 export const DefaultNftDetailState: NftDetailState = {
@@ -31,6 +34,8 @@ export const DefaultNftDetailState: NftDetailState = {
     externalLink: '',
     customId: false,
     customName: false,
+    image: undefined,
+    preview: undefined,
 }
 
 const NftDetailPage: FC<{
@@ -50,7 +55,7 @@ const NftDetailPage: FC<{
 
     useEffect(()=>{
         if (isCollection) updateDetailState({customName: true})
-    })
+    },[])
 
     const updateTokenId = (newId: string) => {
         const filtered = newId//.replace(/[^a-zA-Z0-9]/gi, '');
@@ -138,6 +143,28 @@ const NftDetailPage: FC<{
         }
     }
 
+    const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            if (FileReader && e.target.files && e.target.files.length) {
+                var fr = new FileReader();
+                fr.onload = function () {
+                    // onChange(e.target.files[0], fr.result)
+                    updateDetailState({
+                        //@ts-expect-error
+                        image: e.target.files[0],
+                        preview: fr.result,
+                    })
+                }
+                fr.readAsDataURL(e.target.files[0]);
+            } else {
+                updateDetailState({
+                    image: e.target.files[0],
+                    preview: undefined,
+                })
+            }
+        }
+    }
+
     useEffect(()=>{
         if (isCollection) return;
         getDefaultId()
@@ -163,10 +190,85 @@ const NftDetailPage: FC<{
                 <button type='button' onClick={handleNext}>Next</button>
             </div>
             <form className={styles.form}>
-                <div className='d-flex flex-wrap mb24'>
+                <div className='d-flex mb24'>
+                    <Col className='mr8'>
+                        <div className='d-flex flex-wrap gap16'>
+                            <Col className='d-flex align-items-end'>
+                                <label className='wide'>
+                                    NFT Image
+                                    <div className='lightText10' style={{margin: '2px 8px 0 8px', lineHeight: '100%'}}>
+                                        Required
+                                    </div>
+                                    <label className={styles.customfileupload}>
+                                        <div className='ml16'>
+                                            { state.image ? state.image.name : 'Select a file' }
+                                        </div>
+                                        <img src='/upload.svg' style={{maxHeight: '1em' }} className='mr16' />
+                                        <input
+                                            type='file'
+                                            accept="image/*"
+                                            onChange={handleUpload}
+                                        />
+                                    </label>
+                                    <div className='lightText11' style={{margin: '4px 8px 0 8px'}}>
+                                    <span>Recommended Size: At least 720 x 720</span><br /><span>Accepts JPG, PNG, GIF, SVG, WEBP.&nbsp;&nbsp;Max: 5 MB</span> 
+                                </div>
+                                </label>
+                            </Col>
+                            <Col xs={3} className='d-lg-none'>
+                                <PlaceholdImg src={state.preview} className='imgCover wide tall square br8' />
+                            </Col>
+                        </div>
+                        <div className='d-flex flex-wrap gap8 mt16'>
+                            <Col xs={12} md={isCollection ? 12 : 8} lg={isCollection ? 12 : 8}>
+                                <label>
+                                    NFT Name
+                                    <div className='lightText10' style={{margin: '2px 8px 0 8px', lineHeight: '100%'}}>
+                                        Display name for this NFT. Does not have to be unique.
+                                    </div>
+                                    <input type='text' disabled={!state.customName} value={state.name} onChange={(e)=>updateDetailState({name: e.target.value})} className={errors?.name && styles.error} />
+                                    {!!errors?.name &&
+                                        <div className={styles.alert}>
+                                            <img alt='Alert' src='/alert.svg' style={{height:'1.5em'}} />
+                                        </div>
+                                    }
+                                    {!isCollection &&
+                                        <div style={{textAlign: 'right'}}>
+                                            <input type='checkbox' checked={state.customName} onChange={()=>updateDetailState({customName: !state.customName})} />Customize Name
+                                        </div>
+                                    }
+                                </label>
+                            </Col>
+                            {!isCollection &&
+                                <Col xs={12} md={true}>
+                                    <label>
+                                        Token ID
+                                        <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
+                                            Unique ID for this NFT.
+                                        </div>
+                                        <input type='text' disabled={!state.customId} value={state.tokenId} onChange={(e)=>updateTokenId(e.target.value)} className={errors?.tokenId && styles.error}  />
+                                        {!!errors?.tokenId &&
+                                            <div className={styles.alert}>
+                                                <img alt='Alert' src='/alert.svg' style={{height:'1.5em'}} />
+                                            </div>
+                                        }
+                                            <div style={{textAlign: 'right'}}>
+                                                <input type='checkbox' checked={state.customId} onChange={()=>updateDetailState({customId: !state.customId})} />Customize ID
+                                            </div>
+                                        
+                                    </label>
+                                </Col>
+                            }
+                        </div>
+                    </Col>
+                    <Col xs={3} className='d-none d-lg-block'>
+                        <PlaceholdImg src={state.preview} className='imgCover wide tall square br8' />
+                    </Col>
+                </div>                
+                {/* <div className='d-flex flex-wrap mb24'>
                     <Col xs={12} md={isCollection ? 12 : 6} lg={isCollection ? 12 : 8}>
                         <label>
-                            Item Name
+                            NFT Name
                             <div className='lightText10' style={{margin: '4px 8px 0 8px', minHeight: '2em', lineHeight: '100%'}}>
                                 Display name for this NFT. Does not have to be unique.
                             </div>
@@ -203,18 +305,7 @@ const NftDetailPage: FC<{
                             </label>
                         </Col>
                     }
-                </div>
-                <div className='d-flex mb24'>
-                    <Col>
-                        <label>
-                            External Link
-                            <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
-                                Optional. A link to view the NFT on your own website.
-                            </div>
-                            <input type='text' placeholder='http://' value={state.externalLink} onChange={(e)=>updateDetailState({externalLink: e.target.value})} />
-                        </label>
-                    </Col>
-                </div>
+                </div> */}
                 <div className='d-flex mb24'>
                     <Col>
                         <label>

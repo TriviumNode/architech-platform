@@ -92,7 +92,7 @@ const CollectionDetailPage: FC<{
                         <Col>
                             <label>
                                 Collection Symbol
-                                <input value={state.symbol} disabled={isImporting} onChange={(e)=>updateDetailState({symbol: e.target.value})}  className={errors?.symbol && 'error'} />
+                                <input value={state.symbol} disabled={isImporting} onChange={(e)=>updateDetailState({symbol: e.target.value.replace(/[^a-zA-Z]/gi, '').toUpperCase()})}  className={errors?.symbol && 'error'} />
                                 {!!errors?.symbol &&
                                     <div className='inputAlert'>
                                         <img alt='alert' src='/alert.svg' style={{height:'1.5em'}} />
@@ -152,7 +152,7 @@ const CollectionDetailPage: FC<{
                     <div className='d-flex mb24'>
                         <Col xs={12} md={6}>
                             <label>
-                                Category
+                                Categories
                                 <MultiSelect title={'Select...'} style={{marginTop: '8px'}} options={CATEGORIES} selected={state.categories} onChange={(selected) => updateDetailState({ categories: selected })} />
                             </label>
                         </Col>

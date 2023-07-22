@@ -18,6 +18,7 @@
     background: #FFFFFF;
     border-radius: 8px;
     overflow: hidden;
+    max-width: 400px;
 
     .navCardInner {
         margin: 48px;
@@ -62,6 +63,7 @@
 
 @media (max-width: 767.98px) {
     .navCard {
+        max-width: unset;
         .navCardInner {
             margin: 16px;
             flex-direction: row;
@@ -117,7 +119,7 @@
     height: 48px;
     border: 1px solid #cfccc9;
     border-radius: 8px;
-    margin-top: 8px;
+    margin-top: 4px;
     font-weight: 400;
     font-size: 14px;
     line-height: 120%;
@@ -161,7 +163,7 @@
     height: 48px;
 
     border-radius: 8px;
-    margin-top: 8px;
+    margin-top: 4px;
     font-weight: 400;
     font-size: 14px;
     line-height: 120%;
@@ -242,16 +244,17 @@
             gap: 32px;
             justify-content: center;
             align-items: stretch;
-            width: 100%;
+            width: 80%;
+            height: 256px;
         }
 
         button {
-            padding: 24px 12px;
+            padding: 48px 32px;
             background: rgb(0,0,0,0.05);
             color: #000;
             // border: 1px solid rgb(0,0,0,0.05);
             height: 100%;
-            width: 212px;
+            // width: 212px;
             display: flex;
             flex-direction: column;
             transition: all 0.1s ease-in-out;
@@ -274,6 +277,13 @@
 
 }
 
+
+
+.nftPreviewCard {
+    border-radius: 8px;
+    background: radial-gradient(280% 98.54% at -0.00% 0%, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.1) 100%), #F7F7F7;
+    padding: 24px;
+}
 
 
 

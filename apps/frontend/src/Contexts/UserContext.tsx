@@ -13,12 +13,14 @@ import { checkLogin, getUserProfile, requestNonce, walletLogin } from '../Utils/
 import { Coin, Pubkey } from '@cosmjs/amino';
 import { Row, Col } from 'react-bootstrap';
 import Loader from '../Components/Loader';
-import { denomToHuman, getCreditBalance, getRewards } from '@architech/lib';
+import { denomToHuman, getCreditBalance, getRewards, parseError } from '@architech/lib';
 import { GetUserProfileResponse } from '@architech/types';
 import { CREDIT_ADDRESS } from '../Utils/queryClient';
 import ModalV2 from '../Components/ModalV2';
 
 import styles from './WalletModal.module.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMobileScreenButton } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   children: ReactNode;
@@ -170,7 +172,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
         setWalletStatus('CONNECTED');
 
       }catch(err: any){
-        toast.error(err.message); 
+        toast.error(parseError(err)); 
         setWalletStatus('DISCONNECTED');
       }
     } catch(err: any){
@@ -219,40 +221,48 @@ export const UserProvider = ({ children }: Props): ReactElement => {
           <div className={styles.selectWalletContainer}>
             <Col className={styles.walletTile}>
               <button onClick={()=>connectKeplr()} disabled={typeof window.keplr === "undefined"}>
-                <img src='/images/wallets/keplr.png' />
                 <div>
-                  <h2>Keplr</h2>
+                  <img src='/images/wallets/keplr.png' />
+                  <div>
+                    <h2>Keplr</h2>
+                  </div>
                 </div>
               </button>
               { typeof window.keplr === "undefined" ?
-                <a href='https://www.keplr.app/download'>Get Keplr Wallet</a> : <div style={{height: '1em'}} />
+                <a href='https://www.keplr.app/download' target='_blank' rel='noreferrer noopener'>Get Keplr Wallet</a> : <div style={{height: '1em'}} />
               }
             </Col>
 
             <Col className={styles.walletTile}>
               {/* @ts-expect-error */}
               <button onClick={()=>connectKeplr()} disabled={typeof window.archx === "undefined"}>
-                <img src='/images/wallets/archx.svg' />
                 <div>
-                  <h2>ArchX</h2>
+                  <img src='/images/wallets/archx.svg' />
+                  <div>
+                    <h2>ArchX</h2>
+                  </div>
                 </div>
+                <FontAwesomeIcon icon={faMobileScreenButton} size={'2x'} />
               </button>
               {/* @ts-expect-error */}
               { typeof window.archx === "undefined" ?
-                <a href='https://archx.io'>Get ArchX Wallet</a> : <div style={{height: '1em'}} />
+                <a href='https://archx.io' target='_blank' rel='noreferrer noopener'>Get ArchX Wallet</a> : <div style={{height: '1em'}} />
               }
             </Col>
             <Col className={styles.walletTile}>
               {/* @ts-expect-error */}
               <button onClick={()=>connectKeplr()} disabled={typeof window.leap === "undefined"}>
-                <img src='/images/wallets/leap.svg' />
                 <div>
-                  <h2>Leap Wallet</h2>
+                  <img src='/images/wallets/leap.svg' />
+                  <div>
+                    <h2>Leap</h2>
+                  </div>
                 </div>
+                <FontAwesomeIcon icon={faMobileScreenButton} size={'2x'} />
               </button>
               {/* @ts-expect-error */}
               { typeof window.leap === "undefined" ?
-                <a href='https://www.leapwallet.io/download'>Get Leap Wallet</a> : <div style={{height: '1em'}} />
+                <a href='https://www.leapwallet.io/download' target='_blank' rel='noreferrer noopener'>Get Leap Wallet</a> : <div style={{height: '1em'}} />
               }
             </Col>
           </div>
@@ -280,9 +290,9 @@ export const UserProvider = ({ children }: Props): ReactElement => {
   return <UserContext.Provider value={values}>
           <ModalV2
             open={walletStatus !== 'CONNECTED' && walletStatus !== 'DISCONNECTED' }
-            locked={true}
-            onClose={()=>{}}
+            onClose={()=>setWalletStatus('DISCONNECTED')}
             title='Connect Wallet'
+            style={{maxWidth: '400px'}}
           >
             {modalContent()}
         </ModalV2>

@@ -41,44 +41,53 @@ const FinishPage: FC<{
                 <div className='d-flex flex-column mb24 align-items-center mt16'>
                     <div className={styles.reviewBox}>
                         <p>
-                            Review your collection and minter settings below. if everything looks good, click the button to deploy your collection and minter. Afterwards, you'll be able to load items into the minter. 
+                            Review your collection and minter settings below. if everything looks good, click the button to deploy your collection and minter.<br />
+                            {collectionType==='RANDOM' && `Afterwards, you'll be able to load items into the minter.`}
                         </p>
 
-                        <div className='d-flex flex-wrap wide'>
+                        <div className='d-flex flex-wrap wide mb16'>
                             <Col xs={6}>
                                 <h4>Collection Name</h4>
-                                <div className='lightText12'>{details.name}</div>
+                                <div className='lightText12'>{details.name || (<span style={{color: '#f02e2e'}}>Not Set</span>)}</div>
                             </Col>
                             <Col>
                                 <h4>Collection Symbol</h4>
-                                <div className='lightText12'>{details.name}</div>
+                                <div className='lightText12'>{details.symbol || (<span style={{color: '#f02e2e'}}>Not Set</span>)}</div>
                             </Col>
                         </div>
 
                         { (collectionType === 'RANDOM' || collectionType === 'COPY') &&
-                            <div className='d-flex flex-wrap wide'>
+                            <div className='d-flex flex-wrap wide mb16'>
                                 <Col xs={6}>
                                     <h4>Mint Price</h4>
-                                    <div className='lightText12'>{financials?.amount} {financials?.denom.displayDenom}</div>
+                                    <div className='lightText12'>{financials?.amount || '0'} {financials?.denom.displayDenom}</div>
                                 </Col>
                                 <Col>
                                     <h4>Beneficiary</h4>
-                                    <div className='lightText12'>{financials?.beneficiary_address}</div>
+                                    <div className='lightText12'>{
+                                        financials?.beneficiary_address ?
+                                            financials.beneficiary_address
+                                        : (!!financials?.amount || collectionType !== 'COPY') ?
+                                            <span style={{color: '#f02e2e'}}>Not Set</span>
+                                        :
+                                            '   N/A'
+                                    
+                                    }</div>
                                 </Col>
                             </div>
                         }
 
                         { (collectionType === 'RANDOM' || collectionType === 'COPY') &&
-                            <div className={`d-flex flex-wrap wide`}>
+                            <div className={`d-flex flex-wrap wide mb16`}>
                                 <Col xs={6}>
                                     <h4>Launch Time</h4>
-                                    <div className='lightText12'>{new Date(times?.launch_time || '').toLocaleTimeString()}</div>
+                                    <div className='lightText12'>{times?.launch_time ? new Date(times.launch_time).toLocaleTimeString() : 'Not Set'}</div>
                                 </Col>
                                 { collectionType === 'RANDOM' ?
                                     <>
                                         <Col>
                                             <h4>Whitelist Launch Time</h4>
-                                            <div className='lightText12'>{new Date(times?.whitelist_launch_time || '').toLocaleTimeString()}</div>
+                                            <div className='lightText12'>{times?.whitelist_launch_time ? new Date(times.whitelist_launch_time).toLocaleTimeString() : 'Not Set'}</div>
                                         </Col>
                                         <Col>
                                             <h4>Whitelist</h4>
@@ -89,7 +98,7 @@ const FinishPage: FC<{
                                     <>
                                         <Col>
                                             <h4>End Time</h4>
-                                            <div className='lightText12'>{new Date(times?.end_time || '').toLocaleTimeString()}</div>
+                                            <div className='lightText12'>{times?.end_time ? new Date(times?.end_time).toLocaleTimeString() : 'Not Set'}</div>
                                         </Col>
                                         <Col>
                                             <h4>Mint Limit</h4>

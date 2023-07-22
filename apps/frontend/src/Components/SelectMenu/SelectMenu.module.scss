@@ -7,7 +7,8 @@
     align-items: center;
     padding: 12px 16px;
 
-    border: 1px solid #F2EFED;
+    border: 1px solid #cfccc9;
+    // border: 1px solid #F2EFED;
     // border: 1px solid red;
     border-radius: 8px;
 
@@ -28,9 +29,9 @@
 .menu {
     width: 100%;
     // max-height: 128px;
-    border-left: 1px solid #F2EFED;
-    border-right: 1px solid #F2EFED;
-    border-bottom: 1px solid #F2EFED;
+    border-left: 1px solid #cfccc9;
+    border-right: 1px solid #cfccc9;
+    border-bottom: 1px solid #cfccc9;
 
     border-radius: 0 0 8px 8px;
 
@@ -63,7 +64,7 @@
 }
 
 .menuOption {
-    
+    border: 1px solid #f2efed !important;
 }
 
 .menuOption:hover {

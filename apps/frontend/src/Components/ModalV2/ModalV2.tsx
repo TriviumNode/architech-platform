@@ -1,3 +1,5 @@
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CSSProperties, useCallback, useEffect, useMemo, useRef } from "react";
 import styles from "./Modal.module.scss";
 
@@ -11,7 +13,7 @@ interface ModalProps {
     closeButton?: boolean;
 }
 
-export default function ModalV2({ open, locked, onClose, children, style, title, closeButton }: ModalProps) {
+export default function ModalV2({ open, locked = false, onClose, children, style, title, closeButton = !locked }: ModalProps) {
   const modalRef = useRef(null);
 
   // work out which classes should be applied to the dialog element
@@ -71,7 +73,10 @@ export default function ModalV2({ open, locked, onClose, children, style, title,
       <div className={styles["modal__container"]}>
         {!!title &&
         <div>
-          {title}
+          <div className='d-flex justify-content-between align-items-center pr8'>
+            {title}
+            {closeButton && <FontAwesomeIcon icon={faXmark} size='lg' color='#222' onClick={()=>onClose()}  style={{cursor: 'pointer'}} /> }
+          </div>
           <hr />
         </div>
 }

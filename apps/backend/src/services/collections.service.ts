@@ -158,10 +158,11 @@ export const refreshCollection = async (contract: string) => {
   console.log('Processed Tokens', processedTokens);
 
   // Check for minter info
-  const { minter, actual_creator } = await getMinterInfo(creator);
-  const cleanNew = removeNullUndefined(minter);
-  const cleanOld = removeId(removeNullUndefined(knownCollectionData.collectionMinter));
+  // const { minter, actual_creator } = await getMinterInfo(creator);
+  const minterResponse = await getMinterInfo(creator);
+  const cleanNew = removeNullUndefined(minterResponse.minter || {});
 
+  const cleanOld = removeId(removeNullUndefined(knownCollectionData.collectionMinter || {}));
   // Check if update is needed
   if (
     !equal(knownCollectionData.totalTokens, numTokens) ||
@@ -190,7 +191,7 @@ export const refreshCollection = async (contract: string) => {
       collectionProfile: {
         profile_image: pfp,
       },
-      collectionMinter: minter,
+      collectionMinter: minterResponse.minter,
     };
     const updatedCollection = await updateCollection(knownCollectionData._id, updateData);
 
@@ -235,8 +236,8 @@ export const importCollection = async (
   if (
     user.address !== admin &&
     user.address !== creator &&
-    user.address !== minterResponse?.minter?.beneficiary &&
-    user.address !== minterResponse?.minter?.minter_admin &&
+    user.address !== minterResponse.minter?.beneficiary &&
+    user.address !== minterResponse.minter?.minter_admin &&
     // Allow Architech admins to import anything
     !ADMINS.includes(user.address)
   )
@@ -277,7 +278,7 @@ export const importCollection = async (
     admin: admin,
     cw721_name,
     cw721_symbol,
-    creator: minterResponse?.actual_creator || creator,
+    creator: minterResponse.actual_creator || creator,
     collectionProfile: {
       name: importBody.name || cw721_name,
       description: importBody.description,
@@ -295,7 +296,7 @@ export const importCollection = async (
     uniqueTraits: 0,
     hidden: hidden,
     tokenIds: tokenIdList,
-    collectionMinter: minterResponse?.minter,
+    collectionMinter: minterResponse.minter,
   };
   console.log('collectionProfile', newCollection.collectionProfile);
   const result = await createCollection(newCollection);
@@ -403,6 +404,6 @@ const getMinterInfo = async (creator: string) => {
         }
       }
     }
-    return { minter: undefined, actual_creator: creator };
   }
+  return { minter: undefined, actual_creator: creator };
 };
