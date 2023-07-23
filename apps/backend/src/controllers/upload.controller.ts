@@ -5,7 +5,7 @@ import path from 'path';
 
 import AWS from 'aws-sdk';
 import { HttpException } from '@/exceptions/HttpException';
-import { FILEBASE_S3_KEY, FILEBASE_S3_KEY_ID } from '@/config';
+import { FILEBASE_BUCKET, FILEBASE_S3_KEY, FILEBASE_S3_KEY_ID } from '@/config';
 import { Multer } from 'multer';
 
 const s3 = new AWS.S3({
@@ -53,8 +53,8 @@ export const uploadImage = async (req: RequestWithUser, res: Response, next: Nex
   const fileName = `${hash.digest('hex')}${path.extname(req.file.originalname)}`;
 
   const params = {
-    Bucket: 'test-architech',
-    Key: `test/${fileName}`,
+    Bucket: FILEBASE_BUCKET,
+    Key: `uploads/${fileName}`,
     ContentType: req.file.mimetype,
     Body: buffer,
     ACL: 'public-read',
@@ -118,8 +118,8 @@ const s3Upload = async (file: any): Promise<string> => {
   const fileName = `${hash.digest('hex')}${path.extname(file.originalname)}`;
 
   const params = {
-    Bucket: 'test-architech',
-    Key: `test/${fileName}`,
+    Bucket: FILEBASE_BUCKET,
+    Key: `uploads/${fileName}`,
     ContentType: file.mimetype,
     Body: buffer,
     ACL: 'public-read',
