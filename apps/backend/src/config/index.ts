@@ -15,6 +15,7 @@ export const {
   ORIGIN,
   FILEBASE_S3_KEY_ID,
   FILEBASE_S3_KEY,
+  FILEBASE_BUCKET,
   CHAIN_ID,
 } = process.env;
 

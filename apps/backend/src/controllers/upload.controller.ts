@@ -5,7 +5,7 @@ import path from 'path';
 
 import AWS from 'aws-sdk';
 import { HttpException } from '@/exceptions/HttpException';
-import { FILEBASE_S3_KEY, FILEBASE_S3_KEY_ID } from '@/config';
+import { FILEBASE_BUCKET, FILEBASE_S3_KEY, FILEBASE_S3_KEY_ID } from '@/config';
 
 const s3 = new AWS.S3({
   apiVersion: '2006-03-01',
@@ -48,8 +48,8 @@ export const uploadImage = async (req: RequestWithUser, res: Response, next: Nex
   const fileName = `${hash.digest('hex')}${path.extname(req.file.originalname)}`;
 
   const params = {
-    Bucket: 'test-architech',
-    Key: `test/${fileName}`,
+    Bucket: FILEBASE_BUCKET,
+    Key: `uploads/${fileName}`,
     ContentType: req.file.mimetype,
     Body: buffer,
     ACL: 'public-read',
