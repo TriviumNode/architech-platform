@@ -10,18 +10,21 @@ export type ExecuteMsg = {
     collection_admin: Addr;
     contract_name: string;
     label: string;
-    launch_time?: Timestamp | null;
+    launch_time?: Uint64 | null;
+    mint_limit?: number | null;
     mint_price: Payment;
     nft_symbol: string;
     reward_admin: string;
-    whitelist_launch_time?: Timestamp | null;
+    whitelist_launch_time?: Uint64 | null;
     whitelisted?: string[] | null;
+    wl_mint_price?: Payment | null;
   };
 } | {
   init_copy_project: {
     beneficiary: Addr;
     end_time?: Uint64 | null;
     launch_time?: Uint64 | null;
+    maximum_copies?: number | null;
     metadata: Metadata;
     mint_limit?: number | null;
     mint_price?: Payment | null;
@@ -31,6 +34,9 @@ export type ExecuteMsg = {
     nft_label: string;
     nft_name: string;
     nft_symbol: string;
+    whitelist_launch_time?: Uint64 | null;
+    whitelist_mint_price?: Payment | null;
+    whitelisted?: string[] | null;
   };
 } | {
   change_admin: {
@@ -40,9 +46,12 @@ export type ExecuteMsg = {
   change_fees: {
     new_fees: Fee;
   };
+} | {
+  change_nois_proxy: {
+    new_proxy: string;
+  };
 };
 export type Addr = string;
-export type Timestamp = Uint64;
 export type Uint64 = string;
 export type Payment = {
   cw20_payment: {
@@ -87,21 +96,25 @@ export interface InstantiateMsg {
   admin_fee: Fee;
   copy_mint_code_id: Uint64;
   credit_contract_addr: string;
-  flat_fee: Coin;
   nft_contract_code_id: Uint64;
   nois_proxy: string;
   random_mint_code_id: Uint64;
-}
-export interface Coin {
-  amount: Uint128;
-  denom: string;
-  [k: string]: unknown;
+  reward_recipient: string;
+  test_mode?: boolean | null;
 }
 export type QueryMsg = {
-  minters: {};
+  get_minters: {};
+} | {
+  get_nois_proxy: {};
 };
-export type ArrayOfMinter = Minter[];
+export interface GetMintersResponse {
+  minters: Minter[];
+}
 export interface Minter {
   minter_address: string;
   [k: string]: unknown;
 }
+export interface GetNoisProxyResponse {
+  nois_proxy: string;
+}
+export type ArrayOfMinter = Minter[];

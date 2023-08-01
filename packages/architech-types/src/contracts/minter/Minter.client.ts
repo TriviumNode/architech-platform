@@ -6,10 +6,15 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { ExecuteMsg, Timestamp, Uint64, Addr, Uint128, Binary, HexBinary, Metadata, Trait, Cw20ReceiveMsg, NoisCallback, Payment, InstantiateMsg, Fee, QueryMsg, GetConfigResponse, Config, MintStatus } from "./Minter.types";
+import { ExecuteMsg, Uint64, Addr, Uint128, Binary, Timestamp, HexBinary, Metadata, Trait, Cw20ReceiveMsg, NoisCallback, Payment, InstantiateMsg, Fee, QueryMsg, GetBeneficiaryResponse, GetConfigResponse, Config, GetMintLimitResponse, GetMintStatusResponse, GetNftAddrResponse, GetPreloadResponse, GetPriceResponse } from "./Minter.types";
 export interface MinterReadOnlyInterface {
   contractAddress: string;
   getPrice: () => Promise<GetPriceResponse>;
+  getMintLimit: ({
+    sender
+  }: {
+    sender: string;
+  }) => Promise<GetMintLimitResponse>;
   getMintStatus: () => Promise<GetMintStatusResponse>;
   getBeneficiary: () => Promise<GetBeneficiaryResponse>;
   getNftAddr: () => Promise<GetNftAddrResponse>;
@@ -23,6 +28,7 @@ export class MinterQueryClient implements MinterReadOnlyInterface {
     this.client = client;
     this.contractAddress = contractAddress;
     this.getPrice = this.getPrice.bind(this);
+    this.getMintLimit = this.getMintLimit.bind(this);
     this.getMintStatus = this.getMintStatus.bind(this);
     this.getBeneficiary = this.getBeneficiary.bind(this);
     this.getNftAddr = this.getNftAddr.bind(this);
@@ -32,6 +38,17 @@ export class MinterQueryClient implements MinterReadOnlyInterface {
   getPrice = async (): Promise<GetPriceResponse> => {
     return this.client.queryContractSmart(this.contractAddress, {
       get_price: {}
+    });
+  };
+  getMintLimit = async ({
+    sender
+  }: {
+    sender: string;
+  }): Promise<GetMintLimitResponse> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      get_mint_limit: {
+        sender
+      }
     });
   };
   getMintStatus = async (): Promise<GetMintStatusResponse> => {
@@ -63,8 +80,8 @@ export interface MinterInterface extends MinterReadOnlyInterface {
     launchTime,
     whitelistLaunchTime
   }: {
-    launchTime?: Timestamp;
-    whitelistLaunchTime?: Timestamp;
+    launchTime?: Uint64;
+    whitelistLaunchTime?: Uint64;
   }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
   setBeneficiary: ({
     newBeneficiary
@@ -124,8 +141,8 @@ export class MinterClient extends MinterQueryClient implements MinterInterface {
     launchTime,
     whitelistLaunchTime
   }: {
-    launchTime?: Timestamp;
-    whitelistLaunchTime?: Timestamp;
+    launchTime?: Uint64;
+    whitelistLaunchTime?: Uint64;
   }, fee: number | StdFee | "auto" = "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> => {
     return await this.client.execute(this.sender, this.contractAddress, {
       set_launch_time: {

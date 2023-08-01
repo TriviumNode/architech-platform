@@ -1,5 +1,4 @@
 import { cw2981, factory, minter } from "@architech/types";
-import { getFee } from "../helpers";
 import { SigningArchwayClient } from "@archwayhq/arch3.js";
 import secureRandom from "secure-random";
 
@@ -32,7 +31,7 @@ export const initStandardProject = async({
         CW721_CODE_ID,
         msg as any,
         label,
-        getFee(500_000),
+        'auto',
         {
             admin: signer,
         }
@@ -96,7 +95,7 @@ export const initCopyProject = async({
         signer,
         contract,
         msg,
-        getFee(700_000),
+        'auto',
     )
     // Find instantiated Minter address
     const minterAddress = result.logs[0].events.find(e=>e.type==='reply')?.attributes.find(a=>a.key.includes('contract_address'))?.value;
@@ -165,12 +164,11 @@ export const initRandomProject = async({
         }
     }
     console.log('Minter Admin', minter_admin)
-    // const est = await client.simulate()
     const result = await client.execute(
         signer,
         contract,
         msg,
-        getFee(700_000),
+        'auto',
     )
     console.log('GAS',result.gasUsed, '/', result.gasWanted)
     // Find instantiated Minter address

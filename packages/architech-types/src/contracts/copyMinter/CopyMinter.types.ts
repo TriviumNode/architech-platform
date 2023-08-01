@@ -7,6 +7,7 @@
 export type ExecuteMsg = {
   set_launch_time: {
     launch_time?: Uint64 | null;
+    whitelist_launch_time?: Uint64 | null;
   };
 } | {
   set_beneficiary: {
@@ -50,6 +51,7 @@ export interface InstantiateMsg {
   credit_contract?: string | null;
   end_time?: Uint64 | null;
   launch_time?: Uint64 | null;
+  maximum_copies?: number | null;
   metadata: Metadata;
   mint_limit?: number | null;
   mint_price?: Payment | null;
@@ -59,6 +61,9 @@ export interface InstantiateMsg {
   nft_label: string;
   nft_name: string;
   nft_symbol: string;
+  whitelist_launch_time?: Uint64 | null;
+  whitelisted?: string[] | null;
+  wl_mint_price?: Payment | null;
 }
 export interface Fee {
   decimal_places: number;
@@ -109,11 +114,14 @@ export interface Config {
   credit_contract?: string | null;
   end_time?: Timestamp | null;
   launch_time?: Timestamp | null;
+  maximum_copies?: number | null;
   metadata: Metadata;
   mint_limit?: number | null;
   mint_price?: Payment | null;
   minter_admin: Addr;
   nft_admin: Addr;
+  whitelist_launch_time?: Timestamp | null;
+  wl_mint_price?: Payment | null;
   [k: string]: unknown;
 }
 export interface GetMintStatusResponse {
@@ -130,4 +138,5 @@ export interface GetNftAddrResponse {
 }
 export interface GetPriceResponse {
   price?: Payment | null;
+  wl_price?: Payment | null;
 }

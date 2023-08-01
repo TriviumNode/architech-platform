@@ -8,8 +8,8 @@ export type ExecuteMsg = {
   mint: {};
 } | {
   set_launch_time: {
-    launch_time?: Timestamp | null;
-    whitelist_launch_time?: Timestamp | null;
+    launch_time?: Uint64 | null;
+    whitelist_launch_time?: Uint64 | null;
   };
 } | {
   set_beneficiary: {
@@ -30,11 +30,11 @@ export type ExecuteMsg = {
     callback: NoisCallback;
   };
 };
-export type Timestamp = Uint64;
 export type Uint64 = string;
 export type Addr = string;
 export type Uint128 = string;
 export type Binary = string;
+export type Timestamp = Uint64;
 export type HexBinary = string;
 export interface Metadata {
   animation_url?: string | null;
@@ -83,15 +83,18 @@ export interface InstantiateMsg {
   beneficiary: Addr;
   contract_name: string;
   credit_contract: string;
-  launch_time?: Timestamp | null;
+  launch_time?: Uint64 | null;
+  mint_limit?: number | null;
   mint_price: Payment;
   nft_code_id: number;
   nft_symbol: string;
   nois_proxy: string;
   operator: Addr;
   reward_admin: string;
-  whitelist_launch_time?: Timestamp | null;
+  test_mode?: boolean | null;
+  whitelist_launch_time?: Uint64 | null;
   whitelisted?: string[] | null;
+  wl_mint_price?: Payment | null;
 }
 export interface Fee {
   decimal_places: number;
@@ -102,6 +105,10 @@ export interface Fee {
 export type QueryMsg = {
   get_price: {};
 } | {
+  get_mint_limit: {
+    sender: string;
+  };
+} | {
   get_mint_status: {};
 } | {
   get_beneficiary: {};
@@ -110,6 +117,9 @@ export type QueryMsg = {
 } | {
   get_config: {};
 };
+export interface GetBeneficiaryResponse {
+  beneficiary: Addr;
+}
 export interface GetConfigResponse {
   config: Config;
 }
@@ -117,13 +127,29 @@ export interface Config {
   admin: Addr;
   beneficiary: Addr;
   launch_time?: Timestamp | null;
+  mint_limit?: number | null;
   price: Payment;
+  test_mode: boolean;
   whitelist_limit_time?: Timestamp | null;
+  wl_price?: Payment | null;
   [k: string]: unknown;
 }
-export interface MintStatus {
-  launch_time?: Timestamp | null;
+export interface GetMintLimitResponse {
+  mint_limit?: number | null;
+  mints?: number | null;
+}
+export interface GetMintStatusResponse {
+  launch_time?: Uint64 | null;
   remaining: number;
-  whitelist_launch_time?: Timestamp | null;
-  [k: string]: unknown;
+  whitelist_launch_time?: Uint64 | null;
+}
+export interface GetNftAddrResponse {
+  nft_address: Addr;
+}
+export interface GetPreloadResponse {
+  preload: Metadata[];
+}
+export interface GetPriceResponse {
+  price: Payment;
+  wl_price?: Payment | null;
 }

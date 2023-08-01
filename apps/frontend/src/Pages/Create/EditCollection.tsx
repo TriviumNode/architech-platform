@@ -293,14 +293,11 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                 }),
             };
 
-            const gas = await wallet.client.simulate(wallet.address, [WasmMsg], '');
-
             const result = await preloadData({
                 client: wallet.client,
                 signer: wallet.address,
                 contract: fullCollection.collection.collectionMinter?.minter_address as string,
                 metadata: cleanMetadata,
-                gas: Math.ceil(gas*1.25)
             })
             console.log(result);
             setPreloadState(DefaultPreloadState);

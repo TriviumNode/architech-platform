@@ -83,14 +83,14 @@ export interface CreditsInterface extends CreditsReadOnlyInterface {
   }: {
     newAdmin: Addr;
   }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
-  editCreditPermissions: ({
+  editOperatorPermissions: ({
     addPerms,
     address
   }: {
     addPerms: boolean;
     address: Addr;
   }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
-  editOperatorPermissions: ({
+  editCreditPermissions: ({
     addPerms,
     address
   }: {
@@ -121,8 +121,8 @@ export class CreditsClient extends CreditsQueryClient implements CreditsInterfac
     this.sender = sender;
     this.contractAddress = contractAddress;
     this.editAdmin = this.editAdmin.bind(this);
-    this.editCreditPermissions = this.editCreditPermissions.bind(this);
     this.editOperatorPermissions = this.editOperatorPermissions.bind(this);
+    this.editCreditPermissions = this.editCreditPermissions.bind(this);
     this.editCreditRewards = this.editCreditRewards.bind(this);
     this.earnCredits = this.earnCredits.bind(this);
   }
@@ -138,20 +138,6 @@ export class CreditsClient extends CreditsQueryClient implements CreditsInterfac
       }
     }, fee, memo, funds);
   };
-  editCreditPermissions = async ({
-    addPerms,
-    address
-  }: {
-    addPerms: boolean;
-    address: Addr;
-  }, fee: number | StdFee | "auto" = "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> => {
-    return await this.client.execute(this.sender, this.contractAddress, {
-      edit_credit_permissions: {
-        add_perms: addPerms,
-        address
-      }
-    }, fee, memo, funds);
-  };
   editOperatorPermissions = async ({
     addPerms,
     address
@@ -161,6 +147,20 @@ export class CreditsClient extends CreditsQueryClient implements CreditsInterfac
   }, fee: number | StdFee | "auto" = "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> => {
     return await this.client.execute(this.sender, this.contractAddress, {
       edit_operator_permissions: {
+        add_perms: addPerms,
+        address
+      }
+    }, fee, memo, funds);
+  };
+  editCreditPermissions = async ({
+    addPerms,
+    address
+  }: {
+    addPerms: boolean;
+    address: Addr;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      edit_credit_permissions: {
         add_perms: addPerms,
         address
       }

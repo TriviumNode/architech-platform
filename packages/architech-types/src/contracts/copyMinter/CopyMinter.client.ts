@@ -6,13 +6,14 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { ExecuteMsg, Uint64, Addr, Uint128, Binary, Cw20ReceiveMsg, Payment, InstantiateMsg, Fee, Metadata, Trait, QueryMsg, GetBeneficiaryResponse, GetMintStatusResponse, MintStatus, GetNftAddrResponse, GetPriceResponse } from "./CopyMinter.types";
+import { ExecuteMsg, Uint64, Addr, Uint128, Binary, Cw20ReceiveMsg, Payment, InstantiateMsg, Fee, Metadata, Trait, QueryMsg, GetBeneficiaryResponse, Timestamp, GetConfigResponse, Config, GetMintStatusResponse, MintStatus, GetNftAddrResponse, GetPriceResponse } from "./CopyMinter.types";
 export interface CopyMinterReadOnlyInterface {
   contractAddress: string;
   getPrice: () => Promise<GetPriceResponse>;
   getMintStatus: () => Promise<GetMintStatusResponse>;
   getBeneficiary: () => Promise<GetBeneficiaryResponse>;
   getNftAddr: () => Promise<GetNftAddrResponse>;
+  getConfig: () => Promise<GetConfigResponse>;
 }
 export class CopyMinterQueryClient implements CopyMinterReadOnlyInterface {
   client: CosmWasmClient;
@@ -25,6 +26,7 @@ export class CopyMinterQueryClient implements CopyMinterReadOnlyInterface {
     this.getMintStatus = this.getMintStatus.bind(this);
     this.getBeneficiary = this.getBeneficiary.bind(this);
     this.getNftAddr = this.getNftAddr.bind(this);
+    this.getConfig = this.getConfig.bind(this);
   }
 
   getPrice = async (): Promise<GetPriceResponse> => {
@@ -47,14 +49,21 @@ export class CopyMinterQueryClient implements CopyMinterReadOnlyInterface {
       get_nft_addr: {}
     });
   };
+  getConfig = async (): Promise<GetConfigResponse> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      get_config: {}
+    });
+  };
 }
 export interface CopyMinterInterface extends CopyMinterReadOnlyInterface {
   contractAddress: string;
   sender: string;
   setLaunchTime: ({
-    launchTime
+    launchTime,
+    whitelistLaunchTime
   }: {
     launchTime?: Uint64;
+    whitelistLaunchTime?: Uint64;
   }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
   setBeneficiary: ({
     newBeneficiary
@@ -95,13 +104,16 @@ export class CopyMinterClient extends CopyMinterQueryClient implements CopyMinte
   }
 
   setLaunchTime = async ({
-    launchTime
+    launchTime,
+    whitelistLaunchTime
   }: {
     launchTime?: Uint64;
+    whitelistLaunchTime?: Uint64;
   }, fee: number | StdFee | "auto" = "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> => {
     return await this.client.execute(this.sender, this.contractAddress, {
       set_launch_time: {
-        launch_time: launchTime
+        launch_time: launchTime,
+        whitelist_launch_time: whitelistLaunchTime
       }
     }, fee, memo, funds);
   };

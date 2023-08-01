@@ -49,7 +49,6 @@ const SingleMinter: FC<any> = (): ReactElement => {
           signer: user.address,
           minter_contract: collection.collectionMinter.minter_address,
           funds: collection.collectionMinter.payment_denom ? [{amount: collection.collectionMinter.payment_amount, denom: collection.collectionMinter.payment_denom}] : [],
-          gas: collection.collectionMinter.minter_type === "COPY" ? 600_000 : undefined,
         })
         console.log('Mint Result', result);
         if (collection.collectionMinter.minter_type === "RANDOM")

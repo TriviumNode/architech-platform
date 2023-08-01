@@ -1,14 +1,6 @@
 import { marketplace } from "@architech/types";
 import BigNumber from "bignumber.js";
 
-export const getFee = (gas: number) => {
-    const fee = Math.ceil(gas * parseFloat(process.env.GAS_PRICE || '1'))
-    return {
-        amount: [{denom: process.env.GAS_DENOM || 'uconst', amount: fee.toString()}],
-        gas: gas.toString(),
-    }
-}
-
 export const resolveIpfs = (uri: string) => {
     const isIpfs = uri.startsWith('ipfs://');
     if (isIpfs) uri = `https://ipfs.filebase.io/ipfs/${uri.replace('ipfs://', '')}`;

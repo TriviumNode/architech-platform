@@ -1,6 +1,5 @@
 import type { SigningArchwayClient } from "@archwayhq/arch3.js/build";
 import { cw2981, cw721 } from '@architech/types'
-import { getFee } from "../utils";
 
 type ExecuteMsg = cw721.ExecuteMsg;
 
@@ -11,7 +10,6 @@ export const sendNft = async({
     tokenId,
     recipient,
     subMsg,
-    gas = 500_000,
 }:{
     client: SigningArchwayClient,
     signer: string,
@@ -19,7 +17,6 @@ export const sendNft = async({
     tokenId: string;
     recipient: string;
     subMsg: any;
-    gas?: number;
 }) => {
     const msg: ExecuteMsg = {
         send_nft: {
@@ -34,7 +31,7 @@ export const sendNft = async({
         signer,
         contract,
         msg,
-        getFee(gas),
+        'auto',
     )
     return result;
 
@@ -67,7 +64,7 @@ export const mintNft = async({
         signer,
         contract,
         msg,
-        getFee(215_000),
+        'auto',
     )
     return result;
 
@@ -106,7 +103,7 @@ export const mintRoyaltyNft = async({
         signer,
         contract,
         msg,
-        getFee(215_000),
+        'auto',
     )
     return result;
 

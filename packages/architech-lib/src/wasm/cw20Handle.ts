@@ -1,8 +1,7 @@
 import { SigningArchwayClient } from "@archwayhq/arch3.js/build";
 import { Coin } from "@cosmjs/amino";
 import { cw20 } from "@architech/types";
-import { getFee } from "../utils";
-type Cw20ExecuteMsg = cw20.Cw20ExecuteMsg
+type Cw20ExecuteMsg = cw20.ExecuteMsg
 
 export const sendTokens = async({
     client,
@@ -11,7 +10,6 @@ export const sendTokens = async({
     amount,
     recipient,
     subMsg,
-    gas = 500_000,
     funds = []
 }:{
     client: SigningArchwayClient,
@@ -20,7 +18,6 @@ export const sendTokens = async({
     amount: string;
     recipient: string;
     subMsg: any;
-    gas?: number;
     funds?: Coin[]
 }) => {
     const msg: Cw20ExecuteMsg = {
@@ -35,8 +32,11 @@ export const sendTokens = async({
         signer,
         contract,
         msg,
-        getFee(gas),
+        'auto',
     )
+    const handle = Object.keys(subMsg)[0];
+    //@ts-ignore-error
+    gasUsage[handle] ? gasUsage[handle].push(result.gasUsed) : gasUsage[handle] = [result.gasUsed];
     return result;
 
 }
@@ -47,7 +47,6 @@ export const transferTokens = async({
     contract,
     amount,
     recipient,
-    gas = 50_000,
     funds = []
 }:{
     client: SigningArchwayClient,
@@ -55,7 +54,6 @@ export const transferTokens = async({
     contract: string,
     amount: string;
     recipient: string;
-    gas?: number;
     funds?: Coin[]
 }) => {
     const msg: Cw20ExecuteMsg = {
@@ -69,7 +67,7 @@ export const transferTokens = async({
         signer,
         contract,
         msg,
-        getFee(gas),
+        'auto',
         undefined,
         
     )

@@ -5,11 +5,12 @@
 */
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
-import { StdFee } from "@cosmjs/amino";
-import { ExecuteMsg, Addr, Timestamp, Uint64, Payment, Uint128, Metadata, Trait, Fee, InstantiateMsg, Coin, QueryMsg, ArrayOfMinter, Minter } from "./Factory.types";
+import { Coin, StdFee } from "@cosmjs/amino";
+import { ExecuteMsg, Addr, Uint64, Payment, Uint128, Metadata, Trait, Fee, InstantiateMsg, QueryMsg, GetMintersResponse, Minter, GetNoisProxyResponse, ArrayOfMinter } from "./Factory.types";
 export interface FactoryReadOnlyInterface {
   contractAddress: string;
-  minters: () => Promise<MintersResponse>;
+  getMinters: () => Promise<GetMintersResponse>;
+  getNoisProxy: () => Promise<GetNoisProxyResponse>;
 }
 export class FactoryQueryClient implements FactoryReadOnlyInterface {
   client: CosmWasmClient;
@@ -18,12 +19,18 @@ export class FactoryQueryClient implements FactoryReadOnlyInterface {
   constructor(client: CosmWasmClient, contractAddress: string) {
     this.client = client;
     this.contractAddress = contractAddress;
-    this.minters = this.minters.bind(this);
+    this.getMinters = this.getMinters.bind(this);
+    this.getNoisProxy = this.getNoisProxy.bind(this);
   }
 
-  minters = async (): Promise<MintersResponse> => {
+  getMinters = async (): Promise<GetMintersResponse> => {
     return this.client.queryContractSmart(this.contractAddress, {
-      minters: {}
+      get_minters: {}
+    });
+  };
+  getNoisProxy = async (): Promise<GetNoisProxyResponse> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      get_nois_proxy: {}
     });
   };
 }
@@ -36,27 +43,32 @@ export interface FactoryInterface extends FactoryReadOnlyInterface {
     contractName,
     label,
     launchTime,
+    mintLimit,
     mintPrice,
     nftSymbol,
     rewardAdmin,
     whitelistLaunchTime,
-    whitelisted
+    whitelisted,
+    wlMintPrice
   }: {
     beneficiary: Addr;
     collectionAdmin: Addr;
     contractName: string;
     label: string;
-    launchTime?: Timestamp;
+    launchTime?: Uint64;
+    mintLimit?: number;
     mintPrice: Payment;
     nftSymbol: string;
     rewardAdmin: string;
-    whitelistLaunchTime?: Timestamp;
+    whitelistLaunchTime?: Uint64;
     whitelisted?: string[];
+    wlMintPrice?: Payment;
   }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
   initCopyProject: ({
     beneficiary,
     endTime,
     launchTime,
+    maximumCopies,
     metadata,
     mintLimit,
     mintPrice,
@@ -65,11 +77,15 @@ export interface FactoryInterface extends FactoryReadOnlyInterface {
     nftAdmin,
     nftLabel,
     nftName,
-    nftSymbol
+    nftSymbol,
+    whitelistLaunchTime,
+    whitelistMintPrice,
+    whitelisted
   }: {
     beneficiary: Addr;
     endTime?: Uint64;
     launchTime?: Uint64;
+    maximumCopies?: number;
     metadata: Metadata;
     mintLimit?: number;
     mintPrice?: Payment;
@@ -79,6 +95,9 @@ export interface FactoryInterface extends FactoryReadOnlyInterface {
     nftLabel: string;
     nftName: string;
     nftSymbol: string;
+    whitelistLaunchTime?: Uint64;
+    whitelistMintPrice?: Payment;
+    whitelisted?: string[];
   }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
   changeAdmin: ({
     newAdmin
@@ -89,6 +108,11 @@ export interface FactoryInterface extends FactoryReadOnlyInterface {
     newFees
   }: {
     newFees: Fee;
+  }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
+  changeNoisProxy: ({
+    newProxy
+  }: {
+    newProxy: string;
   }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
 }
 export class FactoryClient extends FactoryQueryClient implements FactoryInterface {
@@ -105,6 +129,7 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
     this.initCopyProject = this.initCopyProject.bind(this);
     this.changeAdmin = this.changeAdmin.bind(this);
     this.changeFees = this.changeFees.bind(this);
+    this.changeNoisProxy = this.changeNoisProxy.bind(this);
   }
 
   initRandomProject = async ({
@@ -113,22 +138,26 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
     contractName,
     label,
     launchTime,
+    mintLimit,
     mintPrice,
     nftSymbol,
     rewardAdmin,
     whitelistLaunchTime,
-    whitelisted
+    whitelisted,
+    wlMintPrice
   }: {
     beneficiary: Addr;
     collectionAdmin: Addr;
     contractName: string;
     label: string;
-    launchTime?: Timestamp;
+    launchTime?: Uint64;
+    mintLimit?: number;
     mintPrice: Payment;
     nftSymbol: string;
     rewardAdmin: string;
-    whitelistLaunchTime?: Timestamp;
+    whitelistLaunchTime?: Uint64;
     whitelisted?: string[];
+    wlMintPrice?: Payment;
   }, fee: number | StdFee | "auto" = "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> => {
     return await this.client.execute(this.sender, this.contractAddress, {
       init_random_project: {
@@ -137,11 +166,13 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
         contract_name: contractName,
         label,
         launch_time: launchTime,
+        mint_limit: mintLimit,
         mint_price: mintPrice,
         nft_symbol: nftSymbol,
         reward_admin: rewardAdmin,
         whitelist_launch_time: whitelistLaunchTime,
-        whitelisted
+        whitelisted,
+        wl_mint_price: wlMintPrice
       }
     }, fee, memo, funds);
   };
@@ -149,6 +180,7 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
     beneficiary,
     endTime,
     launchTime,
+    maximumCopies,
     metadata,
     mintLimit,
     mintPrice,
@@ -157,11 +189,15 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
     nftAdmin,
     nftLabel,
     nftName,
-    nftSymbol
+    nftSymbol,
+    whitelistLaunchTime,
+    whitelistMintPrice,
+    whitelisted
   }: {
     beneficiary: Addr;
     endTime?: Uint64;
     launchTime?: Uint64;
+    maximumCopies?: number;
     metadata: Metadata;
     mintLimit?: number;
     mintPrice?: Payment;
@@ -171,12 +207,16 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
     nftLabel: string;
     nftName: string;
     nftSymbol: string;
+    whitelistLaunchTime?: Uint64;
+    whitelistMintPrice?: Payment;
+    whitelisted?: string[];
   }, fee: number | StdFee | "auto" = "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> => {
     return await this.client.execute(this.sender, this.contractAddress, {
       init_copy_project: {
         beneficiary,
         end_time: endTime,
         launch_time: launchTime,
+        maximum_copies: maximumCopies,
         metadata,
         mint_limit: mintLimit,
         mint_price: mintPrice,
@@ -185,7 +225,10 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
         nft_admin: nftAdmin,
         nft_label: nftLabel,
         nft_name: nftName,
-        nft_symbol: nftSymbol
+        nft_symbol: nftSymbol,
+        whitelist_launch_time: whitelistLaunchTime,
+        whitelist_mint_price: whitelistMintPrice,
+        whitelisted
       }
     }, fee, memo, funds);
   };
@@ -208,6 +251,17 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
     return await this.client.execute(this.sender, this.contractAddress, {
       change_fees: {
         new_fees: newFees
+      }
+    }, fee, memo, funds);
+  };
+  changeNoisProxy = async ({
+    newProxy
+  }: {
+    newProxy: string;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      change_nois_proxy: {
+        new_proxy: newProxy
       }
     }, fee, memo, funds);
   };

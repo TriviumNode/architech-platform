@@ -1,6 +1,5 @@
 import { marketplace } from "@architech/types";
 import type { SigningArchwayClient } from "@archwayhq/arch3.js/build";
-import { getFee } from "../utils";
 import { sendTokens } from "./cw20Handle";
 import { sendNft } from "./nftHandle";
 type ExecuteMsg = marketplace.ExecuteMsg
@@ -33,7 +32,7 @@ export const purchaseNative = async({
         signer,
         marketplace_contract,
         msg,
-        getFee(700_000),
+        'auto',
         undefined,
         [{ amount, denom }]
     )
@@ -72,7 +71,6 @@ export const purchaseCw20 = async({
         amount: amount.toString(),
         recipient: marketplace_contract,
         subMsg: buyMsg,
-        gas: 1_000_000
     });
     return buyResult;
 }
@@ -108,7 +106,6 @@ export const listToken = async({
         tokenId: token_id,
         recipient: marketplace_contract,
         subMsg: listMsg,
-        gas: 400_000
     })
 }
 
@@ -136,7 +133,7 @@ export const cancelListing = async({
         signer,
         marketplace_contract,
         msg,
-        getFee(400_000),
+        'auto',
         undefined,
     )
 }

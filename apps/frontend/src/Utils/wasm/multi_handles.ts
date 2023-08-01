@@ -3,7 +3,6 @@ import { SigningArchwayClient } from "@archwayhq/arch3.js/build";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { MARKETPLACE_ADDRESS } from "../queryClient";
 import { Buffer } from 'buffer';
-import { getFee } from "@architech/lib";
 
 export const mintAndList = async ({
     client,
@@ -61,7 +60,7 @@ export const mintAndList = async ({
         }),
     };
 
-    const result = await client.signAndBroadcast(signer, [MintExecMsg, ListExecMsg], getFee(500_000));
+    const result = await client.signAndBroadcast(signer, [MintExecMsg, ListExecMsg], 'auto');
     if (result.code) throw result;
     else return result;
 }

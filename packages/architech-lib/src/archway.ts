@@ -1,20 +1,15 @@
 import { ArchwayClient, OutstandingRewards, RewardsMsgEncoder, SigningArchwayClient } from "@archwayhq/arch3.js";
-import Long from "long";
-import { getFee } from "./utils";
-
 
 export const setRewardsMetadata = async({
     client,
     signer,
     contract,
     rewards_address,
-    gas = 100_000,
 }:{
     client: SigningArchwayClient,
     signer: string,
     contract: string,
     rewards_address: string;
-    gas?: number;
 }) => {
     return await client.setContractMetadata(
         signer,
@@ -22,7 +17,7 @@ export const setRewardsMetadata = async({
             contractAddress: contract,
             rewardsAddress: rewards_address,
         },
-        getFee(100_000)
+        'auto'
     );
 }
 
@@ -62,5 +57,5 @@ export const claimRewards = async({
     address: string,
     num_records: number,
 }) => {
-    return await client.withdrawContractRewards(address, 100, getFee(50_000*num_records));
+    return await client.withdrawContractRewards(address, 100, 'auto');
 }
