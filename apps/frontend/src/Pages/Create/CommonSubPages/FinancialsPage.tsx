@@ -75,7 +75,7 @@ const FinancialPage: FC<{
             </div>
             <form className={styles.form}>
 
-            { !collectionType || collectionType === 'COPY' &&<>
+            { (!collectionType || collectionType === 'COPY') &&<>
                 <div className='d-flex mb24'>
                     <Col xs={8}>
                         <label>
