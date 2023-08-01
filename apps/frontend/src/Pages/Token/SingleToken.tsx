@@ -171,7 +171,12 @@ const SingleToken: FC<any> = (): ReactElement => {
       <>
       <ListModal open={isListing} onClose={()=>setIsListing(false)} token={tokenResponse.token} onList={()=>revalidator.revalidate()} />
       <Modal open={viewFull} onClose={()=>setViewFull(false)} innerStyle={{padding: 0, height: 'fit-content', width: 'fit-content'}} style={{height: 'fit-content', width: 'fit-content'}}>
-        <TokenImage alt={`${collectionName} ${tokenResponse.token.tokenId}`} src={tokenImage} style={{display: 'block'}}  className='wide tall imgCover' />
+        <TokenImage
+          alt={`${collectionName} ${tokenResponse.token.tokenId}`}
+          src={tokenImage}
+          style={{display: 'block', maxHeight: '80vh', maxWidth: '80vw'}}
+          className='wide tall imgCover'
+        />
       </Modal>
 
       {/*  Collection Row */}
