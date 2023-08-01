@@ -6,6 +6,7 @@ import { Buffer } from 'buffer';
 import { CW721_CODE_ID } from "../queryClient";
 
 type ExecuteMsg = factory.ExecuteMsg;
+type Payment = factory.Payment;
 
 export const initStandardProject = async({
     client,
@@ -53,10 +54,14 @@ export const initCopyProject = async({
     minter_label = Buffer.from(secureRandom(8, { type: "Uint8Array" })).toString("base64"),
     nft_label = Buffer.from(secureRandom(8, { type: "Uint8Array" })).toString("base64"),
     launch_time,
+    whitelist_launch_time,
     end_time,
     mint_limit,
+    maximum_copies,
     mint_price,
+    whitelist_mint_price,
     metadata,
+    whitelisted,
 }:{
     client: SigningArchwayClient,
     signer: string,
@@ -70,9 +75,13 @@ export const initCopyProject = async({
     nft_label?: string;
     metadata: cw2981.Metadata;
     launch_time?: string;
+    whitelist_launch_time?: string;
     end_time?: string;
     mint_limit?: number,
-    mint_price?: minter.Payment,
+    maximum_copies?: number,
+    mint_price?: Payment,
+    whitelist_mint_price?: Payment,
+    whitelisted?: string[],
 }) => {
     const msg: factory.ExecuteMsg = {
         init_copy_project: {
@@ -86,8 +95,12 @@ export const initCopyProject = async({
             nft_symbol,
             end_time,
             launch_time,
+            whitelist_launch_time,
             mint_limit,
+            maximum_copies,
             mint_price,
+            whitelist_mint_price,
+            whitelisted,
         }
     }
     console.log('Minter Admin', minter_admin)
@@ -121,56 +134,65 @@ export const initRandomProject = async({
     /// Admin of the minter. Can preload and change mint settings.
     minter_admin = signer,
     /// Name for the CW721 config
-    nft_name = Buffer.from(secureRandom(8, { type: "Uint8Array" })).toString("base64"),
+    nft_name,
     /// Symbol for the CW721 config
     nft_symbol,
     /// Label to use when instantiating minter
-    minter_label = Buffer.from(secureRandom(8, { type: "Uint8Array" })).toString("base64"),
+    minter_label,
     /// Time to open minting to public. Nanosecond epoch.
     launch_time,
     /// Time to open minting to whitelisted addresses. Nanosecond epoch.
     whitelist_launch_time,
     /// Payment config. Native or CW20 supported.
     mint_price,
+    wl_mint_price,
     /// Array of whitelisted addresses.
     whitelisted,
+    /// Maximum number of mints per address
+    mint_limit
 }:{
     client: SigningArchwayClient,
     signer: string,
     contract: string,
     nft_admin?: string;
     minter_admin?: string;
-    beneficiary?: string;
-    nft_name?: string;
+    beneficiary: string;
+    nft_name: string;
     nft_symbol: string;
-    minter_label?: string;
+    minter_label: string;
     launch_time?: string;
     whitelist_launch_time?: string;
-    mint_price: minter.Payment,
+    mint_price: Payment,
+    wl_mint_price?: Payment,
     whitelisted?: string[],
+    mint_limit?: number,
 }) => {
     const msg: ExecuteMsg = {
         init_random_project: {
-            beneficiary,
-            nft_symbol,
-            launch_time,
-            mint_price,
             collection_admin: nft_admin,
-            contract_name: nft_name,
-            label: minter_label,
+            beneficiary,
             reward_admin: nft_admin,
+
+            launch_time,
             whitelist_launch_time,
+            mint_price,
+            wl_mint_price,
             whitelisted,
+            mint_limit,
+
+            contract_name: nft_name,
+            nft_symbol,
+            label: minter_label,
         }
     }
-    console.log('Minter Admin', minter_admin)
+    console.log(msg)
+
     const result = await client.execute(
         signer,
         contract,
         msg,
         'auto',
     )
-    console.log('GAS',result.gasUsed, '/', result.gasWanted)
     // Find instantiated Minter address
     const minterAddress = result.logs[0].events.find(e=>e.type==='reply')?.attributes.find(a=>a.key.includes('contract_address'))?.value;
     if (!minterAddress) throw new Error('Unable to find Minter address in logs');

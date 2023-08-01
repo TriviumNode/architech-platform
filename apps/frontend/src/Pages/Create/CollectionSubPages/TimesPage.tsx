@@ -12,6 +12,16 @@ import { CollectionType } from "../CreateCollection";
 // import 'react-calendar/dist/Calendar.css';
 // import 'react-clock/dist/Clock.css';
 
+export function timestampToDatetimeInputString(timestamp: Date) {
+    const date = new Date(timestamp.valueOf() + _getTimeZoneOffsetInMs());
+    // slice(0, 19) includes seconds
+    return date.toISOString().slice(0, 19);
+}
+
+function _getTimeZoneOffsetInMs() {
+    return new Date().getTimezoneOffset() * -60 * 1000;
+}
+
 export interface TimesState {
     launch_time: Date | undefined;
 
@@ -21,13 +31,15 @@ export interface TimesState {
     // Copy Mint only
     end_time: Date | undefined;
     mint_limit: string;
+    max_copies: string;
 }
 
 export const DefaultTimesState: TimesState = {
     launch_time: undefined,
     whitelist_launch_time: undefined,
     end_time: undefined,
-    mint_limit: '',
+    mint_limit: '1',
+    max_copies: '',
 }
 
 const TimesPage: FC<{
@@ -45,20 +57,23 @@ const TimesPage: FC<{
     }
 
     const handleChangeLaunchTime = (e: any) => {
-        console.log(e.target.validity)
+        console.log(e.target)
         if (!e.target.validity.valid) return;
-        updateState({launch_time:  e.target.value});
+
+        const date = new Date(e.target.value)
+        updateState({launch_time: date});
     }
     const handleChangeWhitelistTime = (e: any) => {
-        console.log(e.target.validity)
         if (!e.target.validity.valid) return;
-        console.log('e.target', e.target)
-        updateState({whitelist_launch_time: e.target.value});
+        
+        const date = new Date(e.target.value)
+        updateState({whitelist_launch_time: date});
     }
     const handleChangeEndTime = (e: any) => {
-        console.log(e.target.validity)
         if (!e.target.validity.valid) return;
-        updateState({end_time: e.target.value});
+
+        const date = new Date(e.target.value)
+        updateState({end_time: date});
     }
     return (
         <div style={{margin: '48px'}} className='d-flex flex-column'>
@@ -74,8 +89,16 @@ const TimesPage: FC<{
                             <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
                                 Time allow minting for any address.<br /><span style={{color: 'red'}}>This can't be changed after minting has started.</span>
                             </div>
-                            <input disabled={true} defaultValue={state.launch_time?.valueOf()} onChange={handleChangeLaunchTime} type="datetime-local" />
-                            {/* <DateTimePicker onChange={(data: any)=>console.log(data)} value={state.launch_time} /> */}
+                            <input
+                                defaultValue={
+                                    state.launch_time ?
+                                        timestampToDatetimeInputString(state.launch_time)
+                                    :
+                                        undefined
+                                }
+                                onChange={handleChangeLaunchTime}
+                                type="datetime-local"
+                            />
                         </label>
                     </Col>
                     { collectionType === 'RANDOM' ?
@@ -85,7 +108,16 @@ const TimesPage: FC<{
                             <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
                                 Time allow minting for whitelisted addresses. <span style={{color: 'red'}}>This can't be changed after minting has started.</span>
                             </div>
-                            <input disabled={true} defaultValue={state.whitelist_launch_time?.valueOf()} onChange={handleChangeWhitelistTime} type="datetime-local" />
+                            <input
+                                defaultValue={
+                                    state.whitelist_launch_time ?
+                                        timestampToDatetimeInputString(state.whitelist_launch_time)
+                                    :
+                                        undefined
+                                }
+                                onChange={handleChangeWhitelistTime}
+                                type="datetime-local"
+                            />
                         </label>
                     </Col>
                     :
@@ -95,28 +127,49 @@ const TimesPage: FC<{
                             <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
                                 Time stop additional copies from being minted.<br /><span style={{color: 'red'}}>This can't be changed after minting has started.</span>
                             </div>
-                            <input disabled={true} defaultValue={state.end_time?.valueOf()} onChange={handleChangeEndTime} type="datetime-local" />
+                            <input
+                                defaultValue={
+                                    state.end_time ?
+                                        timestampToDatetimeInputString(state.end_time)
+                                    :
+                                        undefined
+                                }
+                                onChange={handleChangeEndTime}
+                                type="datetime-local"
+                            />
                         </label>
                     </Col>
                     }
                 </div>
-                { collectionType === 'COPY' &&
                 <div className='d-flex mb24'>
-                    <Col xs={4}>
+                    <Col xs={collectionType === 'COPY' ? 6 : 4}>
                         <label>
                             Mint Limit
                             <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
-                                Maximum number of copies that can be minted.<br /><span style={{color: 'red'}}>This can't be changed after minting has started.</span>
+                                Number of copies each address can mint.<br /><span style={{color: 'red'}}>This can't be changed after minting has started.</span>
                             </div>
                             <input
                                 value={state.mint_limit}
                                 onChange={(e)=>updateState({mint_limit: e.target.value.replace(/[^0-9]/gi, '')})}
                             />
-                            {/* <DateTimePicker onChange={(data: any)=>console.log(data)} value={state.launch_time} /> */}
                         </label>
                     </Col>
-                </div>
+                    { collectionType === 'COPY' &&
+                    <Col xs={6}>
+                        <label>
+                            Maximum Copies
+                            <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
+                                Total number of copies that can be minted.<br /><span style={{color: 'red'}}>This can't be changed after minting has started.</span>
+                            </div>
+                            <input
+                                value={state.max_copies}
+                                onChange={(e)=>updateState({max_copies: e.target.value.replace(/[^0-9]/gi, '')})}
+                            />
+                        </label>
+                    </Col>
                 }
+                </div>
+
             </form>
         </div>
     )

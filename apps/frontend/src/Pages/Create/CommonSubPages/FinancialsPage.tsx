@@ -10,6 +10,7 @@ import { useUser } from "../../../Contexts/UserContext";
 import { Switch } from 'react-switch-input';
 
 import styles from '../create.module.scss'
+import { CollectionType } from "../CreateCollection";
 
 const nativeDenom = findDenom(process.env.REACT_APP_NETWORK_DENOM);
 const selectOptions: SelectOption[] = [
@@ -44,10 +45,10 @@ export const DefaultFinancialState: FinancialState = {
 
 const FinancialPage: FC<{
     state: FinancialState,
-    isCollection?: boolean,
+    collectionType?: CollectionType,
     onChange: (data: FinancialState)=>void;
     next: ()=>void;
-}> = ({state, isCollection, onChange, next}): ReactElement => {
+}> = ({state, collectionType, onChange, next}): ReactElement => {
     const {user} = useUser()
     const [selectedOption, setSelectedOption] = useState<SelectOption>(selectOptions[0])
 
@@ -61,7 +62,7 @@ const FinancialPage: FC<{
     }
 
     const denomAmount = parseInt(humanToDenom(state.amount || 0, selectedOption.value.decimals));
-    const feeAmountDenom = calculateFee(denomAmount, isCollection ? 0.03 : 0.025);
+    const feeAmountDenom = calculateFee(denomAmount, collectionType ? 0.03 : 0.025);
     const feeAmount = denomToHuman(feeAmountDenom, selectedOption.value.decimals)
 
     const total = parseFloat(state.amount || '0') - feeAmount
@@ -73,7 +74,8 @@ const FinancialPage: FC<{
                 <button type='button' onClick={()=>next()}>Next</button>
             </div>
             <form className={styles.form}>
-            { !!!isCollection &&<>
+
+            { !collectionType || collectionType === 'COPY' &&<>
                 <div className='d-flex mb24'>
                     <Col xs={8}>
                         <label>
@@ -91,20 +93,23 @@ const FinancialPage: FC<{
                         </label>
                     </Col>
                 </div>
-                <div className='d-flex align-items-center mb24 mt16'>
-                    <Switch
-                        checked={state.list}
-                        onChange={(e: any)=>updateState({list: e.target.checked})}
-                    />
-                    <span className='ml16'>List NFT for sale on Architech.</span>
-                </div>
+                { !!!collectionType &&
+                    <div className='d-flex align-items-center mb24 mt16'>
+                        <Switch
+                            checked={state.list}
+                            onChange={(e: any)=>updateState({list: e.target.checked})}
+                        />
+                        <span className='ml16'>List NFT for sale on Architech.</span>
+                    </div>
+                }
             </>}
-            { (!!isCollection || state.list) &&
+
+            { (!!collectionType || state.list) &&
             <>
                 <div className='d-flex flex-wrap mt16 mb24'>
                     <Col xs={6}>
                         <label>
-                            Sell {!!isCollection && 'each '} NFT for<br />
+                            Sell {!!collectionType && 'each '} NFT for<br />
                             <SelectMenu options={selectOptions} title='Select a token' selected={selectedOption} select={(option)=>handleSelect(option)}  className='mt8'  />
                         </label>
                     </Col>
@@ -115,7 +120,7 @@ const FinancialPage: FC<{
                         </label>
                     </Col>
                 </div>
-                { !!isCollection &&
+                { !!collectionType &&
                     <div className='d-flex mb24'>
                         <Col>
                             <label>
@@ -134,12 +139,12 @@ const FinancialPage: FC<{
                     
                     <div className='d-flex flex-column gap8' style={{margin: '0px 16px'}}>
                         <div className='d-flex justify-content-between'>
-                            <span>Sale Fee&nbsp;<span className='lightText10'>({!!isCollection ? '3%' : '2.5%'})</span></span>
-                            <span className="lightText12">{feeAmount.toFixed(3)}&nbsp;{selectedOption.value.displayDenom}<span className='lightText10'>{!!isCollection &&' / Mint'}</span></span>
+                            <span>Sale Fee&nbsp;<span className='lightText10'>({!!collectionType ? '3%' : '2.5%'})</span></span>
+                            <span className="lightText12">{feeAmount.toFixed(3)}&nbsp;{selectedOption.value.displayDenom}<span className='lightText10'>{!!collectionType &&' / Mint'}</span></span>
                         </div>
                         <div className='d-flex justify-content-between'>
                             <span style={{fontWeight: '600'}}>You Get</span>
-                            <span>{`${total.toFixed(3)} ${selectedOption.value.displayDenom}`}<span className='lightText10'>{!!isCollection &&' / Mint'}</span></span>
+                            <span>{`${total.toFixed(3)} ${selectedOption.value.displayDenom}`}<span className='lightText10'>{!!collectionType &&' / Mint'}</span></span>
                         </div>
                     </div>
                 </div>

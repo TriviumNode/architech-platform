@@ -7,12 +7,14 @@ import ConnectWallet from "../../Components/ConnectWallet";
 import AdminTasksPage from "./TasksPage";
 import { ADMINS } from "@architech/lib";
 import AdminRewardsPage from "./RewardsPage";
+import AdminMinterQueries from "./MinterQueries";
 
-export type Page = 'Tasks' | 'Rewards'
+export type Page = 'Maintenance Tasks' | 'Rewards' | 'Minter Queries'
 
 export const Pages: Page[] = [
-    'Tasks',
     'Rewards',
+    'Minter Queries',
+    'Maintenance Tasks',
 ]
 
 const AdminDashboard: FC<any> = (): ReactElement => {
@@ -22,10 +24,12 @@ const AdminDashboard: FC<any> = (): ReactElement => {
 
     const getPage = () => {
         switch(page) {
-            case 'Tasks':
-                return <AdminTasksPage />
             case 'Rewards':
                 return <AdminRewardsPage />
+            case 'Minter Queries':
+                return <AdminMinterQueries />
+            case 'Maintenance Tasks':
+                return <AdminTasksPage />
             default:
                 return <div style={{margin: '32px', textAlign: 'center'}}><h2 style={{color: 'red'}}>Something went wrong</h2><p>The application encounted an error: `Tried to navigate to undefined page.`<br />Please try to navigate to another page using the menu on the left.</p></div>
         }

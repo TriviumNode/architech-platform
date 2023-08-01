@@ -214,6 +214,7 @@ const AdminRewardsPage: FC<{}> = (): ReactElement => {
                 { !!lookupResult?.minterInfo &&
                     <Col xs={6}>
                         <h5>Minter</h5>
+                        {lookupResult.minterInfo.metadata?.contractAddress}
                         <p><span>Admin</span><br/>{lookupResult.minterInfo.info.admin}</p>
                         <p><span>Owner</span><br/>{lookupResult.minterInfo.metadata?.ownerAddress || 'Not Configured'}</p>
                         <p><span>Reward Recipient</span><br/>{lookupResult.minterInfo.metadata?.rewardsAddress || 'Not Configured'}</p>

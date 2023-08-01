@@ -1,4 +1,4 @@
-import {ReactElement, FC, useState} from "react";
+import {ReactElement, FC, useState, useEffect} from "react";
 import { Col, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../../Contexts/UserContext";
@@ -26,9 +26,11 @@ import { toast } from "react-toastify";
 import {Buffer} from 'buffer';
 import TasksModal, { Task } from "./TasksModal/TasksModal";
 
+import { bech32 } from "bech32";
+
 export type StdPage = 'Details' | 'Links' | 'Finish'
-export type RandomPage = 'Details' | 'Links' | 'Financials' | 'Launch Time' | 'Whitelist' | 'Finish'
-export type CopyPage = 'Collection Details' | 'Links' | 'Financials' | 'NFT Details' | 'NFT Image' | 'Times & Limits' | 'Finish'
+export type RandomPage = 'Details' | 'Links' | 'Financials' | 'Times & Limits' | 'Whitelist' | 'Finish'
+export type CopyPage = 'Collection Details' | 'Links' | 'Financials' | 'NFT Details' | 'NFT Image' | 'Times & Limits' | 'Whitelist' | 'Finish'
 export type Page = StdPage | RandomPage | CopyPage
 
 export const StdPages: StdPage[] = [
@@ -41,7 +43,7 @@ export const RandomPages: RandomPage[] = [
     'Details',
     'Links',
     'Financials',
-    'Launch Time',
+    'Times & Limits',
     'Whitelist',
     'Finish',
 ]
@@ -51,8 +53,8 @@ export const CopyPages: CopyPage[] = [
     'Links',
     'Financials',
     'NFT Details',
-    // 'NFT Image',
     'Times & Limits',
+    'Whitelist',
     'Finish',
 ]
 
@@ -76,6 +78,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
         beneficiary_address: wallet?.address || '',
     });
     const [whitelistState, setWhitelistState] = useState<WhitelistState>(DefaultWhitelistState);
+    const [filteredWhitelist, setFilteredWhitelist] = useState<string[]>([]);
 
     // State used by copy minter
     const [nftDetailState, setNftDetailState] = useState<NftDetailState>(DefaultNftDetailState);
@@ -98,6 +101,16 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
     const [errorTasks, setErrorTasks] = useState<Task[]>([])
     const [taskMessage, setTaskMessage] = useState<any>()
 
+    useEffect(()=>{
+        const ary = whitelistState.raw_addresses.split(/\r?\n/);
+        const filtered = ary
+            .filter(a=>a.trim() !== '')
+            .map(v=>{
+                return v.trim()
+            }
+        );
+        setFilteredWhitelist(filtered);
+    },[whitelistState.raw_addresses])
 
 
     const selectType = (type: CollectionType) => {
@@ -131,7 +144,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                 />
             case 'Financials':
                 return <FinancialPage
-                    isCollection={true}
+                    collectionType={collectionType}
                     state={financialState}
                     onChange={(newState)=>setFinancialState(newState)}
                     next={()=>setPage(pages[pages.findIndex(p=>p==='Financials')+1])}
@@ -156,13 +169,6 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     onChange={(newState) => setLinkState(newState)}
                     next={()=>setPage(pages[pages.findIndex(p=>p==='Links')+1])}
                 />
-            case 'Launch Time':
-                return <TimesPage
-                    state={timesState}
-                    collectionType={collectionType as CollectionType}
-                    onChange={(newState)=>setTimesState(newState)}
-                    next={()=>setPage(pages[pages.findIndex(p=>p==='Launch Time')+1])}
-                />
             case 'Times & Limits':
                 return <TimesPage
                     state={timesState}
@@ -177,7 +183,18 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     next={()=>setPage(pages[pages.findIndex(p=>p==='Whitelist')+1])}
                 />
             case 'Finish':
-                return <FinishPage finishType='Deploy' collectionType={collectionType as CollectionType} details={detailState} financials={financialState} data={finishState} onChange={(data) => setFinishState(data)} onClick={handleCreate}/>
+                return <FinishPage
+                    finishType='Deploy'
+                    collectionType={collectionType as CollectionType}
+                    details={detailState}
+                    financials={financialState}
+                    data={finishState}
+                    onChange={(data) => setFinishState(data)}
+                    onClick={handleCreate}
+                    whitelisted={filteredWhitelist.length}
+                    nft_details={nftDetailState}
+                    times={timesState}
+                />
             default:
                 return <div style={{margin: '32px', textAlign: 'center'}}><h2 style={{color: 'red'}}>Something went wrong</h2><p>The application encounted an error: `Tried to navigate to undefined page.`<br />Please try to navigate to another page using the menu on the left.</p></div>
         }
@@ -204,10 +221,13 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
             if (!collectionAddress){
                 setStatus("CREATING")
 
+                const newErrorTasks: Task[] = []
+
                 // #############################################
                 // Verify Required Data for ALL Collection Types
                 // #############################################
-                const newErrorTasks: Task[] = []
+                
+                // Basic collection info
                 if (!detailState.name || !detailState.symbol){
                     newErrorTasks.push({
                         content:  `Enter a ${
@@ -224,10 +244,56 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     })
                 }
 
+                // Whitelist
+                let whitelist: string[] = [];
+                if (whitelistState.raw_addresses !== '') {
+                    const raw = whitelistState.raw_addresses.split(/\r?\n/);
+                    const filtered = raw.filter(a=>a.trim() !== '');
+                    console.log('filtered', filtered)
 
-                // ################
-                // Standard Project
-                // ################
+                    try {
+                        whitelist = filtered.map((v, i)=>{
+                            v = v.trim();
+                            console.log(v)
+                            try {
+                                bech32.decode(v);   
+                            } catch(err: any){
+                                console.error(err);
+                                const errorString = err.toString().slice(7)
+                                throw new Error(`Invalid whitelisted address ${v}: Address verification failed`)
+                            }
+                            if (!v.startsWith('archway1')) throw new Error(`Invalid Whitelisted Address: ${v}: Invalid network prefix, expected '${process.env.REACT_APP_NETWORK_PREFIX}'`)
+
+                            return v;
+                        })
+                    } catch(error: any) {
+                        newErrorTasks.push({
+                            content:  error.toString().slice(7),
+                            onClick: ()=>setPage('Whitelist')
+                        })
+                    }
+
+                    // whitelist = whitelistState.raw_addresses.split(/\r?\n/);
+
+                    // whitelist.filter(a=>a.trim() !== '').forEach((v, i)=>{
+                    //     v = v.trim();
+                    //     try {
+                    //         bech32.decode(v);
+
+                    //     } catch(err: any){
+                    //         const errorString = err.toString().slice(7)
+                    //         throw new Error(`Invalid whitelisted address ${v}: Address verification failed ${errorString}`)
+                    //     }
+                    //     if (!v.startsWith('archway1')) throw new Error(`Invalid Whitelisted Address: ${v}: Invalid network prefix, expected '${process.env.REACT_APP_NETWORK_PREFIX}'`)
+
+                    //     whitelist[i] = v.trim();
+                    // })
+                }
+
+
+                // #####################
+                // Init Standard Project
+                // #####################
                 if (collectionType === "STANDARD") {
                     if (checkErrors(newErrorTasks)) return;
                     const result = await initStandardProject({
@@ -243,10 +309,15 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     newNftAddr = contractAddress;
 
 
+
+
+                // #########################
+                // #-----------------------#
+                // #- Init Random Project -#
+                // #-----------------------#
+                // #########################
                 } else if (collectionType === 'RANDOM') {
-                // ##############
-                // Random Project
-                // ##############
+                    
                     if (!financialState.amount || !financialState.beneficiary_address){
                         newErrorTasks.push({
                             content: `Enter a ${
@@ -262,8 +333,15 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                             onClick: ()=>setPage('Financials')
                         })
                     }
+                    if (whitelistState.whitelist_price && (whitelistState.amount === '' || !whitelistState.denom)) {
+                        newErrorTasks.push({
+                            content: `Enter a whitelist price, or disable whitelist pricing.`,
+                            onClick: ()=>setPage('Whitelist')
+                        });
+                    }
+                    console.log('newErrorTasks', newErrorTasks)
+                    // Show Error Tasks
                     if (checkErrors(newErrorTasks)) return;
-
 
                     const {minterAddress, nftAddress} = await initRandomProject({
                         client: wallet.client, signer: wallet.address,
@@ -274,8 +352,13 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                         nft_name: detailState.name,
                         nft_symbol: detailState.symbol,
                         minter_label: `${detailState.name}_Random_Minter_${randomString(6)}`,
-                        launch_time: timesState.launch_time ? timesState.launch_time.valueOf().toString() + '000000' : undefined,
-                        whitelist_launch_time: timesState.whitelist_launch_time ? timesState.whitelist_launch_time.valueOf().toString() + '000000' : undefined,
+
+                        launch_time: timesState.launch_time ? (timesState.launch_time.valueOf() / 1000).toString() : undefined,
+                        whitelist_launch_time: timesState.whitelist_launch_time ? (timesState.whitelist_launch_time.valueOf() / 1000).toString() : undefined,
+                        
+                        whitelisted: whitelist,
+                        mint_limit: timesState.mint_limit ? parseInt(timesState.mint_limit) : undefined,
+
                         mint_price: financialState.denom.nativeDenom ? 
                             {
                                 native_payment: {
@@ -298,18 +381,42 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                                 }
                             }
                         ,
-                        whitelisted: [],
+                        wl_mint_price: whitelistState.whitelist_price ? 
+                            whitelistState.denom.nativeDenom ?
+                                {
+                                    native_payment: {
+                                        amount: humanToDenom(whitelistState.amount, whitelistState.denom.decimals),
+                                        denom: financialState.denom.nativeDenom as string,
+                                    }
+                                }
+                            : whitelistState.denom.cw20Contract ?
+                                {
+                                    cw20_payment: {
+                                        amount: humanToDenom(whitelistState.amount, whitelistState.denom.decimals),
+                                        token: whitelistState.denom.cw20Contract
+                                    }
+                                }
+                            :
+                                {
+                                    cw20_payment: {
+                                        amount: 'error',
+                                        token: (()=>{throw new Error('Invalid Denom')}) as unknown as string, // fuck off
+                                    }
+                                }
+                        : undefined,
                     })
                     console.log('Init Result', {minterAddress, nftAddress})
                     setCollectionAddress(nftAddress)
                     newNftAddr = nftAddress;
                 
                 
-
+                // ##################
+                // #----------------#
+                // #- Copy Project -#
+                // #----------------#
+                // ##################
                 } else if (collectionType === 'COPY') {
-                // ############
-                // Copy Project
-                // ############
+
     
                     // Clean NFT Attributes
                     const badAttributes = nftDetailState.attributes.filter((attribute: cw721.Trait)=>
@@ -360,8 +467,12 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                         beneficiary: financialState.beneficiary_address,
 
                         end_time: timesState.end_time ? timesState.end_time.getSeconds().toString() : undefined,
-                        launch_time: timesState.launch_time ? timesState.launch_time.getSeconds().toString() : undefined,
+                        launch_time: timesState.launch_time ? (timesState.launch_time.valueOf() / 1000).toString() : undefined,
+                        whitelist_launch_time: timesState.whitelist_launch_time ? (timesState.whitelist_launch_time.valueOf() / 1000).toString() : undefined,
+
                         mint_limit: timesState.mint_limit ? parseInt(timesState.mint_limit) : undefined,
+                        maximum_copies: timesState.max_copies ? parseInt(timesState.max_copies) : undefined,
+                        whitelisted: whitelist,
 
                         nft_name: detailState.name,
                         nft_symbol: detailState.symbol,

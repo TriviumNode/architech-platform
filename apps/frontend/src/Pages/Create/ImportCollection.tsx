@@ -55,7 +55,15 @@ const ImportCollectionPage: FC<any> = (): ReactElement => {
             case 'Links':
                 return <LinksPage state={linkState} onChange={(newState) => setLinkState(newState)} next={()=>setPage('Finish')} />
             case 'Finish':
-                return <FinishPage finishType='Import' details={detailState} data={finishState} onChange={(data) => setFinishState(data)} onClick={handleImport}/>
+                return <FinishPage
+                    finishType='Import'
+                    details={detailState}
+                    data={finishState}
+                    onChange={(data) => setFinishState(data)}
+                    onClick={handleImport}
+                    whitelisted={0}
+                    times={undefined}
+                />
             default:
                 return <div style={{margin: '32px', textAlign: 'center'}}><h2 style={{color: 'red'}}>Something went wrong</h2><p>The application encounted an error: `Tried to navigate to undefined page.`<br />Please try to navigate to another page using the menu on the left.</p></div>
         }

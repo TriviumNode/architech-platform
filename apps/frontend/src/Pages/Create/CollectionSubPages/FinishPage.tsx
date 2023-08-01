@@ -10,6 +10,8 @@ import { CollectionType } from "../CreateCollection";
 import { DetailState } from "./CollectionDetailPage";
 import { FinancialState } from "../CommonSubPages/FinancialsPage";
 import { TimesState } from "./TimesPage";
+import { NftPreviewCard } from "../NftSubPages/ReviewPage";
+import { NftDetailState } from "../NftSubPages/NftDetailPage";
 
 export interface FinishState {
     hidden: boolean,
@@ -25,12 +27,14 @@ const FinishPage: FC<{
     finishType: FinishType,
     data: FinishState,
     details: DetailState,
+    nft_details?: NftDetailState,
     financials?: FinancialState,
-    times?: TimesState,
+    times: TimesState | undefined,
+    whitelisted: number,
     onChange: (data: FinishState)=>void;
     onClick: (e: any)=>any;
-}> = ({collectionType, finishType, data, times, details, financials, onChange, onClick}): ReactElement => {
-
+}> = ({collectionType, finishType, data, times, details, nft_details, financials, whitelisted, onChange, onClick}): ReactElement => {
+    console.log('TIMES')
     const updateState = (newState: Partial<FinishState>) => {
         onChange({...data, ...newState})
     }
@@ -45,6 +49,12 @@ const FinishPage: FC<{
                             {collectionType==='RANDOM' && `Afterwards, you'll be able to load items into the minter.`}
                         </p>
 
+                        {collectionType === 'COPY' &&
+                            <div className='d-flex flex-wrap wide mb16'>
+                                <NftPreviewCard collectionName={details.name} details={nft_details as NftDetailState}  />
+                            </div>
+                        }
+                        
                         <div className='d-flex flex-wrap wide mb16'>
                             <Col xs={6}>
                                 <h4>Collection Name</h4>
@@ -79,31 +89,37 @@ const FinishPage: FC<{
 
                         { (collectionType === 'RANDOM' || collectionType === 'COPY') &&
                             <div className={`d-flex flex-wrap wide mb16`}>
-                                <Col xs={6}>
+                                <Col>
                                     <h4>Launch Time</h4>
-                                    <div className='lightText12'>{times?.launch_time ? new Date(times.launch_time).toLocaleTimeString() : 'Not Set'}</div>
+                                    <div className='lightText12'>{times?.launch_time ? times.launch_time.toLocaleString() : 'Not Set'}</div>
                                 </Col>
                                 { collectionType === 'RANDOM' ?
                                     <>
                                         <Col>
                                             <h4>Whitelist Launch Time</h4>
-                                            <div className='lightText12'>{times?.whitelist_launch_time ? new Date(times.whitelist_launch_time).toLocaleTimeString() : 'Not Set'}</div>
+                                            <div className='lightText12'>{times?.whitelist_launch_time ? times.whitelist_launch_time.toLocaleString() : 'Not Set'}</div>
                                         </Col>
                                         <Col>
                                             <h4>Whitelist</h4>
-                                            <div className='lightText12'>{0} addresses whitelisted</div>
+                                            <div className='lightText12'>{whitelisted} addresses whitelisted</div>
                                         </Col>
                                     </>
                                 :
                                     <>
                                         <Col>
                                             <h4>End Time</h4>
-                                            <div className='lightText12'>{times?.end_time ? new Date(times?.end_time).toLocaleTimeString() : 'Not Set'}</div>
+                                            <div className='lightText12'>{times?.end_time ? times.end_time.toLocaleString() : 'Not Set'}</div>
                                         </Col>
                                         <Col>
                                             <h4>Mint Limit</h4>
                                             <div className='lightText12'>{times?.mint_limit || 'Infinite'}</div>
                                         </Col>
+                                        { collectionType === 'COPY' &&
+                                            <Col>
+                                            <h4>Maximum Copies</h4>
+                                            <div className='lightText12'>{times?.max_copies || 'Infinite'}</div>
+                                        </Col>
+                                        }
                                     </>
                                 }
                             </div>
