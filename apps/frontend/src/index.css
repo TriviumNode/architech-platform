@@ -354,3 +354,7 @@ button:disabled {
 .unclickable {
   cursor: default !important;
 }
+
+.pointer {
+  cursor: pointer;
+}

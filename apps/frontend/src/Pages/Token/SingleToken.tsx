@@ -10,6 +10,7 @@ import ArchDenom, { DenomImg } from "../../Components/ArchDenom";
 import Badge from "../../Components/Badge";
 import CollectionStats from "../../Components/CollectionStats/CollectionStats";
 import Loader from "../../Components/Loader";
+import Modal from "../../Components/Modal";
 import ListModal from "../../Components/Modals/ListModal";
 import PlaceholdImg from "../../Components/PlaceholdImg";
 import SmallLoader from "../../Components/SmallLoader";
@@ -37,6 +38,7 @@ const SingleToken: FC<any> = (): ReactElement => {
     const { token: tokenResponse, collection: fullCollection } = useLoaderData() as { token: GetTokenResponse, collection: GetCollectionResponse};
     const collection = fullCollection?.collection;
 
+    const [viewFull, setViewFull] = useState(false);
     const [isListing, setIsListing] = useState(false);
     const [loadingTx, setLoadingTx] = useState(false);
     const [prices, setPrices] = useState<Prices>();
@@ -168,6 +170,9 @@ const SingleToken: FC<any> = (): ReactElement => {
     return (
       <>
       <ListModal open={isListing} onClose={()=>setIsListing(false)} token={tokenResponse.token} onList={()=>revalidator.revalidate()} />
+      <Modal open={viewFull} onClose={()=>setViewFull(false)} innerStyle={{padding: 0, height: 'fit-content', width: 'fit-content'}} style={{height: 'fit-content', width: 'fit-content'}}>
+        <TokenImage alt={`${collectionName} ${tokenResponse.token.tokenId}`} src={tokenImage} style={{display: 'block'}}  className='wide tall imgCover' />
+      </Modal>
 
       {/*  Collection Row */}
       <div className='d-flex gap8' style={{height: '64px', marginBottom: '8px'}}>
@@ -189,7 +194,7 @@ const SingleToken: FC<any> = (): ReactElement => {
       {/* Main Row */}
       <div className='d-flex gap8 mb8 flex-wrap' style={{minWidth: 0}}>
         <Col xs={{span: 8, offset: 2}} md={{span: 6, offset: 0}} className={`br8 square`} style={{maxHeight: '630px'}}>
-          <TokenImage alt={`${collectionName} ${tokenResponse.token.tokenId}`} src={tokenImage} className='tall wide imgCover' />
+          <TokenImage alt={`${collectionName} ${tokenResponse.token.tokenId}`} src={tokenImage} className='tall wide imgCover pointer' onClick={()=>setViewFull(true)} />
         </Col>
 
         {/* Accordian */}
