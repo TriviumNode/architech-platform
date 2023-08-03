@@ -10,7 +10,7 @@ export type ExecuteMsg = {
     collection_admin: Addr;
     contract_name: string;
     label: string;
-    launch_time?: Uint64 | null;
+    launch_time: Uint64;
     mint_limit?: number | null;
     mint_price: Payment;
     nft_symbol: string;
@@ -24,7 +24,7 @@ export type ExecuteMsg = {
     beneficiary: Addr;
     end_time?: Uint64 | null;
     launch_time?: Uint64 | null;
-    maximum_copies?: number | null;
+    max_copies?: number | null;
     metadata: Metadata;
     mint_limit?: number | null;
     mint_price?: Payment | null;
@@ -100,7 +100,6 @@ export interface InstantiateMsg {
   nois_proxy: string;
   random_mint_code_id: Uint64;
   reward_recipient: string;
-  test_mode?: boolean | null;
 }
 export type QueryMsg = {
   get_minters: {};

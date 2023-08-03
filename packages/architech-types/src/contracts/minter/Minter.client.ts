@@ -6,7 +6,7 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { ExecuteMsg, Uint64, Addr, Uint128, Binary, Timestamp, HexBinary, Metadata, Trait, Cw20ReceiveMsg, NoisCallback, Payment, InstantiateMsg, Fee, QueryMsg, GetBeneficiaryResponse, GetConfigResponse, Config, GetMintLimitResponse, GetMintStatusResponse, GetNftAddrResponse, GetPreloadResponse, GetPriceResponse } from "./Minter.types";
+import { ExecuteMsg, Uint64, Addr, Uint128, Binary, Timestamp, HexBinary, Metadata, Trait, Cw20ReceiveMsg, NoisCallback, Payment, InstantiateMsg, Fee, QueryMsg, GetBeneficiaryResponse, GetConfigResponse, Config, GetMintLimitResponse, GetMintStatusResponse, GetNftAddrResponse, GetPreloadResponse, GetPriceResponse, GetWhitelistResponse } from "./Minter.types";
 export interface MinterReadOnlyInterface {
   contractAddress: string;
   getPrice: () => Promise<GetPriceResponse>;

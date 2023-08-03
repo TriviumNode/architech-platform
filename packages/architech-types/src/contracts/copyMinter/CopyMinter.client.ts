@@ -6,10 +6,15 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { ExecuteMsg, Uint64, Addr, Uint128, Binary, Cw20ReceiveMsg, Payment, InstantiateMsg, Fee, Metadata, Trait, QueryMsg, GetBeneficiaryResponse, Timestamp, GetConfigResponse, Config, GetMintStatusResponse, MintStatus, GetNftAddrResponse, GetPriceResponse } from "./CopyMinter.types";
+import { ExecuteMsg, Uint64, Addr, Uint128, Binary, Cw20ReceiveMsg, Payment, InstantiateMsg, Fee, Metadata, Trait, QueryMsg, GetBeneficiaryResponse, Timestamp, GetConfigResponse, Config, GetMintLimitResponse, GetMintStatusResponse, GetNftAddrResponse, GetPriceResponse } from "./CopyMinter.types";
 export interface CopyMinterReadOnlyInterface {
   contractAddress: string;
   getPrice: () => Promise<GetPriceResponse>;
+  getMintLimit: ({
+    sender
+  }: {
+    sender: string;
+  }) => Promise<GetMintLimitResponse>;
   getMintStatus: () => Promise<GetMintStatusResponse>;
   getBeneficiary: () => Promise<GetBeneficiaryResponse>;
   getNftAddr: () => Promise<GetNftAddrResponse>;
@@ -23,6 +28,7 @@ export class CopyMinterQueryClient implements CopyMinterReadOnlyInterface {
     this.client = client;
     this.contractAddress = contractAddress;
     this.getPrice = this.getPrice.bind(this);
+    this.getMintLimit = this.getMintLimit.bind(this);
     this.getMintStatus = this.getMintStatus.bind(this);
     this.getBeneficiary = this.getBeneficiary.bind(this);
     this.getNftAddr = this.getNftAddr.bind(this);
@@ -32,6 +38,17 @@ export class CopyMinterQueryClient implements CopyMinterReadOnlyInterface {
   getPrice = async (): Promise<GetPriceResponse> => {
     return this.client.queryContractSmart(this.contractAddress, {
       get_price: {}
+    });
+  };
+  getMintLimit = async ({
+    sender
+  }: {
+    sender: string;
+  }): Promise<GetMintLimitResponse> => {
+    return this.client.queryContractSmart(this.contractAddress, {
+      get_mint_limit: {
+        sender
+      }
     });
   };
   getMintStatus = async (): Promise<GetMintStatusResponse> => {

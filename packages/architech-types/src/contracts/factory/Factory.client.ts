@@ -55,7 +55,7 @@ export interface FactoryInterface extends FactoryReadOnlyInterface {
     collectionAdmin: Addr;
     contractName: string;
     label: string;
-    launchTime?: Uint64;
+    launchTime: Uint64;
     mintLimit?: number;
     mintPrice: Payment;
     nftSymbol: string;
@@ -68,7 +68,7 @@ export interface FactoryInterface extends FactoryReadOnlyInterface {
     beneficiary,
     endTime,
     launchTime,
-    maximumCopies,
+    maxCopies,
     metadata,
     mintLimit,
     mintPrice,
@@ -85,7 +85,7 @@ export interface FactoryInterface extends FactoryReadOnlyInterface {
     beneficiary: Addr;
     endTime?: Uint64;
     launchTime?: Uint64;
-    maximumCopies?: number;
+    maxCopies?: number;
     metadata: Metadata;
     mintLimit?: number;
     mintPrice?: Payment;
@@ -150,7 +150,7 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
     collectionAdmin: Addr;
     contractName: string;
     label: string;
-    launchTime?: Uint64;
+    launchTime: Uint64;
     mintLimit?: number;
     mintPrice: Payment;
     nftSymbol: string;
@@ -180,7 +180,7 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
     beneficiary,
     endTime,
     launchTime,
-    maximumCopies,
+    maxCopies,
     metadata,
     mintLimit,
     mintPrice,
@@ -197,7 +197,7 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
     beneficiary: Addr;
     endTime?: Uint64;
     launchTime?: Uint64;
-    maximumCopies?: number;
+    maxCopies?: number;
     metadata: Metadata;
     mintLimit?: number;
     mintPrice?: Payment;
@@ -216,7 +216,7 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
         beneficiary,
         end_time: endTime,
         launch_time: launchTime,
-        maximum_copies: maximumCopies,
+        max_copies: maxCopies,
         metadata,
         mint_limit: mintLimit,
         mint_price: mintPrice,

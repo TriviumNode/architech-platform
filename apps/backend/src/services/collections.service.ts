@@ -1,12 +1,12 @@
 import { HttpException } from '@exceptions/HttpException';
-import collectionsModel, { CollectionMinterClass } from '@models/collections.model';
+import collectionsModel, { CollectionMinterClass, MinterPaymentClass } from '@models/collections.model';
 
 import { isEmpty } from '@utils/util';
 import { isContract, queryClient as client, queryClient } from '@/utils/chainClients';
 
 import equal from 'fast-deep-equal';
 import { findCollectionTokenCount, processCollectionTokens, processCollectionTraits } from './tokens.service';
-import { Collection, copyMinter, GetCollectionResponse, minter, User } from '@architech/types';
+import { Collection, copyMinter, GetCollectionResponse, minter, MinterPaymentI, User } from '@architech/types';
 
 import { CreateCollectionData } from '@/interfaces/collections.interface';
 import CollectionModel from '@models/collections.model';
@@ -358,22 +358,46 @@ const getMinterInfo = async (creator: string) => {
             // Get minter config
             const { config }: { config: minter.Config } = await getConfig({ client: queryClient, contract: creator });
 
+            const payment: MinterPaymentI = config.price
+              ? {
+                  //@ts-expect-error idk
+                  type: config.price.native_payment ? 'NATIVE' : 'CW20',
+                  //@ts-expect-error idk
+                  denom: config.price.native_payment?.denom,
+                  //@ts-expect-error idk
+                  token: config.price.cw20_payment?.token,
+                  //@ts-expect-error idk
+                  amount: config.price.native_payment?.amount || config.price.cw20_payment?.amount,
+                }
+              : undefined;
+
+            const whitelist_payment: MinterPaymentI = config.wl_price
+              ? {
+                  //@ts-expect-error idk
+                  type: config.wl_price.native_payment ? 'NATIVE' : 'CW20',
+                  //@ts-expect-error idk
+                  denom: config.wl_price.native_payment?.denom,
+                  //@ts-expect-error idk
+                  token: config.wl_price.cw20_payment?.token,
+                  //@ts-expect-error idk
+                  amount: config.wl_price.native_payment?.amount || config.wl_price.cw20_payment?.amount,
+                }
+              : undefined;
+
             // Set minter data
             const minter: CollectionMinterClass = {
               minter_address: creator,
               minter_type: 'RANDOM',
               minter_admin: config.admin,
               beneficiary: config.beneficiary,
-              launch_time: config.launch_time,
-              whitelist_launch_time: config.whitelist_limit_time,
-              //@ts-expect-error idk
-              payment_type: config.price.native_payment ? 'NATIVE' : 'CW20',
-              //@ts-expect-error idk
-              payment_denom: config.price.native_payment?.denom,
-              //@ts-expect-error idk
-              payment_token: config.price.cw20_payment?.token,
-              //@ts-expect-error idk
-              payment_amount: config.price.native_payment?.amount || config.price.cw20_payment?.amount,
+              launch_time: (parseInt(config.launch_time) / 1000000000).toString(),
+              whitelist_launch_time: (parseInt(config.whitelist_limit_time) / 1000000000).toString(),
+              payment,
+              whitelist_payment,
+              // payment_type: config.price.native_payment ? 'NATIVE' : 'CW20',
+              // payment_denom: config.price.native_payment?.denom,
+              // payment_token: config.price.cw20_payment?.token,
+              // payment_amount: config.price.native_payment?.amount || config.price.cw20_payment?.amount,
             };
             const actual_creator = config.admin;
             return { minter, actual_creator };
@@ -383,22 +407,44 @@ const getMinterInfo = async (creator: string) => {
           else if (subStr === 'copy_minter::msg::QueryMsg') {
             // Get minter config
             const { config }: { config: copyMinter.Config } = await getConfig({ client: queryClient, contract: creator });
+
+            const payment: MinterPaymentI = config.mint_price
+              ? {
+                  //@ts-expect-error idk
+                  type: config.mint_price.native_payment ? 'NATIVE' : 'CW20',
+                  //@ts-expect-error idk
+                  denom: config.mint_price.native_payment?.denom,
+                  //@ts-expect-error idk
+                  token: config.mint_price.cw20_payment?.token,
+                  //@ts-expect-error idk
+                  amount: config.mint_price.native_payment?.amount || config.mint_price.cw20_payment?.amount || '0',
+                }
+              : undefined;
+
+            const whitelist_payment: MinterPaymentI = config.wl_mint_price
+              ? {
+                  //@ts-expect-error idk
+                  type: config.wl_mint_price.native_payment ? 'NATIVE' : 'CW20',
+                  //@ts-expect-error idk
+                  denom: config.wl_mint_price.native_payment?.denom,
+                  //@ts-expect-error idk
+                  token: config.wl_mint_price.cw20_payment?.token,
+                  //@ts-expect-error idk
+                  amount: config.wl_mint_price.native_payment?.amount || config.wl_mint_price.cw20_payment?.amount,
+                }
+              : undefined;
+
             // Set minter data
             const minter: CollectionMinterClass = {
               minter_address: creator,
               minter_type: 'COPY',
               minter_admin: config.minter_admin as string,
               beneficiary: config.beneficiary,
-              launch_time: config.launch_time,
-              end_time: config.end_time,
-              //@ts-expect-error idk
-              payment_type: config.price?.cw20_payment ? 'CW20' : 'NATIVE',
-              //@ts-expect-error idk
-              payment_denom: config.price?.native_payment?.denom,
-              //@ts-expect-error idk
-              payment_token: config.price?.cw20_payment?.token,
-              //@ts-expect-error idk
-              payment_amount: config.price?.cw20_payment?.payment_amount || config.price?.native_payment?.payment_amount || '0',
+              launch_time: (parseInt(config.launch_time) / 1000000000).toString(),
+              whitelist_launch_time: (parseInt(config.whitelist_launch_time) / 1000000000).toString(),
+              end_time: (parseInt(config.end_time) / 1000000000).toString(),
+              payment,
+              whitelist_payment,
             };
             const actual_creator = config.minter_admin;
             return { minter, actual_creator };

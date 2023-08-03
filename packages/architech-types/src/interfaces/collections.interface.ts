@@ -9,10 +9,12 @@ export interface CollectionMinterI {
   minter_type: MinterType;
   minter_admin: string;
   beneficiary?: string;
-  payment_type: PaymentType;
-  payment_token?: string;
-  payment_denom?: string;
-  payment_amount: string;
+  // payment_type: PaymentType;
+  // payment_token?: string;
+  // payment_denom?: string;
+  // payment_amount: string;
+  payment?: MinterPaymentI;
+  whitelist_payment?: MinterPaymentI;
 
   // Epoch
   launch_time?: string;
@@ -25,6 +27,13 @@ export interface CollectionMinterI {
 
   // For copy minters
   mint_limit?: number;
+}
+
+export interface MinterPaymentI {
+  type: PaymentType;
+  token?: string;
+  denom?: string;
+  amount: string;
 }
 
 export interface CollectionProfile {

@@ -83,7 +83,7 @@ export interface InstantiateMsg {
   beneficiary: Addr;
   contract_name: string;
   credit_contract: string;
-  launch_time?: Uint64 | null;
+  launch_time: Uint64;
   mint_limit?: number | null;
   mint_price: Payment;
   nft_code_id: number;
@@ -91,7 +91,6 @@ export interface InstantiateMsg {
   nois_proxy: string;
   operator: Addr;
   reward_admin: string;
-  test_mode?: boolean | null;
   whitelist_launch_time?: Uint64 | null;
   whitelisted?: string[] | null;
   wl_mint_price?: Payment | null;
@@ -126,10 +125,9 @@ export interface GetConfigResponse {
 export interface Config {
   admin: Addr;
   beneficiary: Addr;
-  launch_time?: Timestamp | null;
+  launch_time: Timestamp;
   mint_limit?: number | null;
   price: Payment;
-  test_mode: boolean;
   whitelist_limit_time?: Timestamp | null;
   wl_price?: Payment | null;
   [k: string]: unknown;
@@ -137,9 +135,10 @@ export interface Config {
 export interface GetMintLimitResponse {
   mint_limit?: number | null;
   mints?: number | null;
+  whitelisted: boolean;
 }
 export interface GetMintStatusResponse {
-  launch_time?: Uint64 | null;
+  launch_time: Uint64;
   remaining: number;
   whitelist_launch_time?: Uint64 | null;
 }
@@ -152,4 +151,7 @@ export interface GetPreloadResponse {
 export interface GetPriceResponse {
   price: Payment;
   wl_price?: Payment | null;
+}
+export interface GetWhitelistResponse {
+  whitelist: string[];
 }

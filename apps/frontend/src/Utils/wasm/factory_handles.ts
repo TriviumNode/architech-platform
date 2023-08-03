@@ -57,7 +57,7 @@ export const initCopyProject = async({
     whitelist_launch_time,
     end_time,
     mint_limit,
-    maximum_copies,
+    max_copies,
     mint_price,
     whitelist_mint_price,
     metadata,
@@ -78,7 +78,7 @@ export const initCopyProject = async({
     whitelist_launch_time?: string;
     end_time?: string;
     mint_limit?: number,
-    maximum_copies?: number,
+    max_copies?: number,
     mint_price?: Payment,
     whitelist_mint_price?: Payment,
     whitelisted?: string[],
@@ -97,7 +97,7 @@ export const initCopyProject = async({
             launch_time,
             whitelist_launch_time,
             mint_limit,
-            maximum_copies,
+            max_copies,
             mint_price,
             whitelist_mint_price,
             whitelisted,
@@ -160,7 +160,7 @@ export const initRandomProject = async({
     nft_name: string;
     nft_symbol: string;
     minter_label: string;
-    launch_time?: string;
+    launch_time: string;
     whitelist_launch_time?: string;
     mint_price: Payment,
     wl_mint_price?: Payment,

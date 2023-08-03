@@ -1,7 +1,10 @@
-import { denomToHuman, findDenom, findToken, mintWithMinter, noDenom, truncateAddress, unknownDenom } from "@architech/lib";
-import { cw721, GetCollectionResponse, Denom } from "@architech/types";
+import { denomToHuman, findDenom, findToken, getMintLimit, mintWithMinter, noDenom, truncateAddress, unknownDenom } from "@architech/lib";
+import { cw721, GetCollectionResponse, Denom, minter } from "@architech/types";
+import { faCheck, faClock, faRefresh, faX } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FC, ReactElement, useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
+import Countdown from "react-countdown";
 import { Link, useLoaderData, useRevalidator } from "react-router-dom";
 import { toast } from "react-toastify";
 import { DenomImg } from "../../Components/ArchDenom";
@@ -12,45 +15,108 @@ import TokenImage from "../../Components/TokenImg";
 import Vr from "../../Components/vr";
 import { useMint } from "../../Contexts/MintContext";
 import { useUser } from "../../Contexts/UserContext";
-import { getApiUrl } from "../../Utils/backend";
+import { getApiUrl, refreshCollection } from "../../Utils/backend";
 import { getPrice } from "../../Utils/data";
 import { getCollectionName } from "../../Utils/helpers";
-import { Prices } from "../Token/SingleToken";
+import { QueryClient } from "../../Utils/queryClient";
+import sleep from "../../Utils/sleep";
 
 import styles from './minter.module.scss';
 
 type Trait = cw721.Trait;
+
+type Price = {
+  denom: Denom;
+  displayAmount: string;
+  displayUsd: string;
+}
+
+type Prices = {
+  public: Price;
+  private?: Price;
+}
 
 const SingleMinter: FC<any> = (): ReactElement => {
     const { collection: fullCollection } = useLoaderData() as { collection: GetCollectionResponse};
     const { waitForMint } = useMint()
     const collection = fullCollection?.collection;
 
-    const [isListing, setIsListing] = useState(false);
     const [loadingTx, setLoadingTx] = useState(false);
     const [prices, setPrices] = useState<Prices>();
+
+    const [buyerStatus, setBuyerStatus] = useState<minter.GetMintLimitResponse>();
+    const [minterStatus, setMinterStatus] = useState();
 
     const { user, refreshProfile } = useUser()
     const revalidator = useRevalidator()
 
-    // const isFavorite = !user ? false :
-    //   !user.profile.favorites.length ? false :
-    //   (user.profile.favorites.findIndex(f=>f.token._id === tokenResponse.token._id)) > -1 ? true : false;
+    const checkWhitelist = async () => {
+      if (!user) return;
+      if (!collection.collectionMinter) return;
+
+      try {
+        const result: minter.GetMintLimitResponse = await getMintLimit({ client: user.client, contract: collection.collectionMinter.minter_address, buyer: user.address });
+        setBuyerStatus(result);
+      } catch (error: any) {
+        console.error('Failed to check minter status:', error.toString())
+        console.error(error)
+        toast.error('Failed to check minter status')
+      }
+    }
+
+    useEffect(()=>{
+      checkWhitelist();
+    },[user])
+
+    const handleRefresh = async () => {
+      try {
+          // setIsRefreshing(true);
+          await refreshCollection(collection.address);
+          await sleep(750)
+          revalidator.revalidate()
+      } catch (err: any) {
+          console.error('Error refreshing collection:', err);
+          toast.error(err.toString())
+      } finally {
+          // setIsRefreshing(false);
+      }
+  }
 
     const handleMint = async (e?: any) => {
       if (e) e.preventDefault();
       try {
         if (!user) throw new Error('Wallet is not connected.')
         if (!collection.collectionMinter) throw new Error('Minter not found for this collection.')
-        if (collection.collectionMinter.payment_token) throw new Error('Non-native payments are not supported.')
+        if (collection.collectionMinter.payment?.token || collection.collectionMinter.whitelist_payment?.token) throw new Error('Non-native payments are not supported.')
+        if (!buyerStatus) throw new Error('Unable to fetch minter status.')
+        if (buyerStatus.mint_limit && (buyerStatus.mints || 0 > buyerStatus.mint_limit)) throw new Error('You are at the mint limit for this collection.')
         setLoadingTx(true);
-        const result = await mintWithMinter({
-          client: user.client,
-          signer: user.address,
-          minter_contract: collection.collectionMinter.minter_address,
-          funds: collection.collectionMinter.payment_denom ? [{amount: collection.collectionMinter.payment_amount, denom: collection.collectionMinter.payment_denom}] : [],
-        })
-        console.log('Mint Result', result);
+
+        if (buyerStatus.whitelisted) {
+          console.log('Whitelist Mint')
+          const result = await mintWithMinter({
+            client: user.client,
+            signer: user.address,
+            minter_contract: collection.collectionMinter.minter_address,
+            funds: collection.collectionMinter.whitelist_payment?.denom ?
+              [{amount: collection.collectionMinter.whitelist_payment.amount, denom: collection.collectionMinter.whitelist_payment.denom}]
+            : collection.collectionMinter.payment?.denom ?
+              [{amount: collection.collectionMinter.payment.amount, denom: collection.collectionMinter.payment.denom}]
+            :
+              [],
+          })
+          console.log('Mint Result', result);
+        } else {
+          console.log('Public Mint')
+          const result = await mintWithMinter({
+            client: user.client,
+            signer: user.address,
+            minter_contract: collection.collectionMinter.minter_address,
+            funds: collection.collectionMinter.payment?.denom ? [{amount: collection.collectionMinter.payment.amount, denom: collection.collectionMinter.payment.denom}] : [],
+          })
+          console.log('Mint Result', result);
+        }
+
         if (collection.collectionMinter.minter_type === "RANDOM")
           waitForMint({
             collectionContract: collection.address,
@@ -69,52 +135,77 @@ const SingleMinter: FC<any> = (): ReactElement => {
       }
     }
 
-    const handleFavorite = async (e: any) => {
-      e.preventDefault()
-      // if (!tokenResponse) throw new Error('Token data is not loaded.')
-      // try { 
-      //   if (isFavorite) await removeFavorite(tokenResponse.token._id)
-      //   else await addFavorite(tokenResponse.token._id);
-      //   await refreshProfile();
-      //   revalidator.revalidate();
-      // } catch (err: any) {
-      //   console.error('Error adding favorite:', err)
-      //   toast.error(err.toString())
-      // }
-    }
-
     const calculatePrices = async () => {
       if (!collection.collectionMinter) return;
-      let saleAmount: string = '--';
-      let usdAmount: string = '--';
-      let saleDenom: Denom = unknownDenom;
-      if (collection.collectionMinter.payment_token) {
-        const denom = findToken(collection.collectionMinter.payment_token);
-        if (denom) {
-          saleDenom = denom;
-          const num = denomToHuman(collection.collectionMinter.payment_amount, denom.decimals)
-          saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
-          usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+
+      const publicPrice: Price = await(async()=>{
+        const payment = collection.collectionMinter?.payment
+
+        let saleAmount: string = '--';
+        let usdAmount: string = '--';
+        let saleDenom: Denom = unknownDenom;
+
+        if (!payment) {
+          saleAmount = 'Free';
+          usdAmount = '';
+          saleDenom = noDenom;
+        } else if (payment.token) {
+          const denom = findToken(payment.token);
+          if (denom) {
+            saleDenom = denom;
+            const num = denomToHuman(payment.amount, denom.decimals)
+            saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+            usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+          }
+        } else if (payment.denom) {
+          const denom = findDenom(payment.denom);
+          if (denom) {
+            saleDenom = denom;
+            const num = denomToHuman(payment.amount, denom.decimals)
+            saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+            usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+          }
         }
-      } else if (collection.collectionMinter.payment_denom) {
-        const denom = findDenom(collection.collectionMinter.payment_denom);
-        if (denom) {
-          saleDenom = denom;
-          const num = denomToHuman(collection.collectionMinter.payment_amount, denom.decimals)
-          saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
-          usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+
+        return { displayAmount: saleAmount, displayUsd: usdAmount, denom: saleDenom }
+      })()
+
+      const privatePrice: Price | undefined = await(async()=>{
+        const payment = collection.collectionMinter?.whitelist_payment
+
+        let saleAmount: string = '--';
+        let usdAmount: string = '--';
+        let saleDenom: Denom = unknownDenom;
+
+        if (!payment) {
+          return undefined;
+        } else if (payment.token) {
+          const denom = findToken(payment.token);
+          if (denom) {
+            saleDenom = denom;
+            const num = denomToHuman(payment.amount, denom.decimals)
+            saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+            usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+          }
+        } else if (payment.denom) {
+          const denom = findDenom(payment.denom);
+          if (denom) {
+            saleDenom = denom;
+            const num = denomToHuman(payment.amount, denom.decimals)
+            saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+            usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+          }
         }
-      } else {
-        saleAmount = 'Free';
-        usdAmount = '';
-        saleDenom = noDenom;
-      }
+
+        return { displayAmount: saleAmount, displayUsd: usdAmount, denom: saleDenom }
+      })()
+
       setPrices({
-        denom: saleDenom,
-        displayAmount: saleAmount,
-        displayUsd: usdAmount,
+        private: privatePrice,
+        public: publicPrice,
       })
     }
+    console.log('Prices', prices)
 
     useEffect(()=>{
       calculatePrices()
@@ -138,32 +229,17 @@ const SingleMinter: FC<any> = (): ReactElement => {
     const collectionName = getCollectionName(collection);
     const collectionImage = collection.collectionProfile?.profile_image ? getApiUrl(`/public/${collection.collectionProfile?.profile_image}`) : undefined;
 
-    // const handleRefresh = async (e: any) => {
-    //   e.preventDefault()
-    //   const data = await refreshToken(collection.address, tokenResponse.token.tokenId);
-    //   settokenResponse(data);
-    // }
+    const startDate = collection.collectionMinter.launch_time ?
+        new Date(parseInt(collection.collectionMinter.launch_time) * 1000)
+      : undefined;
 
-    // let saleAmount: string = '--';
-    // let usdAmount: string = '--';
-    // let saleDenom: Denom = unknownDenom;
-    //   if (collection.collectionMinter.payment_token) {
-    //     const denom = findToken(collection.collectionMinter.payment_token);
-    //     if (denom) {
-    //       saleDenom = denom;
-    //       const num = denomToHuman(collection.collectionMinter.payment_amount, denom.decimals)
-    //       saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(denom.decimals.toString()) })
-    //       usdAmount = await getPrice(saleDenom.displayDenom, num).toLocaleString("en-US", { maximumFractionDigits: 2 });
-    //     }
-    //   } else {
-    //     const denom = findDenom(process.env.REACT_APP_NETWORK_DENOM);
-    //     if (denom) {
-    //       saleDenom = denom;
-    //       const num = denomToHuman(collection.collectionMinter.payment_amount, denom.decimals)
-    //       saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(denom.decimals.toString()) })
-    //       usdAmount = await getPrice(saleDenom.displayDenom, num).toLocaleString("en-US", { maximumFractionDigits: 2 });
-    //     }
-    // }
+    const wlStartDate = collection.collectionMinter.whitelist_launch_time ?
+      new Date(parseInt(collection.collectionMinter.whitelist_launch_time) * 1000)
+    : undefined;
+
+    const endDate = collection.collectionMinter.end_time ?
+      new Date(parseInt(collection.collectionMinter.end_time) * 1000)
+    : undefined;
 
     const Stats = (): {title: string; value: string}[] => {
       switch (collection.collectionMinter?.minter_type) {
@@ -179,11 +255,11 @@ const SingleMinter: FC<any> = (): ReactElement => {
             },
             {
               title: 'Minted',
-              value: '69',
+              value: collection.totalTokens.toString(),
             },
             {
-              title: 'Royalties',
-              value: '69%',
+              title: 'Mint Limit',
+              value: `${collection.collectionMinter.mint_limit} per User`,
             },
           ]
           break;
@@ -215,7 +291,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
 
       {/* Main Row */}
       <div className='d-flex gap8 mb8 flex-wrap' style={{minWidth: 0}}>
-        <Col xs={{span: 8, offset: 2}} md={{span: 6, offset: 0}} className={`br8 square`} style={{maxHeight: '630px'}}>
+        <Col xs={{span: 8, offset: 2}} md={{span: 5, offset: 0}} className={`br8 square`} style={{maxHeight: '630px'}}>
           <TokenImage alt={`${collectionName}`} src={collectionImage} className='tall wide imgCover' />
         </Col>
 
@@ -236,7 +312,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
                 </Link>
               </div>
               <div className='d-flex align-items-center'>
-                <div className="d-flex align-items-stretch" style={{gap: '16px'}}>
+                {/* <div className="d-flex align-items-stretch" style={{gap: '16px'}}>
                   <button onClick={handleFavorite} disabled={!!!user} className='clearBtn' style={{padding: 0, height: 'unset'}}>
                     <div className={styles.number}><img alt='' src={false ? '/red_heart.svg' : '/heart.svg'} style={{height: '1.3em'}} />&nbsp;0</div>
                     <span className={styles.label}>Favorites</span>
@@ -246,7 +322,8 @@ const SingleMinter: FC<any> = (): ReactElement => {
                     <div className={`${styles.number} d-flex align-items-center`}><img alt='' src='/eye.svg' style={{height: '1.3em'}} />&nbsp;0</div>
                     <span className={styles.label}>Views</span>
                   </div>
-                </div>
+                </div> */}
+                <FontAwesomeIcon icon={faRefresh} onClick={()=>handleRefresh()} size={"2x"} />
               </div>
             </div>
             <div className='d-flex flex-column' style={{flexGrow: 1 }} >
@@ -282,6 +359,33 @@ const SingleMinter: FC<any> = (): ReactElement => {
                 </div>
               }
             </div>
+            <div style={{padding: '32px'}} className='d-flex flex-column gap8'>
+              {!!collection.collectionMinter.whitelist_launch_time &&
+                <SaleTimeRow
+                  saleType='Private'
+                  startTime={wlStartDate}
+                  endTime={startDate}
+                  price={!prices ? <SmallLoader />
+                    : prices.private ?
+                      <div style={{fontSize: '28px'}}>{prices.private.displayAmount} <DenomImg denom={prices.private.denom} size='medium' /></div>
+                    :
+                      <div style={{fontSize: '28px'}}>{prices.public.displayAmount} <DenomImg denom={prices.public.denom} size='medium' /></div>
+                  }
+                />
+              }
+              {!!collection.collectionMinter.launch_time &&
+                <SaleTimeRow
+                  saleType='Public'
+                  startTime={startDate}
+                  endTime={endDate}
+                  price={prices?.public.displayAmount ?
+                    <div style={{fontSize: '28px'}}>{prices.public.displayAmount} <DenomImg denom={prices.public.denom} size='medium' /></div>
+                    : <SmallLoader />
+                  }
+                />
+              }
+
+            </div>
           </div>
         </Col>
       </div>
@@ -295,8 +399,8 @@ const SingleMinter: FC<any> = (): ReactElement => {
             <div className='d-flex align-items-center' style={{gap: '24px'}}>
               {prices ?
                 <div>
-                  <div style={{fontSize: '28px'}}>{prices.displayAmount} <DenomImg denom={prices.denom} size='medium' /></div>
-                  {!!prices.displayUsd && <div className='lightText12'>~ ${prices.displayUsd}</div>}
+                  <div style={{fontSize: '28px'}}>{prices.public.displayAmount} <DenomImg denom={prices.public.denom} size='medium' /></div>
+                  {!!prices.public.displayUsd && <div className='lightText12'>~ ${prices.public.displayUsd}</div>}
                 </div>
               :
               <div>
@@ -310,6 +414,65 @@ const SingleMinter: FC<any> = (): ReactElement => {
       </div>
     </>
     )
+}
+
+
+// Random component
+const Completionist = () => <span>You are good to go!</span>;
+
+// Renderer callback with condition
+const renderer = ({ hours, minutes, seconds, completed }: any) => {
+  if (completed) {
+    // Render a completed state
+    return <Completionist />;
+  } else {
+    // Render a countdown
+    return <span>{hours}:{minutes}:{seconds}</span>;
+  }
+};
+
+type TimeRowProps = {
+  saleType: string;
+  startTime: Date | undefined;
+  endTime: Date | undefined;
+  ended?: boolean;
+  price: any;
+}
+
+const SaleTimeRow: FC<TimeRowProps> = ({saleType, startTime, endTime, ended, price}): ReactElement => {
+  const [now, setNow] = useState(new Date())
+
+  const status = !!ended || (endTime && now > endTime) ?
+    'Ended'
+  : startTime && now < startTime ?
+    // `Starts ${startTime.toLocaleString()}`
+    <Countdown
+      date={startTime}
+      renderer={renderer}
+    />
+  : endTime ?
+    <Countdown
+      date={endTime}
+      renderer={renderer}
+    />
+  : 'Active'
+
+  const icon = !!ended || (endTime && now > endTime) ?
+    faX
+  : startTime && now < startTime ?
+    faClock
+  : faCheck
+  
+  return (
+    <div className='d-flex br8 align-items-center' style={{background: '#DDD', padding: '8px 16px'}}>
+      <FontAwesomeIcon icon={icon} size='2x' className='mr16' />
+      <div>
+        <div className='lightText12'>{saleType} Mint</div>
+        <div>{price}</div>
+      </div>
+      <h3 style={{marginLeft: 'auto'}}>{status}</h3>
+    </div>
+  )
 }
 
 export default SingleMinter;

@@ -1,3 +1,4 @@
+import { Block } from "@cosmjs/stargate";
 import { useEffect, useState } from "react";
 import { Col, Row, ToastContainer } from "react-bootstrap";
 import Container from "react-bootstrap/esm/Container";
@@ -6,12 +7,14 @@ import { toast } from "react-toastify";
 import Navbar, { BurgerMenu, HeaderPage } from "../Components/Navbar/NavBar";
 import { MintProvider } from "../Contexts/MintContext";
 import { useUser } from "../Contexts/UserContext";
-import { CREDIT_ADDRESS, initClients, MARKETPLACE_ADDRESS } from "../Utils/queryClient";
+import { CREDIT_ADDRESS, initClients, MARKETPLACE_ADDRESS, QueryClient } from "../Utils/queryClient";
 import styles from './Main.module.scss'
 
 export default function MainLayout() {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const [latestBlockTime, setLatestBlockTime] = useState<Date>()
 
   const scrollbarWidth = window.innerWidth - document.body.clientWidth
 
@@ -19,6 +22,15 @@ export default function MainLayout() {
     document.body.style.setProperty("--scrollbarWidth", `${scrollbarWidth}px`)
     document.body.style.setProperty('--viewportWidth', `calc(100vw - ${scrollbarWidth}px)`);
   },[scrollbarWidth])
+
+  const getBlockTime = async() => {
+    QueryClient.getBlock().then((block: Block)=>setLatestBlockTime(new Date(block.header.time))).catch((a)=>{})
+  }
+
+  useEffect(()=>{
+    if (process.env.REACT_APP_CHAIN_ID.startsWith('archway-')) return;
+    getBlockTime();
+  },[QueryClient])
 
   const page: HeaderPage =
     location.pathname.toLowerCase().includes('nfts') ? 'NFTS' :
@@ -44,6 +56,7 @@ export default function MainLayout() {
               </div>
             </div>
 
+            <div>Block Tme: {latestBlockTime?.toLocaleString()}</div>
             <div>
               <div>Marketplace: {MARKETPLACE_ADDRESS}</div>
               <div>Credits: {CREDIT_ADDRESS}  </div>

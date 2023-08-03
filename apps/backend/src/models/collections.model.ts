@@ -1,5 +1,5 @@
-import { prop, getModelForClass, modelOptions, mongoose, plugin, Ref, index } from '@typegoose/typegoose';
-import { CollectionProfile, cw721, CollectionModel as CollectionModelInterface, MinterType, PaymentType, CollectionMinterI } from '@architech/types';
+import { prop, getModelForClass, modelOptions, mongoose, plugin, index } from '@typegoose/typegoose';
+import { CollectionProfile, cw721, MinterType, PaymentType, CollectionMinterI, MinterPaymentI } from '@architech/types';
 import mongoosastic from 'mongoosastic';
 import { esClient } from '@/utils/elasticsearch';
 import paginate from 'mongoose-paginate-v2';
@@ -15,6 +15,20 @@ export class PaginatedModel {
   ) => Promise<PaginateResult<T>>;
 }
 
+export class MinterPaymentClass implements MinterPaymentI {
+  @prop({ type: String, required: true })
+  public type: PaymentType;
+
+  @prop({ type: String })
+  public token?: string;
+
+  @prop({ type: String })
+  public denom?: string;
+
+  @prop({ type: String, required: true })
+  public amount: string;
+}
+
 export class CollectionMinterClass implements CollectionMinterI {
   @prop({ type: String, required: true })
   public minter_address: string;
@@ -28,17 +42,11 @@ export class CollectionMinterClass implements CollectionMinterI {
   @prop({ type: String })
   public beneficiary?: string;
 
-  @prop({ type: String, required: true })
-  public payment_type: PaymentType;
+  @prop()
+  public payment?: MinterPaymentClass;
 
-  @prop({ type: String })
-  public payment_token?: string;
-
-  @prop({ type: String })
-  public payment_denom?: string;
-
-  @prop({ type: String, required: true })
-  public payment_amount: string;
+  @prop()
+  public whitelist_payment?: MinterPaymentClass;
 
   // Epoch
   @prop({ type: String })
@@ -46,15 +54,18 @@ export class CollectionMinterClass implements CollectionMinterI {
 
   // Epoch
   @prop({ type: String })
-  public end_time?: string;
+  public whitelist_launch_time?: string;
 
   // Epoch
   @prop({ type: String })
-  public whitelist_launch_time?: string;
+  public end_time?: string;
+
+  @prop({ type: Number })
+  public mint_limit?: number;
 
   // For copy minters
   @prop({ type: Number })
-  public mint_limit?: number;
+  public max_copies?: number;
 }
 
 @index(

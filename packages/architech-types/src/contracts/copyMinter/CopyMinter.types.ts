@@ -51,7 +51,7 @@ export interface InstantiateMsg {
   credit_contract?: string | null;
   end_time?: Uint64 | null;
   launch_time?: Uint64 | null;
-  maximum_copies?: number | null;
+  max_copies?: number | null;
   metadata: Metadata;
   mint_limit?: number | null;
   mint_price?: Payment | null;
@@ -92,6 +92,10 @@ export interface Trait {
 export type QueryMsg = {
   get_price: {};
 } | {
+  get_mint_limit: {
+    sender: string;
+  };
+} | {
   get_mint_status: {};
 } | {
   get_beneficiary: {};
@@ -114,7 +118,7 @@ export interface Config {
   credit_contract?: string | null;
   end_time?: Timestamp | null;
   launch_time?: Timestamp | null;
-  maximum_copies?: number | null;
+  max_copies?: number | null;
   metadata: Metadata;
   mint_limit?: number | null;
   mint_price?: Payment | null;
@@ -124,14 +128,16 @@ export interface Config {
   wl_mint_price?: Payment | null;
   [k: string]: unknown;
 }
-export interface GetMintStatusResponse {
-  status: MintStatus;
-}
-export interface MintStatus {
-  launch_time?: Uint64 | null;
+export interface GetMintLimitResponse {
   mint_limit?: number | null;
+  mints?: number | null;
+  whitelisted: boolean;
+}
+export interface GetMintStatusResponse {
+  launch_time?: Uint64 | null;
+  max_copies?: number | null;
   minted: number;
-  [k: string]: unknown;
+  whitelist_launch_time?: Uint64 | null;
 }
 export interface GetNftAddrResponse {
   nft_address: Addr;

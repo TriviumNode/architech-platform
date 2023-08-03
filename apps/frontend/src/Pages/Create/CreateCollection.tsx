@@ -333,6 +333,12 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                             onClick: ()=>setPage('Financials')
                         })
                     }
+                    if (!timesState.launch_time) {
+                      newErrorTasks.push({
+                          content: `Enter a launch time.`,
+                          onClick: ()=>setPage("Times & Limits")
+                      });
+                    }
                     if (whitelistState.whitelist_price && (whitelistState.amount === '' || !whitelistState.denom)) {
                         newErrorTasks.push({
                             content: `Enter a whitelist price, or disable whitelist pricing.`,
@@ -342,7 +348,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     console.log('newErrorTasks', newErrorTasks)
                     // Show Error Tasks
                     if (checkErrors(newErrorTasks)) return;
-
+                    console.log('WL STATE', whitelistState)
                     const {minterAddress, nftAddress} = await initRandomProject({
                         client: wallet.client, signer: wallet.address,
                         contract: NFT_FACTORY_ADDRESS,
@@ -353,7 +359,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                         nft_symbol: detailState.symbol,
                         minter_label: `${detailState.name}_Random_Minter_${randomString(6)}`,
 
-                        launch_time: timesState.launch_time ? (timesState.launch_time.valueOf() / 1000).toString() : undefined,
+                        launch_time: ((timesState.launch_time as Date).valueOf() / 1000).toString(),
                         whitelist_launch_time: timesState.whitelist_launch_time ? (timesState.whitelist_launch_time.valueOf() / 1000).toString() : undefined,
                         
                         whitelisted: whitelist,
@@ -471,7 +477,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                         whitelist_launch_time: timesState.whitelist_launch_time ? (timesState.whitelist_launch_time.valueOf() / 1000).toString() : undefined,
 
                         mint_limit: timesState.mint_limit ? parseInt(timesState.mint_limit) : undefined,
-                        maximum_copies: timesState.max_copies ? parseInt(timesState.max_copies) : undefined,
+                        max_copies: timesState.max_copies ? parseInt(timesState.max_copies) : undefined,
                         whitelisted: whitelist,
 
                         nft_name: detailState.name,
