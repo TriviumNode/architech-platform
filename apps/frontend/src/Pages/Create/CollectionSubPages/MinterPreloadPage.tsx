@@ -29,7 +29,7 @@ export const DefaultPreloadState: PreloadState = {
 }
 
 export interface IdMetadata extends cw2981.Metadata {
-    file_name: string;
+  file_name: string;
 }
 
 const MinterPreloadPage: FC<{
@@ -128,8 +128,8 @@ const MinterPreloadPage: FC<{
             </div>
             <p>
                 Upload a CSV or JSON file to preload items into your random minter.
-
-                See the <a href="#">Architech Documentation</a> for more information.
+                <br />
+                See the <a href="https://docs.architech.zone/preload.html" className='textLink' target='_blank' rel="noreferrer noopener">Architech Documentation</a> for more information.
             </p>
             <div style={{width: 'fit-content'}} className='mb16'>
                 <Badge style={{fontSize: '16px'}}>
@@ -180,7 +180,7 @@ const MinterPreloadPage: FC<{
                                 />
                             </label>
                         </label>
-                        <div className='lightText11' style={{margin: '4px 8px 0 8px'}}>
+                        <div className='lightText11' style={{margin: '4px 8px 0 8px', textAlign: 'right'}}>
                             <a target='blank' href='/architech-template.json'>Download template</a>
                         </div>
                     </Col>
@@ -209,7 +209,7 @@ const MinterPreloadPage: FC<{
                         </div> */}
                         <label>
                             <span>Upload NFT images here. Max size: 5MB each.</span>
-                        <PreloadDropzone images={state.images} invalidFiles={state.invalidFiles} setImages={(newImages)=>updateState({images: newImages})} />
+                        <PreloadDropzone disabled={!state.items.length} images={state.images} invalidFiles={state.invalidFiles} setImages={(newImages)=>updateState({images: newImages})} />
                         </label>
                     </Col>
                 </div>

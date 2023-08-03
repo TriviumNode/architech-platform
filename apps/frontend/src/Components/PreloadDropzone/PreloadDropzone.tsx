@@ -21,11 +21,13 @@ export default function PreloadDropzone(
   {
     images: acceptedFiles,
     setImages: setAcceptedFiles,
-    invalidFiles
+    invalidFiles,
+    disabled
   }:{ 
     images: FileWithPreview[];
     setImages: (newImages: FileWithPreview[])=>void;
     invalidFiles: string[];
+    disabled: boolean;
   }){
     const filesRef = useRef<FileWithPreview[]>(acceptedFiles);
     const invalidFilesRef = useRef<string[]>(invalidFiles);
@@ -33,6 +35,7 @@ export default function PreloadDropzone(
     invalidFilesRef.current = invalidFiles;
 
     const onDrop = useCallback((files: File[]) => {
+      if (disabled) return;
       const newFiles: FileWithPreview[] = []
       files.forEach(f=>{
         if (filesRef.current.findIndex(fi=>fi.file.name === f.name) === -1)
@@ -125,24 +128,31 @@ export default function PreloadDropzone(
     e.preventDefault();
     e.stopPropagation();
   }
+
+  let inputProps = getInputProps();
+  if (disabled) inputProps = {...inputProps, onClick: noClick, onChange: noClick}
   return (
     <div style={{
       border: '1px solid rgb(0,0,0,0.15)',
       borderRadius: '8px',
       padding: '8px',
+      background: disabled ? '#DEDEDE' : undefined,
+      color: disabled ? '#232323' : undefined
     }}>
     <section>
       <div {...getRootProps({className: 'dropzone br8 mb8'})} style={{
         padding: '8px',
         border: '2px dashed rgb(0,0,0,0.2)',
-        cursor: 'pointer'
+        cursor: disabled ? 'default' : 'pointer'
       }}>
-        <input {...getInputProps()} />
+        <input {...inputProps} />
         <div style={{padding: '16px', textAlign: 'center', fontSize: '16px'}} className='br8 mb8'>
         {
-          isDragActive ?
+          isDragActive && !disabled ?
             <p>Drop the images here ...</p> :
-            <p>Click or tap to select images, or drag and drop images here.</p>
+            disabled ?
+              <p>Upload a CSV or JSON before uploading images.</p>
+            : <p>Click or tap to select images, or drag and drop images here.</p>
         }
         </div>
 
