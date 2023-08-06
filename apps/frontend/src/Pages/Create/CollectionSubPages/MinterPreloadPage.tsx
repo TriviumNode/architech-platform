@@ -133,7 +133,7 @@ const MinterPreloadPage: FC<{
             </p>
             <div style={{width: 'fit-content'}} className='mb16'>
                 <Badge style={{fontSize: '16px'}}>
-                    {state.items.length} NFTs uploaded
+                    {state.items.length} NFTs found
                 </Badge>
             </div>
             <form className={styles.form}>

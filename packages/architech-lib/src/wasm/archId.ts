@@ -1,7 +1,7 @@
 import { SigningArchwayClient, ArchwayClient } from "@archwayhq/arch3.js/build";
 
 export const resolveArchId = async(client: ArchwayClient | SigningArchwayClient, contract: string, address: string): Promise<string> => {
-    if (!address) return;
+    if (!address || !address.length || !contract || !contract.length) return;
     try {
         const query = {
             resolve_address: {

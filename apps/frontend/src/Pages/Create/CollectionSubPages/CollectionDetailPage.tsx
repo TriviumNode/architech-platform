@@ -49,11 +49,11 @@ const CollectionDetailPage: FC<{
         }
     }
     const validateForm = () => {
-        const errors: Partial<DetailState> = {}
-        if (!state.name) errors.name='true';
-        if (!state.symbol) errors.symbol='true';
-        if(Object.keys(errors).length){
-            setErrors(errors);
+        const newErrors: Partial<DetailState> = {}
+        if (!state.name) newErrors.name='true';
+        if (!state.symbol) newErrors.symbol='true';
+        if(Object.keys(newErrors).length){
+            setErrors(newErrors);
             return true;
         } else
             return false;

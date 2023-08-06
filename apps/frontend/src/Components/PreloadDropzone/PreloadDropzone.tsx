@@ -31,11 +31,13 @@ export default function PreloadDropzone(
   }){
     const filesRef = useRef<FileWithPreview[]>(acceptedFiles);
     const invalidFilesRef = useRef<string[]>(invalidFiles);
+    const disabledRef = useRef<boolean>(disabled);
     filesRef.current = acceptedFiles;
     invalidFilesRef.current = invalidFiles;
+    disabledRef.current = disabled;
 
     const onDrop = useCallback((files: File[]) => {
-      if (disabled) return;
+      if (disabledRef.current) return;
       const newFiles: FileWithPreview[] = []
       files.forEach(f=>{
         if (filesRef.current.findIndex(fi=>fi.file.name === f.name) === -1)

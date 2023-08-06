@@ -384,7 +384,7 @@ const getMinterInfo = async (creator: string) => {
                 }
               : undefined;
 
-            // Set minter data
+            // Set Random minter data
             const minter: CollectionMinterClass = {
               minter_address: creator,
               minter_type: 'RANDOM',
@@ -392,12 +392,11 @@ const getMinterInfo = async (creator: string) => {
               beneficiary: config.beneficiary,
               launch_time: (parseInt(config.launch_time) / 1000000000).toString(),
               whitelist_launch_time: (parseInt(config.whitelist_limit_time) / 1000000000).toString(),
+              end_time: undefined,
               payment,
               whitelist_payment,
-              // payment_type: config.price.native_payment ? 'NATIVE' : 'CW20',
-              // payment_denom: config.price.native_payment?.denom,
-              // payment_token: config.price.cw20_payment?.token,
-              // payment_amount: config.price.native_payment?.amount || config.price.cw20_payment?.amount,
+              mint_limit: config.mint_limit,
+              max_copies: undefined,
             };
             const actual_creator = config.admin;
             return { minter, actual_creator };
@@ -445,6 +444,8 @@ const getMinterInfo = async (creator: string) => {
               end_time: (parseInt(config.end_time) / 1000000000).toString(),
               payment,
               whitelist_payment,
+              mint_limit: config.mint_limit,
+              max_copies: config.max_copies,
             };
             const actual_creator = config.minter_admin;
             return { minter, actual_creator };

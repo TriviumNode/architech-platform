@@ -1,4 +1,4 @@
-import { denomToHuman, findDenom, findToken, getMintLimit, mintWithMinter, noDenom, truncateAddress, unknownDenom } from "@architech/lib";
+import { denomToHuman, findDenom, findToken, getMintLimit, getMintStatus, mintWithMinter, noDenom, truncateAddress, unknownDenom } from "@architech/lib";
 import { cw721, GetCollectionResponse, Denom, minter } from "@architech/types";
 import { faCheck, faClock, faRefresh, faX } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -45,7 +45,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
     const [prices, setPrices] = useState<Prices>();
 
     const [buyerStatus, setBuyerStatus] = useState<minter.GetMintLimitResponse>();
-    const [minterStatus, setMinterStatus] = useState();
+    const [minterStatus, setMinterStatus] = useState<minter.GetMintStatusResponse>();
 
     const { user, refreshProfile } = useUser()
     const revalidator = useRevalidator()
@@ -58,6 +58,19 @@ const SingleMinter: FC<any> = (): ReactElement => {
         const result: minter.GetMintLimitResponse = await getMintLimit({ client: user.client, contract: collection.collectionMinter.minter_address, buyer: user.address });
         setBuyerStatus(result);
       } catch (error: any) {
+        console.error('Failed to check buyer whitelist status:', error.toString())
+        console.error(error)
+        toast.error('Failed to check buyer whitelist status')
+      }
+    }
+
+    const getMinterStatus = async () => {
+      if (!collection.collectionMinter) return;
+
+      try {
+        const result: minter.GetMintStatusResponse = await getMintStatus({ client: QueryClient, contract: collection.collectionMinter.minter_address });
+        setMinterStatus(result);
+      } catch (error: any) {
         console.error('Failed to check minter status:', error.toString())
         console.error(error)
         toast.error('Failed to check minter status')
@@ -66,6 +79,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
 
     useEffect(()=>{
       checkWhitelist();
+      getMinterStatus();
     },[user])
 
     const handleRefresh = async () => {
@@ -205,7 +219,6 @@ const SingleMinter: FC<any> = (): ReactElement => {
         public: publicPrice,
       })
     }
-    console.log('Prices', prices)
 
     useEffect(()=>{
       calculatePrices()
@@ -225,7 +238,6 @@ const SingleMinter: FC<any> = (): ReactElement => {
         <div><h6>Not a minter</h6></div>
       )
 
-
     const collectionName = getCollectionName(collection);
     const collectionImage = collection.collectionProfile?.profile_image ? getApiUrl(`/public/${collection.collectionProfile?.profile_image}`) : undefined;
 
@@ -241,7 +253,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
       new Date(parseInt(collection.collectionMinter.end_time) * 1000)
     : undefined;
 
-    const Stats = (): {title: string; value: string}[] => {
+    const Stats = (): {title: string; value: any}[] => {
       switch (collection.collectionMinter?.minter_type) {
         case 'RANDOM':
           return [
@@ -251,7 +263,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
             },
             {
               title: 'Available',
-              value: '69',
+              value: minterStatus?.remaining || <SmallLoader />,
             },
             {
               title: 'Minted',
@@ -364,13 +376,15 @@ const SingleMinter: FC<any> = (): ReactElement => {
                 <SaleTimeRow
                   saleType='Private'
                   startTime={wlStartDate}
-                  endTime={startDate}
+                  endTime={undefined}
+                  endCountdown={false}
                   price={!prices ? <SmallLoader />
                     : prices.private ?
                       <div style={{fontSize: '28px'}}>{prices.private.displayAmount} <DenomImg denom={prices.private.denom} size='medium' /></div>
                     :
                       <div style={{fontSize: '28px'}}>{prices.public.displayAmount} <DenomImg denom={prices.public.denom} size='medium' /></div>
                   }
+                  eligible={buyerStatus?.whitelisted || false}
                 />
               }
               {!!collection.collectionMinter.launch_time &&
@@ -378,6 +392,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
                   saleType='Public'
                   startTime={startDate}
                   endTime={endDate}
+                  endCountdown={true}
                   price={prices?.public.displayAmount ?
                     <div style={{fontSize: '28px'}}>{prices.public.displayAmount} <DenomImg denom={prices.public.denom} size='medium' /></div>
                     : <SmallLoader />
@@ -398,6 +413,12 @@ const SingleMinter: FC<any> = (): ReactElement => {
             </div>
             <div className='d-flex align-items-center' style={{gap: '24px'}}>
               {prices ?
+                prices.private && buyerStatus?.whitelisted ?
+                <div>
+                  <div style={{fontSize: '28px'}}>{prices.private.displayAmount} <DenomImg denom={prices.private.denom} size='medium' /></div>
+                  {!!prices.private.displayUsd && <div className='lightText12'>~ ${prices.private.displayUsd}</div>}
+                </div>
+                :
                 <div>
                   <div style={{fontSize: '28px'}}>{prices.public.displayAmount} <DenomImg denom={prices.public.denom} size='medium' /></div>
                   {!!prices.public.displayUsd && <div className='lightText12'>~ ${prices.public.displayUsd}</div>}
@@ -435,33 +456,42 @@ type TimeRowProps = {
   saleType: string;
   startTime: Date | undefined;
   endTime: Date | undefined;
+  endCountdown?: boolean;
   ended?: boolean;
   price: any;
+  eligible?: boolean;
 }
 
-const SaleTimeRow: FC<TimeRowProps> = ({saleType, startTime, endTime, ended, price}): ReactElement => {
+const SaleTimeRow: FC<TimeRowProps> = ({saleType, startTime, endTime, endCountdown = true, ended, price, eligible = true}): ReactElement => {
   const [now, setNow] = useState(new Date())
 
-  const status = !!ended || (endTime && now > endTime) ?
-    'Ended'
-  : startTime && now < startTime ?
-    // `Starts ${startTime.toLocaleString()}`
-    <Countdown
+  let status;
+  let icon;
+
+  if (ended || (endTime && now > endTime)){
+    status = 'Ended';
+    icon = faX;
+  } else if (startTime && now < startTime){
+    status = <Countdown
       date={startTime}
       renderer={renderer}
-    />
-  : endTime ?
-    <Countdown
+      onComplete={()=>setNow(new Date())}
+    />;
+    icon = faClock;
+  } else if (endTime && endCountdown){
+    status = <Countdown
       date={endTime}
       renderer={renderer}
-    />
-  : 'Active'
-
-  const icon = !!ended || (endTime && now > endTime) ?
-    faX
-  : startTime && now < startTime ?
-    faClock
-  : faCheck
+      onComplete={()=>setNow(new Date())}
+    />;
+    icon = faCheck;
+  } else if (eligible) {
+    status = 'Active';
+    icon = faCheck;
+  } else {
+    status = 'Not Eligible';
+    icon = faX;
+  }
   
   return (
     <div className='d-flex br8 align-items-center' style={{background: '#DDD', padding: '8px 16px'}}>

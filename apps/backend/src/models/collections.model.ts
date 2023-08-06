@@ -50,22 +50,22 @@ export class CollectionMinterClass implements CollectionMinterI {
 
   // Epoch
   @prop({ type: String })
-  public launch_time?: string;
+  public launch_time: string | undefined;
 
   // Epoch
   @prop({ type: String })
-  public whitelist_launch_time?: string;
+  public whitelist_launch_time: string | undefined;
 
   // Epoch
   @prop({ type: String })
-  public end_time?: string;
+  public end_time: string | undefined;
 
   @prop({ type: Number })
-  public mint_limit?: number;
+  public mint_limit: number | undefined;
 
   // For copy minters
   @prop({ type: Number })
-  public max_copies?: number;
+  public max_copies: number | undefined;
 }
 
 @index(

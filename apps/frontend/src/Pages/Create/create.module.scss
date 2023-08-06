@@ -353,16 +353,20 @@
 
 
 input[type="datetime-local"] {
-    width: calc(100% - 32px);
-    height: 48px;
-    border: 1px solid #cfccc9;
-    border-radius: 8px;
-    margin-top: 8px;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 120%;
-    color: #666666;
-    padding: 0 16px;
+  width: calc(100% - 32px);
+  height: 48px;
+  border: 1px solid #cfccc9;
+  border-radius: 8px;
+  margin-top: 8px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 120%;
+  color: #666666;
+  padding: 0 16px;
+}
+input[type="datetime-local"]:disabled {
+  border: 1px solid #cfccc9;
+  background: #cfccc9;
 }
 
 .reviewBox {
