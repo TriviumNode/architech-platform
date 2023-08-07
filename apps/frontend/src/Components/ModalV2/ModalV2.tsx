@@ -72,14 +72,14 @@ export default function ModalV2({ open, locked = false, onClose, children, style
     >
       <div className={styles["modal__container"]}>
         {!!title &&
-        <div>
-          <div className='d-flex justify-content-between align-items-center pr8'>
-            {title}
-            {closeButton && <FontAwesomeIcon icon={faXmark} size='lg' color='#222' onClick={()=>onClose()}  style={{cursor: 'pointer'}} /> }
+          <div>
+            <div className='d-flex justify-content-between align-items-center pr8'>
+              {title}
+              {closeButton && <FontAwesomeIcon icon={faXmark} size='lg' color='#222' onClick={()=>onClose()}  style={{cursor: 'pointer'}} /> }
+            </div>
+            <hr />
           </div>
-          <hr />
-        </div>
-}
+        }
         {children}
       </div>
     </dialog>

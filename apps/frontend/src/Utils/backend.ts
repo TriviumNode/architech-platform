@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosProgressEvent } from 'axios';
 import { Collection, GetUserProfileResponse, NonceRequest, NonceResponse, Token, UpdateUserDto, User, WalletLogin, ImportCollectionRequest, GetTokenResponse, GetCollectionResponse, SortOption, GetTrendingCollectionResponse, GetLatestListingsResponse } from '@architech/types'
 import { Pubkey } from '@cosmjs/amino';
 import { ImportCollectionData, UpdateProfileData } from '../Interfaces/interfaces';
@@ -357,7 +357,7 @@ export const uploadImage = async(file: File): Promise<any> => {
     return data.cid;
 }
 
-export const uploadBatch = async(files: File[]): Promise<any> => {
+export const uploadBatch = async(files: File[], onUploadProgress?: (progressEvent: AxiosProgressEvent)=>void): Promise<any> => {
     const url = getApiUrl(`/upload/batch`);
 
     const formData = new FormData();
@@ -374,6 +374,7 @@ export const uploadBatch = async(files: File[]): Promise<any> => {
             headers: {
                 "Content-Type": "multipart/form-data"
             },
+            onUploadProgress
         }
     )
     return data;

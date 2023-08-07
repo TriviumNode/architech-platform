@@ -1,4 +1,4 @@
-import {ReactElement, FC, useState, useEffect} from "react";
+import {ReactElement, FC, useState, useEffect, memo} from "react";
 import { Col } from "react-bootstrap";
 import { useLoaderData, useNavigate, useParams, useRevalidator } from "react-router-dom";
 import { useUser } from "../../Contexts/UserContext";
@@ -12,7 +12,7 @@ import { cw2981, GetCollectionResponse } from "@architech/types";
 import { toast } from "react-toastify";
 import equal from "fast-deep-equal";
 import RewardsPage, { DefaultRewardsState, RewardsState } from "./CollectionSubPages/RewardsPage";
-import { getMetadata, preloadData, setRewardsMetadata } from "@architech/lib";
+import { getMetadata, parseError, preloadData, setRewardsMetadata } from "@architech/lib";
 import SmallLoader from "../../Components/SmallLoader";
 import { QueryClient } from "../../Utils/queryClient";
 import { ContractMetadata } from "@archwayhq/arch3.js/build";
@@ -21,6 +21,9 @@ import MinterPreloadPage, { DefaultPreloadState, PreloadState } from "./Collecti
 
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import {Buffer} from 'buffer';
+import ModalV2 from "../../Components/ModalV2";
+import Loader from "../../Components/Loader";
+import { AxiosProgressEvent } from "axios";
 
 
 
@@ -52,6 +55,8 @@ export const RandomPAGES: Page[] = [
         title: 'Preload Minter',
     },
 ]
+
+export type PreloadStatus = 'PROCESSING' | 'UPLOADING' | 'WAITING_SIGN' | 'WAITING_TX' | 'COMPLETE' | 'ERROR'
 
 const EditCollectionPage: FC<any> = (): ReactElement => {
     const { user: wallet, refreshProfile } = useUser();
@@ -91,10 +96,12 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
 
     const [unsaved, setUnsaved] = useState(false);
     const [saving, setSaving] = useState(false);
-    const [preloading, setPreloading] = useState(false);
+    const [preloadStatus, setPreloadStatus] = useState<PreloadStatus>();
     const [preloadReady, setPreloadReady] = useState(false);
-
+    const [uploadPercent, setUploadPercent] = useState(0);
     
+    const [preloadError, setPreloadError] = useState<any>();
+
     const [metadata, setMetadata] = useState<ContractMetadata>()
     const [loadingMetadata, setLoadingMetadata] = useState(true)
     const [loadMetadataError, setLoadMetadataError] = useState<string>();
@@ -251,19 +258,23 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
         setLinkState(currentLinks);
     }
 
+    const handleProgress = (progressEvent: AxiosProgressEvent) => {
+      const percent = Math.ceil((progressEvent.progress || 0) * 100);
+      setUploadPercent(percent);
+      if (percent === 100) setPreloadStatus('PROCESSING');
+    }
+
     const handlePreload = async() => {
         if (!wallet) throw new Error('Wallet is not connected.');
         if (!fullCollection.collection.collectionMinter) throw new Error(`This collection doesn't have a Minter.`);
-        setPreloading(true);
+        setPreloadStatus('UPLOADING');
         try {
-            const uploadResult = await uploadBatch(preloadState.images.map(i=>i.file));
-            console.log(uploadResult);
-
+            const uploadResult = await uploadBatch(preloadState.images.map(i=>i.file), handleProgress);
+            setPreloadStatus('PROCESSING');
             const cleanMetadata: cw2981.Metadata[] = preloadState.items.map(i=>{
                 if (!i.image) {
                     const findImg = uploadResult.find((r: any)=>r.fileName === i.file_name);
                     if (!findImg) throw new Error(`Unable to find filename ${i.file_name} in upload result.`)
-                    console.log('uncleaned', i)
                     const metadata: cw2981.Metadata = {
                         ...{...i, file_name: undefined},
                         royalty_percentage: i.royalty_percentage ? parseInt(i.royalty_percentage.toString()) : undefined,
@@ -275,44 +286,81 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                     royalty_percentage: i.royalty_percentage ? parseInt(i.royalty_percentage.toString()) : undefined,
                 };
             })
-            console.log('cleanMetadata', cleanMetadata)
 
-            // Simulate Gas limit. This breaks if I do it in the lib package for some reason.
-            const msg = {
-                preload_data: {
-                    new_data: cleanMetadata
-                }
-            }
-        
-            const WasmMsg = {
-                typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
-                value: MsgExecuteContract.fromPartial({
-                  contract: fullCollection.collection.collectionMinter?.minter_address as string,
-                  msg: Buffer.from(JSON.stringify(msg)),
-                  sender: wallet.address
-                }),
-            };
-
+            setPreloadStatus('WAITING_SIGN');
             const result = await preloadData({
                 client: wallet.client,
                 signer: wallet.address,
                 contract: fullCollection.collection.collectionMinter?.minter_address as string,
                 metadata: cleanMetadata,
             })
-            console.log(result);
-            setPreloadState(DefaultPreloadState);
-            toast.success(`Preloaded ${cleanMetadata.length} NFTs`)
+            console.log('Preload TX Result', result);
+            setPreloadStatus('COMPLETE')
         } catch(err: any) {
-            toast.error(err.toString());
             console.error(err);
+            setPreloadError(parseError(err))
+            setPreloadStatus('ERROR');
         }
-        setPreloading(false)
+        setUploadPercent(0);
     }
+
+    const handleCompleteClose = () => {
+      setPreloadState(DefaultPreloadState);
+      setPreloadStatus(undefined);
+    }
+
+    const getStatusMessage = () => {
+      switch (preloadStatus) {
+        case "UPLOADING":
+          return (
+            <>
+              <h3 className='mb8'>Uploading</h3>
+              <div className='lightText14'>
+                {uploadPercent}%
+              </div>
+              <Loader />
+            </>
+          );
+        case "PROCESSING":
+          return (
+            <>
+              <h3>Processing</h3>
+              <Loader />
+            </>
+          );
+        case "WAITING_SIGN":
+          return (
+            <>
+              <div style={{fontSize: '16px'}}>Please sign the transaction with your wallet</div>
+              <Loader />
+            </>
+          );
+        case "COMPLETE":
+          return (
+            <>
+              <h3>Success</h3>
+              <p className='lightText12'>Preloaded {preloadState.items.length} NFTs</p>
+              <button onClick={()=>handleCompleteClose()}>Close</button>
+            </>
+          );
+        case "ERROR":
+          return (
+            <>
+              <h3 className='mb8'>Error</h3>
+              <code className='mb16'>{preloadError}</code>
+              <button onClick={()=>setPreloadStatus(undefined)}>Close</button>
+            </>
+          );
+      }
+    }
+
+
 
     if (!wallet) return (
         <ConnectWallet text='Connect your wallet to edit this collection' />
     )
     return (<>
+        <PreloadModal preloadStatus={preloadStatus} getStatusMessage={getStatusMessage} />
         <div className={styles.mainRow}>
             <Col xs={12} md={4} className={styles.navCard}>
                 <div className={styles.navCardInner}>
@@ -352,10 +400,25 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
         { preloadReady &&
             <div className={styles.saveToast}>
                 <div style={{margin: '0 24px 0 8px', whiteSpace: 'nowrap'}}>You have {preloadState.items.length} NFTs to preload</div>
-                <button disabled={preloading} onClick={()=>handlePreload()}>Preload{preloading && <SmallLoader />}</button>
+                <button disabled={!!preloadStatus} onClick={()=>handlePreload()}>Preload{!!preloadStatus && <SmallLoader />}</button>
             </div>
         }
     </>);
 };
+
+type PModalProps = {
+  preloadStatus: PreloadStatus | undefined
+  getStatusMessage: ()=>any;
+}
+
+const PreloadModal = ({preloadStatus, getStatusMessage}: PModalProps) => {
+  return (
+    <ModalV2 open={!!preloadStatus} locked={true} closeButton={false} onClose={()=>{}} title={'Preloading Minter'} style={{width: '256px'}} >
+      <div className='d-flex flex-column justify-content-center align-items-center' style={{textAlign: 'center', paddingTop: '16px'}}>
+        {getStatusMessage()}
+      </div>
+    </ModalV2>
+  )
+}
 
 export default EditCollectionPage;
