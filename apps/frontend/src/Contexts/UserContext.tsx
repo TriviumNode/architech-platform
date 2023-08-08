@@ -26,7 +26,7 @@ interface Props {
   children: ReactNode;
 }
 
-interface User {
+export interface CurrentWallet {
   wallet_type: 'Keplr';
   client:  SigningArchwayClient;
   address: string;
@@ -44,7 +44,7 @@ interface Balances {
 }
 
 export interface UserContextState {
-  user: User | undefined;
+  user: CurrentWallet | undefined;
   balances: Balances | undefined;
   walletStatus: STATUS;
   connectWallet: (()=>void)
@@ -69,7 +69,7 @@ const connectedKeplr = localStorage.getItem(KEY);
 type STATUS = 'DISCONNECTED' | 'SELECT' | 'LOADING_CONNECT' | 'LOADING_NONCE' | 'LOADING_SIG' | 'LOADING_LOGIN' | 'CONNECTED' | 'ERROR'
 
 export const UserProvider = ({ children }: Props): ReactElement => {
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<CurrentWallet>();
   const [balances, setBalances] = useState<Balances>();
   const [walletStatus, setWalletStatus] = useState<STATUS>('DISCONNECTED');
 
@@ -148,7 +148,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
       setWalletStatus('LOADING_NONCE');
       try {
         const response = await checkLogin(address);
-        const newUser: User = {client, address, pubKey, wallet_type: 'Keplr', profile: response}
+        const newUser: CurrentWallet = {client, address, pubKey, wallet_type: 'Keplr', profile: response}
         setUser(newUser)
         setWalletStatus('CONNECTED');
         localStorage.setItem(KEY, 'true');
@@ -166,7 +166,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
 
         const loginResult = await walletLogin(JSON.stringify(signResult.pub_key), signResult.signature)
         // setAuthenticated(true);
-        const newUser: User = {client, address, pubKey, wallet_type: 'Keplr', profile: loginResult}
+        const newUser: CurrentWallet = {client, address, pubKey, wallet_type: 'Keplr', profile: loginResult}
 
         setUser(newUser)
         localStorage.setItem(KEY, 'true');
@@ -195,7 +195,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
   const refreshProfile = async() => {
     if (!user) throw 'Unable to refresh profile when user is not set.'
     const newProfile = await getUserProfile(user?.address);
-    const newUser: User = {...user, profile: newProfile}
+    const newUser: CurrentWallet = {...user, profile: newProfile}
     setUser(newUser)
   }
 

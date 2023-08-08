@@ -1,11 +1,10 @@
-import { calculateFee, CATEGORIES, denomToHuman, findDenom, humanToDenom } from "@architech/lib";
+import { calculateFee, denomToHuman, findDenom, humanToDenom } from "@architech/lib";
 import { Denom } from "@architech/types";
 import { FC, ReactElement, useState } from "react";
 import { Col } from "react-bootstrap";
 import { DenomImg } from "../../../Components/ArchDenom";
-import MultiSelect from "../../../Components/MultiSelect";
 import SelectMenu, { SelectOption } from "../../../Components/SelectMenu/SelectMenu";
-import { useUser } from "../../../Contexts/UserContext";
+import { CurrentWallet, useUser } from "../../../Contexts/UserContext";
 //@ts-expect-error
 import { Switch } from 'react-switch-input';
 
@@ -21,7 +20,6 @@ const selectOptions: SelectOption[] = [
                 <DenomImg denom={nativeDenom} /> {nativeDenom.displayDenom}
             </div>
         )
-
     }
 ]
 
@@ -74,84 +72,171 @@ const FinancialPage: FC<{
                 <button type='button' onClick={()=>next()}>Next</button>
             </div>
             <form className={styles.form}>
-
-            { (!collectionType || collectionType === 'COPY') &&<>
-                <div className='d-flex mb24'>
-                    <Col xs={8}>
-                        <label>
-                            Royalty Payment Wallet
-                            <input value={state.royalty_address} onChange={e=>updateState({royalty_address: e.target.value})} placeholder='archway1a2b...' />
-                        </label>
-                        <div style={{textAlign: 'right', cursor: 'pointer'}} className={`${styles.spanButton} wide`} onClick={()=>updateState({royalty_address: user?.address || ''})}>Use my address</div>
-                    </Col>
-                    <Col xs={4}>
-                        <label>
-                            Royalty Percentage
-                            <div className='d-flex flex-column wide'>
-                                <input value={state.royalty_percent} onChange={e=>updateState({royalty_percent: e.target.value})} placeholder='5' /><span className={styles.percent}>%</span>
-                            </div>
-                        </label>
-                    </Col>
-                </div>
-                { !!!collectionType &&
-                    <div className='d-flex align-items-center mb24 mt16'>
-                        <Switch
-                            checked={state.list}
-                            onChange={(e: any)=>updateState({list: e.target.checked})}
-                        />
-                        <span className='ml16'>List NFT for sale on Architech.</span>
-                    </div>
-                }
-            </>}
-
-            { (!!collectionType || state.list) &&
-            <>
-                <div className='d-flex flex-wrap mt16 mb24'>
-                    <Col xs={6}>
-                        <label>
-                            Sell {!!collectionType && 'each '} NFT for<br />
-                            <SelectMenu options={selectOptions} title='Select a token' selected={selectedOption} select={(option)=>handleSelect(option)}  className='mt8'  />
-                        </label>
-                    </Col>
-                    <Col xs={true}>
-                        <label className='d-flex flex-column'>
-                            Amount<br />
-                            <input value={state.amount} onChange={(e)=>updateState({amount: e.target.value.replace(/[^0-9.]/gi, '')})} className='mt8'  />
-                        </label>
-                    </Col>
-                </div>
+              <>
                 { !!collectionType &&
-                    <div className='d-flex mb24'>
-                        <Col>
-                            <label>
-                                Beneficiary Address
-                                <div className='lightText10'>
-                                    Address to receive the funds from minting
-                                </div>
-                                <input value={state.beneficiary_address} onChange={e=>updateState({beneficiary_address: e.target.value})} placeholder='archway1a2b...' />
-                            </label>
-                            <div style={{textAlign: 'right', cursor: 'pointer'}} className={`${styles.spanButton} wide`} onClick={()=>updateState({beneficiary_address: user?.address || ''})}>Use my address</div>
-                        </Col>
-                    </div>
+                  <>
+                    <ListRow collectionType={collectionType} handleSelect={handleSelect} selectedOption={selectedOption} state={state} updateState={updateState} />
+                    {BeneficiaryRow({user, state, updateState})}
+                  </>  
                 }
-                <div className='d-flex flex-column gap8 mb16' style={{margin: '0px 16px'}}>
-                    <h4 style={{color: '#000'}}>Fee Breakdown</h4>
-                    
-                    <div className='d-flex flex-column gap8' style={{margin: '0px 16px'}}>
-                        <div className='d-flex justify-content-between'>
-                            <span>Sale Fee&nbsp;<span className='lightText10'>({!!collectionType ? '3%' : '2.5%'})</span></span>
-                            <span className="lightText12">{feeAmount.toFixed(3)}&nbsp;{selectedOption.value.displayDenom}<span className='lightText10'>{!!collectionType &&' / Mint'}</span></span>
-                        </div>
-                        <div className='d-flex justify-content-between'>
-                            <span style={{fontWeight: '600'}}>You Get</span>
-                            <span>{`${total.toFixed(3)} ${selectedOption.value.displayDenom}`}<span className='lightText10'>{!!collectionType &&' / Mint'}</span></span>
-                        </div>
+                { (!!!collectionType || collectionType === 'COPY') &&
+                  RoyaltyRow({user, state, updateState})
+                }
+                { !!!collectionType &&
+                  <>
+                    <div className='d-flex align-items-center mb24 mt16'>
+                      <Switch
+                        checked={state.list}
+                        onChange={(e: any)=>updateState({list: e.target.checked})}
+                      />
+                      <span className='ml16'>List NFT for sale on Architech.</span>
                     </div>
-                </div>
-            </>}
+                    { state.list &&
+                      ListRow({collectionType, selectedOption, state, updateState, handleSelect})
+                    }
+                  </>
+                }
+                { (!!collectionType || state.list) &&
+                  FeeBreakdownRow({collectionType, selectedOption, feeAmount, total})
+                }
+              </>
             </form>
         </div>
     )
 }
 
 export default FinancialPage;
+
+
+const ListRow = ({
+  state,
+  collectionType,
+  selectedOption,
+  handleSelect,
+  updateState,
+}:{
+  state: FinancialState
+  collectionType: CollectionType | undefined,
+  selectedOption: SelectOption,
+  handleSelect: (option: SelectOption)=>void,
+  updateState: (newState: Partial<FinancialState>)=>void;
+}) => {
+
+  return (
+    <div className='d-flex flex-wrap mt16 mb24'>
+      <Col xs={6}>
+          <label>
+              Sell {!!collectionType && 'each '} NFT for<br />
+              <SelectMenu options={selectOptions} title='Select a token' selected={selectedOption} select={(option)=>handleSelect(option)}  className='mt8'  />
+          </label>
+      </Col>
+      <Col xs={true}>
+          <label className='d-flex flex-column'>
+              Amount<br />
+              <input value={state.amount} onChange={(e)=>updateState({amount: e.target.value.replace(/[^0-9.]/gi, '')})} className='mt8'  />
+          </label>
+      </Col>
+  </div>
+  )
+}
+
+const BeneficiaryRow = ({
+  user,
+  state,
+  updateState,
+}:{
+  user: CurrentWallet | undefined;
+  state: FinancialState;
+  updateState: (newState: Partial<FinancialState>)=>void;
+}) => {
+
+  return (
+    <div className='d-flex mb24'>
+      <Col>
+          <label>
+              Beneficiary Address
+              <div className='lightText10'>
+                  Address to receive the funds from minting
+              </div>
+              <input value={state.beneficiary_address} onChange={e=>updateState({beneficiary_address: e.target.value})} placeholder='archway1a2b...' />
+          </label>
+          <UseMyAddr onClick={()=>updateState({beneficiary_address: user?.address || ''})} />
+      </Col>
+  </div>
+  )
+}
+
+const RoyaltyRow = ({
+  user,
+  state,
+  updateState
+}:{
+  user: CurrentWallet | undefined;
+  state: FinancialState;
+  updateState: (newState: Partial<FinancialState>)=>void;
+}) => {
+  return (
+    <div className='d-flex mb24'>
+      <Col xs={4}>
+        <label>
+          Royalty Percentage
+          <div className='d-flex flex-column wide'>
+            <input value={state.royalty_percent} onChange={e=>updateState({royalty_percent: e.target.value})} placeholder='0' /><span className={styles.percent}>%</span>
+          </div>
+        </label>
+      </Col>
+      <Col xs={8}>
+        <label>
+          Royalty Payment Wallet
+          <input value={state.royalty_address} onChange={e=>updateState({royalty_address: e.target.value})} placeholder='archway1a2b...' />
+        </label>
+        <UseMyAddr onClick={()=>updateState({royalty_address: user?.address || ''})} />
+      </Col>
+    </div>
+  );
+}
+
+const FeeBreakdownRow = ({
+  collectionType,
+  selectedOption,
+  feeAmount,
+  total,
+}:{
+  collectionType: CollectionType | undefined,
+  selectedOption: SelectOption,
+  feeAmount: number,
+  total: number,
+}) => {
+  return (
+    <div className='d-flex flex-column gap8 mb16' style={{margin: '0px 16px'}}>
+      <h4 style={{color: '#000'}}>Fee Breakdown</h4>
+      
+      <div className='d-flex flex-column gap8' style={{margin: '0px 16px'}}>
+          <div className='d-flex justify-content-between'>
+              <span>Sale Fee&nbsp;<span className='lightText10'>({!!collectionType ? '3%' : '2.5%'})</span></span>
+              <span className="lightText12">{feeAmount.toFixed(3)}&nbsp;{selectedOption.value.displayDenom}<span className='lightText10'>{!!collectionType &&' / Mint'}</span></span>
+          </div>
+          <div className='d-flex justify-content-between'>
+              <span style={{fontWeight: '600'}}>You Get</span>
+              <span>{`${total.toFixed(3)} ${selectedOption.value.displayDenom}`}<span className='lightText10'>{!!collectionType &&' / Mint'}</span></span>
+          </div>
+      </div>
+  </div>
+  )
+}
+
+const UseMyAddr = ({
+  onClick,
+}:{
+  onClick: ()=>void;
+}) => {
+  return (
+    <div
+      style={{textAlign: 'right', cursor: 'pointer'}}
+      className={`${styles.spanButton} wide`}
+      onClick={()=>onClick()}
+    >
+      Use my address
+    </div>
+  )
+}
