@@ -133,7 +133,8 @@ export const UserProvider = ({ children }: Props): ReactElement => {
     setWalletStatus('SELECT')
   }
 
-  const connectKeplr = async () => {
+  const connectKeplr = async (wallet: any) => {
+    window.wallet = wallet;
     try {
       setWalletStatus('LOADING_CONNECT');
       const { client, address, pubKey } = await connectKeplrWallet();
@@ -220,7 +221,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
         return (
           <div className={styles.selectWalletContainer}>
             <Col className={styles.walletTile}>
-              <button onClick={()=>connectKeplr()} disabled={typeof window.keplr === "undefined"}>
+              <button onClick={()=>connectKeplr(window.keplr)} disabled={typeof window.keplr === "undefined"}>
                 <div>
                   <img src='/images/wallets/keplr.png' />
                   <div>
@@ -235,7 +236,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
 
             <Col className={styles.walletTile}>
               {/* @ts-expect-error */}
-              <button onClick={()=>connectKeplr()} disabled={typeof window.archx === "undefined"}>
+              <button onClick={()=>connectKeplr(window.archx)} disabled={typeof window.archx === "undefined"}>
                 <div>
                   <img src='/images/wallets/archx.svg' />
                   <div>
@@ -251,7 +252,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
             </Col>
             <Col className={styles.walletTile}>
               {/* @ts-expect-error */}
-              <button onClick={()=>connectKeplr()} disabled={typeof window.leap === "undefined"}>
+              <button onClick={()=>connectKeplr(window.leap)} disabled={typeof window.leap === "undefined"}>
                 <div>
                   <img src='/images/wallets/leap.svg' />
                   <div>
