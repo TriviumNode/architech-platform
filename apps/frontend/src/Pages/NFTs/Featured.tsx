@@ -44,7 +44,13 @@ const FeaturedCarousel: FC<any> = (): ReactElement => {
       return 'pl4 pr4'
     })()
 
-    let row2 = <>Floor&nbsp;&nbsp;&nbsp;&nbsp;{floor || '--'}&nbsp;<ArchDenom /></>
+    // let row2 = <>Floor&nbsp;&nbsp;&nbsp;&nbsp;{floor || '--'}&nbsp;<ArchDenom /></>
+    let row2 = (
+      <div className='wide d-flex justify-content-between'>
+        <div>Floor</div>
+        <div className='d-flex align-items-center'>{floor || '--'}&nbsp;<ArchDenom /></div>
+      </div>
+    );
     let link = `/nfts/${f.collection.address}`
     if (f.collection.collectionMinter) {
       const launch_time = f.collection.collectionMinter.launch_time ? new Date(parseInt(f.collection.collectionMinter.launch_time) * 1000) : undefined;
@@ -66,13 +72,21 @@ const FeaturedCarousel: FC<any> = (): ReactElement => {
         if (f.collection.collectionMinter.payment){
           const denom = findDenom((f.collection.collectionMinter.payment.denom || f.collection.collectionMinter.payment.token) as string);
           const humanPrice = denomToHuman(f.collection.collectionMinter.payment.amount, denom.decimals)
-          row2 = <div className='wide d-flex justify-content-between'>
-            <div>{text}</div>
-            <div className='d-flex align-items-center'>{humanPrice}&nbsp;<DenomImg denom={denom} /></div>
-          </div>
           // row2 = <>{text}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{humanPrice}&nbsp;<DenomImg denom={denom}/></>
+          row2 = (
+            <div className='wide d-flex justify-content-between'>
+              <div>{text}</div>
+              <div className='d-flex align-items-center'>{humanPrice}&nbsp;<DenomImg denom={denom} /></div>
+            </div>
+          );
         } else 
-          row2 = <>{text}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Free&nbsp;<ArchDenom /></>
+          // row2 = <>{text}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Free&nbsp;<ArchDenom /></>
+          row2 = (
+            <div className='wide d-flex justify-content-between'>
+              <div>{text}</div>
+              <div className='d-flex align-items-center'>Free&nbsp;<ArchDenom /></div>
+            </div>
+          );
       } else if (
         // Launch time
         launch_time &&
