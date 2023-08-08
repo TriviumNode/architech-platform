@@ -12,7 +12,7 @@ import { cw2981, GetCollectionResponse } from "@architech/types";
 import { toast } from "react-toastify";
 import equal from "fast-deep-equal";
 import RewardsPage, { DefaultRewardsState, RewardsState } from "./CollectionSubPages/RewardsPage";
-import { getMetadata, parseError, preloadData, setRewardsMetadata } from "@architech/lib";
+import { ADMINS, getMetadata, parseError, preloadData, setRewardsMetadata } from "@architech/lib";
 import SmallLoader from "../../Components/SmallLoader";
 import { QueryClient } from "../../Utils/queryClient";
 import { ContractMetadata } from "@archwayhq/arch3.js/build";
@@ -24,6 +24,7 @@ import {Buffer} from 'buffer';
 import ModalV2 from "../../Components/ModalV2";
 import Loader from "../../Components/Loader";
 import { AxiosProgressEvent } from "axios";
+import AdminEditPage from "./CollectionSubPages/AdminEditPage";
 
 
 
@@ -108,6 +109,9 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
 
     const [popupError, setPopupError] = useState<any>();
 
+    useEffect(()=>{
+      if (ADMINS.includes(wallet?.address || 'notadmin')) Pages.push({ link: 'admin', title: 'Admin' })
+    },[wallet])
     const changePage = (newLink: string) => {
         setPage(Pages.find(p=>p.link===newLink) as Page);
     }
@@ -213,6 +217,8 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                 return <RewardsPage state={rewardsState} onChange={(data) => setRewardsState(data)} contractAddress={collection.address} metadata={metadata} loadingMetadata={loadingMetadata} loadingMetadataError={loadMetadataError} />
             case page.link==='preload':
                 return <MinterPreloadPage state={preloadState} onChange={(data) => setPreloadState(data)}  />
+            case page.link==='admin':
+              return <AdminEditPage collection={fullCollection.collection}  />
             default:
                 return <div style={{margin: '32px', textAlign: 'center'}}><h2 style={{color: 'red'}}>Something went wrong</h2><p>The application encounted an error: `Tried to navigate to undefined page.`<br />Please try to navigate to another page using the menu on the left.</p></div>
         }

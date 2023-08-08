@@ -2,6 +2,8 @@ export interface ImportCollectionData {
     name: string;
     description: string;
     hidden: boolean;
+    admin_hidden?: boolean;
+    featured?: boolean;
     profileImage?: File;
     bannerImage?: File;
     twitter?: string;

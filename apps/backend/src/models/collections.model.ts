@@ -167,6 +167,13 @@ export class CollectionClass extends PaginatedModel {
   @prop({ type: Boolean, required: true })
   public hidden: boolean;
 
+  // Permanently hidden from anyone not the creator
+  @prop({ type: Boolean, required: true, default: false })
+  public admin_hidden: boolean;
+
+  @prop({ type: Boolean, required: true, default: false })
+  public featured: boolean;
+
   @prop({ type: Number, required: true, default: 0 })
   public total_views: number;
 

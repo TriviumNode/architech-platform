@@ -24,7 +24,7 @@ export const getLatestListings = async (req: Request, res: Response, next: NextF
       const ask = asks[i];
 
       const collection = await CollectionModel.findOne({ address: ask.collection });
-      if (!collection || collection.hidden) continue;
+      if (!collection || collection.hidden || collection.admin_hidden) continue;
 
       const token = await tokenService.ensureToken(ask.collection, ask.token_id);
       if (!token) continue;

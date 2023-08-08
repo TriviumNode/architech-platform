@@ -5,12 +5,13 @@ import { Collection, CollectionProfile, GetTrendingCollectionResponse, RequestWi
 import { EditCollectionBodyDto, ImportCollectionBodyDto } from '@/dtos/collections.dto';
 import { validate } from 'class-validator';
 import ViewModel from '@/models/views.model';
-import CollectionModel from '@/models/collections.model';
+import CollectionModel, { CollectionClass } from '@/models/collections.model';
 import mongoose from 'mongoose';
 import { RequestWithImages } from '@/middlewares/fileUploadMiddleware';
 import { HttpException } from '@/exceptions/HttpException';
 import { collectionsToResponse, queryDbCollectionByAddress, queryDbCollections } from '@/queriers/collection.querier';
 import { addCollectionView } from '@/services/view.service';
+import { ADMINS } from '@/../../../packages/architech-lib/dist';
 
 export const getAllCollections = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -44,7 +45,7 @@ export const getTrendingCollections = async (req: Request, res: Response, next: 
     ]);
     await CollectionModel.populate(trending, { path: '_id' });
     const raw_collections: Collection[] = trending.slice(0, 10).map(t => t._id);
-    const collections = raw_collections.filter(c => c && !c.hidden);
+    const collections = raw_collections.filter(c => c && !c.hidden && !c.admin_hidden);
 
     const collectionsResponse = await collectionsToResponse(collections);
 
@@ -56,26 +57,6 @@ export const getTrendingCollections = async (req: Request, res: Response, next: 
       };
     });
     res.status(200).json(response);
-
-    // const addresses = trending.map(t => t._id.address);
-    // try {
-    //   const dossiers = await getBatchCollectionDossier({
-    //     client: queryClient,
-    //     collections: addresses,
-    //     contract: MARKETPLACE_ADDRESS,
-    //   });
-    //   const result: GetTrendingCollectionResponse = trending.map(function (elm, key) {
-    //     return { collection: elm._id, count: elm.count, asks: dossiers[key].asks, volume: dossiers[key].volume };
-    //   });
-    //   res.status(200).json(result);
-    // } catch (err: any) {
-    //   console.error('ERROR QUERYING MARKETPLACE', err);
-    //   res.status(200).json(
-    //     trending.map(function (elm, key) {
-    //       return { collection: elm._id, count: elm.count, asks: [], volume: [] };
-    //     }),
-    //   );
-    // }
   } catch (error) {
     next(error);
   }
@@ -104,7 +85,7 @@ export const getCollectionByAddress = async (req: RequestWithOptionalUser, res: 
 
     if (fullCollection) {
       if (
-        fullCollection.collection.hidden &&
+        (fullCollection.collection.hidden || fullCollection.collection.admin_hidden) &&
         fullCollection.collection.creator !== req.user?.address &&
         fullCollection.collection.admin !== req.user?.address
       )
@@ -143,6 +124,7 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
     const profile_image: string | undefined = req.images?.profile;
     const banner_image: string | undefined = req.images?.banner;
 
+    console.log('BODY', req.body);
     // validate body contents
     const validator = new EditCollectionBodyDto();
     validator.name = req.body.name;
@@ -154,8 +136,31 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
     validator.discord = req.body.discord;
     validator.telegram = req.body.telegram;
 
+    // Admin Only Settings
+    validator.admin_hidden = req.body.admin_hidden;
+    validator.featured = req.body.featured;
+
+    // Verify Input
     await validate(validator);
 
+    // Check if Admin Only settings were changed, and verify if sender is an Admin if so
+    if (validator.admin_hidden !== undefined || validator.featured !== undefined) {
+      if (!ADMINS.includes(req.user.address)) {
+        res.status(403).send('Not authorized to change these settings');
+        return;
+      }
+    }
+
+    console.log('collectionId', collectionId);
+    // Verify Sender is Collection creator or admin
+    // TODO: Allow rewards recipient or metadata owner?
+    const collection = await CollectionModel.findById(collectionId).lean();
+    if (req.user.address !== collection.creator && req.user.address !== collection.admin && !ADMINS.includes(req.user.address)) {
+      res.status(403).send('Not authorized to edit this collection');
+      return;
+    }
+
+    // Build Profile Object
     const profileData: Partial<CollectionProfile> = {
       name: validator.name,
       description: validator.description,
@@ -169,12 +174,16 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
 
     // Strip undefined fields
     Object.keys(profileData).forEach(key => profileData[key] === undefined && delete profileData[key]);
-
-    const updateCollection: Partial<Collection> = {
+    console.log('Validator', validator);
+    const updateCollection: Partial<CollectionClass> = {
       collectionProfile: profileData,
       hidden: validator.hidden ? validator.hidden === 'true' : undefined,
+      admin_hidden: validator.admin_hidden ? validator.admin_hidden === 'true' : false,
+      featured: validator.featured ? validator.featured === 'true' : undefined,
+
       categories: validator.categories ? JSON.parse(validator.categories) : undefined,
     };
+    console.log('AAAAAAAAAA updateCollection', updateCollection);
 
     Object.keys(updateCollection).forEach(key => updateCollection[key] === undefined && delete updateCollection[key]);
 

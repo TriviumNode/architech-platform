@@ -210,8 +210,8 @@ export const importCollection = async(address: string, request: ImportCollection
     return data;
 }
 
-export const editCollection = async(address: string, request: Partial<ImportCollectionData>): Promise<Collection> => {
-    const url = getApiUrl(`/collections/edit/${address}`);
+export const editCollection = async(collectionId: string, request: Partial<ImportCollectionData>): Promise<Collection> => {
+    const url = getApiUrl(`/collections/edit/${collectionId}`);
 
     const formData = new FormData();
     if (request.name)
@@ -238,7 +238,15 @@ export const editCollection = async(address: string, request: Partial<ImportColl
         formData.append('discord', request.discord);
     if (request.telegram)
         formData.append('telegram', request.telegram);
+
+    // Admin Settings
+    if (typeof request.admin_hidden === 'boolean')
+      formData.append('admin_hidden', request.admin_hidden.toString());
+
+    if (typeof request.featured === 'boolean')
+      formData.append('featured', request.featured.toString());
     
+    console.log('Edit Request', request)
     try {
         const {data}: {data: Collection} = await axios(
             url,

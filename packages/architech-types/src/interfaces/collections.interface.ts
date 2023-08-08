@@ -66,9 +66,12 @@ export interface CollectionModel {
   totalTokens: number;
   importComplete: boolean;
   hidden: boolean;
+  admin_hidden: boolean;
+  featured: boolean;
+  total_views: number;
+  collectionMinter?: CollectionMinterI;
   createdAt?: Date;
   updatedAt?: Date;
-  collectionMinter?: CollectionMinterI;
 }
 
 export interface Collection extends CollectionModel {

@@ -29,6 +29,8 @@ class CollectionsRoute implements Routes {
     // Note: Sort middleware?
     this.router.get(`${this.path}`, getAllCollections);
 
+    // Search Collections
+    // TODO: Search users too
     this.router.get(`${this.path}/search`, searchCollections);
 
     // Get top viewed collections
@@ -57,6 +59,7 @@ class CollectionsRoute implements Routes {
     this.router.post(`${this.path}/refresh/:contractAddr`, refreshCollection);
 
     // Edit Collection Profile
+    // Requires Authentication. Can only be edited by collection owner/admin, or Architech Admin
     this.router.post(
       `${this.path}/edit/:id`,
       upload.fields([
