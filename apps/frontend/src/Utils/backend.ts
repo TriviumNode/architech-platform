@@ -31,6 +31,12 @@ export const getTrendingCollections = async(): Promise<GetTrendingCollectionResp
     return data;
 }
 
+export const getFeaturedCollections = async(): Promise<GetTrendingCollectionResponse> => {
+  const url = getApiUrl(`/collections/featured`)
+  const {data}: {data: GetTrendingCollectionResponse} = await axios.get(url)
+  return data;
+}
+
 export const getLatestListings = async(): Promise<GetLatestListingsResponse[]> => {
     const url = getApiUrl(`/tokens/latest_listings`)
     const {data}: {data: GetLatestListingsResponse[]} = await axios.get(url)

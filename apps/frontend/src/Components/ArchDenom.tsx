@@ -25,7 +25,7 @@ export const DenomImg: FC<DenomProps> = ({denom, size,className}): ReactElement 
             <img
                 src={`/${denom.image}`}
                 alt={`${denom.displayDenom}`}
-                style={{ height: px }}
+                style={{ height: px, width: px }}
                 className={className}
             />
     )

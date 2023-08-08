@@ -16,25 +16,12 @@ import Vr from "../../Components/vr";
 import { useMint } from "../../Contexts/MintContext";
 import { useUser } from "../../Contexts/UserContext";
 import { getApiUrl, refreshCollection } from "../../Utils/backend";
-import { getPrice } from "../../Utils/data";
+import { calculatePrices, getPrice, Prices } from "../../Utils/data";
 import { getCollectionName } from "../../Utils/helpers";
 import { QueryClient } from "../../Utils/queryClient";
 import sleep from "../../Utils/sleep";
 
 import styles from './minter.module.scss';
-
-type Trait = cw721.Trait;
-
-type Price = {
-  denom: Denom;
-  displayAmount: string;
-  displayUsd: string;
-}
-
-type Prices = {
-  public: Price;
-  private?: Price;
-}
 
 const SingleMinter: FC<any> = (): ReactElement => {
     const { collection: fullCollection } = useLoaderData() as { collection: GetCollectionResponse};
@@ -149,79 +136,84 @@ const SingleMinter: FC<any> = (): ReactElement => {
       }
     }
 
-    const calculatePrices = async () => {
+    const handleCalculatePrices = async() => {
       if (!collection.collectionMinter) return;
-
-      const publicPrice: Price = await(async()=>{
-        const payment = collection.collectionMinter?.payment
-
-        let saleAmount: string = '--';
-        let usdAmount: string = '--';
-        let saleDenom: Denom = unknownDenom;
-
-        if (!payment) {
-          saleAmount = 'Free';
-          usdAmount = '';
-          saleDenom = noDenom;
-        } else if (payment.token) {
-          const denom = findToken(payment.token);
-          if (denom) {
-            saleDenom = denom;
-            const num = denomToHuman(payment.amount, denom.decimals)
-            saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
-            usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
-          }
-        } else if (payment.denom) {
-          const denom = findDenom(payment.denom);
-          if (denom) {
-            saleDenom = denom;
-            const num = denomToHuman(payment.amount, denom.decimals)
-            saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
-            usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
-          }
-        }
-
-        return { displayAmount: saleAmount, displayUsd: usdAmount, denom: saleDenom }
-      })()
-
-      const privatePrice: Price | undefined = await(async()=>{
-        const payment = collection.collectionMinter?.whitelist_payment
-
-        let saleAmount: string = '--';
-        let usdAmount: string = '--';
-        let saleDenom: Denom = unknownDenom;
-
-        if (!payment) {
-          return undefined;
-        } else if (payment.token) {
-          const denom = findToken(payment.token);
-          if (denom) {
-            saleDenom = denom;
-            const num = denomToHuman(payment.amount, denom.decimals)
-            saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
-            usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
-          }
-        } else if (payment.denom) {
-          const denom = findDenom(payment.denom);
-          if (denom) {
-            saleDenom = denom;
-            const num = denomToHuman(payment.amount, denom.decimals)
-            saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
-            usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
-          }
-        }
-
-        return { displayAmount: saleAmount, displayUsd: usdAmount, denom: saleDenom }
-      })()
-
-      setPrices({
-        private: privatePrice,
-        public: publicPrice,
-      })
+      setPrices(await calculatePrices(collection.collectionMinter))
     }
 
+    // const calculatePrices = async () => {
+    //   if (!collection.collectionMinter) return;
+
+    //   const publicPrice: Price = await(async()=>{
+    //     const payment = collection.collectionMinter?.payment
+
+    //     let saleAmount: string = '--';
+    //     let usdAmount: string = '--';
+    //     let saleDenom: Denom = unknownDenom;
+
+    //     if (!payment) {
+    //       saleAmount = 'Free';
+    //       usdAmount = '';
+    //       saleDenom = noDenom;
+    //     } else if (payment.token) {
+    //       const denom = findToken(payment.token);
+    //       if (denom) {
+    //         saleDenom = denom;
+    //         const num = denomToHuman(payment.amount, denom.decimals)
+    //         saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+    //         usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+    //       }
+    //     } else if (payment.denom) {
+    //       const denom = findDenom(payment.denom);
+    //       if (denom) {
+    //         saleDenom = denom;
+    //         const num = denomToHuman(payment.amount, denom.decimals)
+    //         saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+    //         usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+    //       }
+    //     }
+
+    //     return { displayAmount: saleAmount, displayUsd: usdAmount, denom: saleDenom }
+    //   })()
+
+    //   const privatePrice: Price | undefined = await(async()=>{
+    //     const payment = collection.collectionMinter?.whitelist_payment
+
+    //     let saleAmount: string = '--';
+    //     let usdAmount: string = '--';
+    //     let saleDenom: Denom = unknownDenom;
+
+    //     if (!payment) {
+    //       return undefined;
+    //     } else if (payment.token) {
+    //       const denom = findToken(payment.token);
+    //       if (denom) {
+    //         saleDenom = denom;
+    //         const num = denomToHuman(payment.amount, denom.decimals)
+    //         saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+    //         usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+    //       }
+    //     } else if (payment.denom) {
+    //       const denom = findDenom(payment.denom);
+    //       if (denom) {
+    //         saleDenom = denom;
+    //         const num = denomToHuman(payment.amount, denom.decimals)
+    //         saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+    //         usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
+    //       }
+    //     }
+
+    //     return { displayAmount: saleAmount, displayUsd: usdAmount, denom: saleDenom }
+    //   })()
+
+    //   setPrices({
+    //     private: privatePrice,
+    //     public: publicPrice,
+    //   })
+    // }
+
     useEffect(()=>{
-      calculatePrices()
+      handleCalculatePrices()
     },[])
 
     if (!collection)
@@ -442,13 +434,13 @@ const SingleMinter: FC<any> = (): ReactElement => {
 const Completionist = () => <span>You are good to go!</span>;
 
 // Renderer callback with condition
-const renderer = ({ hours, minutes, seconds, completed }: any) => {
+const renderer = ({ days, hours, minutes, seconds, completed }: any) => {
   if (completed) {
     // Render a completed state
     return <Completionist />;
   } else {
     // Render a countdown
-    return <span>{hours}:{minutes}:{seconds}</span>;
+    return <span>{hours}d {hours}h {minutes}m {seconds}s</span>;
   }
 };
 

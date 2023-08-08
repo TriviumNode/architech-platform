@@ -176,6 +176,13 @@ textarea {
   margin-bottom: 32px !important;
 }
 
+.pr4 {
+  padding-right: 4px !important;
+}
+.pl4 {
+  padding-left: 4px !important;
+}
+
 .br8 {
   border-radius: 8px;
   overflow: hidden;

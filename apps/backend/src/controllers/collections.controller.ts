@@ -13,6 +13,9 @@ import { collectionsToResponse, queryDbCollectionByAddress, queryDbCollections }
 import { addCollectionView } from '@/services/view.service';
 import { ADMINS } from '@/../../../packages/architech-lib/dist';
 
+const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+const TWO_WEEKS = SEVEN_DAYS * 2;
+
 export const getAllCollections = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const page = req.query.page ? parseInt(req.query.page as string) : undefined;
@@ -27,7 +30,6 @@ export const getAllCollections = async (req: Request, res: Response, next: NextF
 };
 
 export const getTrendingCollections = async (req: Request, res: Response, next: NextFunction) => {
-  const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
   try {
     const trending = await ViewModel.aggregate([
       {
@@ -46,6 +48,41 @@ export const getTrendingCollections = async (req: Request, res: Response, next: 
     await CollectionModel.populate(trending, { path: '_id' });
     const raw_collections: Collection[] = trending.slice(0, 10).map(t => t._id);
     const collections = raw_collections.filter(c => c && !c.hidden && !c.admin_hidden);
+
+    const collectionsResponse = await collectionsToResponse(collections);
+
+    // Append counts
+    const response: GetTrendingCollectionResponse = collectionsResponse.map(function (cr, key) {
+      return {
+        ...cr,
+        count: trending[key].count,
+      };
+    });
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTrendingFeaturedCollections = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const trending = await ViewModel.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: new Date(new Date().valueOf() - TWO_WEEKS) },
+        },
+      },
+      {
+        $group: {
+          _id: '$collectionRef',
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { count: -1 } },
+    ]);
+    await CollectionModel.populate(trending, { path: '_id' });
+    const raw_collections: Collection[] = trending.map(t => t._id);
+    const collections = raw_collections.filter(c => c && !c.hidden && !c.admin_hidden && c.featured);
 
     const collectionsResponse = await collectionsToResponse(collections);
 

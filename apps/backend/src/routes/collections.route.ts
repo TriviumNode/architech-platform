@@ -7,6 +7,7 @@ import {
   getAllCollections,
   getCollectionByAddress,
   getTrendingCollections,
+  getTrendingFeaturedCollections,
   importCollection,
   refreshCollection,
   searchCollections,
@@ -35,6 +36,9 @@ class CollectionsRoute implements Routes {
 
     // Get top viewed collections
     this.router.get(`${this.path}/trending`, getTrendingCollections);
+
+    // Get featured collections, sorted by number of views last 2 weeks
+    this.router.get(`${this.path}/featured`, getTrendingFeaturedCollections);
 
     // Get collection details
     // Authentication not required, only used to store view history
