@@ -318,6 +318,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                 // #########################
                 } else if (collectionType === 'RANDOM') {
                     
+                    // Check for Errors
                     if (!financialState.amount || !financialState.beneficiary_address){
                         newErrorTasks.push({
                             content: `Enter a ${
@@ -348,7 +349,9 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     console.log('newErrorTasks', newErrorTasks)
                     // Show Error Tasks
                     if (checkErrors(newErrorTasks)) return;
-                    console.log('WL STATE', whitelistState)
+
+
+                    // Init Project
                     const {minterAddress, nftAddress} = await initRandomProject({
                         client: wallet.client, signer: wallet.address,
                         contract: NFT_FACTORY_ADDRESS,
@@ -464,48 +467,82 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     //@ts-expect-error
                     const cid = await uploadImage(cleanedNftDetails.image);
 
+                    
+                    // Init Project
                     const {minterAddress, nftAddress} = await initCopyProject({
-                        client: wallet.client, signer: wallet.address,
-                        contract: NFT_FACTORY_ADDRESS,
+                      client: wallet.client, signer: wallet.address,
+                      contract: NFT_FACTORY_ADDRESS,
 
-                        nft_admin: wallet.address,
-                        minter_admin: wallet.address,
-                        beneficiary: financialState.beneficiary_address,
+                      nft_admin: wallet.address,
+                      minter_admin: wallet.address,
+                      beneficiary: financialState.beneficiary_address,
 
-                        end_time: timesState.end_time ? timesState.end_time.getSeconds().toString() : undefined,
-                        launch_time: timesState.launch_time ? (timesState.launch_time.valueOf() / 1000).toString() : undefined,
-                        whitelist_launch_time: timesState.whitelist_launch_time ? (timesState.whitelist_launch_time.valueOf() / 1000).toString() : undefined,
+                      launch_time: timesState.launch_time ? (timesState.launch_time.valueOf() / 1000).toString() : undefined,
+                      whitelist_launch_time: timesState.whitelist_launch_time ? (timesState.whitelist_launch_time.valueOf() / 1000).toString() : undefined,
+                      end_time: timesState.end_time ? (timesState.end_time.valueOf() / 1000).toString() : undefined,
 
-                        mint_limit: timesState.mint_limit ? parseInt(timesState.mint_limit) : undefined,
-                        max_copies: timesState.max_copies ? parseInt(timesState.max_copies) : undefined,
-                        whitelisted: whitelist,
+                      mint_limit: timesState.mint_limit ? parseInt(timesState.mint_limit) : undefined,
+                      max_copies: timesState.max_copies ? parseInt(timesState.max_copies) : undefined,
+                      whitelisted: whitelist,
 
-                        nft_name: detailState.name,
-                        nft_symbol: detailState.symbol,
-                        minter_label: `${detailState.name}_Copy_Minter_${randomString(6)}`,
-                        nft_label: `Architech_Copy_Collection_${detailState.name.trim()}_${Buffer.from(secureRandom(8, { type: "Uint8Array" })).toString("base64")}}`,
-                        metadata: {
-                            name: cleanedNftDetails.name,
-                            description: cleanedNftDetails.description,
-                            attributes: cleanedNftDetails.attributes,
-                            external_url: cleanedNftDetails.externalLink,
-                            royalty_payment_address: financialState.royalty_address,
-                            royalty_percentage: financialState.royalty_percent ? parseInt(financialState.royalty_percent) : undefined,
-                            image: `ipfs://${cid}`,
-                        },
-                        mint_price: financialState.amount ?
-                            financialState.denom.cw20Contract ?
-                                { cw20_payment: {
-                                    amount: financialState.amount,
-                                    token: financialState.denom.cw20Contract,
-                                }}
-                            : financialState.denom.nativeDenom ?
-                                { native_payment: {
-                                    amount: financialState.amount,
-                                    denom: financialState.denom.nativeDenom,
-                                }}
-                                : undefined
-                            : undefined,
+                      nft_name: detailState.name,
+                      nft_symbol: detailState.symbol,
+                      minter_label: `${detailState.name}_Copy_Minter_${randomString(6)}`,
+                      nft_label: `Architech_Copy_Collection_${detailState.name.trim()}_${Buffer.from(secureRandom(8, { type: "Uint8Array" })).toString("base64")}}`,
+                      metadata: {
+                        name: cleanedNftDetails.name,
+                        description: cleanedNftDetails.description,
+                        attributes: cleanedNftDetails.attributes,
+                        external_url: cleanedNftDetails.externalLink,
+                        royalty_payment_address: financialState.royalty_address,
+                        royalty_percentage: financialState.royalty_percent ? parseInt(financialState.royalty_percent) : undefined,
+                        image: `ipfs://${cid}`,
+                      },
+                      mint_price: financialState.denom.nativeDenom ? 
+                        {
+                          native_payment: {
+                            amount: humanToDenom(financialState.amount, financialState.denom.decimals),
+                            denom: financialState.denom.nativeDenom,
+                          }
+                        }
+                        : financialState.denom.cw20Contract ?
+                        {
+                          cw20_payment: {
+                            amount: humanToDenom(financialState.amount, financialState.denom.decimals),
+                            token: financialState.denom.cw20Contract
+                          }
+                        }
+                        :
+                        {
+                          cw20_payment: {
+                            amount: 'error',
+                            token: (()=>{throw new Error('Invalid Denom')}) as unknown as string, // fuck off
+                          }
+                        }
+                      ,
+                      whitelist_mint_price: whitelistState.whitelist_price ? 
+                        whitelistState.denom.nativeDenom ?
+                          {
+                            native_payment: {
+                              amount: humanToDenom(whitelistState.amount, whitelistState.denom.decimals),
+                              denom: financialState.denom.nativeDenom as string,
+                            }
+                          }
+                        : whitelistState.denom.cw20Contract ?
+                          {
+                            cw20_payment: {
+                              amount: humanToDenom(whitelistState.amount, whitelistState.denom.decimals),
+                              token: whitelistState.denom.cw20Contract
+                            }
+                          }
+                        :
+                          {
+                            cw20_payment: {
+                              amount: 'error',
+                              token: (()=>{throw new Error('Invalid Denom')}) as unknown as string, // fuck off
+                            }
+                          }
+                      : undefined,
                     });
                     console.log('Init Result', {minterAddress, nftAddress})
                     setCollectionAddress(nftAddress)

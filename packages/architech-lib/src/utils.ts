@@ -48,3 +48,8 @@ export function randomString(length: number, chars = '0123456789abcdefghijklmnop
     for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
     return result;
 }
+
+export const epochToDate = (unixEpoch: number | string) => {
+  if (typeof unixEpoch === 'string') unixEpoch = parseInt(unixEpoch);
+  return new Date(unixEpoch * 1000)
+}

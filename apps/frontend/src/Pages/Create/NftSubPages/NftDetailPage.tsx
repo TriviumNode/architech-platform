@@ -340,7 +340,7 @@ const NftDetailPage: FC<{
                 { state.attributes.length > 1 && 
                     state.attributes.slice(1, state.attributes.length).map((attribute, index)=>{
                     index=index+1;
-                    return (<div className='d-flex mb8'>
+                    return (<div className='d-flex mb8' key={index}>
                         <Col>
                             <label>
                                 <input type='text' value={attribute.trait_type} onChange={(e)=>updateAttribute(index, {trait_type: e.target.value})} />

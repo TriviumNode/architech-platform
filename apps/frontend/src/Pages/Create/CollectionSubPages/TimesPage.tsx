@@ -71,7 +71,7 @@ const TimesPage: FC<{
         })
         return;
       } else {
-        const newErrors = Object.fromEntries(Object.entries(errors).filter(([key]) => key.includes('whitelist_launch_time')));
+        const newErrors = Object.fromEntries(Object.entries(errors).filter(([key]) => !key.includes('whitelist_launch_time')));
         setErrors(newErrors);
       }
     },[state.whitelist_launch_time])
@@ -143,7 +143,6 @@ const TimesPage: FC<{
                             />
                         </label>
                     </Col>
-                    { collectionType === 'RANDOM' ?
                     <Col>
                         <label>
                             Whitelist Launch Time
@@ -152,12 +151,6 @@ const TimesPage: FC<{
                             </div>
                             <input
                                 defaultValue={getDefaultValue(state.whitelist_launch_time)}
-                                // defaultValue={
-                                //     state.whitelist_launch_time ?
-                                //         timestampToDatetimeInputString(state.whitelist_launch_time)
-                                //     :
-                                //         undefined
-                                // }
                                 onChange={handleChangeWhitelistTime}
                                 type="datetime-local"
                                 className={errors.whitelist_launch_time ? 'error' : undefined}
@@ -176,7 +169,6 @@ const TimesPage: FC<{
                               }
                         </label>
                     </Col>
-                    :
                     <Col>
                         <label>
                             End Time
@@ -185,18 +177,11 @@ const TimesPage: FC<{
                             </div>
                             <input
                                 defaultValue={getDefaultValue(state.end_time)}
-                                // defaultValue={
-                                //     state.end_time ?
-                                //         timestampToDatetimeInputString(state.end_time)
-                                //     :
-                                //         undefined
-                                // }
                                 onChange={handleChangeEndTime}
                                 type="datetime-local"
                             />
                         </label>
                     </Col>
-                    }
                 </div>
                 <div className='d-flex mb24'>
                     <Col xs={collectionType === 'COPY' ? 6 : 4}>
