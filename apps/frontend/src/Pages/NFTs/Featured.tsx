@@ -108,7 +108,8 @@ const FeaturedCarousel: FC<any> = (): ReactElement => {
         />
           <div className={styles.overlay}>
             <div style={{width: 'fit-content'}}>
-              <h2>{collectionName}</h2>
+              {/* <h6 className='lightText10' style={{textTransform: 'uppercase', fontWeight: '800'}}>Featured</h6> */}
+              <h2 style={{marginTop: 0}}>{collectionName}</h2>
               <div style={{display: 'flex', alignItems: 'center', width: '100%'}}>
                   {row2}
               </div>

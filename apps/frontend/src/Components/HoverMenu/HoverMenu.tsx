@@ -1,22 +1,20 @@
-import React, { RefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Menu, MenuButton, MenuList, MenuItem, MenuPopover, MenuItems } from "@reach/menu-button";
+import { RefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Menu, MenuButton, MenuItem, MenuPopover, MenuItems } from "@reach/menu-button";
 import { Link } from "react-router-dom";
-import { useUser } from "../../Contexts/UserContext";
 import { positionMatchWidth } from "@reach/popover";
 import styles from './hoverMenu.module.scss';
-import SmallLoader from "../SmallLoader";
-import { toast } from "react-toastify";
-import { claimRewards } from "@architech/lib";
-import ArchDenom from "../ArchDenom";
 
 interface HoverMenuProps {
-    content: any;
+  children: any;
+  links: HoverMenuLink[]
 }
 
-export default function ProfileMenu(props: HoverMenuProps) {
-  let { content } = props;
-  const {user, balances} = useUser()
+export type HoverMenuLink = {
+  text: string;
+  link: string;
+}
 
+export default function HoverMenu({ children, links }: HoverMenuProps) {
   let [isOverButton, setIsOverButton] = useState(false);
   let [isOverList, setIsOverList] = useState(false);
   let [isOpen, setIsOpen] = useState<boolean>();
@@ -24,41 +22,34 @@ export default function ProfileMenu(props: HoverMenuProps) {
   let [hasClicked, setHasClicked] = useState<boolean>();
   let button: RefObject<HTMLButtonElement> = useRef(null);
 
-  const [claiming, setClaiming] = useState(false);
+  const isOver = useRef(isOverButton || isOverList);
 
-  const handleClaimRewards = async () => {
-    try {
-      if (!user) throw new Error('Wallet is not connected.')
-      if (!balances?.rewards_records) throw new Error('Number of rewards records is 0 or unknown.')
-      setClaiming(true);
+  isOver.current = isOverButton || isOverList
 
-      const result = await claimRewards({
-        client: user.client,
-        address: user.address,
-        num_records: balances.rewards_records
-      })
-    } catch (err: any) {
-      console.error('Failed to claim Archway Rewards:', err);
-      toast.error(err.toString())
+  useLayoutEffect(() => {
+    if (!button.current) return;
+    if (isOpen && !isOverButton && !isOverList && !isTouchInput) {
+      // Close Menu
+
+      // button.current.dispatchEvent(new Event("mousedown", { bubbles: true }));
+      setTimeout(() => {
+        if (!button.current) return;
+        if (isOver.current) return;
+        button.current.dispatchEvent(new Event("mousedown", { bubbles: true }));
+      }, 500);
+      setIsOpen(false);
+    } else if (!isOpen && (isOverButton || isOverList) && !isTouchInput) {
+      // Open Menu
+      button.current.dispatchEvent(new Event("mousedown", { bubbles: true }));
+      setIsOpen(true);
     }
-    setClaiming(false);
-  }
-
-  // useLayoutEffect(() => {
-  //   if (!button.current) return;
-  //   if (isOpen && !isOverButton && !isOverList && !isTouchInput) {
-  //     button.current.click();
-  //     setIsOpen(false);
-  //   } else if (!isOpen && (isOverButton || isOverList) && !isTouchInput) {
-  //     button.current.click();
-  //     setIsOpen(true);
-  //   }
-  // }, [isOverButton, isOverList]);
+  }, [isOpen, isOverButton, isOverList, isTouchInput]);
 
   useEffect(() => {
     setIsTouchInput(false);
     setHasClicked(false);
   }, [hasClicked]);
+  console.log('IsOverList', isOverList)
 
   return (
     <Menu>
@@ -73,10 +64,11 @@ export default function ProfileMenu(props: HoverMenuProps) {
         onMouseLeave={event => {
           setIsOverButton(false);
         }}
-        onClick={() => {
-          setHasClicked(true);
-          setIsOpen(!isOpen);
-        }}
+        // onClick={() => {
+        //   console.log('CLICK!')
+        //   setHasClicked(true);
+        //   setIsOpen(!isOpen);
+        // }}
         onKeyDown={() => {
           setIsOpen(!isOpen);
         }}
@@ -85,52 +77,34 @@ export default function ProfileMenu(props: HoverMenuProps) {
           lineHeight: '150%',
         }}
       >
-        {content}
+        {children}
         {/* <span aria-hidden>▾</span> */}
       </MenuButton>
-      <MenuPopover position={positionMatchWidth}
-                style={{
-                  // transition: "all .2s ease",
-                  // opacity: (!isOpen) ? "0" : "1",
-                }}>
+      <MenuPopover position={positionMatchWidth} >
         <MenuItems
           className={`d-flex flex-column card gap16 mt8 ${styles.menu} ${styles.box}`}
           style={{
             width: 'calc(100%-32px)',
             padding: '8px',
-            // transition: "all .5s",
-            // opacity: (!isOpen) ? "0" : "1",
           }}
-          onMouseEnter={event => {
-            setIsOverList(true);
-          }}
-          onMouseLeave={event => {
-            setIsOverList(false);
-          }}
+          // onMouseEnter={event => {
+          //   setIsOverList(true);
+          // }}
+          // onMouseLeave={event => {
+          //   setIsOverList(false);
+          // }}
         >
-          {!!balances?.rewards &&
-            <div style={{
-              border: '1px solid #676767',
-              borderRadius: '8px',
-
-            }}>
-                <div style={{
-                  margin: '8px',
-                }}>
-                  <span className='lightText12'>Arch Rewards</span><br/>
-                  <div style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: 'center'
-                  }}>
-                    <span className='d-flex align-items-center'>{balances?.rewards.toFixed(3) || 0}&nbsp;<ArchDenom /></span> {/* </div><span style={{fontSize: '11px'}}>ARCH</span></span> */}
-                    <button style={{height: 'unset', padding: '12px'}} disabled={claiming} onClick={()=>handleClaimRewards()}>{claiming ? <SmallLoader /> : 'Claim'}</button>
-                  </div>
-
-                </div>
-            </div>
-          }
-          <MenuItem
+          {links.map((l, i)=>
+            <MenuItem
+              onSelect={() => {
+                setIsOpen(false);
+              }}
+              key={i}
+            >
+                <Link to={l.link}>{l.text}</Link>
+            </MenuItem>
+          )}
+          {/* <MenuItem
             onSelect={() => {
               setIsOpen(false);
             }}
@@ -157,7 +131,7 @@ export default function ProfileMenu(props: HoverMenuProps) {
             }}
           >
               <Link to={`nfts/import`}>Import Collection</Link>
-          </MenuItem>
+          </MenuItem> */}
         </MenuItems>
       </MenuPopover>
     </Menu>

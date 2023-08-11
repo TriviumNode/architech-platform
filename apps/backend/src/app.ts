@@ -19,6 +19,7 @@ import bodyParser from 'body-parser';
 import NodeCache from 'node-cache';
 import { RawData, WebSocket } from 'ws';
 import { ensureToken } from './services/tokens.service';
+import { refreshCollection } from './services/collections.service';
 
 export const cache = new NodeCache({ stdTTL: 15 });
 
@@ -50,7 +51,7 @@ class App {
     // Will re-run when websocket is re-created
     this.ws.on('open', function open() {
       console.log('New Websocket Opened.');
-      const subscribe = {
+      const subscribeMint = {
         jsonrpc: '2.0',
         method: 'subscribe',
         id: 0,
@@ -59,7 +60,17 @@ class App {
           // query: "tm.event='NewBlock'",
         },
       };
-      this.send(JSON.stringify(subscribe));
+      this.send(JSON.stringify(subscribeMint));
+
+      const subscribeEdit = {
+        jsonrpc: '2.0',
+        method: 'subscribe',
+        id: 1,
+        params: {
+          query: "wasm.architech_action='edit_minter'",
+        },
+      };
+      this.send(JSON.stringify(subscribeEdit));
       console.log('WS Subscribed.');
     });
 
@@ -115,6 +126,15 @@ class App {
           // Todo: Update collection or ensure ensureToken updates the collection. Make sure to prevent race conditions.
           ensureToken(collectionAddress, mintedTokenId);
           break;
+        case `wasm.architech_action='edit_minter'`: {
+          // Handle Edit Minter
+          const collectionAddress: string = object.result.events['wasm.collection'][0];
+          const minterAddress: string = object.result.events['wasm.minter'][0];
+          const architechApp: string = object.result.events['wasm.architech_app'][0];
+          console.log(`${architechApp} ${minterAddress} for collection ${collectionAddress} was edited!`);
+          refreshCollection(collectionAddress);
+          break;
+        }
       }
     }
   }

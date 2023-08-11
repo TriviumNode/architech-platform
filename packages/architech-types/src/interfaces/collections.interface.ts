@@ -27,6 +27,8 @@ export interface CollectionMinterI {
 
   // For copy minters
   mint_limit?: number;
+
+  ended: boolean;
 }
 
 export interface MinterPaymentI {

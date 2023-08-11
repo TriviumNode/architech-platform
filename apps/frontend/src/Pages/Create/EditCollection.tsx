@@ -66,6 +66,11 @@ export const RandomPAGES: Page[] = [
     },
 ]
 
+export const CopyPAGES: Page[] = [
+  ...PAGES,
+  ...MinterPAGES,
+]
+
 export type PreloadStatus = 'PROCESSING' | 'UPLOADING' | 'WAITING_SIGN' | 'WAITING_TX' | 'COMPLETE' | 'ERROR'
 
 const EditCollectionPage: FC<any> = (): ReactElement => {
@@ -74,7 +79,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     const navigate = useNavigate();
     const params = useParams()
 
-    const [Pages, setPages] = useState<Page[]>(fullCollection.collection.collectionMinter?.minter_type === 'RANDOM' ? RandomPAGES : PAGES);
+    const [Pages, setPages] = useState<Page[]>(fullCollection.collection.collectionMinter?.minter_type === 'RANDOM' ? RandomPAGES : fullCollection.collection.collectionMinter?.minter_type === 'COPY' ? CopyPAGES : PAGES);
 
     const findPage = Pages.find(p=>p.link.toLowerCase() === params.page?.toLowerCase()) || Pages[0]
 
@@ -296,7 +301,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                 client: wallet.client,
                 signer: wallet.address,
                 minter_contract: fullCollection.collection.collectionMinter.minter_address,
-                // launch_time: timesState.launch_time !== currentTimes.launch_time ? timesState.launch_time : undefined,
+                launch_time: timesState.launch_time !== currentTimes.launch_time ? timesState.launch_time : undefined,
                 whitelist_launch_time: timesState.whitelist_launch_time !== currentTimes.whitelist_launch_time ? timesState.whitelist_launch_time : undefined,
               })
               console.log('Edit Launch Time TX Result:', editTimeResult);

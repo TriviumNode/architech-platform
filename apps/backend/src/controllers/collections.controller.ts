@@ -29,6 +29,45 @@ export const getAllCollections = async (req: Request, res: Response, next: NextF
   }
 };
 
+export const getAllMinters = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const page = req.query.page ? parseInt(req.query.page as string) : undefined;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+
+    const response = await queryDbCollections({ collectionMinter: { $not: { $type: 'null' } } }, page, limit);
+
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getActiveMinters = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const page = req.query.page ? parseInt(req.query.page as string) : undefined;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+
+    const response = await queryDbCollections({ 'collectionMinter.ended': false }, page, limit);
+
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getEndedMinters = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const page = req.query.page ? parseInt(req.query.page as string) : undefined;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+
+    const response = await queryDbCollections({ 'collectionMinter.ended': true }, page, limit);
+
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getTrendingCollections = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const trending = await ViewModel.aggregate([

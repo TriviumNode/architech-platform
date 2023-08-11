@@ -5,6 +5,7 @@ import { Link, useLoaderData } from "react-router-dom";
 import ArchDenom from "../../Components/ArchDenom";
 import CollectionTile from "../../Components/CollectionTile/CollectionTile";
 import CreateTile from "../../Components/CreateTile/CreateTile";
+import Loader from "../../Components/Loader";
 import FeaturedCarousel from "./Featured";
 import LatestListingsCard from "./LatestListingsCard";
 
@@ -53,7 +54,7 @@ const NftPage: FC<any> = (): ReactElement => {
       <div className={`grayCard wide mb8 d-flex align-items-center`} style={{height: '64px'}}>
           <h2 style={{marginLeft: '24px'}}>Collections</h2>
       </div>
-      <div className={styles.collectionsContainer}>
+      {/* <div className={styles.collectionsContainer}>
           <CreateTile />
           {collections && collections.map((collection: GetCollectionResponse, key: number)=>{
               // const style = key === 0 ? {gridColumn: 1, gridRow: 1} : key === 1 ? {gridColumn: 2, gridRow: 1} : key === 2 ? {gridColumn: 3, gridRow: 1} : undefined;
@@ -63,9 +64,33 @@ const NftPage: FC<any> = (): ReactElement => {
                   <CollectionTile fullCollection={collection} className={className} style={{...style, ...{maxHeight: '350px'}}} key={key} />
               );
           })}
-      </div>
+      </div> */}
+      <CollectionsDisplay collections={collections} displayCreateTile={true} />
     </>
   );
 };
 
 export default NftPage;
+
+export const CollectionsDisplay = ({collections, displayCreateTile = false}:{collections?: GetCollectionResponse[], displayCreateTile: boolean}) => {
+  if (!collections) {
+    return (
+      <div className='wide d-flex justify-content-center align-items-center' style={{flexGrow: 1, minHeight: '256px'}}>
+        <Loader />
+      </div>
+    )
+  }
+  return (
+    <div className={styles.collectionsContainer}>
+      {displayCreateTile && <CreateTile /> }
+      {collections.map((collection: GetCollectionResponse, key: number)=>{
+          // const style = key === 0 ? {gridColumn: 1, gridRow: 1} : key === 1 ? {gridColumn: 2, gridRow: 1} : key === 2 ? {gridColumn: 3, gridRow: 1} : undefined;
+          const style = {}
+          const className = key === 0 ? styles.item1 : key === 1 ? styles.item2 : key === 2 ? styles.item3 : undefined;
+          return(
+              <CollectionTile fullCollection={collection} className={className} style={{...style, ...{maxHeight: '350px'}}} key={key} />
+          );
+      })}
+    </div>
+  )
+}

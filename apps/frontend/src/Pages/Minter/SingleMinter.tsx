@@ -26,23 +26,23 @@ import styles from './minter.module.scss';
 
 type TimeStatus = { public: boolean, private: boolean, ended: boolean }
 
-const getTimeStatus = (minter: CollectionMinterI): TimeStatus => {
+const getTimeStatus = (minter: CollectionMinterI, now: Date): TimeStatus => {
   const getPublic = () => {
     if (!minter.launch_time) return true;
-    if (epochToDate(minter.launch_time).valueOf() < new Date().valueOf()) return true;
+    if (epochToDate(minter.launch_time).valueOf() < now.valueOf()) return true;
     return false;
   }
   return {
     public: getPublic(),
     private: (()=>{
       if (!minter.whitelist_launch_time) return getPublic();
-      if (epochToDate(minter.whitelist_launch_time).valueOf() < new Date().valueOf()) return true;
+      if (epochToDate(minter.whitelist_launch_time).valueOf() < now.valueOf()) return true;
       return false;
     })(),
     ended: (()=>{
       if (!minter.end_time) return false;
-      if (epochToDate(minter.end_time).valueOf() > new Date().valueOf()) return false;
-      console.log('Minter has ended', minter.end_time, new Date())
+      if (epochToDate(minter.end_time).valueOf() > now.valueOf()) return false;
+      console.log('Minter has ended', minter.end_time, now)
       return true;
     })()
   }
@@ -68,6 +68,8 @@ const SingleMinter: FC<any> = (): ReactElement => {
     const [buyerStatus, setBuyerStatus] = useState<copyMinter.GetMintLimitResponse>();
     const [minterStatus, setMinterStatus] = useState<copyMinter.GetMintStatusResponse>();
     const [copyMetadata, setCopyMetadata] = useState<cw2981.Metadata>();
+
+    const [now, setNow] = useState(new Date())
 
     const { user, refreshProfile } = useUser()
     const revalidator = useRevalidator()
@@ -198,7 +200,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
       <div><h6>Not a minter</h6></div>
     )
 
-  const timeStatus = getTimeStatus(collection.collectionMinter);
+  const timeStatus = getTimeStatus(collection.collectionMinter, now);
   const mintingAvailable = isMintingAvailable(timeStatus, buyerStatus?.whitelisted);
 
   const collectionName = getCollectionName(collection);
@@ -357,6 +359,8 @@ const SingleMinter: FC<any> = (): ReactElement => {
                     <div style={{fontSize: '28px'}}>{prices.public.displayAmount} <DenomImg denom={prices.public.denom} size='medium' /></div>
                 }
                 eligible={buyerStatus?.whitelisted || false}
+                now={now}
+                onComplete={()=>setNow(new Date())}
               />
             }
             {!!collection.collectionMinter.launch_time &&
@@ -369,6 +373,8 @@ const SingleMinter: FC<any> = (): ReactElement => {
                   <div style={{fontSize: '28px'}}>{prices.public.displayAmount} <DenomImg denom={prices.public.denom} size='medium' /></div>
                   : <SmallLoader />
                 }
+                now={now}
+                onComplete={()=>setNow(new Date())}
               />
             }
 
@@ -376,8 +382,8 @@ const SingleMinter: FC<any> = (): ReactElement => {
         </div>
 
         { copyMetadata !== undefined &&
-          <div className={`${styles.accordionItem} ${activeItem === 'item2' && styles.activeItem}`} onClick={()=>setActiveItem(activeItem === 'item2' ? 'item1' : 'item2')} >
-            <div className='d-flex justify-content-between' style={{margin: '32px 32px 16px 32px', height: 'fit-content', width: 'calc(100% - 64px)'}}>
+          <div className={`${styles.accordionItem} ${activeItem === 'item2' && styles.activeItem}`} >
+            <div className='d-flex justify-content-between pointer' style={{margin: '32px 32px 16px 32px', height: 'fit-content', width: 'calc(100% - 64px)'}} onClick={()=>setActiveItem(activeItem === 'item2' ? 'item1' : 'item2')}>
               <div className='d-flex align-items-center mb16 wide justify-content-between'>
                 <h2 className='mr8' style={{lineHeight: 1}}>NFT Details</h2>
                 <div className='d-flex align-items-center'>
@@ -418,7 +424,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
     <div className='card d-flex' style={{height: '84px', marginBottom: '8px'}}>
       <div style={{margin: '0 16px'}} className='d-flex align-items-center align-self-stretch justify-content-between wide'>
           <div className='d-flex align-items-center lightText justify-content-between'>
-            <h2>{collectionName}</h2>
+            <h2>{collection.collectionMinter.minter_type} Mint&nbsp;&nbsp;-&nbsp;&nbsp;{collectionName}</h2>
           </div>
           <div className='d-flex align-items-center' style={{gap: '24px'}}>
             {prices ?
@@ -463,13 +469,27 @@ const Completionist = () => <span>You are good to go!</span>;
 
 // Renderer callback with condition
 const renderer = ({ days, hours, minutes, seconds, completed }: any) => {
-  if (completed) {
+  // if (completed) {
     // Render a completed state
-    return <Completionist />;
-  } else {
+    // return <Completionist />;
+  // } else {
     // Render a countdown
-    return <span>{hours}d {hours}h {minutes}m {seconds}s</span>;
-  }
+    return <span>{days}<h6 className='d-inline'>d</h6> {hours}<h6 className='d-inline'>h</h6> {minutes}<h6 className='d-inline'>m</h6> {seconds}<h6 className='d-inline'>s</h6></span>;
+  // }
+};
+
+const endRenderer = ({ days, hours, minutes, seconds, completed }: any) => {
+  return (
+    <div>
+      <h5 style={{color: '#666666', marginBottom: 0}}>Ends in</h5>
+      <h3>
+        {days}<h6 className='d-inline'>d</h6>&nbsp;
+        {hours}<h6 className='d-inline'>h</h6>&nbsp;
+        {minutes}<h6 className='d-inline'>m</h6>&nbsp;
+        {seconds}<h6 className='d-inline'>s</h6>
+      </h3>
+    </div>
+  );
 };
 
 type TimeRowProps = {
@@ -480,11 +500,11 @@ type TimeRowProps = {
   ended?: boolean;
   price: any;
   eligible?: boolean;
+  now: Date;
+  onComplete: ()=>void;
 }
 
-const SaleTimeRow: FC<TimeRowProps> = ({saleType, startTime, endTime, endCountdown = true, ended, price, eligible = true}): ReactElement => {
-  const [now, setNow] = useState(new Date())
-
+const SaleTimeRow: FC<TimeRowProps> = ({saleType, startTime, endTime, endCountdown = true, ended, price, eligible = true, now, onComplete}): ReactElement => {
   let status;
   let icon;
 
@@ -495,14 +515,14 @@ const SaleTimeRow: FC<TimeRowProps> = ({saleType, startTime, endTime, endCountdo
     status = <Countdown
       date={startTime}
       renderer={renderer}
-      onComplete={()=>setNow(new Date())}
+      onComplete={onComplete}
     />;
     icon = faClock;
   } else if (endTime && endCountdown){
     status = <Countdown
       date={endTime}
-      renderer={renderer}
-      onComplete={()=>setNow(new Date())}
+      renderer={endRenderer}
+      onComplete={onComplete}
     />;
     icon = faCheck;
   } else if (eligible) {

@@ -25,6 +25,18 @@ export const getCollection = async(contractAddr: string): Promise<GetCollectionR
     return data;
 }
 
+export const getActiveMinters = async(): Promise<GetCollectionResponse[]> => {
+  const url = getApiUrl(`/collections/minters/active`)
+  const { data } = await axios.get(url)
+  return data;
+}
+
+export const getEndedMinters = async(): Promise<GetCollectionResponse[]> => {
+  const url = getApiUrl(`/collections/minters/ended`)
+  const { data } = await axios.get(url)
+  return data;
+}
+
 export const getTrendingCollections = async(): Promise<GetTrendingCollectionResponse> => {
     const url = getApiUrl(`/collections/trending`)
     const {data}: {data: GetTrendingCollectionResponse} = await axios.get(url)
@@ -130,17 +142,6 @@ export const updateProfile = async(userId: string, updateData: UpdateUserDto): P
         }
     )
     return data;
-
-    // const response = await fetch(url, {
-    //     method: "POST", // *GET, POST, PUT, DELETE, etc.
-    //     // credentials: "include", // include, *same-origin, omit
-    //     mode: 'cors',
-    //     headers: {
-    //         "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(updateData), // body data type must match "Content-Type" header
-    // })
-    // return response.json()
 }
 
 export const updateProfileImage = async(userId: string, file: File): Promise<User> => {
@@ -162,20 +163,6 @@ export const updateProfileImage = async(userId: string, file: File): Promise<Use
     )
     return data;
 }
-
-// export const importCollection = async(collectionAddress: string): Promise<Collection> => {
-//     const url = getApiUrl(`/collections/import/${collectionAddress}`);
-
-//     const {data}: {data: Collection} = await axios(
-//         url,
-//         {
-//             method: 'POST',
-//             withCredentials: true,
-//             headers: {'Content-Type': 'application/json'}
-//         }
-//     )
-//     return data;
-// }
 
 export const importCollection = async(address: string, request: ImportCollectionData): Promise<Collection> => {
     const url = getApiUrl(`/collections/import/${address}`);

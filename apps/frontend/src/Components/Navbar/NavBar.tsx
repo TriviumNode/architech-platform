@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useUser } from "../../Contexts/UserContext";
 import ArchDenom from "../ArchDenom";
-import ProfileMenu from "../HoverMenu";
+import ProfileMenu from "../ProfileMenu";
 import SmallLoader from "../SmallLoader";
 import Vr from "../vr";
 import { useLocation } from 'react-router-dom'
@@ -12,9 +12,22 @@ import SearchBar from "../SearchBar/SearchBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faHamburger, faMagnifyingGlass, faWallet, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
+import HoverMenu from "../HoverMenu";
+import { HoverMenuLink } from "../HoverMenu/HoverMenu";
 
 
-export type HeaderPage = 'NFTS' | 'DAOS' | 'HOME';
+export type HeaderPage = 'NFTS' | 'DROPS' | 'DAOS' | 'HOME';
+
+const nftLinks: HoverMenuLink[] = [
+  {
+    text: 'Collections',
+    link: '/nfts/collections',
+  },
+  {
+    text: 'Drops',
+    link: '/nfts/drops',
+  }
+]
 
 
 export const BurgerMenu = ({page, open, handleClose}:{page: HeaderPage, open: boolean, handleClose: ()=>any}) => {
@@ -69,6 +82,7 @@ const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
   const location = useLocation();
 
   const page: HeaderPage =
+    location.pathname.toLowerCase().includes('drops') ? 'DROPS' :
     location.pathname.toLowerCase().includes('nfts') ? 'NFTS' :
     location.pathname.toLowerCase().includes('daos') ? 'DAOS' :
     'HOME';
@@ -105,7 +119,11 @@ const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
             </button>
           </div>
             <Link to="/" className={`${styles.logoLink} d-none d-md-flex align-items-center`} style={{color: '#666 !important'}}><img src='/logo.svg' alt="Architech"/><h5 className='ml8' style={{fontSize: '18px', fontWeight: '400'}}>Beta</h5></Link>
-            <Link to={`nfts`} className={`${page === 'NFTS' ? styles.activeLink : undefined} d-none d-md-flex`}>NFTs</Link>
+            <Link style={{marginRight: '12px'}} to={`nfts`} className={`${page === 'NFTS' ? styles.activeLink : undefined} d-none d-md-flex`}>NFTs</Link>
+            <Link to={`/nfts/drops`} className={`${page === 'DROPS' ? styles.activeLink : undefined} d-none d-md-flex`}>Drops</Link>
+            {/* <HoverMenu links={nftLinks}>
+              <Link to={`nfts`} className={`${page === 'NFTS' ? styles.activeLink : undefined} d-none d-md-flex`}>NFTs</Link>
+            </HoverMenu> */}
             <SearchBar style={{marginLeft: 'auto'}} className='d-none d-md-block' />
             <div style={{width: 'auto', height: '100%'}} className='d-none d-md-block'>
             { !!user ? 

@@ -1,11 +1,21 @@
 import { GetCollectionResponse } from "@architech/types";
 import axios, { Axios, AxiosError } from "axios";
-import { getApiUrl, getCollection, getOwnedTokens, getToken, getTokens, getUserProfile } from "./backend";
+import { getActiveMinters, getApiUrl, getCollection, getEndedMinters, getOwnedTokens, getToken, getTokens, getUserProfile } from "./backend";
 
 export async function allCollectionsLoader({ params }: any) {
     const url = getApiUrl(`/collections`)
     const {data: collections}: {data: GetCollectionResponse[]} = await axios.get(url.toString())
     return { collections };
+}
+
+export async function activeMintersLoader({ params }: any): Promise<{ collections: GetCollectionResponse[] }> {
+  const collections = await getActiveMinters();
+  return { collections };
+}
+
+export async function endedMintersLoader({ params }: any): Promise<{ collections: GetCollectionResponse[] }> {
+  const collections = await getEndedMinters();
+  return { collections };
 }
 
 export async function collectionLoader({ params, request }: any) {

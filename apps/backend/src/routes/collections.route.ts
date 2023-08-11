@@ -4,8 +4,10 @@ import { Routes } from '@interfaces/routes.interface';
 import validationMiddleware from '@middlewares/validation.middleware';
 import {
   editCollection,
+  getActiveMinters,
   getAllCollections,
   getCollectionByAddress,
+  getEndedMinters,
   getTrendingCollections,
   getTrendingFeaturedCollections,
   importCollection,
@@ -29,6 +31,16 @@ class CollectionsRoute implements Routes {
     // TODO: Pagination and Sorting
     // Note: Sort middleware?
     this.router.get(`${this.path}`, getAllCollections);
+
+    // Get collections with active minters
+    // TODO: Pagination and Sorting
+    // Note: Sort middleware?
+    this.router.get(`${this.path}/minters/active`, getActiveMinters);
+
+    // Get collections with ended minters
+    // TODO: Pagination and Sorting
+    // Note: Sort middleware?
+    this.router.get(`${this.path}/minters/ended`, getEndedMinters);
 
     // Search Collections
     // TODO: Search users too

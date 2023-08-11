@@ -1,3 +1,3 @@
-import ProfileMenu from "./HoverMenu";
+import HoverMenu from "./HoverMenu";
 
-export default ProfileMenu;
+export default HoverMenu;
