@@ -22,53 +22,60 @@
 
 
 .accordionCol {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 
-    max-width: '712px';
-    min-width: 0; //??
+  max-width: '712px';
+  min-width: 0; //??
 
-    .accordionItem {
-        display: flex;
-        flex-direction: column;
-        background: #FFF;
-        border-radius: 8px;
-        overflow: hidden;
-        margin-bottom: 8px;
-        height: 89px;
+  .accordionItem {
+      display: flex;
+      flex-direction: column;
+      background: #FFF;
+      border-radius: 8px;
+      overflow: hidden;
+      // margin-bottom: 8px;
+      height: 89px;
 
-        transition: flex-grow 0.15s ease-in-out;
+      transition: flex-grow 0.15s ease-in-out;
 
-        [data-prefix="fas"] {
-            transition: transform 0.15s ease-in-out;
-            color: #666666;
-            // font-size: 14px;
-        }
-    }
-    @media (max-width: 767.98px) {
-        // .activeItem,.firstItem {
-            // height: fit-content !important;
-        // }
-    }
+      [data-prefix="fas"] {
+          transition: transform 0.15s ease-in-out;
+          color: #666666;
+          // font-size: 14px;
+      }
+  }
+  @media (max-width: 767.98px) {
+      .activeItem,.firstItem {
+          height: fit-content !important;
+      }
+  }
 
-    .firstItem {
-        height: 100%;
-    }
+  .firstItem {
+    flex-grow: 1;
+      height: 128px;
+  }
 
-    .activeItem {
-        flex-grow: 1;
-        overflow-y: auto;
+  .activeItem {
+      // flex-grow: 1;
+      overflow-y: auto;
+      height: fit-content !important;
 
-        [data-prefix="fas"] {
-            transform: rotate(90deg);
-        }
-    }
+      // [data-prefix="fas"] {
+      //     transform: rotate(90deg);
+      // }
+  }
 
-    .itemTitle {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+  .activeIcon {
+    transform: rotate(90deg);
+  }
+
+  .itemTitle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+  }
 }
 
 .trait {

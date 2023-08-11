@@ -1,6 +1,6 @@
-import { denomToHuman, epochToDate, findDenom, findToken, getMintLimit, getMintStatus, mintWithMinter, noDenom, truncateAddress, unknownDenom } from "@architech/lib";
-import { cw721, GetCollectionResponse, Denom, minter, copyMinter, CollectionMinterI } from "@architech/types";
-import { faCheck, faClock, faRefresh, faX } from "@fortawesome/free-solid-svg-icons";
+import { denomToHuman, epochToDate, findDenom, findToken, getConfig, getMintLimit, getMintStatus, mintWithMinter, noDenom, truncateAddress, unknownDenom } from "@architech/lib";
+import { cw721, GetCollectionResponse, Denom, minter, copyMinter, CollectionMinterI, cw2981 } from "@architech/types";
+import { faCheck, faChevronRight, faClock, faRefresh, faX } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FC, ReactElement, useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
@@ -59,11 +59,14 @@ const SingleMinter: FC<any> = (): ReactElement => {
     const { waitForMint } = useMint()
     const collection = fullCollection?.collection;
 
+    const [activeItem, setActiveItem] = useState('item1')
+
     const [loadingTx, setLoadingTx] = useState(false);
     const [prices, setPrices] = useState<Prices>();
 
     const [buyerStatus, setBuyerStatus] = useState<copyMinter.GetMintLimitResponse>();
     const [minterStatus, setMinterStatus] = useState<copyMinter.GetMintStatusResponse>();
+    const [copyMetadata, setCopyMetadata] = useState<cw2981.Metadata>();
 
     const { user, refreshProfile } = useUser()
     const revalidator = useRevalidator()
@@ -82,12 +85,16 @@ const SingleMinter: FC<any> = (): ReactElement => {
       }
     }
 
-    const getMinterStatus = async () => {
+    const queryMinter = async () => {
       if (!collection.collectionMinter) return;
 
       try {
-        const result: any = await getMintStatus({ client: QueryClient, contract: collection.collectionMinter.minter_address });
-        setMinterStatus(result);
+        const status: any = await getMintStatus({ client: QueryClient, contract: collection.collectionMinter.minter_address });
+        setMinterStatus(status);
+
+        const {config} = await getConfig({client: QueryClient, contract: collection.collectionMinter.minter_address})
+        console.log(config)
+        setCopyMetadata(config.metadata)
       } catch (error: any) {
         console.error('Failed to check minter status:', error.toString())
         console.error(error)
@@ -97,7 +104,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
 
     useEffect(()=>{
       checkWhitelist();
-      getMinterStatus();
+      queryMinter();
     },[user])
 
     const handleRefresh = async () => {
@@ -172,77 +179,6 @@ const SingleMinter: FC<any> = (): ReactElement => {
     setPrices(await calculatePrices(collection.collectionMinter))
   }
 
-  // const calculatePrices = async () => {
-  //   if (!collection.collectionMinter) return;
-
-  //   const publicPrice: Price = await(async()=>{
-  //     const payment = collection.collectionMinter?.payment
-
-  //     let saleAmount: string = '--';
-  //     let usdAmount: string = '--';
-  //     let saleDenom: Denom = unknownDenom;
-
-  //     if (!payment) {
-  //       saleAmount = 'Free';
-  //       usdAmount = '';
-  //       saleDenom = noDenom;
-  //     } else if (payment.token) {
-  //       const denom = findToken(payment.token);
-  //       if (denom) {
-  //         saleDenom = denom;
-  //         const num = denomToHuman(payment.amount, denom.decimals)
-  //         saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
-  //         usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
-  //       }
-  //     } else if (payment.denom) {
-  //       const denom = findDenom(payment.denom);
-  //       if (denom) {
-  //         saleDenom = denom;
-  //         const num = denomToHuman(payment.amount, denom.decimals)
-  //         saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
-  //         usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
-  //       }
-  //     }
-
-  //     return { displayAmount: saleAmount, displayUsd: usdAmount, denom: saleDenom }
-  //   })()
-
-  //   const privatePrice: Price | undefined = await(async()=>{
-  //     const payment = collection.collectionMinter?.whitelist_payment
-
-  //     let saleAmount: string = '--';
-  //     let usdAmount: string = '--';
-  //     let saleDenom: Denom = unknownDenom;
-
-  //     if (!payment) {
-  //       return undefined;
-  //     } else if (payment.token) {
-  //       const denom = findToken(payment.token);
-  //       if (denom) {
-  //         saleDenom = denom;
-  //         const num = denomToHuman(payment.amount, denom.decimals)
-  //         saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
-  //         usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
-  //       }
-  //     } else if (payment.denom) {
-  //       const denom = findDenom(payment.denom);
-  //       if (denom) {
-  //         saleDenom = denom;
-  //         const num = denomToHuman(payment.amount, denom.decimals)
-  //         saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
-  //         usdAmount = (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 });
-  //       }
-  //     }
-
-  //     return { displayAmount: saleAmount, displayUsd: usdAmount, denom: saleDenom }
-  //   })()
-
-  //   setPrices({
-  //     private: privatePrice,
-  //     public: publicPrice,
-  //   })
-  // }
-
   useEffect(()=>{
     handleCalculatePrices()
   },[])
@@ -265,7 +201,6 @@ const SingleMinter: FC<any> = (): ReactElement => {
   const mintingAvailable = isMintingAvailable(timeStatus, buyerStatus?.whitelisted);
 
   const collectionName = getCollectionName(collection);
-  const collectionImage = collection.collectionProfile?.profile_image ? getApiUrl(`/public/${collection.collectionProfile?.profile_image}`) : undefined;
 
   const startDate = collection.collectionMinter.launch_time ?
     epochToDate(collection.collectionMinter.launch_time)
@@ -290,7 +225,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
           {
             title: 'Available',
             //@ts-expect-error
-            value: minterStatus?.remaining || <SmallLoader />,
+            value: minterStatus !== undefined ? minterStatus.remaining : <SmallLoader />,
           },
           {
             title: 'Minted',
@@ -325,6 +260,12 @@ const SingleMinter: FC<any> = (): ReactElement => {
     }
   }
 
+  const collectionImage = (()=>{
+    if (collection.collectionMinter?.minter_type === 'COPY' && copyMetadata?.image) return copyMetadata.image;
+    if (collection.collectionProfile?.profile_image) return getApiUrl(`/public/${collection.collectionProfile?.profile_image}`)
+    return undefined;
+  })()
+
   return (
     <>
 
@@ -336,7 +277,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
 
       {/* Accordian */}
       <Col xs={12} md={true} className={styles.accordionCol}>
-        <div className={`${styles.accordionItem} ${styles.firstItem}`}>
+        <div className={`${styles.accordionItem} ${styles.firstItem} ${activeItem === 'item1' && styles.activeItem}`} onClick={()=>setActiveItem('item1')} >
           <div className='d-flex justify-content-between' style={{margin: '32px 32px 16px 32px', height: 'fit-content', width: 'calc(100% - 64px)'}}>
             <div>
               <div className='d-flex align-items-center mb16'>
@@ -429,6 +370,43 @@ const SingleMinter: FC<any> = (): ReactElement => {
 
           </div>
         </div>
+
+        { copyMetadata !== undefined &&
+          <div className={`${styles.accordionItem} ${activeItem === 'item2' && styles.activeItem}`} onClick={()=>setActiveItem(activeItem === 'item2' ? 'item1' : 'item2')} >
+            <div className='d-flex justify-content-between' style={{margin: '32px 32px 16px 32px', height: 'fit-content', width: 'calc(100% - 64px)'}}>
+              <div className='d-flex align-items-center mb16 wide justify-content-between'>
+                <h2 className='mr8' style={{lineHeight: 1}}>NFT Details</h2>
+                <div className='d-flex align-items-center'>
+                  <FontAwesomeIcon icon={faChevronRight} className={activeItem === 'item2' ? styles.activeIcon : undefined} />
+                </div>
+              </div>
+            </div>
+            <div className='d-flex flex-column' >
+                { !!copyMetadata.description &&
+                  <div style={{margin: '0 48px 12px 48px', width: 'fit-content', maxWidth: 'calc(100% - 96px)'}}>
+                    <span className='lightText12'>Description</span>
+                    <p style={{margin: '8px 0 0 0 ', fontSize: '12px', padding: '0 8px'}}>{copyMetadata.description}</p>
+                  </div>
+                }
+                { !!(copyMetadata.attributes && copyMetadata.attributes.length) &&
+                  <div style={{margin: '0 48px 12px 48px', width: 'fit-content', maxWidth: 'calc(100% - 96px)'}}>
+                    <div className='lightText12 mb8'>Traits</div>
+                    <div className='d-flex flex-wrap gap8' style={{margin: '0 8px', width: 'calc(100% - 16px)'}}>
+                    {copyMetadata.attributes.map(a=>{
+                      return (
+                        <div className={`${styles.trait} grayCard`}>
+                          <span className={styles.type}>{a.trait_type}</span>
+                          <hr />
+                          <span className={styles.value}>{a.value}</span>
+                        </div>
+                      )
+                    })}
+                    </div>
+                  </div>
+                }
+            </div>
+          </div>
+        }
       </Col>
     </div>
 
