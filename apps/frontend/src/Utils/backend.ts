@@ -251,6 +251,9 @@ export const editCollection = async(collectionId: string, request: Partial<Impor
 
     if (typeof request.featured === 'boolean')
       formData.append('featured', request.featured.toString());
+
+    if (typeof request.verified === 'boolean')
+      formData.append('verified', request.verified.toString());
     
     console.log('Edit Request', request)
     try {

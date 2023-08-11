@@ -74,4 +74,8 @@ export class EditCollectionBodyDto {
   @IsOptional()
   @IsString()
   public featured?: string;
+
+  @IsOptional()
+  @IsString()
+  public verified?: string;
 }

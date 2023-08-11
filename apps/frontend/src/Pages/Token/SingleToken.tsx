@@ -16,6 +16,7 @@ import PlaceholdImg from "../../Components/PlaceholdImg";
 import SmallLoader from "../../Components/SmallLoader";
 import SocialLinks from "../../Components/Socials";
 import TokenImage from "../../Components/TokenImg";
+import VerifiedBadge from "../../Components/Verified";
 import Vr from "../../Components/vr";
 import { useUser } from "../../Contexts/UserContext";
 import { addFavorite, getApiUrl, refreshToken, removeFavorite } from "../../Utils/backend";
@@ -187,7 +188,12 @@ const SingleToken: FC<any> = (): ReactElement => {
           </Link>
         </Col>
         <Col className='card d-flex flex-row justify-content-between align-items-center'>
-          <h2 className='ml16 d-none d-md-block'>{collectionName}</h2>
+          <div className='d-flex align-items-center gap8'>
+            <h2 className='ml16 d-none d-md-block'>{collectionName}</h2>
+            {!!collection.verified &&
+              <VerifiedBadge content="Collection" />
+            }
+          </div>
           <h4 className='ml16 d-md-none'>{collectionName}</h4>
           <div style={{paddingRight: '24px'}}  className='d-flex justify-content-between align-items-center'>
             <CollectionStats collection={collection} asks={fullCollection.asks} />

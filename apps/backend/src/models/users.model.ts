@@ -39,6 +39,9 @@ export class UserClass implements UserModelInterface {
   @prop({ type: String })
   public website?: string;
 
+  @prop({ type: Boolean, required: true, default: false })
+  public verified: boolean;
+
   public createdAt?: Date;
 
   public updatedAt?: Date;

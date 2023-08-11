@@ -26,7 +26,7 @@ import { isEmpty } from '@/utils/util';
 import { RequestWithImages } from '@/middlewares/fileUploadMiddleware';
 import { collectionsToResponse } from '@/queriers/collection.querier';
 import { findUserFavorites } from '@/services/favorites.service';
-import { resolveArchId } from '@/../../../packages/architech-lib/dist';
+import { ADMINS, resolveArchId } from '@/../../../packages/architech-lib/dist';
 import { queryClient } from '@/utils/chainClients';
 import { ARCHID_ADDRESS } from '@/config';
 
@@ -113,6 +113,11 @@ export const editUser = async (req: RequestWithImages, res: Response, next: Next
       return;
     }
 
+    if (req.user._id !== userId && !ADMINS.includes(req.user.address)) {
+      res.status(403).send('Unauthorized');
+      return;
+    }
+
     // const profile_image: string | undefined = (req.files.profile || [])[0]?.filename;
     // const banner_image: string | undefined = (req.files.banner || [])[0]?.filename;
     const profile_image = req.images?.profile;
@@ -126,7 +131,15 @@ export const editUser = async (req: RequestWithImages, res: Response, next: Next
     validator.discord = req.body.discord;
     validator.telegram = req.body.telegram;
 
+    // Admin settings
+    validator.verified = req.body.verified;
+
     await validate(validator);
+
+    if (validator.verified !== undefined && !ADMINS.includes(req.user.address)) {
+      res.status(403).send('Unauthorized');
+      return;
+    }
 
     const userData: Partial<User> = {
       username: validator.username,
@@ -136,11 +149,11 @@ export const editUser = async (req: RequestWithImages, res: Response, next: Next
       discord: validator.discord,
       telegram: validator.telegram,
       profile_image,
+      verified: validator.verified ? validator.verified === 'true' : undefined,
     };
 
     // Strip undefined fields
     Object.keys(userData).forEach(key => userData[key] === undefined && delete userData[key]);
-    console.log('EDIT DATA', userData);
 
     const updated = await userModel.findByIdAndUpdate(userId, userData, { new: true });
     res.status(200).json(updated);

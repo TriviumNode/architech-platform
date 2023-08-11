@@ -18,6 +18,7 @@ const AdminEditPage: FC<{
   const {user} = useUser();
   const [admin_hidden, setAdminHidden] = useState(collection.admin_hidden);
   const [featured, setFeatured] = useState(collection.admin_hidden);
+  const [verified, setVerified] = useState(collection.verified);
   const [saving, setSaving] = useState(false);
 
 
@@ -26,7 +27,7 @@ const AdminEditPage: FC<{
     if (e) e.preventDefault();
     setSaving(true)
     try {
-      const result = await editCollection(collection._id.toString(), { admin_hidden, featured })
+      const result = await editCollection(collection._id.toString(), { admin_hidden, featured, verified })
       console.log('Admin Edit Result', result)
       toast.success('Saved Admin Settings')
     } catch(err: any) {
@@ -53,6 +54,13 @@ const AdminEditPage: FC<{
               <div className='d-flex mb24'>
                   <Col>
                       <label>
+                          Verified Collection
+                          <div className='lightText12' style={{minHeight: '1em'}} />
+                          <input type='checkbox' checked={verified} onChange={(e)=>setVerified(e.target.checked)} />
+                      </label>
+                  </Col>
+                  <Col>
+                      <label>
                           Featured Collection
                           <div className='lightText12' style={{minHeight: '1em'}} />
                           <input type='checkbox' checked={featured} onChange={(e)=>setFeatured(e.target.checked)} />
@@ -65,7 +73,6 @@ const AdminEditPage: FC<{
                           <input type='checkbox' checked={admin_hidden} onChange={(e)=>setAdminHidden(e.target.checked)} />
                       </label>
                   </Col>
-
               </div>
               <div className='d-flex'>
                 <button type='submit' disabled={saving}>Save Changes {saving && <SmallLoader />}</button>

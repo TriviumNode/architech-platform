@@ -18,13 +18,14 @@ import { getCollectionName } from "../../Utils/helpers";
 import EditModal from "./EditModal";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowRotateRight, faCoffee, faPencil } from '@fortawesome/free-solid-svg-icons'
+import { faArrowRotateRight, faCheckSquare, faCoffee, faPencil } from '@fortawesome/free-solid-svg-icons'
 import { toast } from "react-toastify";
 import sleep from "../../Utils/sleep";
 import { Tooltip } from "react-tooltip";
 import { ADMINS } from "@architech/lib";
 
 import styles from './Collection.module.scss';
+import VerifiedBadge from "../../Components/Verified";
 
 const statusOptions = [
     'For Sale',
@@ -150,6 +151,9 @@ const SingleCollection: FC<any> = (): ReactElement => {
                         <div className='d-flex flex-column genOverlay' style={{position: 'absolute', left: '16px', bottom: '16px'}}>
                             <div className='d-flex align-items-center gap8'>
                                 <h1>{collectionName}</h1>
+                                {!!collection.verified &&
+                                  <VerifiedBadge content="Collection" />
+                                }
                                 {(collection.categories || []).map(category=>
                                     <Badge key={category}><span>{category}</span></Badge>
                                 )}

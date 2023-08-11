@@ -12,6 +12,7 @@ import Badge from "../../Components/Badge";
 import Loader from "../../Components/Loader";
 import SmallLoader from "../../Components/SmallLoader";
 import TokenImage from "../../Components/TokenImg";
+import VerifiedBadge from "../../Components/Verified";
 import Vr from "../../Components/vr";
 import { useMint } from "../../Contexts/MintContext";
 import { useUser } from "../../Contexts/UserContext";
@@ -282,6 +283,9 @@ const SingleMinter: FC<any> = (): ReactElement => {
             <div>
               <div className='d-flex align-items-center mb16'>
                 <h1 className='mr8' style={{lineHeight: 1}}>{collectionName}</h1>
+                {!!collection.verified &&
+                  <VerifiedBadge content="Collection" />
+                }
                 {(collection.categories || []).map(category=>
                   <Badge className='mr8' key={category}><span>{category}</span></Badge>
                 )}

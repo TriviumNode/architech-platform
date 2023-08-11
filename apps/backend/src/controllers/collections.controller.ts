@@ -176,12 +176,13 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
     // Admin Only Settings
     validator.admin_hidden = req.body.admin_hidden;
     validator.featured = req.body.featured;
+    validator.verified = req.body.verified;
 
     // Verify Input
     await validate(validator);
 
     // Check if Admin Only settings were changed, and verify if sender is an Admin if so
-    if (validator.admin_hidden !== undefined || validator.featured !== undefined) {
+    if (validator.admin_hidden !== undefined || validator.featured !== undefined || validator.verified !== undefined) {
       if (!ADMINS.includes(req.user.address)) {
         res.status(403).send('Not authorized to change these settings');
         return;
@@ -217,10 +218,10 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
       hidden: validator.hidden ? validator.hidden === 'true' : undefined,
       admin_hidden: validator.admin_hidden ? validator.admin_hidden === 'true' : false,
       featured: validator.featured ? validator.featured === 'true' : undefined,
+      verified: validator.verified ? validator.verified === 'true' : undefined,
 
       categories: validator.categories ? JSON.parse(validator.categories) : undefined,
     };
-    console.log('AAAAAAAAAA updateCollection', updateCollection);
 
     Object.keys(updateCollection).forEach(key => updateCollection[key] === undefined && delete updateCollection[key]);
 

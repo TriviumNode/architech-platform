@@ -174,6 +174,9 @@ export class CollectionClass extends PaginatedModel {
   @prop({ type: Boolean, required: true, default: false })
   public featured: boolean;
 
+  @prop({ type: Boolean, required: true, default: false })
+  public verified: boolean;
+
   @prop({ type: Number, required: true, default: 0 })
   public total_views: number;
 

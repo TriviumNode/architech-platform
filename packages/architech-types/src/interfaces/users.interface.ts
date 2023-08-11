@@ -15,6 +15,7 @@ export interface UserModel {
   discord?: string;
   telegram?: string;
   website?: string;
+  verified: boolean;
 }
 
 export interface User extends UserModel {

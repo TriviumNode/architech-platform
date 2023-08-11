@@ -68,6 +68,7 @@ export interface CollectionModel {
   hidden: boolean;
   admin_hidden: boolean;
   featured: boolean;
+  verified: boolean;
   total_views: number;
   collectionMinter?: CollectionMinterI;
   createdAt?: Date;

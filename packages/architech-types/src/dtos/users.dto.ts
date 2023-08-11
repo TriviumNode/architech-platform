@@ -84,4 +84,8 @@ export class EditUserBodyDto {
   @IsOptional()
   @IsString()
   public telegram?: string;
+
+  @IsOptional()
+  @IsString()
+  public verified?: string;
 }
