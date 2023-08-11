@@ -12,7 +12,7 @@ import { cw2981, GetCollectionResponse } from "@architech/types";
 import { toast } from "react-toastify";
 import equal from "fast-deep-equal";
 import RewardsPage, { DefaultRewardsState, RewardsState } from "./CollectionSubPages/RewardsPage";
-import { ADMINS, getMetadata, parseError, preloadData, setRewardsMetadata } from "@architech/lib";
+import { ADMINS, getMetadata, parseError, preloadData, setLaunchTime, setRewardsMetadata } from "@architech/lib";
 import SmallLoader from "../../Components/SmallLoader";
 import { QueryClient } from "../../Utils/queryClient";
 import { ContractMetadata } from "@archwayhq/arch3.js/build";
@@ -25,6 +25,7 @@ import ModalV2 from "../../Components/ModalV2";
 import Loader from "../../Components/Loader";
 import { AxiosProgressEvent } from "axios";
 import AdminEditPage from "./CollectionSubPages/AdminEditPage";
+import TimesPage, { DefaultTimesState, TimesState } from "./CollectionSubPages/TimesPage";
 
 
 
@@ -49,8 +50,16 @@ export const PAGES: Page[] = [
     },
 ]
 
+export const MinterPAGES: Page[] = [
+  {
+      link: 'launchtime',
+      title: 'Launch Time',
+  },
+]
+
 export const RandomPAGES: Page[] = [
     ...PAGES,
+    ...MinterPAGES,
     {
         link: 'preload',
         title: 'Preload Minter',
@@ -74,24 +83,31 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     const {collection} = fullCollection;
 
     const currentDetail = {
-        categories: fullCollection.collection.categories,
-        description: collection.collectionProfile.description || '',
-        name: collection.collectionProfile.name || '',
-        symbol: collection.cw721_symbol,
-        hidden: collection.hidden,
+      categories: fullCollection.collection.categories,
+      description: collection.collectionProfile.description || '',
+      name: collection.collectionProfile.name || '',
+      symbol: collection.cw721_symbol,
+      hidden: collection.hidden,
     }
     
     const currentLinks = {
-        discord: collection.collectionProfile.discord || '',
-        telegram: collection.collectionProfile.telegram || '',
-        twitter: collection.collectionProfile.twitter || '',
-        website: collection.collectionProfile.website || '',
+      discord: collection.collectionProfile.discord || '',
+      telegram: collection.collectionProfile.telegram || '',
+      twitter: collection.collectionProfile.twitter || '',
+      website: collection.collectionProfile.website || '',
+    }
+
+    const currentTimes: TimesState = {
+      ...DefaultTimesState,
+      launch_time: collection.collectionMinter?.launch_time ? new Date(parseInt(collection.collectionMinter.launch_time) * 1000) : undefined,
+      whitelist_launch_time: collection.collectionMinter?.whitelist_launch_time ? new Date(parseInt(collection.collectionMinter.whitelist_launch_time) * 1000) : undefined,
     }
 
     const [detailState, setDetailState] = useState<DetailState>(currentDetail);
     const [linkState, setLinkState] = useState<LinkState>(currentLinks);
     const [rewardsState, setRewardsState] = useState<RewardsState>(DefaultRewardsState);
     const [preloadState, setPreloadState] = useState<PreloadState>(DefaultPreloadState);
+    const [timesState, setTimesState] = useState<TimesState>(currentTimes);
 
     const [page, setPage] = useState<Page>(findPage)
 
@@ -110,7 +126,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     const [popupError, setPopupError] = useState<any>();
 
     useEffect(()=>{
-      if (ADMINS.includes(wallet?.address || 'notadmin')) Pages.push({ link: 'admin', title: 'Admin' })
+      if (ADMINS.includes(wallet?.address || 'notadmin') && Pages.findIndex(p=>p.link === 'admin') === -1 ) Pages.push({ link: 'admin', title: 'Admin' })
     },[wallet])
     const changePage = (newLink: string) => {
         setPage(Pages.find(p=>p.link===newLink) as Page);
@@ -119,6 +135,18 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     useEffect(()=>{
         refreshMetadata();
     },[QueryClient])
+
+    useEffect(()=>{
+      if (!collection.collectionMinter) return;
+      const newTimesState = {...timesState}
+      if (collection.collectionMinter.launch_time){
+        newTimesState.launch_time = new Date(parseInt(collection.collectionMinter.launch_time) * 1000)
+      }
+      if (collection.collectionMinter.whitelist_launch_time){
+        newTimesState.whitelist_launch_time = new Date(parseInt(collection.collectionMinter.whitelist_launch_time) * 1000)
+      }
+      setTimesState(newTimesState)
+    },[collection])
 
     const refreshMetadata = async() => {
         if (!QueryClient) return;
@@ -139,14 +167,24 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
         }
     }
       
+    // Effect to check for unsaved changes
     useEffect(()=>{
-        if ((!equal(currentDetail, detailState) || !equal(currentLinks, linkState)) || rewardsState.address){
-            setUnsaved(true);
-        }
-        else {
-            setUnsaved(false)
-        }
-    },[detailState, linkState, rewardsState])
+      if (
+        (!equal(currentDetail, detailState) || !equal(currentLinks, linkState))
+        || rewardsState.address
+      ){
+        setUnsaved(true);
+      } else if (!equal(currentTimes.launch_time, timesState.launch_time)) {
+        console.log('Launch Time is unsaved!', currentTimes.launch_time, timesState.launch_time)
+        setUnsaved(true);
+      } else if (!equal(currentTimes.whitelist_launch_time, timesState.whitelist_launch_time)) {
+        console.log('Whitelist Launch Time is unsaved!', currentTimes.whitelist_launch_time, timesState.whitelist_launch_time)
+        setUnsaved(true);
+      }
+      else {
+        setUnsaved(false)
+      }
+    },[detailState, linkState, rewardsState, timesState])
 
     // Effect to error check preloading
     useEffect(()=>{
@@ -217,6 +255,8 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                 return <RewardsPage state={rewardsState} onChange={(data) => setRewardsState(data)} contractAddress={collection.address} metadata={metadata} loadingMetadata={loadingMetadata} loadingMetadataError={loadMetadataError} />
             case page.link==='preload':
                 return <MinterPreloadPage state={preloadState} onChange={(data) => setPreloadState(data)}  />
+            case page.link==='launchtime':
+              return <TimesPage state={timesState} onChange={(data) =>setTimesState(data)} collectionType={collection.collectionMinter?.minter_type} collectionMinter={collection.collectionMinter} />
             case page.link==='admin':
               return <AdminEditPage collection={fullCollection.collection}  />
             default:
@@ -249,6 +289,20 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                 setUnsaved(false);
                 toast.success('Saved rewards address');
             }
+
+            if (!equal(currentTimes.launch_time, timesState.launch_time) || !equal(currentTimes.whitelist_launch_time, timesState.whitelist_launch_time)) {
+              if (!fullCollection.collection.collectionMinter) throw new Error('Attempting to edit launch time on a non-minter collection.')
+              const editTimeResult = await setLaunchTime({
+                client: wallet.client,
+                signer: wallet.address,
+                minter_contract: fullCollection.collection.collectionMinter.minter_address,
+                // launch_time: timesState.launch_time !== currentTimes.launch_time ? timesState.launch_time : undefined,
+                whitelist_launch_time: timesState.whitelist_launch_time !== currentTimes.whitelist_launch_time ? timesState.whitelist_launch_time : undefined,
+              })
+              console.log('Edit Launch Time TX Result:', editTimeResult);
+              setUnsaved(false);
+              toast.success('Saved launch times')
+            }
             refreshProfile()
         } catch(err: any) {
             toast.error(err.toString())
@@ -259,9 +313,10 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     }
 
     const handleCancel = (e: any) => {
-        if (e) e.preventDefault();
-        setDetailState(currentDetail);
-        setLinkState(currentLinks);
+      if (e) e.preventDefault();
+      setDetailState(currentDetail);
+      setLinkState(currentLinks);
+      setTimesState(currentTimes);
     }
 
     const handleProgress = (progressEvent: AxiosProgressEvent) => {

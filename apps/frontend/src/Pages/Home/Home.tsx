@@ -20,7 +20,7 @@ const Home: FC<any> = (): ReactElement => {
                     Web3 Community Management on Archway.
                 </p>
                 <p className={styles.tagMargin}>
-                    Build your DAO, NFTCommunity, manage treasuries<br />
+                    Build your DAO, NFT Community, manage treasuries<br />
                     and more at the click of a button.
                 </p>
             </Col>

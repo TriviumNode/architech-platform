@@ -66,6 +66,9 @@ export class CollectionMinterClass implements CollectionMinterI {
   // For copy minters
   @prop({ type: Number })
   public max_copies: number | undefined;
+
+  @prop({ type: Boolean, required: true, default: false })
+  public ended: boolean;
 }
 
 @index(

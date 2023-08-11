@@ -1,4 +1,5 @@
 import { CATEGORIES } from "@architech/lib";
+import { CollectionMinterI } from "@architech/types";
 import { FC, ReactElement, useEffect, useState } from "react";
 import { Col } from "react-bootstrap";
 import DateTimePicker from "react-datetime-picker";
@@ -53,10 +54,11 @@ export const DefaultTimesState: TimesState = {
 
 const TimesPage: FC<{
     state: TimesState,
-    collectionType: CollectionType;
+    collectionType?: CollectionType;
     onChange: (data: TimesState)=>void;
-    next: ()=>void;
-}> = ({state, collectionType, onChange, next}): ReactElement => {
+    next?: ()=>void;
+    collectionMinter?: CollectionMinterI;
+}> = ({state, collectionType, onChange, next, collectionMinter}): ReactElement => {
     const {user} = useUser()
     if (collectionType === 'STANDARD') throw new Error('Invalid collection type for this page.');
 
@@ -119,8 +121,10 @@ const TimesPage: FC<{
     return (
         <div style={{margin: '48px'}} className='d-flex flex-column'>
             <div className='d-flex justify-content-between'>
-            <h2 className='mb32'>{collectionType === 'RANDOM' ? (<>Launch<br/>Time</>) :  (<>{`Times & Limits`}</>)}</h2>
+              <h2 className='mb32'>{collectionType === 'RANDOM' ? (<>Launch<br/>Time</>) :  (<>{`Times & Limits`}</>)}</h2>
+              { !!next &&
                 <button type='button' onClick={()=>next()}>Next</button>
+              }
             </div>
             <div>
               <p>
@@ -137,7 +141,26 @@ const TimesPage: FC<{
                                 Time allow minting for any address.
                             </div>
                             <input
-                                defaultValue={getDefaultValue(state.launch_time)}
+                                // defaultValue={
+                                //   getDefaultValue(
+                                //     state.launch_time ? state.launch_time
+                                //     : collectionMinter?.launch_time ? new Date(parseInt(collectionMinter.launch_time) * 1000)
+                                //     : undefined
+                                //   )
+                                // }
+                                // value={
+                                //   getDefaultValue(
+                                //     state.launch_time ? state.launch_time
+                                //     : collectionMinter?.launch_time ? new Date(parseInt(collectionMinter.launch_time) * 1000)
+                                //     : undefined
+                                //   )
+                                // }
+                                value={
+                                  getDefaultValue(
+                                    state.launch_time ? state.launch_time
+                                    : undefined
+                                  )
+                                }
                                 onChange={handleChangeLaunchTime}
                                 type="datetime-local"
                             />
@@ -150,7 +173,13 @@ const TimesPage: FC<{
                                 Time allow minting for whitelisted addresses.
                             </div>
                             <input
-                                defaultValue={getDefaultValue(state.whitelist_launch_time)}
+                                // defaultValue={getDefaultValue(state.whitelist_launch_time)}
+                                value={
+                                  getDefaultValue(
+                                    state.whitelist_launch_time ? state.whitelist_launch_time
+                                    : undefined
+                                  )
+                                }
                                 onChange={handleChangeWhitelistTime}
                                 type="datetime-local"
                                 className={errors.whitelist_launch_time ? 'error' : undefined}
@@ -169,49 +198,52 @@ const TimesPage: FC<{
                               }
                         </label>
                     </Col>
-                    <Col>
-                        <label>
-                            End Time
-                            <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
-                                Time stop additional copies from being minted.
-                            </div>
-                            <input
-                                defaultValue={getDefaultValue(state.end_time)}
-                                onChange={handleChangeEndTime}
-                                type="datetime-local"
-                            />
-                        </label>
-                    </Col>
+                    {!!!collectionMinter &&
+                      <Col>
+                          <label>
+                              End Time
+                              <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
+                                  Time stop additional copies from being minted.
+                              </div>
+                              <input
+                                  defaultValue={getDefaultValue(state.end_time)}
+                                  onChange={handleChangeEndTime}
+                                  type="datetime-local"
+                              />
+                          </label>
+                      </Col>
+                    }
                 </div>
-                <div className='d-flex mb24'>
-                    <Col xs={collectionType === 'COPY' ? 6 : 4}>
-                        <label>
-                            Mint Limit
-                            <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
-                                Number of copies each address can mint.
-                            </div>
-                            <input
-                                value={state.mint_limit}
-                                onChange={(e)=>updateState({mint_limit: e.target.value.replace(/[^0-9]/gi, '')})}
-                            />
-                        </label>
-                    </Col>
-                    { collectionType === 'COPY' &&
-                    <Col xs={6}>
-                        <label>
-                            Maximum Copies
-                            <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
-                                Total number of copies that can be minted.
-                            </div>
-                            <input
-                                value={state.max_copies}
-                                onChange={(e)=>updateState({max_copies: e.target.value.replace(/[^0-9]/gi, '')})}
-                            />
-                        </label>
-                    </Col>
+                {!!!collectionMinter &&
+                  <div className='d-flex mb24'>
+                      <Col xs={collectionType === 'COPY' ? 6 : 4}>
+                          <label>
+                              Mint Limit
+                              <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
+                                  Number of copies each address can mint.
+                              </div>
+                              <input
+                                  value={state.mint_limit}
+                                  onChange={(e)=>updateState({mint_limit: e.target.value.replace(/[^0-9]/gi, '')})}
+                              />
+                          </label>
+                      </Col>
+                      { collectionType === 'COPY' &&
+                      <Col xs={6}>
+                          <label>
+                              Maximum Copies
+                              <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
+                                  Total number of copies that can be minted.
+                              </div>
+                              <input
+                                  value={state.max_copies}
+                                  onChange={(e)=>updateState({max_copies: e.target.value.replace(/[^0-9]/gi, '')})}
+                              />
+                          </label>
+                      </Col>
+                  }
+                  </div>
                 }
-                </div>
-
             </form>
         </div>
     )

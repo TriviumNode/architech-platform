@@ -16,6 +16,7 @@ import {
   getCollectionDossier,
   getConfig,
   getContractInfo,
+  getMintStatus,
   getNftInfo,
   getNumTokens,
   resolveArchId,
@@ -357,7 +358,8 @@ const getMinterInfo = async (creator: string) => {
           if (subStr === 'random_minter::msg::QueryMsg') {
             // Get minter config
             const { config }: { config: minter.Config } = await getConfig({ client: queryClient, contract: creator });
-
+            const { remaining } = await getMintStatus({ client: queryClient, contract: creator });
+            console.log('Minter Config', config);
             const payment: MinterPaymentI = config.price
               ? {
                   //@ts-expect-error idk
@@ -370,6 +372,10 @@ const getMinterInfo = async (creator: string) => {
                   amount: config.price.native_payment?.amount || config.price.cw20_payment?.amount,
                 }
               : undefined;
+
+            // Determine if ended
+            let ended = false;
+            if (remaining === 0) ended = true;
 
             const whitelist_payment: MinterPaymentI = config.wl_price
               ? {
@@ -390,13 +396,14 @@ const getMinterInfo = async (creator: string) => {
               minter_type: 'RANDOM',
               minter_admin: config.admin,
               beneficiary: config.beneficiary,
-              launch_time: (parseInt(config.launch_time) / 1000000000).toString(),
-              whitelist_launch_time: (parseInt(config.whitelist_limit_time) / 1000000000).toString(),
+              launch_time: config.launch_time ? (parseInt(config.launch_time) / 1000000000).toString() : undefined,
+              whitelist_launch_time: config.whitelist_launch_time ? (parseInt(config.whitelist_launch_time) / 1000000000).toString() : undefined,
               end_time: undefined,
               payment,
               whitelist_payment,
               mint_limit: config.mint_limit,
               max_copies: undefined,
+              ended,
             };
             const actual_creator = config.admin;
             return { minter, actual_creator };
@@ -406,6 +413,10 @@ const getMinterInfo = async (creator: string) => {
           else if (subStr === 'copy_minter::msg::QueryMsg') {
             // Get minter config
             const { config }: { config: copyMinter.Config } = await getConfig({ client: queryClient, contract: creator });
+            const { minted, max_copies } = (await getMintStatus({
+              client: queryClient,
+              contract: creator,
+            })) as unknown as copyMinter.GetMintStatusResponse;
 
             const payment: MinterPaymentI = config.mint_price
               ? {
@@ -433,19 +444,25 @@ const getMinterInfo = async (creator: string) => {
                 }
               : undefined;
 
+            // Determine if ended
+            let ended = false;
+            if (minted >= max_copies) ended = true;
+            if (config.end_time && new Date(parseInt(config.end_time) * 1000).valueOf() < new Date().valueOf()) ended = true;
+
             // Set minter data
             const minter: CollectionMinterClass = {
               minter_address: creator,
               minter_type: 'COPY',
               minter_admin: config.minter_admin as string,
               beneficiary: config.beneficiary,
-              launch_time: (parseInt(config.launch_time) / 1000000000).toString(),
-              whitelist_launch_time: (parseInt(config.whitelist_launch_time) / 1000000000).toString(),
-              end_time: (parseInt(config.end_time) / 1000000000).toString(),
+              launch_time: config.launch_time ? (parseInt(config.launch_time) / 1000000000).toString() : undefined,
+              whitelist_launch_time: config.whitelist_launch_time ? (parseInt(config.whitelist_launch_time) / 1000000000).toString() : undefined,
+              end_time: config.end_time ? (parseInt(config.end_time) / 1000000000).toString() : undefined,
               payment,
               whitelist_payment,
               mint_limit: config.mint_limit,
               max_copies: config.max_copies,
+              ended,
             };
             const actual_creator = config.minter_admin;
             return { minter, actual_creator };

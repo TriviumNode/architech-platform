@@ -20,9 +20,9 @@ export const getAddresses = (chainId: string) => {
             break;
         case "localnet":
             return {
-                CREDIT_ADDRESS: 'archway106nal47c3rwre9e0v7gjd8ff89s0rhkz5l4ywlgrj9j60zx26r9slc6ggf',
-                MARKETPLACE_ADDRESS: 'archway1x6ttpp3vpzaknxcc25u0mjrlnagu3agvwnyl0wpwhtjdljaw8aks75a344',
-                NFT_FACTORY_ADDRESS: 'archway18h8ncg9szj3v92cz289qz3ndwqk5zema4cr2t4e7amjaehrae52qwhpy2n',
+                CREDIT_ADDRESS: 'archway152mrl9ke6vpctcptceeqg7cy90gw4l4z5tw8uhncac9vshrq9n2sn62qrf',
+                MARKETPLACE_ADDRESS: 'archway1cy7rjsve2xcd3ykahpclnpa4t8f37qzk5hur94q6337tzadq6qnqeanghd',
+                NFT_FACTORY_ADDRESS: 'archway17hrwvh0ytuzymxp2ghydmnmzze9kuzywhkmuq88apf37k0xqwywsjhxqfv',
                 CW721_CODE_ID: 73,
                 ARCHID_ADDRESS: '',
                 RANDOM_MINT_CODE_ID: 69,

@@ -128,7 +128,7 @@ export interface Config {
   launch_time: Timestamp;
   mint_limit?: number | null;
   price: Payment;
-  whitelist_limit_time?: Timestamp | null;
+  whitelist_launch_time?: Timestamp | null;
   wl_price?: Payment | null;
   [k: string]: unknown;
 }
