@@ -564,7 +564,13 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
             await refreshProfile()
             console.log('Import Response', response)
             setStatus("COMPLETE")
-            setTaskMessage(<p><h5 className='d-inline'>{detailState.name}</h5> has been created.<br />Here's some things to do next:</p>)
+            setTaskMessage(
+              <p>
+                Collection
+                <h5>{detailState.name}</h5>
+                has been created.<br />
+                Here's some things to do next:
+              </p>)
         } catch(err: any) {
             console.error(err)
             setStatus("ERROR")
@@ -664,19 +670,6 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                 <Col style={{textAlign: 'center'}}>
                     { status === "CREATING" && <><p>Deploying collection...</p><Loader /></>}
                     { status === "IMPORTING" && <><p>Importing collection into Architech...</p><Loader /></>}
-                    { status === "COMPLETE" && 
-                    <>
-                        <p><h5>{detailState.name}</h5> has been created.<br />Here's some things to do next:</p>
-                        { collectionType === 'RANDOM' ?
-                        <div className='mb16'><Link className={styles.modalLink} to={`/nfts/edit/${collectionAddress}/preload`}>Load Items into the Random Minter</Link></div>
-                    :
-                    <>
-                    <div className='mb8'><Link className={styles.modalLink} to={`/nfts/${collectionAddress}`}>View your collection</Link></div>
-
-                    <div className='mb16'><Link className={styles.modalLink} to={`/nfts/edit/${collectionAddress}/rewards`}>Setup Archway Rewards</Link></div>
-                    </>}
-                   </>
-                    }
                     { status === "ERROR" && <>
                         <h3>Error</h3>
                         { !!collectionAddress &&

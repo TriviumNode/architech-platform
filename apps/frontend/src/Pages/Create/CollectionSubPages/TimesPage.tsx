@@ -198,7 +198,7 @@ const TimesPage: FC<{
                               }
                         </label>
                     </Col>
-                    {!!!collectionMinter &&
+                    {collectionType === 'COPY' &&
                       <Col>
                           <label>
                               End Time
