@@ -57,7 +57,7 @@ export function NftPreviewCard(
                         <>
                             <div className='lightText16 mb8'>Traits</div>
                             <div className='d-flex flex-wrap gap8 ml8'>
-                                {details.attributes.filter(a => !!a.trait_type && !!a.value).map(a => <TraitCard type={a.trait_type} value={a.value} />)}
+                                {details.attributes.filter(a => !!a.trait_type && !!a.value).map((a, i) => <TraitCard type={a.trait_type} value={a.value} key={i} />)}
                             </div>
                         </>
                     }

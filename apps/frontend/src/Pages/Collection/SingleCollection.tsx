@@ -26,6 +26,7 @@ import { ADMINS } from "@architech/lib";
 
 import styles from './Collection.module.scss';
 import VerifiedBadge from "../../Components/Verified";
+import HiddenBanner from "../../Components/HiddenBanner/HiddenBanner";
 
 const statusOptions = [
     'For Sale',
@@ -134,6 +135,9 @@ const SingleCollection: FC<any> = (): ReactElement => {
 
     return (
         <>
+          {!!collection.hidden &&
+            <HiddenBanner page='COLLECTION' collectionAddress={collection.address} />
+          }
             <div className={styles.picRow}>
                 <Col xs={{span: 8, offset: 2}} md={{span: 3, offset: 0}} className='card' style={{aspectRatio: '1 / 1'}}>
                     <PlaceholdImg alt={collectionName} src={collectionImage} style={{objectFit: 'cover', width: '100%', height: '100%'}} />

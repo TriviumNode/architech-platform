@@ -5,6 +5,7 @@ import Container from "react-bootstrap/esm/Container";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import Navbar, { BurgerMenu, HeaderPage } from "../Components/Navbar/NavBar";
+import SmallLoader from "../Components/SmallLoader";
 import { MintProvider } from "../Contexts/MintContext";
 import { useUser } from "../Contexts/UserContext";
 import { CREDIT_ADDRESS, initClients, MARKETPLACE_ADDRESS, QueryClient } from "../Utils/queryClient";
@@ -28,6 +29,7 @@ export default function MainLayout() {
   }
 
   useEffect(()=>{
+    if (!QueryClient) return;
     if (process.env.REACT_APP_CHAIN_ID.startsWith('archway-')) return;
     getBlockTime();
   },[QueryClient])
@@ -56,7 +58,7 @@ export default function MainLayout() {
               </div>
             </div>
 
-            <div>Block Tme: {latestBlockTime?.toLocaleString()}</div>
+            <div>Block Tme: {latestBlockTime ? latestBlockTime.toLocaleString() : <SmallLoader />}</div>
             <div>
               <div>Marketplace: {MARKETPLACE_ADDRESS}</div>
               <div>Credits: {CREDIT_ADDRESS}  </div>

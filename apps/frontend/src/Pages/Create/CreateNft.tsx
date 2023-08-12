@@ -251,7 +251,7 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
                 {getPage()}
             </Col>
         </div>
-        <Modal open={!!status && status !== 'ERROR'} locked={true} onClose={()=>{}} style={{width: error ? '50vw' : undefined}} >
+        <Modal open={!!status && status !== 'ERROR' && status !== 'COMPLETE'} locked={true} onClose={()=>{}} style={{width: error ? '50vw' : undefined}} >
             <Row className="px-4 pt-4 justify-content-center">
                 <Col xs='auto' style={{textAlign: 'center'}}>
                     { status === "UPLOADING" && <><p>Uploading image to IPFS...</p><Loader /></>}

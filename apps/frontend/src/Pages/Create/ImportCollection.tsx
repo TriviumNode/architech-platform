@@ -164,7 +164,7 @@ const ImportCollectionPage: FC<any> = (): ReactElement => {
                     }
                     { status === "COMPLETE" && 
                     <>
-                        <p>{detailState.name} has been imported into Architech.<br />Here's some things to do next:</p>
+                        <p>{detailState.name} has been imported into Architech.<br /><br />Here's some things to do next:</p>
                         <div className='mb8'><Link className={styles.modalLink} to={`/nfts/${collectionAddress}`}>View your collection</Link></div>
 
                         <div className='mb16'><Link className={styles.modalLink} to={`/nfts/edit/${collectionAddress}/rewards`}>Setup Archway Rewards</Link></div>

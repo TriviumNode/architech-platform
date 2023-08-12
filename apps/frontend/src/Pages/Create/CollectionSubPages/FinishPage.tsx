@@ -34,7 +34,6 @@ const FinishPage: FC<{
     onChange: (data: FinishState)=>void;
     onClick: (e: any)=>any;
 }> = ({collectionType, finishType, data, times, details, nft_details, financials, whitelisted, onChange, onClick}): ReactElement => {
-    console.log('TIMES')
     const updateState = (newState: Partial<FinishState>) => {
         onChange({...data, ...newState})
     }

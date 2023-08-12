@@ -9,6 +9,7 @@ import { Link, useLoaderData, useRevalidator } from "react-router-dom";
 import { toast } from "react-toastify";
 import { DenomImg } from "../../Components/ArchDenom";
 import Badge from "../../Components/Badge";
+import HiddenBanner from "../../Components/HiddenBanner/HiddenBanner";
 import Loader from "../../Components/Loader";
 import SmallLoader from "../../Components/SmallLoader";
 import TokenImage from "../../Components/TokenImg";
@@ -271,6 +272,10 @@ const SingleMinter: FC<any> = (): ReactElement => {
 
   return (
     <>
+
+    {!!collection.hidden &&
+      <HiddenBanner page='MINTER' collectionAddress={collection.address} />
+    }
 
     {/* Main Row */}
     <div className='d-flex gap8 mb8 flex-wrap' style={{minWidth: 0}}>

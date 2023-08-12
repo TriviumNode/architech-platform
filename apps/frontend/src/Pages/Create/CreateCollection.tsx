@@ -437,7 +437,6 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     const cleanedNftDetails = { ...nftDetailState, attributes: goodAttributes };
 
                     //verify required data
-                    console.log(cleanedNftDetails)
                     if (!cleanedNftDetails.name){
                         newErrorTasks.push({
                             content: `Enter a Name for the NFT`,
@@ -467,6 +466,56 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     //@ts-expect-error
                     const cid = await uploadImage(cleanedNftDetails.image);
 
+                    const mint_price = 
+                      !financialState.amount ? undefined
+                      : financialState.denom.nativeDenom ? 
+                        {
+                          native_payment: {
+                            amount: humanToDenom(financialState.amount, financialState.denom.decimals),
+                            denom: financialState.denom.nativeDenom,
+                          }
+                        }
+                      : financialState.denom.cw20Contract ?
+                        {
+                          cw20_payment: {
+                            amount: humanToDenom(financialState.amount, financialState.denom.decimals),
+                            token: financialState.denom.cw20Contract
+                          }
+                        }
+                      :
+                        {
+                          cw20_payment: {
+                            amount: 'error',
+                            token: (()=>{throw new Error('Invalid Denom')}) as unknown as string, // fuck off
+                          }
+                        }
+                    ;
+                    
+                    const whitelist_mint_price = 
+                      !whitelistState.whitelist_price ? undefined
+                      : !whitelistState.amount ? undefined
+                      : whitelistState.denom.nativeDenom ?
+                        {
+                          native_payment: {
+                            amount: humanToDenom(whitelistState.amount, whitelistState.denom.decimals),
+                            denom: financialState.denom.nativeDenom as string,
+                          }
+                        }
+                      : whitelistState.denom.cw20Contract ?
+                        {
+                          cw20_payment: {
+                            amount: humanToDenom(whitelistState.amount, whitelistState.denom.decimals),
+                            token: whitelistState.denom.cw20Contract
+                          }
+                        }
+                      :
+                        {
+                          cw20_payment: {
+                            amount: 'error',
+                            token: (()=>{throw new Error('Invalid Denom')}) as unknown as string, // fuck off
+                          }
+                        }
+                    ;
                     
                     // Init Project
                     const {minterAddress, nftAddress} = await initCopyProject({
@@ -493,56 +542,13 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                         name: cleanedNftDetails.name,
                         description: cleanedNftDetails.description,
                         attributes: cleanedNftDetails.attributes,
-                        external_url: cleanedNftDetails.externalLink,
-                        royalty_payment_address: financialState.royalty_address,
+                        external_url: cleanedNftDetails.externalLink ? cleanedNftDetails.externalLink : undefined,
+                        royalty_payment_address: financialState.royalty_address ? financialState.royalty_address : undefined,
                         royalty_percentage: financialState.royalty_percent ? parseInt(financialState.royalty_percent) : undefined,
                         image: `ipfs://${cid}`,
                       },
-                      mint_price: financialState.denom.nativeDenom ? 
-                        {
-                          native_payment: {
-                            amount: humanToDenom(financialState.amount, financialState.denom.decimals),
-                            denom: financialState.denom.nativeDenom,
-                          }
-                        }
-                        : financialState.denom.cw20Contract ?
-                        {
-                          cw20_payment: {
-                            amount: humanToDenom(financialState.amount, financialState.denom.decimals),
-                            token: financialState.denom.cw20Contract
-                          }
-                        }
-                        :
-                        {
-                          cw20_payment: {
-                            amount: 'error',
-                            token: (()=>{throw new Error('Invalid Denom')}) as unknown as string, // fuck off
-                          }
-                        }
-                      ,
-                      whitelist_mint_price: whitelistState.whitelist_price ? 
-                        whitelistState.denom.nativeDenom ?
-                          {
-                            native_payment: {
-                              amount: humanToDenom(whitelistState.amount, whitelistState.denom.decimals),
-                              denom: financialState.denom.nativeDenom as string,
-                            }
-                          }
-                        : whitelistState.denom.cw20Contract ?
-                          {
-                            cw20_payment: {
-                              amount: humanToDenom(whitelistState.amount, whitelistState.denom.decimals),
-                              token: whitelistState.denom.cw20Contract
-                            }
-                          }
-                        :
-                          {
-                            cw20_payment: {
-                              amount: 'error',
-                              token: (()=>{throw new Error('Invalid Denom')}) as unknown as string, // fuck off
-                            }
-                          }
-                      : undefined,
+                      mint_price,
+                      whitelist_mint_price,
                     });
                     console.log('Init Result', {minterAddress, nftAddress})
                     setCollectionAddress(nftAddress)
@@ -568,7 +574,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
               <p>
                 Collection
                 <h5>{detailState.name}</h5>
-                has been created.<br />
+                has been created.<br /><br />
                 Here's some things to do next:
               </p>)
         } catch(err: any) {

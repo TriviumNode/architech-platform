@@ -6,9 +6,11 @@ import { FC, ReactElement, useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { Link, useLoaderData, useRevalidator } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Tooltip } from "react-tooltip";
 import ArchDenom, { DenomImg } from "../../Components/ArchDenom";
 import Badge from "../../Components/Badge";
 import CollectionStats from "../../Components/CollectionStats/CollectionStats";
+import HiddenBanner from "../../Components/HiddenBanner/HiddenBanner";
 import Loader from "../../Components/Loader";
 import Modal from "../../Components/Modal";
 import ListModal from "../../Components/Modals/ListModal";
@@ -202,6 +204,10 @@ const SingleToken: FC<any> = (): ReactElement => {
         </Col>
       </div>
 
+      {!!collection.hidden &&
+        <HiddenBanner page='NFT' collectionAddress={collection.address} />
+      }
+
       {/* Main Row */}
       <div className='d-flex gap8 mb8 flex-wrap' style={{minWidth: 0}}>
         <Col xs={{span: 8, offset: 2}} md={{span: 6, offset: 0}} className={`br8 square`} style={{maxHeight: '630px'}}>
@@ -334,7 +340,21 @@ const SingleToken: FC<any> = (): ReactElement => {
               </>
               :
                 tokenResponse.token.owner === user?.address && 
-                <button type='button' onClick={()=>setIsListing(true)}>List for sale</button>
+                <>
+                <button
+                  type='button'
+                  onClick={()=>setIsListing(true)}
+                  disabled={!!tokenResponse.token.collectionInfo.hidden}
+                  data-tooltip-id="hidden-tooltip"
+                  data-tooltip-content="Reveal the collection to list this NFT"
+                  data-tooltip-place="top"
+                >
+                  List for sale
+                </button>
+                {!!tokenResponse.token.collectionInfo.hidden &&
+                  <Tooltip id="hidden-tooltip" />
+                }
+                </>
               }
             </div>
             </div>
