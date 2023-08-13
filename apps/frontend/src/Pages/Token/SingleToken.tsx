@@ -6,15 +6,19 @@ import { FC, ReactElement, useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { Link, useLoaderData, useRevalidator } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Tooltip } from "react-tooltip";
 import ArchDenom, { DenomImg } from "../../Components/ArchDenom";
 import Badge from "../../Components/Badge";
 import CollectionStats from "../../Components/CollectionStats/CollectionStats";
+import HiddenBanner from "../../Components/HiddenBanner/HiddenBanner";
 import Loader from "../../Components/Loader";
+import Modal from "../../Components/Modal";
 import ListModal from "../../Components/Modals/ListModal";
 import PlaceholdImg from "../../Components/PlaceholdImg";
 import SmallLoader from "../../Components/SmallLoader";
 import SocialLinks from "../../Components/Socials";
 import TokenImage from "../../Components/TokenImg";
+import VerifiedBadge from "../../Components/Verified";
 import Vr from "../../Components/vr";
 import { useUser } from "../../Contexts/UserContext";
 import { addFavorite, getApiUrl, refreshToken, removeFavorite } from "../../Utils/backend";
@@ -27,7 +31,7 @@ import styles from './singletoken.module.scss';
 
 type Trait = cw721.Trait;
 
-type Prices = {
+export type Prices = {
   denom: Denom;
   displayAmount: string;
   displayUsd: string;
@@ -37,6 +41,7 @@ const SingleToken: FC<any> = (): ReactElement => {
     const { token: tokenResponse, collection: fullCollection } = useLoaderData() as { token: GetTokenResponse, collection: GetCollectionResponse};
     const collection = fullCollection?.collection;
 
+    const [viewFull, setViewFull] = useState(false);
     const [isListing, setIsListing] = useState(false);
     const [loadingTx, setLoadingTx] = useState(false);
     const [prices, setPrices] = useState<Prices>();
@@ -168,6 +173,14 @@ const SingleToken: FC<any> = (): ReactElement => {
     return (
       <>
       <ListModal open={isListing} onClose={()=>setIsListing(false)} token={tokenResponse.token} onList={()=>revalidator.revalidate()} />
+      <Modal open={viewFull} onClose={()=>setViewFull(false)} innerStyle={{padding: 0, height: 'fit-content', width: 'fit-content'}} style={{height: 'fit-content', width: 'fit-content'}}>
+        <TokenImage
+          alt={`${collectionName} ${tokenResponse.token.tokenId}`}
+          src={tokenImage}
+          style={{display: 'block', maxHeight: '80vh', maxWidth: '80vw'}}
+          className='wide tall imgCover'
+        />
+      </Modal>
 
       {/*  Collection Row */}
       <div className='d-flex gap8' style={{height: '64px', marginBottom: '8px'}}>
@@ -177,7 +190,12 @@ const SingleToken: FC<any> = (): ReactElement => {
           </Link>
         </Col>
         <Col className='card d-flex flex-row justify-content-between align-items-center'>
-          <h2 className='ml16 d-none d-md-block'>{collectionName}</h2>
+          <div className='d-flex align-items-center gap8'>
+            <h2 className='ml16 d-none d-md-block'>{collectionName}</h2>
+            {!!collection.verified &&
+              <VerifiedBadge content="Collection" />
+            }
+          </div>
           <h4 className='ml16 d-md-none'>{collectionName}</h4>
           <div style={{paddingRight: '24px'}}  className='d-flex justify-content-between align-items-center'>
             <CollectionStats collection={collection} asks={fullCollection.asks} />
@@ -186,10 +204,14 @@ const SingleToken: FC<any> = (): ReactElement => {
         </Col>
       </div>
 
+      {!!collection.hidden &&
+        <HiddenBanner page='NFT' collectionAddress={collection.address} />
+      }
+
       {/* Main Row */}
       <div className='d-flex gap8 mb8 flex-wrap' style={{minWidth: 0}}>
         <Col xs={{span: 8, offset: 2}} md={{span: 6, offset: 0}} className={`br8 square`} style={{maxHeight: '630px'}}>
-          <TokenImage alt={`${collectionName} ${tokenResponse.token.tokenId}`} src={tokenImage} className='tall wide imgCover' />
+          <TokenImage alt={`${collectionName} ${tokenResponse.token.tokenId}`} src={tokenImage} className='tall wide imgCover pointer' onClick={()=>setViewFull(true)} />
         </Col>
 
         {/* Accordian */}
@@ -247,7 +269,12 @@ const SingleToken: FC<any> = (): ReactElement => {
                 </div>
               }
               <div style={{margin: 'auto 32px 12px 0', width: 'fit-content', maxWidth: 'calc(100% - 96px)', alignSelf: 'flex-end'}}>
-                <span className='lightText12'>Created by <Link style={{color: '#000'}} to={`/profile/${tokenResponse.token.collectionInfo.creator}`}>{truncateAddress(tokenResponse.token.collectionInfo.creator, process.env.REACT_APP_NETWORK_PREFIX)}</Link></span>
+                <span className='lightText12'>
+                  Created by&nbsp;
+                  <Link style={{color: '#000'}} to={`/profile/${fullCollection.full_creator.address}`}>
+                    {truncateAddress(fullCollection.full_creator.display, process.env.REACT_APP_NETWORK_PREFIX)}
+                  </Link>
+                </span>
               </div>
             </div>
           </div>
@@ -313,7 +340,21 @@ const SingleToken: FC<any> = (): ReactElement => {
               </>
               :
                 tokenResponse.token.owner === user?.address && 
-                <button type='button' onClick={()=>setIsListing(true)}>List for sale</button>
+                <>
+                <button
+                  type='button'
+                  onClick={()=>setIsListing(true)}
+                  disabled={!!tokenResponse.token.collectionInfo.hidden}
+                  data-tooltip-id="hidden-tooltip"
+                  data-tooltip-content="Reveal the collection to list this NFT"
+                  data-tooltip-place="top"
+                >
+                  List for sale
+                </button>
+                {!!tokenResponse.token.collectionInfo.hidden &&
+                  <Tooltip id="hidden-tooltip" />
+                }
+                </>
               }
             </div>
             </div>

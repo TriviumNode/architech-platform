@@ -8,14 +8,14 @@ export const connectKeplrWallet = async(): Promise<{
     address: string;
     pubKey: Pubkey;
 }> => {
-    if (!window.keplr) {
+    if (!window.wallet) {
         sleep(1_500)
     }
-    if (!window.keplr) {
+    if (!window.wallet) {
         throw new Error('Keplr Wallet not found')
     }
 
-    await window.keplr.experimentalSuggestChain({
+    await window.wallet.experimentalSuggestChain({
         chainId: process.env.REACT_APP_CHAIN_ID,
         chainName: `Archway ${process.env.REACT_APP_CHAIN_ID}`,
         rpc: process.env.REACT_APP_RPC_URL,
@@ -61,11 +61,11 @@ export const connectKeplrWallet = async(): Promise<{
             high: 900000000000,
         },
     });
-    await window.keplr.enable(process.env.REACT_APP_CHAIN_ID);
+    await window.wallet.enable(process.env.REACT_APP_CHAIN_ID);
 
-    const keyResult = await window.keplr.getKey(process.env.REACT_APP_CHAIN_ID)
+    const keyResult = await window.wallet.getKey(process.env.REACT_APP_CHAIN_ID)
 
-    const offlineSigner = window.keplr.getOfflineSigner(process.env.REACT_APP_CHAIN_ID);
+    const offlineSigner = window.wallet.getOfflineSigner(process.env.REACT_APP_CHAIN_ID);
     const accounts = await offlineSigner.getAccounts();
 
     const client = await SigningArchwayClient.connectWithSigner(process.env.REACT_APP_RPC_URL, offlineSigner);
@@ -79,13 +79,13 @@ export const connectKeplrWallet = async(): Promise<{
 }
 
 export const signLoginPermit = async(nonce: string, signerAddress: string) => {
-    if (!window.keplr) {
+    if (!window.wallet) {
         sleep(1_500)
     }
-    if (!window.keplr) {
+    if (!window.wallet) {
         throw new Error('Keplr Wallet not found')
     }
     const loginString = `Login to Architech\n${nonce}`
-    const { pub_key, signature } = await window.keplr.signArbitrary(process.env.REACT_APP_CHAIN_ID, signerAddress, loginString)
+    const { pub_key, signature } = await window.wallet.signArbitrary(process.env.REACT_APP_CHAIN_ID, signerAddress, loginString)
     return { pub_key, signature };
 }

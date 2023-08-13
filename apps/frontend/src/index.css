@@ -1,5 +1,7 @@
 :root {
   --toastify-toast-width: auto !important;
+  --architech-gradient: linear-gradient(190deg, #02FFFF66 0%, #0166DC66 60%, #017EBA88 100%);
+  --gray-gradient: linear-gradient(190deg, rgb(0,0,0,0.2) 0%, rgb(0,0,0,0.12) 60%, rgb(0,0,0,0.07) 100%);
 }
 
 @font-face {
@@ -27,7 +29,7 @@ hr {
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Druk Wide';
   text-transform: uppercase;
-  letter-spacing: -0.04em;
+  /* letter-spacing: -0.04em; */
   font-style: normal;
   margin: 0;
 }
@@ -72,6 +74,11 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+input:focus-visible, textarea:focus-visible {
+  outline: 2px solid #0166DCBB !important;
+  /* outline: 2px solid #017EBA66; */
 }
 
 input:not([type]), input[type=text] {
@@ -167,6 +174,13 @@ textarea {
 
 .mb32 {
   margin-bottom: 32px !important;
+}
+
+.pr4 {
+  padding-right: 4px !important;
+}
+.pl4 {
+  padding-left: 4px !important;
 }
 
 .br8 {
@@ -272,6 +286,19 @@ button:disabled {
   height: 1em;
 }
 
+.textLink {
+  text-decoration: underline;
+  transition: color .05s ease;
+}
+.textLink:hover {
+  color: #555;
+}
+
+.lightText16 {
+  font-size: 16px !important;
+  color: #666666 !important;
+}
+
 .lightText14 {
   font-family: 'TWK Everett';
   font-style: normal;
@@ -341,4 +368,8 @@ button:disabled {
 
 .unclickable {
   cursor: default !important;
+}
+
+.pointer {
+  cursor: pointer;
 }

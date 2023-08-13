@@ -14,20 +14,24 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { UserProvider } from './Contexts/UserContext';
 import NftPage from './Pages/NFTs/NFTs';
-import { allCollectionsLoader, collectionLoader, tokenLoader, userProfileloader } from './Utils/loaders';
+import { activeMintersLoader, allCollectionsLoader, collectionLoader, tokenLoader, userProfileloader } from './Utils/loaders';
 import ProfilePage from './Pages/Profile/Profile';
 
 import 'react-tooltip/dist/react-tooltip.css'
 import 'bootstrap/dist/css/bootstrap-grid.min.css';
 import SingleCollection from './Pages/Collection/SingleCollection';
 import SingleToken from './Pages/Token/SingleToken';
-import CreateSingleNftPage from './Pages/CreateNft/CreateNft';
-import CreateCollectionPage from './Pages/CreateCollection/CreateCollection';
-import EditCollectionPage from './Pages/CreateCollection/EditCollection';
+import CreateSingleNftPage from './Pages/Create/CreateNft';
+import CreateCollectionPage from './Pages/Create/CreateCollection';
+import EditCollectionPage from './Pages/Create/EditCollection';
 import Home from './Pages/Home/Home';
 import { initClients } from './Utils/queryClient';
-import ImportCollectionPage from './Pages/CreateCollection/ImportCollection';
+import ImportCollectionPage from './Pages/Create/ImportCollection';
 import AdminDashboard from './Pages/Admin/AdminDashboard';
+import SingleMinter from './Pages/Minter/SingleMinter';
+import { MintProvider } from './Contexts/MintContext';
+import AllMinters from './Pages/NFTs/AllMinters';
+import AllCollections from './Pages/NFTs/AllCollections';
 
 
 const router = createBrowserRouter([
@@ -44,6 +48,21 @@ const router = createBrowserRouter([
         path: "/nfts",
         element: <NftPage />,
         loader: allCollectionsLoader
+      },
+      {
+        path: "/nfts/collections",
+        element: <AllCollections />,
+        loader: allCollectionsLoader
+      },
+      {
+        path: "/nfts/drops",
+        element: <AllMinters />,
+        loader: activeMintersLoader
+      },
+      {
+        path: "/nfts/mint/:contractAddr",
+        element: <SingleMinter />,
+        loader: collectionLoader,
       },
       {
         path: "/nfts/:contractAddr/:tokenId",
@@ -122,7 +141,9 @@ const init = async () => {
   root.render(
     <UserProvider>
       <ToastContainer />
-      <RouterProvider router={router} />
+      {/* <MintProvider> */}
+        <RouterProvider router={router} />
+      {/* </MintProvider> */}
     </UserProvider>
   );
 

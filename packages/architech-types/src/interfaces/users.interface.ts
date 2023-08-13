@@ -15,6 +15,7 @@ export interface UserModel {
   discord?: string;
   telegram?: string;
   website?: string;
+  verified: boolean;
 }
 
 export interface User extends UserModel {
@@ -23,6 +24,7 @@ export interface User extends UserModel {
 
 export interface GetUserProfileResponse {
   profile?: User;
+  display_name: string;
   tokens: Token[];
   collections: GetCollectionResponse[];
   favorites: [{

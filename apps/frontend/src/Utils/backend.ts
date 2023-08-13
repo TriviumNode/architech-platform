@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosProgressEvent } from 'axios';
 import { Collection, GetUserProfileResponse, NonceRequest, NonceResponse, Token, UpdateUserDto, User, WalletLogin, ImportCollectionRequest, GetTokenResponse, GetCollectionResponse, SortOption, GetTrendingCollectionResponse, GetLatestListingsResponse } from '@architech/types'
 import { Pubkey } from '@cosmjs/amino';
 import { ImportCollectionData, UpdateProfileData } from '../Interfaces/interfaces';
@@ -25,10 +25,28 @@ export const getCollection = async(contractAddr: string): Promise<GetCollectionR
     return data;
 }
 
+export const getActiveMinters = async(): Promise<GetCollectionResponse[]> => {
+  const url = getApiUrl(`/collections/minters/active`)
+  const { data } = await axios.get(url)
+  return data;
+}
+
+export const getEndedMinters = async(): Promise<GetCollectionResponse[]> => {
+  const url = getApiUrl(`/collections/minters/ended`)
+  const { data } = await axios.get(url)
+  return data;
+}
+
 export const getTrendingCollections = async(): Promise<GetTrendingCollectionResponse> => {
     const url = getApiUrl(`/collections/trending`)
     const {data}: {data: GetTrendingCollectionResponse} = await axios.get(url)
     return data;
+}
+
+export const getFeaturedCollections = async(): Promise<GetTrendingCollectionResponse> => {
+  const url = getApiUrl(`/collections/featured`)
+  const {data}: {data: GetTrendingCollectionResponse} = await axios.get(url)
+  return data;
 }
 
 export const getLatestListings = async(): Promise<GetLatestListingsResponse[]> => {
@@ -124,17 +142,6 @@ export const updateProfile = async(userId: string, updateData: UpdateUserDto): P
         }
     )
     return data;
-
-    // const response = await fetch(url, {
-    //     method: "POST", // *GET, POST, PUT, DELETE, etc.
-    //     // credentials: "include", // include, *same-origin, omit
-    //     mode: 'cors',
-    //     headers: {
-    //         "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(updateData), // body data type must match "Content-Type" header
-    // })
-    // return response.json()
 }
 
 export const updateProfileImage = async(userId: string, file: File): Promise<User> => {
@@ -156,20 +163,6 @@ export const updateProfileImage = async(userId: string, file: File): Promise<Use
     )
     return data;
 }
-
-// export const importCollection = async(collectionAddress: string): Promise<Collection> => {
-//     const url = getApiUrl(`/collections/import/${collectionAddress}`);
-
-//     const {data}: {data: Collection} = await axios(
-//         url,
-//         {
-//             method: 'POST',
-//             withCredentials: true,
-//             headers: {'Content-Type': 'application/json'}
-//         }
-//     )
-//     return data;
-// }
 
 export const importCollection = async(address: string, request: ImportCollectionData): Promise<Collection> => {
     const url = getApiUrl(`/collections/import/${address}`);
@@ -210,8 +203,8 @@ export const importCollection = async(address: string, request: ImportCollection
     return data;
 }
 
-export const editCollection = async(address: string, request: Partial<ImportCollectionData>): Promise<Collection> => {
-    const url = getApiUrl(`/collections/edit/${address}`);
+export const editCollection = async(collectionId: string, request: Partial<ImportCollectionData>): Promise<Collection> => {
+    const url = getApiUrl(`/collections/edit/${collectionId}`);
 
     const formData = new FormData();
     if (request.name)
@@ -238,7 +231,18 @@ export const editCollection = async(address: string, request: Partial<ImportColl
         formData.append('discord', request.discord);
     if (request.telegram)
         formData.append('telegram', request.telegram);
+
+    // Admin Settings
+    if (typeof request.admin_hidden === 'boolean')
+      formData.append('admin_hidden', request.admin_hidden.toString());
+
+    if (typeof request.featured === 'boolean')
+      formData.append('featured', request.featured.toString());
+
+    if (typeof request.verified === 'boolean')
+      formData.append('verified', request.verified.toString());
     
+    console.log('Edit Request', request)
     try {
         const {data}: {data: Collection} = await axios(
             url,
@@ -337,6 +341,7 @@ export const updateCollectionBanner = async(collectionId: string, file: File): P
 }
 
 export const uploadImage = async(file: File): Promise<any> => {
+    if (!file) throw new Error('No File to upload!')
     const url = getApiUrl(`/upload`);
 
     const formData = new FormData();
@@ -354,6 +359,29 @@ export const uploadImage = async(file: File): Promise<any> => {
         }
     )
     return data.cid;
+}
+
+export const uploadBatch = async(files: File[], onUploadProgress?: (progressEvent: AxiosProgressEvent)=>void): Promise<any> => {
+    const url = getApiUrl(`/upload/batch`);
+
+    const formData = new FormData();
+    files.forEach(file=>{
+        formData.append('images', file);
+    });
+
+    const {data}: {data: {cid: string}} = await axios(
+        url,
+        {
+            method: 'POST',
+            withCredentials: true,
+            data: formData,
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+            onUploadProgress
+        }
+    )
+    return data;
 }
 
 export const refreshCollection = async(collectionAddress: string): Promise<Collection> => {

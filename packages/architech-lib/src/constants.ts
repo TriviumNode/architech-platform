@@ -43,6 +43,12 @@ export const unknownDenom: Denom = {
     image: 'arch.svg',
 };
 
+export const noDenom: Denom = {
+    decimals: 0,
+    displayDenom: '',
+    image: '',
+};
+
 export const findDenom = (denom: string): Denom => {
     const found = DENOMS.find(d=>d.nativeDenom === denom);
     return found || unknownDenom;

@@ -4,6 +4,7 @@ import { useRevalidator } from "react-router-dom";
 import { toast } from "react-toastify";
 import FileSelect from "../../Components/FileSelect";
 import Modal from "../../Components/Modal";
+import ModalV2 from "../../Components/ModalV2";
 import { UpdateProfileData } from "../../Interfaces/interfaces";
 import { editCollection, editProfile } from "../../Utils/backend";
 
@@ -46,44 +47,43 @@ export default function EditProfileModal({open, userId, onClose}: Props) {
 
 
     return(
-        <Modal open={open} onClose={onClose}>
+        <ModalV2 open={open} onClose={onClose}>
             <form onSubmit={handleEdit}>
             <Row>
-                <Col xs={6}>
-                
-                    <Row>
+                <Col xs={12} md={6}>
+                    <Row className='mb8'>
                         <label>
                             Username:<br />
                             <input  value={formState.username} onChange={(e)=> updateFormState({username: e.target.value})} />
                         </label>
                     </Row>
-                    <Row>
+                    <Row className='mb8'>
                         <label>
                             Bio:<br />
-                            <textarea value={formState.bio} onChange={(e)=> updateFormState({bio: e.target.value})}  />
+                            <textarea value={formState.bio} onChange={(e)=> updateFormState({bio: e.target.value})} style={{width: 'calc(100% - 32px)'}}  />
                         </label>
                     </Row>
                 </Col>
-                <Col xs={6}>
-                    <Row>
+                <Col xs={12} md={6}>
+                    <Row className='mb8'>
                         <label>
                             Website:<br />
                             <input  value={formState.website} onChange={(e)=> updateFormState({website: e.target.value})} />
                         </label>
                     </Row>
-                    <Row>
+                    <Row className='mb8'>
                         <label>
                             Twitter:<br />
                             <input value={formState.twitter} onChange={(e)=> updateFormState({twitter: e.target.value})}  />
                         </label>
                     </Row>
-                    <Row>
+                    <Row className='mb8'>
                         <label>
                             Discord:<br />
                             <input value={formState.discord} onChange={(e)=> updateFormState({discord: e.target.value})}  />
                         </label>
                     </Row>
-                    <Row>
+                    <Row className='mb8'>
                         <label>
                             Telegram:<br />
                             <input value={formState.telegram} onChange={(e)=> updateFormState({telegram: e.target.value})}  />
@@ -114,6 +114,6 @@ export default function EditProfileModal({open, userId, onClose}: Props) {
                 </Col>
             </Row>
             </form>
-        </Modal>
+        </ModalV2>
     )
 }

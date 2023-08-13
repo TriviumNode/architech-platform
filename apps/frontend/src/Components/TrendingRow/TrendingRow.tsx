@@ -1,5 +1,6 @@
 import { denomToHuman, findFloor } from "@architech/lib"
 import { TrendingCollectionResult } from "@architech/types"
+import millify from "millify"
 import { FC, ReactElement } from "react"
 import { Row, Col } from "react-bootstrap"
 import { Link } from "react-router-dom"
@@ -14,8 +15,8 @@ const TrendingRow: FC<
     }
     > = ({result}): ReactElement => {
 
-    const floor = findFloor(result.asks, parseInt(process.env.REACT_APP_NETWORK_DECIMALS));
-    const volume = result.volume.find(v=>v.denom === process.env.REACT_APP_NETWORK_DENOM)?.amount || '0';
+    const floor = millify(findFloor(result.asks, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)));
+    const volume = millify(parseInt(result.volume.find(v=>v.denom === process.env.REACT_APP_NETWORK_DENOM)?.amount || '0'));
     const humanVolume = denomToHuman(volume, parseInt(process.env.REACT_APP_NETWORK_DECIMALS))
     const collectionName = getCollectionName(result.collection)
 
@@ -24,10 +25,11 @@ const TrendingRow: FC<
     <Link to={`/nfts/${result.collection.address}`}
         style={{
             display: 'flex',
+            gap: '16px'
         }}
         className='wide'
     >
-        <Col xs={8}>
+        <Col xs={true}>
             <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
                 <PlaceholdImg
                     alt=''
@@ -46,10 +48,10 @@ const TrendingRow: FC<
                 </div>
             </div>
         </Col>
-        <Col xs={2} className='d-flex flex-column justify-content-center' style={{textAlign: 'center'}}>
-            <span>{floor ? parseFloat(floor.toFixed(2)) : '--'}&nbsp;<ArchDenom /></span>
+        <Col xs={'auto'} className='d-flex flex-column justify-content-center' style={{textAlign: 'center'}}>
+            <span>{floor || '--'}&nbsp;<ArchDenom /></span>
         </Col>
-        <Col xs={2} className='d-flex flex-column justify-content-center' style={{textAlign: 'center'}}>
+        <Col xs={'auto'} className='d-flex flex-column justify-content-center' style={{textAlign: 'center'}}>
             <span>{humanVolume ? parseFloat(humanVolume.toFixed(2)) : '--'}&nbsp;<ArchDenom /></span>
         </Col>
     </Link>

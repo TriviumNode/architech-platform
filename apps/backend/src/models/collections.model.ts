@@ -1,5 +1,5 @@
-import { prop, getModelForClass, modelOptions, mongoose, plugin, Ref, index } from '@typegoose/typegoose';
-import { CollectionProfile, cw721, CollectionModel as CollectionModelInterface } from '@architech/types';
+import { prop, getModelForClass, modelOptions, mongoose, plugin, index } from '@typegoose/typegoose';
+import { CollectionProfile, cw721, MinterType, PaymentType, CollectionMinterI, MinterPaymentI } from '@architech/types';
 import mongoosastic from 'mongoosastic';
 import { esClient } from '@/utils/elasticsearch';
 import paginate from 'mongoose-paginate-v2';
@@ -13,6 +13,62 @@ export class PaginatedModel {
     options?: PaginateOptions,
     callback?: (err: Error, result: PaginateResult<T>) => void,
   ) => Promise<PaginateResult<T>>;
+}
+
+export class MinterPaymentClass implements MinterPaymentI {
+  @prop({ type: String, required: true })
+  public type: PaymentType;
+
+  @prop({ type: String })
+  public token?: string;
+
+  @prop({ type: String })
+  public denom?: string;
+
+  @prop({ type: String, required: true })
+  public amount: string;
+}
+
+export class CollectionMinterClass implements CollectionMinterI {
+  @prop({ type: String, required: true })
+  public minter_address: string;
+
+  @prop({ type: String, required: true })
+  public minter_type: MinterType;
+
+  @prop({ type: String, required: true })
+  public minter_admin: string;
+
+  @prop({ type: String })
+  public beneficiary?: string;
+
+  @prop()
+  public payment?: MinterPaymentClass;
+
+  @prop()
+  public whitelist_payment?: MinterPaymentClass;
+
+  // Epoch
+  @prop({ type: String })
+  public launch_time: string | undefined;
+
+  // Epoch
+  @prop({ type: String })
+  public whitelist_launch_time: string | undefined;
+
+  // Epoch
+  @prop({ type: String })
+  public end_time: string | undefined;
+
+  @prop({ type: Number })
+  public mint_limit: number | undefined;
+
+  // For copy minters
+  @prop({ type: Number })
+  public max_copies: number | undefined;
+
+  @prop({ type: Boolean, required: true, default: false })
+  public ended: boolean;
 }
 
 @index(
@@ -114,8 +170,21 @@ export class CollectionClass extends PaginatedModel {
   @prop({ type: Boolean, required: true })
   public hidden: boolean;
 
+  // Permanently hidden from anyone not the creator
+  @prop({ type: Boolean, required: true, default: false })
+  public admin_hidden: boolean;
+
+  @prop({ type: Boolean, required: true, default: false })
+  public featured: boolean;
+
+  @prop({ type: Boolean, required: true, default: false })
+  public verified: boolean;
+
   @prop({ type: Number, required: true, default: 0 })
   public total_views: number;
+
+  @prop()
+  public collectionMinter?: CollectionMinterClass;
 
   public createdAt?: Date;
 

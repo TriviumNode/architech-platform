@@ -6,11 +6,15 @@ import styles from './create.module.scss'
 import ConnectWallet from "../../Components/ConnectWallet";
 import AdminTasksPage from "./TasksPage";
 import { ADMINS } from "@architech/lib";
+import AdminRewardsPage from "./RewardsPage";
+import AdminMinterQueries from "./MinterQueries";
 
-export type Page = 'Tasks'
+export type Page = 'Maintenance Tasks' | 'Rewards' | 'Minter Queries'
 
 export const Pages: Page[] = [
-    'Tasks',
+    'Rewards',
+    'Minter Queries',
+    'Maintenance Tasks',
 ]
 
 const AdminDashboard: FC<any> = (): ReactElement => {
@@ -20,7 +24,11 @@ const AdminDashboard: FC<any> = (): ReactElement => {
 
     const getPage = () => {
         switch(page) {
-            case 'Tasks':
+            case 'Rewards':
+                return <AdminRewardsPage />
+            case 'Minter Queries':
+                return <AdminMinterQueries />
+            case 'Maintenance Tasks':
                 return <AdminTasksPage />
             default:
                 return <div style={{margin: '32px', textAlign: 'center'}}><h2 style={{color: 'red'}}>Something went wrong</h2><p>The application encounted an error: `Tried to navigate to undefined page.`<br />Please try to navigate to another page using the menu on the left.</p></div>
@@ -59,38 +67,6 @@ const AdminDashboard: FC<any> = (): ReactElement => {
                 {getPage()}
             </Col>
         </div>
-        {/* <Modal open={!!status} locked={true} onClose={()=>{}} >
-            <Row className="px-4 pt-4">
-                <Col style={{textAlign: 'center'}}>
-                    { status === "CREATING" && <><p>Deploying collection...</p><Loader /></>}
-                    { status === "IMPORTING" && <><p>Importing collection into Architech...</p><Loader /></>}
-                    { status === "COMPLETE" && 
-                    <>
-                        <p>{detailState.name} has been created.<br />Here's some things to do next:</p>
-                        <div className='mb8'><Link className={styles.modalLink} to={`/nfts/${collectionAddress}`}>View your collection</Link></div>
-
-                        <div className='mb16'><Link className={styles.modalLink} to={`/nfts/edit/${collectionAddress}/rewards`}>Setup Archway Rewards</Link></div>
-                    </>
-                    }
-                    { status === "ERROR" && <>
-                        <h3>Error</h3>
-                        { !!collectionAddress &&
-                        <p>
-                            Your collection was deployed on chain successfully, but we were unable to import it into Architech due to the error below.<br />
-                            You can try again now, or come back later and import it manually on our <Link to='nfts/import'>import page</Link>.<br />
-                            Please write down your collection address:<br />
-                            {collectionAddress}
-                        </p>
-}
-                        <p>{error || 'Unknown error.'}</p>
-                        
-                        <button className='mr8' type="button" onClick={()=>setStatus(undefined)}>Close</button>
-                        <button type="button" onClick={()=>handleCreate(undefined)}>Retry</button>
-                    </>
-                    }
-              </Col>
-            </Row>
-        </Modal> */}
     </>);
 };
 

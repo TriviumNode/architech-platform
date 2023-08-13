@@ -5,6 +5,14 @@
     gap: 8px;
 }
 
+
+
+@media (max-width: 767.98px) {
+    .profileCard {
+        height: 192px;
+    }
+}
+
 @media (min-width: 768px) {
     .picRow {
         max-height: '350px'

@@ -4,7 +4,7 @@ type QueryMsg = marketplace.QueryMsg;
 // type Ask = marketplace.Ask;
 
 export interface Ask {
-    id: string;
+    id: number;
     collection: string;
     cw20_contract?: string | null;
     price: string;

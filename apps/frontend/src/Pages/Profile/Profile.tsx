@@ -111,26 +111,24 @@ const ProfilePage: FC<any> = (): ReactElement => {
         }
     }
 
-
-    const displayName = userProfile.profile?.username || userAddress
     const displayImage = userProfile.profile?.profile_image ? getApiUrl(`/public/${userProfile.profile.profile_image}`) : undefined;
     return (<>
                 <EditProfileModal open={editProfile} onClose={()=>setEditProfile(false)} userId={userProfile.profile?._id || ''} />
                 <div className={styles.picRow}>
                     <Col xs={{span: 8, offset: 2}} md={{span: 3, offset: 0}} className='card square'>
-                        <PlaceholdImg src={displayImage} alt={ displayName } className='tall wide imgCover' />
+                        <PlaceholdImg src={displayImage} alt={ userProfile.display_name } className='tall wide imgCover' />
                     </Col>
                     <Col
                         xs={12}
                         md={true}
-                        className='card'
+                        className={`card ${styles.profileCard}`}
                         style={{
                             position: 'relative',
                             // ...bgStyle,
                         }}
                     >
                         <div className='d-flex flex-column genOverlay' style={{position: 'absolute', left: '16px', bottom: '16px', width: 'calc(100% - 32px)'}}>
-                            <h1 className='oneLineLimit'>{displayName}</h1>
+                            <h1 className='oneLineLimit'>{userProfile.display_name}</h1>
                             <p>{userProfile.profile?.bio}</p>
                             <div className='d-flex wide justify-content-space-between'>
                                 {/* <CollectionStats collection={collection} /> */}

@@ -7,11 +7,12 @@ interface ModalProps {
     onClose: () => any;
     children: any;
     style?: CSSProperties;
+    innerStyle?: CSSProperties;
     title?: string;
     closeButton?: boolean;
 }
 
-export default function Modal({ open, locked, onClose, children, style, title, closeButton }: ModalProps) {
+export default function Modal({ open, locked, onClose, children, style, innerStyle, title, closeButton }: ModalProps) {
   const modalRef = useRef(null);
 
   // work out which classes should be applied to the dialog element
@@ -68,7 +69,7 @@ export default function Modal({ open, locked, onClose, children, style, title, c
       onClick={onClick}
       onAnimationEnd={onAnimEnd}
     >
-      <div className={styles["modal__container"]}>
+      <div className={styles["modal__container"]} style={innerStyle}>
         {!!title &&
         <div>
           {title}

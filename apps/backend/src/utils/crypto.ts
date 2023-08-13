@@ -1,6 +1,6 @@
-import { Pubkey, pubkeyToAddress } from "@cosmjs/amino";
-import { bech32 } from "bech32";
-import { createHash } from "crypto";
+import { Pubkey, pubkeyToAddress } from '@cosmjs/amino';
+import { bech32 } from 'bech32';
+import { createHash } from 'crypto';
 
 // export const pubKeyToAddress = (publicKeyBase64: string) => {
 //     const publicKey = Buffer.from(publicKeyBase64, 'base64')
@@ -15,8 +15,8 @@ import { createHash } from "crypto";
 // }
 
 export const validateAddress = (address: string, pubKey: string) => {
-    // Validate address against pubkey
-    const pubKeyObj: Pubkey = JSON.parse(pubKey)
-    const addrFromPub = pubkeyToAddress(pubKeyObj, process.env.PREFIX)
-    return address === addrFromPub
-}
+  // Validate address against pubkey
+  const pubKeyObj: Pubkey = JSON.parse(pubKey);
+  const addrFromPub = pubkeyToAddress(pubKeyObj, process.env.PREFIX);
+  return address === addrFromPub;
+};

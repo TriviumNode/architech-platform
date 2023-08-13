@@ -68,7 +68,7 @@
 .linkCard {
     position: relative;
     h2 {
-        font-size: 14px;
+        font-size: 14px !important;
     }
 }
 @media (min-width: 769px) {
@@ -82,22 +82,28 @@
 
 .overlay {
     position: absolute;
-    bottom: 8px;
-    height: calc(100% - 24px);
+    bottom: 4px;
+    height: calc(100% - 16px);
     color: #fff;
     backdrop-filter: blur(24px) brightness(80%);
     border-radius: 8px;
-    margin: 0 8px;
+    margin: 0 4px;
     padding: 4px;
-    width: calc(100% - 16px - 8px);
+    width: calc(100% - 16px);
     font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
 }
 .overlay > h2 {
     margin-bottom: 0px;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 576px) {
     .overlay {
+        justify-content: center;
+        margin: 0 8px;
+        bottom: 8px;
         padding: 24px;
         height: calc(112px - 48px);
         width: calc(100% - 16px - 48px);
@@ -125,6 +131,16 @@
     border-radius: 8px;
     overflow: hidden;
     background: #fff;
+}
+
+.trendingInternal {
+    margin: 48px;
+}
+
+@media (max-width: 575.98px) {
+    .trendingInternal {
+        margin: 16px !important;
+    }
 }
 
 .socialRow {

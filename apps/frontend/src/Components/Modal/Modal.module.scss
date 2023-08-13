@@ -5,8 +5,8 @@
     border-radius: 2px;
     border-width: 0;
     padding: 0;
-    max-height: 80%;
-    max-width: 80%;
+    max-height: 80vh;
+    max-width: 80vw;
   
     &[open] {
       animation: show 250ms cubic-bezier(0.4, 0, 0.2, 1) forwards;

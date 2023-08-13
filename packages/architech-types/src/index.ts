@@ -6,3 +6,6 @@ export * from './interfaces/interfaces';
 
 export * from './contracts';
 export * from './dtos';
+
+export type MinterType = 'RANDOM' | 'COPY'
+export type PaymentType = 'NATIVE' | 'CW20';

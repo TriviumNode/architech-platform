@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { Routes } from '@interfaces/routes.interface';
 import authMiddleware from '@/middlewares/auth.middleware';
-import { upload, upload5mb } from '@/utils/storage';
-import { uploadImage } from '@/controllers/upload.controller';
+import { upload, upload5mb, uploadBatch } from '@/utils/storage';
+import { uploadImage, uploadImageBatch } from '@/controllers/upload.controller';
 
 class UploadRoute implements Routes {
   public path = '/upload';
@@ -13,8 +13,8 @@ class UploadRoute implements Routes {
   }
 
   private initializeRoutes() {
-    // Edit User Profile
-    this.router.post(`${this.path}`, upload5mb.single('image'), authMiddleware, uploadImage);
+    this.router.post(`${this.path}/batch`, authMiddleware, uploadBatch.fields([{ name: 'images', maxCount: 500 }]), uploadImageBatch);
+    this.router.post(`${this.path}`, authMiddleware, upload5mb.single('image'), uploadImage);
   }
 }
 

@@ -1,0 +1,15 @@
+.selectContainer {
+  display: flex;
+  gap: 8px;
+
+  .active {
+    // background: #666;
+    box-shadow: 0 10px 15px -3px rgb(46 41 51 / 8%), 0 4px 6px -2px rgb(71 63 79 / 16%);
+    background: #FFFFFF66;
+  }
+
+  button {
+    background: #FFFFFF00;
+    color: #333;
+  }
+}

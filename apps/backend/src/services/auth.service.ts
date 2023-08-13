@@ -13,8 +13,6 @@ export async function walletLogin(userData: CreateUserDto) /*: Promise<{ cookie:
   const findUser: User = await userModel.findOne({ address: userData.address });
   if (!findUser) throw new HttpException(404, `This address ${userData.address} was not found`);
 
-  // Validate signature somewhere
-
   const tokenData = createAuthToken(findUser);
   const cookie = createCookie(tokenData);
 

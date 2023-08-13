@@ -4,44 +4,38 @@
 * and run the @cosmwasm/ts-codegen generate command to regenerate this file.
 */
 
-export type Cw20ExecuteMsg = {
+export type ExecuteMsg = {
   transfer: {
     amount: Uint128;
     recipient: string;
-    [k: string]: unknown;
   };
 } | {
   burn: {
     amount: Uint128;
-    [k: string]: unknown;
   };
 } | {
   send: {
     amount: Uint128;
     contract: string;
     msg: Binary;
-    [k: string]: unknown;
   };
 } | {
   increase_allowance: {
     amount: Uint128;
     expires?: Expiration | null;
     spender: string;
-    [k: string]: unknown;
   };
 } | {
   decrease_allowance: {
     amount: Uint128;
     expires?: Expiration | null;
     spender: string;
-    [k: string]: unknown;
   };
 } | {
   transfer_from: {
     amount: Uint128;
     owner: string;
     recipient: string;
-    [k: string]: unknown;
   };
 } | {
   send_from: {
@@ -49,31 +43,26 @@ export type Cw20ExecuteMsg = {
     contract: string;
     msg: Binary;
     owner: string;
-    [k: string]: unknown;
   };
 } | {
   burn_from: {
     amount: Uint128;
     owner: string;
-    [k: string]: unknown;
   };
 } | {
   mint: {
     amount: Uint128;
     recipient: string;
-    [k: string]: unknown;
   };
 } | {
   update_minter: {
     new_minter?: string | null;
-    [k: string]: unknown;
   };
 } | {
   update_marketing: {
     description?: string | null;
     marketing?: string | null;
     project?: string | null;
-    [k: string]: unknown;
   };
 } | {
   upload_logo: Logo;
@@ -85,9 +74,7 @@ export type Expiration = {
 } | {
   at_time: Timestamp;
 } | {
-  never: {
-    [k: string]: unknown;
-  };
+  never: {};
 };
 export type Timestamp = Uint64;
 export type Uint64 = string;
@@ -108,70 +95,104 @@ export interface InstantiateMsg {
   mint?: MinterResponse | null;
   name: string;
   symbol: string;
-  [k: string]: unknown;
 }
 export interface Cw20Coin {
   address: string;
   amount: Uint128;
-  [k: string]: unknown;
 }
 export interface InstantiateMarketingInfo {
   description?: string | null;
   logo?: Logo | null;
   marketing?: string | null;
   project?: string | null;
-  [k: string]: unknown;
 }
 export interface MinterResponse {
   cap?: Uint128 | null;
   minter: string;
-  [k: string]: unknown;
 }
 export type QueryMsg = {
   balance: {
     address: string;
-    [k: string]: unknown;
   };
 } | {
-  token_info: {
-    [k: string]: unknown;
-  };
+  token_info: {};
 } | {
-  minter: {
-    [k: string]: unknown;
-  };
+  minter: {};
 } | {
   allowance: {
     owner: string;
     spender: string;
-    [k: string]: unknown;
   };
 } | {
   all_allowances: {
     limit?: number | null;
     owner: string;
     start_after?: string | null;
-    [k: string]: unknown;
   };
 } | {
   all_spender_allowances: {
     limit?: number | null;
     spender: string;
     start_after?: string | null;
-    [k: string]: unknown;
   };
 } | {
   all_accounts: {
     limit?: number | null;
     start_after?: string | null;
-    [k: string]: unknown;
   };
 } | {
-  marketing_info: {
-    [k: string]: unknown;
-  };
+  marketing_info: {};
 } | {
-  download_logo: {
-    [k: string]: unknown;
-  };
+  download_logo: {};
 };
+export interface AllAccountsResponse {
+  accounts: string[];
+  [k: string]: unknown;
+}
+export interface AllAllowancesResponse {
+  allowances: AllowanceInfo[];
+  [k: string]: unknown;
+}
+export interface AllowanceInfo {
+  allowance: Uint128;
+  expires: Expiration;
+  spender: string;
+}
+export interface AllSpenderAllowancesResponse {
+  allowances: SpenderAllowanceInfo[];
+  [k: string]: unknown;
+}
+export interface SpenderAllowanceInfo {
+  allowance: Uint128;
+  expires: Expiration;
+  owner: string;
+}
+export interface AllowanceResponse {
+  allowance: Uint128;
+  expires: Expiration;
+  [k: string]: unknown;
+}
+export interface BalanceResponse {
+  balance: Uint128;
+}
+export interface DownloadLogoResponse {
+  data: Binary;
+  mime_type: string;
+}
+export type LogoInfo = {
+  url: string;
+} | "embedded";
+export type Addr = string;
+export interface MarketingInfoResponse {
+  description?: string | null;
+  logo?: LogoInfo | null;
+  marketing?: Addr | null;
+  project?: string | null;
+  [k: string]: unknown;
+}
+export interface TokenInfoResponse {
+  decimals: number;
+  name: string;
+  symbol: string;
+  total_supply: Uint128;
+}

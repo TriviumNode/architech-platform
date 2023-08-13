@@ -1,3 +1,4 @@
+import { CollectionMinterClass } from '@/models/collections.model';
 import { Collection, CollectionProfile, cw721 } from '@architech/types';
 
 export interface CreateCollectionData {
@@ -15,6 +16,7 @@ export interface CreateCollectionData {
   totalTokens: number;
   importComplete: boolean;
   hidden: boolean;
+  collectionMinter: CollectionMinterClass;
 }
 
 export interface StartImportData extends CollectionProfile {

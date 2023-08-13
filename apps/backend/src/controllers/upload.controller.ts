@@ -1,5 +1,5 @@
 import { RequestWithUser } from '@architech/types';
-import { Response, NextFunction } from 'express';
+import { Response, NextFunction, Request } from 'express';
 import crypto from 'crypto';
 import path from 'path';
 
@@ -37,7 +37,11 @@ const s3 = new AWS.S3({
 // });
 
 export const uploadImage = async (req: RequestWithUser, res: Response, next: NextFunction) => {
-  console.log(req.file);
+  console.log('Upload req.file', req.file);
+  if (!req.file) {
+    res.status(400).send('No files uploaded');
+    return;
+  }
   const buffer = req.file.buffer;
 
   // Create hash using file buffer
@@ -70,4 +74,62 @@ export const uploadImage = async (req: RequestWithUser, res: Response, next: Nex
   // res.status(200).json({
   //   cid: ETag,
   // });
+};
+
+export const uploadImageBatch = async (req: Request, res: Response, next: NextFunction) => {
+  const responses: {
+    cid: string;
+    fileName: string;
+  }[] = [];
+  //@ts-expect-error no type for file fields
+  for (let i = 0; i < req.files.images.length; i++) {
+    //@ts-expect-error no type for file fields
+    const file = req.files.images[i];
+    const cid = await s3Upload(file);
+    responses.push({
+      cid,
+      fileName: file.originalname,
+    });
+  }
+  res.status(200).json(responses);
+};
+
+export const asyncUpload = (params: any): Promise<string> => {
+  return new Promise(resolve => {
+    const request = s3.putObject(params);
+    request.on('httpHeaders', (statusCode, headers) => {
+      // console.log(`CID: ${headers['x-amz-meta-cid']}`);
+      if (!headers['x-amz-meta-cid']) throw new HttpException(500, 'Unable to fetch IPFS hash.');
+      resolve(headers['x-amz-meta-cid']);
+    });
+    request.send();
+  });
+};
+
+const s3Upload = async (file: any): Promise<string> => {
+  const buffer = file.buffer;
+
+  // Create hash using file buffer
+  const hash = crypto.createHash('sha256');
+  hash.update(buffer);
+
+  // Filename `hash.ext`
+  const fileName = `${hash.digest('hex')}${path.extname(file.originalname)}`;
+
+  const params = {
+    Bucket: FILEBASE_BUCKET,
+    Key: `uploads/${fileName}`,
+    ContentType: file.mimetype,
+    Body: buffer,
+    ACL: 'public-read',
+  };
+  return await asyncUpload(params);
+
+  // const request = s3.putObject(params);
+  // request.on('httpHeaders', (statusCode, headers) => {
+  //   console.log(`CID: ${headers['x-amz-meta-cid']}`);
+  //   if (!headers['x-amz-meta-cid']) throw new HttpException(500, 'Unable to fetch IPFS hash.');
+  //   return headers['x-amz-meta-cid'];
+  // });
+  // request.send();
 };

@@ -1,20 +1,39 @@
 import { HttpException } from '@exceptions/HttpException';
-import collectionsModel from '@models/collections.model';
+import collectionsModel, { CollectionMinterClass, MinterPaymentClass } from '@models/collections.model';
+
 import { isEmpty } from '@utils/util';
-import { queryClient as client, queryClient } from '@/utils/chainClients';
+import { isContract, queryClient as client, queryClient } from '@/utils/chainClients';
+
 import equal from 'fast-deep-equal';
 import { findCollectionTokenCount, processCollectionTokens, processCollectionTraits } from './tokens.service';
-import { Collection, GetCollectionResponse } from '@architech/types';
+import { Collection, copyMinter, GetCollectionResponse, minter, MinterPaymentI, User } from '@architech/types';
+
 import { CreateCollectionData } from '@/interfaces/collections.interface';
 import CollectionModel from '@models/collections.model';
-import { getAllTokens, getCollectionDossier, getContractInfo, getNftInfo, getNumTokens, resolveIpfs } from '@architech/lib';
+import {
+  ADMINS,
+  getAllTokens,
+  getCollectionDossier,
+  getConfig,
+  getContractInfo,
+  getMintStatus,
+  getNftInfo,
+  getNumTokens,
+  resolveArchId,
+  resolveIpfs,
+} from '@architech/lib';
+
 import { ImportCollectionBodyDto } from '@/dtos/collections.dto';
 import { isArray, isBoolean } from 'class-validator';
 import fetch from 'node-fetch';
 import { hashBuffer, saveBuffer } from '@/middlewares/fileUploadMiddleware';
 import mime from 'mime-types';
 import mongoose from 'mongoose';
-import { MARKETPLACE_ADDRESS } from '@/config';
+import { ARCHID_ADDRESS, MARKETPLACE_ADDRESS } from '@/config';
+import UserModel from '@/models/users.model';
+
+const removeNullUndefined = (obj: any) => Object.entries(obj).reduce((a, [k, v]) => (v == null ? a : ((a[k] = v), a)), {});
+const removeId = (obj: any) => Object.entries(obj).reduce((a, [k, v]) => (k == '_id' ? a : ((a[k] = v), a)), {});
 
 export const getFullCollection = async (collectionAddress: string): Promise<GetCollectionResponse> => {
   const collectionData: Collection = await CollectionModel.findOne({ address: collectionAddress });
@@ -26,16 +45,28 @@ export const getFullCollection = async (collectionAddress: string): Promise<GetC
     collection: collectionAddress,
   });
 
+  const creator = collectionData.collectionMinter?.minter_admin || collectionData.creator;
+  let display = await resolveArchId(queryClient, ARCHID_ADDRESS, creator);
+
+  if (!display) {
+    const user = await UserModel.findOne({ address: creator }).lean();
+    if (user && user.username) display = user.username;
+  }
+
   return {
     collection: collectionData,
     asks: dossier.asks,
     volume: dossier.volume,
+    full_creator: {
+      display,
+      address: creator,
+    },
   };
 };
 
 export async function findCollectionByAddress(address: string): Promise<Collection> {
   if (isEmpty(address)) throw new HttpException(400, 'Contract address is empty');
-  const findCollection: Collection = await collectionsModel.findOne({ address: address });
+  const findCollection: Collection = await collectionsModel.findOne({ address: address }).lean();
   if (!findCollection) throw new HttpException(404, 'Collection not found');
 
   return findCollection;
@@ -66,7 +97,7 @@ export async function updateCollection(collectionId: mongoose.Types.ObjectId, co
     collectionData.collectionProfile = { ...findCollection.collectionProfile, ...collectionData.collectionProfile };
   }
 
-  const updateCollectionById: Collection = await collectionsModel.findByIdAndUpdate(collectionId, collectionData);
+  const updateCollectionById: Collection = await collectionsModel.findByIdAndUpdate(collectionId, collectionData, { new: true });
   if (!updateCollectionById) throw new HttpException(404, 'Collection not found');
 
   return updateCollectionById;
@@ -121,22 +152,29 @@ export const refreshCollection = async (contract: string) => {
 
   // Query collection info from chain
   const numTokens = await getNumTokens({ client, contract });
-  const { admin } = await client.getContract(contract);
+  const { admin, creator } = await client.getContract(contract);
 
   // Get processed tokens from DB
   const processedTokens = await findCollectionTokenCount(contract);
   console.log('Processed Tokens', processedTokens);
 
+  // Check for minter info
+  // const { minter, actual_creator } = await getMinterInfo(creator);
+  const minterResponse = await getMinterInfo(creator);
+  const cleanNew = removeNullUndefined(minterResponse.minter || {});
+
+  const cleanOld = removeId(removeNullUndefined(knownCollectionData.collectionMinter || {}));
   // Check if update is needed
   if (
     !equal(knownCollectionData.totalTokens, numTokens) ||
     !equal(knownCollectionData.admin, admin) ||
     !equal(knownCollectionData.totalTokens, knownCollectionData.tokenIds.length) ||
+    !equal(cleanOld, cleanNew) ||
     knownCollectionData.tokenIds.length < numTokens ||
     processedTokens < numTokens ||
     !knownCollectionData.collectionProfile.profile_image
   ) {
-    console.log('Refreshing!');
+    console.log('Refreshing Collection!');
 
     // ensure pfp
     let pfp = knownCollectionData.collectionProfile.profile_image;
@@ -154,6 +192,7 @@ export const refreshCollection = async (contract: string) => {
       collectionProfile: {
         profile_image: pfp,
       },
+      collectionMinter: minterResponse.minter,
     };
     const updatedCollection = await updateCollection(knownCollectionData._id, updateData);
 
@@ -168,12 +207,14 @@ export const refreshCollection = async (contract: string) => {
   }
 
   // Return what we already know if nothing else was returned
+  console.log('No Refresh needed. Returning DB Collection.');
   return knownCollectionData;
 };
 
 export const importCollection = async (
   contractAddress: string,
   importBody: ImportCollectionBodyDto,
+  user: User,
   profile_image?: string,
   banner_image?: string,
 ) => {
@@ -186,6 +227,22 @@ export const importCollection = async (
   const { admin, creator } = await client.getContract(contractAddress);
   const tokenIdList = await getAllTokens({ client, contract: contractAddress });
   console.log('cw721 stuff', { cw721_name, cw721_symbol, admin, creator, tokenIdList });
+
+  // Check if there is an Architech minter contract for this collection
+  // let minter: CollectionMinterClass;
+  // let actual_creator = creator;
+  const minterResponse = await getMinterInfo(creator);
+
+  // Only allow creator to import
+  if (
+    user.address !== admin &&
+    user.address !== creator &&
+    user.address !== minterResponse.minter?.beneficiary &&
+    user.address !== minterResponse.minter?.minter_admin &&
+    // Allow Architech admins to import anything
+    !ADMINS.includes(user.address)
+  )
+    throw new HttpException(403, 'Collections can only be imported by the collection creator or admin.');
 
   // Ensure profile image
   if (!profile_image) {
@@ -222,7 +279,7 @@ export const importCollection = async (
     admin: admin,
     cw721_name,
     cw721_symbol,
-    creator: creator,
+    creator: minterResponse.actual_creator || creator,
     collectionProfile: {
       name: importBody.name || cw721_name,
       description: importBody.description,
@@ -240,6 +297,7 @@ export const importCollection = async (
     uniqueTraits: 0,
     hidden: hidden,
     tokenIds: tokenIdList,
+    collectionMinter: minterResponse.minter,
   };
   console.log('collectionProfile', newCollection.collectionProfile);
   const result = await createCollection(newCollection);
@@ -253,8 +311,9 @@ export const importCollection = async (
 const getEnsuredPfp = async (collection: string, tokenList: string[]) => {
   try {
     // Get random token's image to use as profile image
-    const random_token = tokenList[Math.floor(Math.random() * tokenList.length)];
+    let random_token = tokenList[Math.floor(Math.random() * tokenList.length)];
     console.log('Random ID', random_token);
+    if (!random_token) random_token = tokenList[0];
     const tokenInfo = await getNftInfo({ client, contract: collection, token_id: random_token });
     const imageUrl = tokenInfo.extension?.image;
     if (!imageUrl) throw new Error(); //break
@@ -274,4 +333,144 @@ const getEnsuredPfp = async (collection: string, tokenList: string[]) => {
   } catch (err) {
     console.error('Failed to ensure PFP', err);
   }
+};
+
+const getMinterInfo = async (creator: string) => {
+  if (isContract(creator)) {
+    try {
+      // This query will fail allowing us to identify the contract
+      const invalidQuery = {
+        show_me_some_identification: {},
+      };
+      await queryClient.queryContractSmart(creator, invalidQuery);
+    } catch (e) {
+      try {
+        // Extract the QueryMsg enum including package name
+        const LOOKFOR = 'Error parsing into type ';
+        const LOOKFOR2 = ': unknown variant';
+
+        if (e.toString().includes(LOOKFOR)) {
+          const index = e.toString().indexOf(LOOKFOR);
+          const index2 = e.toString().indexOf(LOOKFOR2);
+          const subStr = e.toString().slice(index + LOOKFOR.length, index2);
+
+          // Handle random minter
+          if (subStr === 'random_minter::msg::QueryMsg') {
+            // Get minter config
+            const { config }: { config: minter.Config } = await getConfig({ client: queryClient, contract: creator });
+            const { remaining } = await getMintStatus({ client: queryClient, contract: creator });
+            console.log('Minter Config', config);
+            const payment: MinterPaymentI = config.price
+              ? {
+                  //@ts-expect-error idk
+                  type: config.price.native_payment ? 'NATIVE' : 'CW20',
+                  //@ts-expect-error idk
+                  denom: config.price.native_payment?.denom,
+                  //@ts-expect-error idk
+                  token: config.price.cw20_payment?.token,
+                  //@ts-expect-error idk
+                  amount: config.price.native_payment?.amount || config.price.cw20_payment?.amount,
+                }
+              : undefined;
+
+            // Determine if ended
+            let ended = false;
+            if (remaining === 0) ended = true;
+
+            const whitelist_payment: MinterPaymentI = config.wl_price
+              ? {
+                  //@ts-expect-error idk
+                  type: config.wl_price.native_payment ? 'NATIVE' : 'CW20',
+                  //@ts-expect-error idk
+                  denom: config.wl_price.native_payment?.denom,
+                  //@ts-expect-error idk
+                  token: config.wl_price.cw20_payment?.token,
+                  //@ts-expect-error idk
+                  amount: config.wl_price.native_payment?.amount || config.wl_price.cw20_payment?.amount,
+                }
+              : undefined;
+
+            // Set Random minter data
+            const minter: CollectionMinterClass = {
+              minter_address: creator,
+              minter_type: 'RANDOM',
+              minter_admin: config.admin,
+              beneficiary: config.beneficiary,
+              launch_time: config.launch_time ? (parseInt(config.launch_time) / 1000000000).toString() : undefined,
+              whitelist_launch_time: config.whitelist_launch_time ? (parseInt(config.whitelist_launch_time) / 1000000000).toString() : undefined,
+              end_time: undefined,
+              payment,
+              whitelist_payment,
+              mint_limit: config.mint_limit,
+              max_copies: undefined,
+              ended,
+            };
+            const actual_creator = config.admin;
+            return { minter, actual_creator };
+          }
+
+          // Handle copy minter
+          else if (subStr === 'copy_minter::msg::QueryMsg') {
+            // Get minter config
+            const { config }: { config: copyMinter.Config } = await getConfig({ client: queryClient, contract: creator });
+            const { minted, max_copies } = (await getMintStatus({
+              client: queryClient,
+              contract: creator,
+            })) as unknown as copyMinter.GetMintStatusResponse;
+
+            const payment: MinterPaymentI = config.mint_price
+              ? {
+                  //@ts-expect-error idk
+                  type: config.mint_price.native_payment ? 'NATIVE' : 'CW20',
+                  //@ts-expect-error idk
+                  denom: config.mint_price.native_payment?.denom,
+                  //@ts-expect-error idk
+                  token: config.mint_price.cw20_payment?.token,
+                  //@ts-expect-error idk
+                  amount: config.mint_price.native_payment?.amount || config.mint_price.cw20_payment?.amount || '0',
+                }
+              : undefined;
+
+            const whitelist_payment: MinterPaymentI = config.wl_mint_price
+              ? {
+                  //@ts-expect-error idk
+                  type: config.wl_mint_price.native_payment ? 'NATIVE' : 'CW20',
+                  //@ts-expect-error idk
+                  denom: config.wl_mint_price.native_payment?.denom,
+                  //@ts-expect-error idk
+                  token: config.wl_mint_price.cw20_payment?.token,
+                  //@ts-expect-error idk
+                  amount: config.wl_mint_price.native_payment?.amount || config.wl_mint_price.cw20_payment?.amount,
+                }
+              : undefined;
+
+            // Determine if ended
+            let ended = false;
+            if (minted >= max_copies) ended = true;
+            if (config.end_time && new Date(parseInt(config.end_time) / 1000000000).valueOf() < new Date().valueOf()) ended = true;
+            // Set minter data
+            const minter: CollectionMinterClass = {
+              minter_address: creator,
+              minter_type: 'COPY',
+              minter_admin: config.minter_admin as string,
+              beneficiary: config.beneficiary,
+              launch_time: config.launch_time ? (parseInt(config.launch_time) / 1000000000).toString() : undefined,
+              whitelist_launch_time: config.whitelist_launch_time ? (parseInt(config.whitelist_launch_time) / 1000000000).toString() : undefined,
+              end_time: config.end_time ? (parseInt(config.end_time) / 1000000000).toString() : undefined,
+              payment,
+              whitelist_payment,
+              mint_limit: config.mint_limit,
+              max_copies: config.max_copies,
+              ended,
+            };
+            const actual_creator = config.minter_admin;
+            return { minter, actual_creator };
+          }
+        }
+      } catch (error) {
+        console.error('Error getting minter info:', error);
+      }
+    }
+  }
+  return { minter: undefined, actual_creator: creator };
 };

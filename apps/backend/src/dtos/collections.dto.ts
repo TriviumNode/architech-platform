@@ -65,4 +65,17 @@ export class EditCollectionBodyDto {
   @IsOptional()
   @IsString()
   public categories?: string;
+
+  // Admin Only Settings
+  @IsOptional()
+  @IsString()
+  public admin_hidden?: string;
+
+  @IsOptional()
+  @IsString()
+  public featured?: string;
+
+  @IsOptional()
+  @IsString()
+  public verified?: string;
 }

@@ -1,0 +1,129 @@
+.halfMinus8 {
+    width: calc(50% - 8px);
+}
+
+.number {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+
+    display: flex;
+    align-items: center;
+    color: #000
+}
+
+.label {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+
+    color: #666666;
+}
+
+
+.accordionCol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  max-width: '712px';
+  min-width: 0; //??
+
+  .accordionItem {
+      display: flex;
+      flex-direction: column;
+      background: #FFF;
+      border-radius: 8px;
+      overflow: hidden;
+      // margin-bottom: 8px;
+      height: 89px;
+
+      transition: flex-grow 0.15s ease-in-out;
+
+      [data-prefix="fas"] {
+          transition: transform 0.15s ease-in-out;
+          color: #666666;
+          // font-size: 14px;
+      }
+  }
+  @media (max-width: 767.98px) {
+      .activeItem,.firstItem {
+          height: fit-content !important;
+      }
+  }
+
+  .firstItem {
+    flex-grow: 1;
+      height: 128px;
+  }
+
+  .activeItem {
+      // flex-grow: 1;
+      overflow-y: auto;
+      height: fit-content !important;
+
+      // [data-prefix="fas"] {
+      //     transform: rotate(90deg);
+      // }
+  }
+
+  .activeIcon {
+    transform: rotate(90deg);
+  }
+
+  .itemTitle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+  }
+}
+
+.trait {
+    background: #66666630;
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 6px 16px;
+    text-align: center;
+    min-width: 48px;
+
+    .type {
+        font-size: 14px;
+        color: #333333;
+        font-weight: 500;
+    }
+
+    .value {
+        font-size: 12px;
+        color: #666666;
+    }
+
+    hr {
+        margin: 0px
+    }
+}
+
+.detailCard {
+    background: #66666630;
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 12px 16px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    // min-width: 48px;
+
+    .type {
+        font-size: 16px;
+        color: #333333;
+        font-weight: 500;
+    }
+
+    .value {
+        font-size: 14px;
+        color: #666666;
+    }
+
+    hr {
+        margin: 0px
+    }
+}

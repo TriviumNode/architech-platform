@@ -9,6 +9,11 @@ export type ExecuteMsg = {
     new_admin: Addr;
   };
 } | {
+  edit_operator_permissions: {
+    add_perms: boolean;
+    address: Addr;
+  };
+} | {
   edit_credit_permissions: {
     add_perms: boolean;
     address: Addr;

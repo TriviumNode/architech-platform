@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { Collection, CreateUserDto, GetUserProfileResponse, RequestWithUser, Token, User, WalletLoginDto } from '@architech/types';
-import { getLoginString } from '@architech/lib';
+import { getLoginString, resolveArchId } from '@architech/lib';
 import * as authService from '@services/auth.service';
 import { pubkeyToAddress } from '@cosmjs/amino';
 
@@ -13,6 +13,8 @@ import CollectionModel from '@/models/collections.model';
 import { rotateNonce } from '@/services/users.service';
 import { queryDbCollectionsByCreator } from '@/queriers/collection.querier';
 import { findUserFavorites } from '@/services/favorites.service';
+import { queryClient } from '@/utils/chainClients';
+import { ARCHID_ADDRESS } from '@/config';
 
 export const walletLogin = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -55,6 +57,8 @@ export const walletLogin = async (req: Request, res: Response, next: NextFunctio
     const valid = verifySignature(signMsg, stdSig);
     if (!valid) throw new HttpException(401, 'Failed to verify signature.');
 
+    const archIdPromise = resolveArchId(queryClient, ARCHID_ADDRESS, userData.address);
+
     // Set cookie
     // const { cookie, findUser } = await authService.walletLogin(userData);
     const { tokenData, findUser } = await authService.walletLogin(userData);
@@ -65,8 +69,11 @@ export const walletLogin = async (req: Request, res: Response, next: NextFunctio
     // Rotate nonce
     rotateNonce(userData._id);
 
+    const archId = await archIdPromise;
+
     const response: GetUserProfileResponse = {
       profile: findUser,
+      display_name: archId || findUser.username || findUser.address,
       tokens: ownedTokens || [],
       collections: ownedCollections || [],
       favorites: favorites as any,
@@ -103,12 +110,18 @@ export const checkLogin = async (req: RequestWithUser, res: Response, next: Next
     const userAddress: string = req.params.userAddress;
     if (userAddress !== userData.address) res.status(400).send('Authorization not valid for this resource.');
     else {
+      const archIdPromise = resolveArchId(queryClient, ARCHID_ADDRESS, userData.address);
+
       // const createdCollections = await CollectionModel.find({ creator: userAddress });
       const createdCollections = await queryDbCollectionsByCreator(userAddress);
       const ownedTokens = await TokenModel.find({ owner: userAddress }).populate('collectionInfo');
       const favorites = await findUserFavorites(userData.address);
+
+      const archId = await archIdPromise;
+
       const response: GetUserProfileResponse = {
         profile: userData,
+        display_name: archId || userData.username || userData.address,
         collections: createdCollections,
         //@ts-expect-error idfk
         tokens: ownedTokens,

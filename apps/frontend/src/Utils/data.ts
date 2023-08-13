@@ -1,7 +1,9 @@
+import { denomToHuman, findDenom, findToken, noDenom, unknownDenom } from "@architech/lib";
+import { Denom, CollectionMinterI } from "@architech/types";
 import axios from "axios";
 
 
-export const getPrice = async (coingeckoId: string | undefined, amount: number) => {
+export const getPrice = async (coingeckoId: string | undefined, amount: number): Promise<number> => {
     if (!coingeckoId) return 0;
     if (coingeckoId.toLowerCase() === 'archway' || coingeckoId.toLowerCase() === 'arch' || coingeckoId.toLowerCase() === 'const') return await getArchPrice(amount);
 
@@ -26,3 +28,83 @@ export const getArchPrice = async (amount: number) => {
     }
 }
 
+
+export type Price = {
+  denom: Denom;
+  displayAmount: string;
+  displayUsd: string;
+}
+
+export type Prices = {
+  public: Price;
+  private?: Price;
+}
+
+export const calculatePrices = async (collectionMinter: CollectionMinterI, getUsd = true) => {
+  const publicPrice: Price = await(async()=>{
+    const payment = collectionMinter?.payment
+
+    let saleAmount: string = '--';
+    let usdAmount: string = '--';
+    let saleDenom: Denom = unknownDenom;
+
+    if (!payment) {
+      saleAmount = 'Free';
+      usdAmount = '';
+      saleDenom = noDenom;
+    } else if (payment.token) {
+      const denom = findToken(payment.token);
+      if (denom) {
+        saleDenom = denom;
+        const num = denomToHuman(payment.amount, denom.decimals)
+        saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+        usdAmount = getUsd ? (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 }) : '--';
+      }
+    } else if (payment.denom) {
+      const denom = findDenom(payment.denom);
+      if (denom) {
+        saleDenom = denom;
+        const num = denomToHuman(payment.amount, denom.decimals)
+        saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+        usdAmount = getUsd ? (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 }) : '--';
+      }
+    }
+
+    return { displayAmount: saleAmount, displayUsd: usdAmount, denom: saleDenom }
+  })()
+
+  const privatePrice: Price | undefined = await(async()=>{
+    const payment = collectionMinter?.whitelist_payment
+
+    let saleAmount: string = '--';
+    let usdAmount: string = '--';
+    let saleDenom: Denom = unknownDenom;
+
+    if (!payment) {
+      return undefined;
+    } else if (payment.token) {
+      const denom = findToken(payment.token);
+      if (denom) {
+        saleDenom = denom;
+        const num = denomToHuman(payment.amount, denom.decimals)
+        saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+        usdAmount = getUsd ? (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 }) : '--';
+      }
+    } else if (payment.denom) {
+      const denom = findDenom(payment.denom);
+      if (denom) {
+        saleDenom = denom;
+        const num = denomToHuman(payment.amount, denom.decimals)
+        saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+        usdAmount = getUsd ? (await getPrice(saleDenom.coingeckoId, num)).toLocaleString("en-US", { maximumFractionDigits: 2 }) : '--';
+      }
+    }
+
+    return { displayAmount: saleAmount, displayUsd: usdAmount, denom: saleDenom }
+  })()
+
+  return({
+    private: privatePrice,
+    public: publicPrice,
+  })
+}

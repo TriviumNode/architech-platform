@@ -1,7 +1,7 @@
 import { cw721, GetCollectionResponse, SortOption, Token } from "@architech/types";
 import {ReactElement, FC, useState, useEffect, CSSProperties} from "react";
 import { Col } from "react-bootstrap";
-import { useLoaderData, useRevalidator, useSearchParams } from "react-router-dom";
+import { Link, useLoaderData, useRevalidator, useSearchParams } from "react-router-dom";
 import Badge from "../../Components/Badge";
 import CollectionStats from "../../Components/CollectionStats/CollectionStats";
 import FilterMenu from "../../Components/FilterMenu";
@@ -18,13 +18,15 @@ import { getCollectionName } from "../../Utils/helpers";
 import EditModal from "./EditModal";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowRotateRight, faCoffee, faPencil } from '@fortawesome/free-solid-svg-icons'
+import { faArrowRotateRight, faCheckSquare, faCoffee, faPencil } from '@fortawesome/free-solid-svg-icons'
 import { toast } from "react-toastify";
 import sleep from "../../Utils/sleep";
 import { Tooltip } from "react-tooltip";
 import { ADMINS } from "@architech/lib";
 
 import styles from './Collection.module.scss';
+import VerifiedBadge from "../../Components/Verified";
+import HiddenBanner from "../../Components/HiddenBanner/HiddenBanner";
 
 const statusOptions = [
     'For Sale',
@@ -133,6 +135,9 @@ const SingleCollection: FC<any> = (): ReactElement => {
 
     return (
         <>
+          {!!collection.hidden &&
+            <HiddenBanner page='COLLECTION' collectionAddress={collection.address} />
+          }
             <div className={styles.picRow}>
                 <Col xs={{span: 8, offset: 2}} md={{span: 3, offset: 0}} className='card' style={{aspectRatio: '1 / 1'}}>
                     <PlaceholdImg alt={collectionName} src={collectionImage} style={{objectFit: 'cover', width: '100%', height: '100%'}} />
@@ -150,6 +155,9 @@ const SingleCollection: FC<any> = (): ReactElement => {
                         <div className='d-flex flex-column genOverlay' style={{position: 'absolute', left: '16px', bottom: '16px'}}>
                             <div className='d-flex align-items-center gap8'>
                                 <h1>{collectionName}</h1>
+                                {!!collection.verified &&
+                                  <VerifiedBadge content="Collection" />
+                                }
                                 {(collection.categories || []).map(category=>
                                     <Badge key={category}><span>{category}</span></Badge>
                                 )}
@@ -215,8 +223,26 @@ const SingleCollection: FC<any> = (): ReactElement => {
                     </div>
                 </Col>
                 
-                {tokens.length ?
+                {tokens.length || collection.collectionMinter ?
                     <Col className={styles.nftsContainer}>
+                        {!!collection.collectionMinter && 
+                            <Link
+                              to={`/nfts/mint/${collection.address}`}
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                backgroundColor: '#666666',
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                position: 'relative',
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                              }}
+                            >
+                                <h4>Minting Now</h4>
+                                <p>Click to see Minter</p>
+                            </Link>
+                        }
                         {tokens.map(token=>{
                             return (
                                 <NftTile collectionName={collectionName} token={token} key={token.tokenId} />

@@ -4,9 +4,12 @@ import { Routes } from '@interfaces/routes.interface';
 import validationMiddleware from '@middlewares/validation.middleware';
 import {
   editCollection,
+  getActiveMinters,
   getAllCollections,
   getCollectionByAddress,
+  getEndedMinters,
   getTrendingCollections,
+  getTrendingFeaturedCollections,
   importCollection,
   refreshCollection,
   searchCollections,
@@ -29,23 +32,39 @@ class CollectionsRoute implements Routes {
     // Note: Sort middleware?
     this.router.get(`${this.path}`, getAllCollections);
 
+    // Get collections with active minters
+    // TODO: Pagination and Sorting
+    // Note: Sort middleware?
+    this.router.get(`${this.path}/minters/active`, getActiveMinters);
+
+    // Get collections with ended minters
+    // TODO: Pagination and Sorting
+    // Note: Sort middleware?
+    this.router.get(`${this.path}/minters/ended`, getEndedMinters);
+
+    // Search Collections
+    // TODO: Search users too
     this.router.get(`${this.path}/search`, searchCollections);
 
     // Get top viewed collections
     this.router.get(`${this.path}/trending`, getTrendingCollections);
+
+    // Get featured collections, sorted by number of views last 2 weeks
+    this.router.get(`${this.path}/featured`, getTrendingFeaturedCollections);
 
     // Get collection details
     // Authentication not required, only used to store view history
     this.router.get(`${this.path}/:contractAddr`, optionalAuthMiddleware, getCollectionByAddress);
 
     // Import collection
-    // TODO: Require authentication. Only allow owner to import.
+    // Only allows owner or admin to import.
     this.router.post(
       `${this.path}/import/:contractAddr`,
       upload.fields([
         { name: 'profile', maxCount: 1 },
         { name: 'banner', maxCount: 1 },
       ]),
+      authMiddleware,
       fileUploadMiddleware,
       importCollection,
     );
@@ -56,6 +75,7 @@ class CollectionsRoute implements Routes {
     this.router.post(`${this.path}/refresh/:contractAddr`, refreshCollection);
 
     // Edit Collection Profile
+    // Requires Authentication. Can only be edited by collection owner/admin, or Architech Admin
     this.router.post(
       `${this.path}/edit/:id`,
       upload.fields([

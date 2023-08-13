@@ -1,4 +1,4 @@
-import { denomToHuman, findDenom, getRoyalty, humanToDenom, listToken } from "@architech/lib";
+import { calculateFee, denomToHuman, findDenom, getRoyalty, humanToDenom, listToken } from "@architech/lib";
 import { Denom, Token } from "@architech/types";
 import { useState, ChangeEvent, useEffect } from "react";
 import { Row, Col } from "react-bootstrap";
@@ -106,10 +106,10 @@ export default function ListModal({open, token, onClose, onList}: Props) {
 
     const denomAmount = parseInt(humanToDenom(formState.amount || 0, selectedOption.value.decimals));
 
-    const feeAmountDenom = denomAmount * 0.025
+    const feeAmountDenom = calculateFee(denomAmount, 0.025); //denomAmount * 0.025
     const feeAmount = denomToHuman(feeAmountDenom, selectedOption.value.decimals)
 
-    const royaltyAmountDenom = denomAmount * royaltyRate
+    const royaltyAmountDenom = calculateFee(denomAmount, royaltyRate); //denomAmount * royaltyRate
     const royaltyAmount = denomToHuman(royaltyAmountDenom, selectedOption.value.decimals)
 
     const total = parseFloat(formState.amount || '0') - royaltyAmount - feeAmount
@@ -137,15 +137,15 @@ export default function ListModal({open, token, onClose, onList}: Props) {
                 <div className='d-flex flex-column gap8' style={{margin: '0px 16px'}}>
                     <div className='d-flex justify-content-between'>
                         <span>Sale Fee&nbsp;<span className='lightText10'>(2.5%)</span></span>
-                        <span className="lightText12">{feeAmount}&nbsp;{selectedOption.value.displayDenom}</span>
+                        <span className="lightText12">{feeAmount.toLocaleString(undefined, {maximumFractionDigits: selectedOption.value.decimals})}&nbsp;{selectedOption.value.displayDenom}</span>
                     </div>
                     <div className='d-flex justify-content-between mb8'>
-                        <span>Royalty&nbsp;<span className='lightText10'>({parseFloat((royaltyRate * 100).toFixed(2))}%)</span></span>
+                        <span>Royalty&nbsp;<span className='lightText10'>({royaltyRate.toLocaleString(undefined, {maximumFractionDigits: selectedOption.value.decimals})}%)</span></span>
                         <span className="lightText12">{loadingRoyalty ? <SmallLoader /> : `${royaltyAmount} ${selectedOption.value.displayDenom}`}</span>
                     </div>
                     <div className='d-flex justify-content-between'>
                         <span style={{fontWeight: '600'}}>You Get</span>
-                        <span>{loadingRoyalty ? <SmallLoader /> : `${total} ${selectedOption.value.displayDenom}`}</span>
+                        <span>{loadingRoyalty ? <SmallLoader /> : `${total.toLocaleString(undefined, {maximumFractionDigits: selectedOption.value.decimals})} ${selectedOption.value.displayDenom}`}</span>
                     </div>
                 </div>
             </div>

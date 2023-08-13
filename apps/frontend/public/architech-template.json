@@ -1,0 +1,36 @@
+[
+  {
+    "file_name": "enteprise.png",
+    "name": "USS Enteprise",
+    "description": "Spaceship with Warp Drive",
+    "royalty_payment_address": "archway1tmgvz9r9q0nlv00kclksvlk903pz9gjnaz62ng",
+    "royalty_percentage": 5,
+    "attributes": [
+      {
+        "trait_type": "Class",
+        "value": "Constitution"
+      },
+      {
+        "trait_type": "Top Speed",
+        "value": "Warp 7"
+      }
+    ]
+  },
+  {
+    "file_name": "voyager.png",
+    "name": "USS Voyager",
+    "description": "Spaceship with Warp Drive",
+    "royalty_payment_address": "archway1tmgvz9r9q0nlv00kclksvlk903pz9gjnaz62ng",
+    "royalty_percentage": 5,
+    "attributes": [
+      {
+        "trait_type": "Class",
+        "value": "Intrepid"
+      },
+      {
+        "trait_type": "Top Speed",
+        "value": "Warp 9.975"
+      }
+    ]
+  }
+]

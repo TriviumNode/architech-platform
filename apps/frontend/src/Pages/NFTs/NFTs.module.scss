@@ -45,7 +45,8 @@
 }
 @media (max-width: 575.98px) {
     .trendingCard {
-        width: calc(100% - 64px) !important;
+        width: calc(100% - 32px) !important;
+        padding: 16px !important;
         flex: 0 0 auto !important;
     }
 }
@@ -130,4 +131,52 @@
         grid-row: 2;
         grid-column: 2;
     }
+}
+
+
+
+
+
+
+
+
+.overlay {
+  position: absolute;
+  bottom: 4px;
+  // height: calc(100% - 16px);
+  color: #fff;
+  backdrop-filter: blur(24px) brightness(80%);
+  border-radius: 8px;
+  margin: 0 4px;
+  padding: 4px;
+  width: calc(100% - 16px);
+  max-width: 350px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 4px
+}
+.overlay > h2 {
+  margin-bottom: 0px;
+}
+
+@media (min-width: 576px) {
+  .overlay {
+      justify-content: center;
+      margin: 0 8px;
+      bottom: 8px;
+      padding: 24px;
+      // height: calc(112px - 48px);
+      width: calc(100% - 16px - 48px);
+      h2 {
+          margin-bottom: 4px;
+      }
+  }
+}
+
+@media (min-width: 992px) {
+  .overlay {
+      // height: calc(92px - 48px);
+  }
 }

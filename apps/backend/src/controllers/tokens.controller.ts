@@ -3,7 +3,7 @@ import { queryClient } from '@/utils/chainClients';
 import * as tokenService from '@/services/tokens.service';
 import { cw721, GetLatestListingsResponse, GetTokenResponse, RequestWithOptionalUser, SortOption, Token } from '@architech/types';
 
-import { getAllAsks } from '@architech/lib';
+import { getAllAsks, resolveArchId } from '@architech/lib';
 import TokenModel from '@/models/tokens.model';
 import { HttpException } from '@/exceptions/HttpException';
 import CollectionModel from '@/models/collections.model';
@@ -11,7 +11,7 @@ import { findFavoritesCount } from '@/services/favorites.service';
 import UserModel from '@/models/users.model';
 import mongoose from 'mongoose';
 import { addTokenView } from '@/services/view.service';
-import { MARKETPLACE_ADDRESS } from '@/config';
+import { ARCHID_ADDRESS, MARKETPLACE_ADDRESS } from '@/config';
 
 // TODO cache this!!
 export const getLatestListings = async (req: Request, res: Response, next: NextFunction) => {
@@ -24,7 +24,7 @@ export const getLatestListings = async (req: Request, res: Response, next: NextF
       const ask = asks[i];
 
       const collection = await CollectionModel.findOne({ address: ask.collection });
-      if (!collection || collection.hidden) continue;
+      if (!collection || collection.hidden || collection.admin_hidden) continue;
 
       const token = await tokenService.ensureToken(ask.collection, ask.token_id);
       if (!token) continue;
@@ -117,14 +117,20 @@ export const getCollectionTokenId = async (req: RequestWithOptionalUser, res: Re
       // Get number of likes
       const count = await findFavoritesCount(tokenData._id);
 
-      // Get owner profile
-      const ownerProfile = await UserModel.findOne({ address: tokenData.owner }).lean();
+      // Get Arch ID if any
+      let ownerName = await resolveArchId(queryClient, ARCHID_ADDRESS, tokenData.owner);
+
+      if (!ownerName) {
+        // Get owner profile
+        const ownerProfile = await UserModel.findOne({ address: tokenData.owner }).lean();
+        ownerName = ownerProfile?.username || tokenData.owner;
+      }
 
       const response: GetTokenResponse = {
         token: tokenData as unknown as Token,
         ask: tokenData.ask,
         favorites: count,
-        ownerName: ownerProfile?.username || tokenData.owner,
+        ownerName,
       };
 
       res.status(200).json(response);

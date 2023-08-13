@@ -1,14 +1,6 @@
 import { marketplace } from "@architech/types";
 import BigNumber from "bignumber.js";
 
-export const getFee = (gas: number) => {
-    const fee = Math.ceil(gas * parseFloat(process.env.GAS_PRICE || '1'))
-    return {
-        amount: [{denom: process.env.GAS_DENOM || 'uconst', amount: fee.toString()}],
-        gas: gas.toString(),
-    }
-}
-
 export const resolveIpfs = (uri: string) => {
     const isIpfs = uri.startsWith('ipfs://');
     if (isIpfs) uri = `https://ipfs.filebase.io/ipfs/${uri.replace('ipfs://', '')}`;
@@ -27,6 +19,13 @@ export const humanToDenom = (amount: number | string, decimals: number): string 
     const result = amount * Math.pow(10, decimals)
     const denomAmount = BigNumber(result)
     return denomAmount.toFixed();
+}
+
+export const calculateFee = (amount: number | string, fee: number): string => {
+    amount = parseFloat(amount.toString());
+    const result = amount * fee
+    const feeAmount = BigNumber(result)
+    return feeAmount.toFixed();
 }
 
 export const findFloor = (asks: marketplace.Ask[], decimals: number) => {
@@ -48,4 +47,9 @@ export function randomString(length: number, chars = '0123456789abcdefghijklmnop
     var result = '';
     for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
     return result;
+}
+
+export const epochToDate = (unixEpoch: number | string) => {
+  if (typeof unixEpoch === 'string') unixEpoch = parseInt(unixEpoch);
+  return new Date(unixEpoch * 1000)
 }

@@ -2,6 +2,41 @@ import { cw721, marketplace } from "../contracts";
 import { Token } from "./tokens.interface";
 import { Ref } from '@typegoose/typegoose';
 import mongoose from "mongoose";
+import { MinterType, PaymentType } from "..";
+
+export interface CollectionMinterI {
+  minter_address: string;
+  minter_type: MinterType;
+  minter_admin: string;
+  beneficiary?: string;
+  // payment_type: PaymentType;
+  // payment_token?: string;
+  // payment_denom?: string;
+  // payment_amount: string;
+  payment?: MinterPaymentI;
+  whitelist_payment?: MinterPaymentI;
+
+  // Epoch
+  launch_time?: string;
+
+  // Epoch
+  end_time?: string;
+
+  // Epoch
+  whitelist_launch_time?: string;
+
+  // For copy minters
+  mint_limit?: number;
+
+  ended: boolean;
+}
+
+export interface MinterPaymentI {
+  type: PaymentType;
+  token?: string;
+  denom?: string;
+  amount: string;
+}
 
 export interface CollectionProfile {
   name?: string;
@@ -33,6 +68,11 @@ export interface CollectionModel {
   totalTokens: number;
   importComplete: boolean;
   hidden: boolean;
+  admin_hidden: boolean;
+  featured: boolean;
+  verified: boolean;
+  total_views: number;
+  collectionMinter?: CollectionMinterI;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -49,6 +89,10 @@ export interface GetCollectionResponse {
   collection: Collection;
   asks: marketplace.Ask[];
   volume: marketplace.Volume[];
+  full_creator: {
+    display: string;
+    address: string;
+  };
 }
 
 export type GetTrendingCollectionResponse = TrendingCollectionResult[];
