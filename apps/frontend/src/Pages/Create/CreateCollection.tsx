@@ -626,21 +626,23 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     </button>
                 </Col>
                 <Col>
-                    <button type='button' onClick={()=>selectType('RANDOM')} >
+                    <button type='button' onClick={()=>selectType('RANDOM')} disabled={true} >
                         <h3>Random Minter</h3>
                         <p className='lightText12'>
                             Preload NFTs in bulk, then distribute them one at a time randomly. 
                             Great for PFP collectons.
                         </p>
+                        <h5>Available Soon</h5>
                     </button>
                 </Col>
                 <Col>
-                    <button type='button' onClick={()=>selectType('COPY')} >
+                    <button type='button' onClick={()=>selectType('COPY')} disabled={true} >
                         <h3>Copy Minter</h3>
                         <p className='lightText12'>
                             Sell or give away copies of an NFT. Optionally limit by number of copies or time. 
                             Great for tickets and limited edition art.
                         </p>
+                        <h5>Available Soon</h5>
                     </button>
                 </Col>
                 </div>
