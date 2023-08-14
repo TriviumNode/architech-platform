@@ -28,6 +28,7 @@ interface Props {
 
 export interface CurrentWallet {
   wallet_type: 'Keplr';
+  key_name: string;
   client:  SigningArchwayClient;
   address: string;
   pubKey: Pubkey;
@@ -66,17 +67,60 @@ const KEY = 'KEPLR_CONNECTED_ARCHITECH';
 
 const connectedKeplr = localStorage.getItem(KEY);
 
-type STATUS = 'DISCONNECTED' | 'SELECT' | 'LOADING_CONNECT' | 'LOADING_NONCE' | 'LOADING_SIG' | 'LOADING_LOGIN' | 'CONNECTED' | 'ERROR'
+type STATUS = 'DISCONNECTED' | 'SELECT' | 'SWITCH' | 'LOADING_CONNECT' | 'LOADING_NONCE' | 'LOADING_SIG' | 'LOADING_LOGIN' | 'CONNECTED' | 'ERROR'
 
 export const UserProvider = ({ children }: Props): ReactElement => {
   const [user, setUser] = useState<CurrentWallet>();
   const [balances, setBalances] = useState<Balances>();
   const [walletStatus, setWalletStatus] = useState<STATUS>('DISCONNECTED');
 
+  window.addEventListener("keplr_keystorechange", () => {
+    console.log("Keplr wallet changed!");
+    onChangeWallet();
+  })
+
+  window.addEventListener("leap_keystorechange", () => {
+    console.log("Leap wallet changed!");
+    onChangeWallet();
+  })
+
+  const onChangeWallet = async () => {
+    if (!user) {
+      connectWallet()
+      return;
+    }
+    if (!window.wallet) throw new Error('window.wallet was not defined.')
+
+    const keyResult = await window.wallet.getKey(process.env.REACT_APP_CHAIN_ID)
+    console.log('New Key', keyResult)
+
+    if (keyResult.bech32Address === user.address) {
+      // Hide modal if switching back to previous wallet
+      setWalletStatus('CONNECTED')
+    } else {
+      // Display modal
+      setWalletStatus('SWITCH')
+    }
+  }
 
   // useEffect(()=>{   
   //   if (!wallet && connectedKeplr === 'true') connectKeplr();
   // },[])
+
+  const handleChangeWallet = async () => {
+    try {
+      setUser(undefined);
+      setBalances(undefined);
+      setWalletStatus('DISCONNECTED')
+
+      if (!window.wallet) connectWallet();
+      else await connectKeplr(window.wallet);
+    } catch(error) {
+      toast.error('Failed to change wallets')
+      console.error('Failed to change wallets:', error)
+      setWalletStatus('DISCONNECTED')
+    }
+  }
 
   const getBalances = async(client = user?.client, addr = user?.address) => {
     if (!addr || !client) throw new Error('Unable to retrieve balances when wallet is not set.');
@@ -137,7 +181,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
     window.wallet = wallet;
     try {
       setWalletStatus('LOADING_CONNECT');
-      const { client, address, pubKey } = await connectKeplrWallet();
+      const { client, address, pubKey, keyName } = await connectKeplrWallet();
       getBalances(client, address)
 
       /* eslint-disable */
@@ -148,7 +192,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
       setWalletStatus('LOADING_NONCE');
       try {
         const response = await checkLogin(address);
-        const newUser: CurrentWallet = {client, address, pubKey, wallet_type: 'Keplr', profile: response}
+        const newUser: CurrentWallet = {client, address, pubKey, wallet_type: 'Keplr', profile: response, key_name: keyName}
         setUser(newUser)
         setWalletStatus('CONNECTED');
         localStorage.setItem(KEY, 'true');
@@ -166,7 +210,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
 
         const loginResult = await walletLogin(JSON.stringify(signResult.pub_key), signResult.signature)
         // setAuthenticated(true);
-        const newUser: CurrentWallet = {client, address, pubKey, wallet_type: 'Keplr', profile: loginResult}
+        const newUser: CurrentWallet = {client, address, pubKey, wallet_type: 'Keplr', profile: loginResult, key_name: keyName}
 
         setUser(newUser)
         localStorage.setItem(KEY, 'true');
@@ -284,6 +328,14 @@ export const UserProvider = ({ children }: Props): ReactElement => {
         return (
           <LoadingModal msg='Authenticating your wallet with Architech' />
         )
+      case 'SWITCH':
+        return (
+          <div className={styles.selectWalletContainer} style={{textAlign: 'center'}}>
+            {/* <h5>Wallet Changed</h5> */}
+            <p>Looks like you changed wallets. To login using the new wallet, click the button below.<br/>Any unsaved changes will be lost.</p>
+            <button type='button' onClick={()=>handleChangeWallet()}>Continue with New Wallet</button>
+          </div>
+        )
     }
   }
 
@@ -292,7 +344,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
           <ModalV2
             open={walletStatus !== 'CONNECTED' && walletStatus !== 'DISCONNECTED' }
             onClose={()=>setWalletStatus('DISCONNECTED')}
-            title='Connect Wallet'
+            title={walletStatus === 'SWITCH' ? 'Change Wallet' : 'Connect Wallet'}
             style={{maxWidth: '400px'}}
           >
             {modalContent()}

@@ -7,6 +7,7 @@ export const connectKeplrWallet = async(): Promise<{
     client: SigningArchwayClient;
     address: string;
     pubKey: Pubkey;
+    keyName: string;
 }> => {
     if (!window.wallet) {
         sleep(1_500)
@@ -63,8 +64,8 @@ export const connectKeplrWallet = async(): Promise<{
     });
     await window.wallet.enable(process.env.REACT_APP_CHAIN_ID);
 
-    const keyResult = await window.wallet.getKey(process.env.REACT_APP_CHAIN_ID)
-
+    const {name: keyName} = await window.wallet.getKey(process.env.REACT_APP_CHAIN_ID)
+    
     const offlineSigner = window.wallet.getOfflineSigner(process.env.REACT_APP_CHAIN_ID);
     const accounts = await offlineSigner.getAccounts();
 
@@ -75,7 +76,7 @@ export const connectKeplrWallet = async(): Promise<{
         value: toBase64(accounts[0].pubkey)
     }
 
-    return {client, address: accounts[0].address, pubKey: stdPubKey}
+    return {client, address: accounts[0].address, pubKey: stdPubKey, keyName}
 }
 
 export const signLoginPermit = async(nonce: string, signerAddress: string) => {
