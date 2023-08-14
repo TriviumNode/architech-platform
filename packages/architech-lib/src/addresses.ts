@@ -4,7 +4,7 @@ export const getAddresses = (chainId: string) => {
             return {
                 CREDIT_ADDRESS: 'archway1dex9s7j726jd3an9vk0g00s9cm608jtznzjueczuzcvs2t9zralqhg4f5h',
                 MARKETPLACE_ADDRESS: 'archway1vg04jejq07cxulffmmgjtxs0gfsezx99a2ajtwuakrc8krf354rqgv8t4a',
-                NFT_FACTORY_ADDRESS: '',
+                NFT_FACTORY_ADDRESS: 'archway1snpedw2xryfl49c76qym66v4wvnupgmjwl08k5tep0nnfx5prjksz8qfg3',
                 CW721_CODE_ID: 44,
                 ARCHID_ADDRESS: 'archway1275jwjpktae4y4y0cdq274a2m0jnpekhttnfuljm6n59wnpyd62qppqxq0',
             };

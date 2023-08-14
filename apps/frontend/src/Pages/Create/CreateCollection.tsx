@@ -616,7 +616,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     <h1>New Collection Type</h1>
                 </div>
                 <div className={styles.buttonRow}>
-                <Col>
+                  <Col>
                     <button type='button' onClick={()=>selectType('STANDARD')} >
                         <h3>Standard Collection</h3>
                         <p className='lightText12'>
@@ -624,8 +624,17 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                             Great for small collections and one-off art.
                         </p>
                     </button>
-                </Col>
-                <Col>
+                  </Col>
+                  <Col>
+                    <button type='button' onClick={()=>selectType('COPY')} >
+                        <h3>Copy Minter</h3>
+                        <p className='lightText12'>
+                            Sell or give away copies of an NFT. Optionally limit by number of copies or time. 
+                            Great for tickets and limited edition art.
+                        </p>
+                    </button>
+                  </Col>
+                  <Col>
                     <button type='button' onClick={()=>selectType('RANDOM')} disabled={true} >
                         <h3>Random Minter</h3>
                         <p className='lightText12'>
@@ -634,17 +643,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                         </p>
                         <h5>Available Soon</h5>
                     </button>
-                </Col>
-                <Col>
-                    <button type='button' onClick={()=>selectType('COPY')} disabled={true} >
-                        <h3>Copy Minter</h3>
-                        <p className='lightText12'>
-                            Sell or give away copies of an NFT. Optionally limit by number of copies or time. 
-                            Great for tickets and limited edition art.
-                        </p>
-                        <h5>Available Soon</h5>
-                    </button>
-                </Col>
+                  </Col>
                 </div>
             </div>
             </div>
