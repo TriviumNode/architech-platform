@@ -127,9 +127,10 @@ const MinterPreloadPage: FC<{
                 <h2 className='mb32'>Preload<br />Items</h2>
             </div>
             <p>
-                Upload a CSV or JSON file to preload items into your random minter.
-                <br />
-                See the <a href="https://docs.architech.zone/preload.html" className='textLink' target='_blank' rel="noreferrer noopener">Architech Documentation</a> for more information.
+              Upload a CSV or JSON file to preload items into your random minter.<br />
+              Split large collections into multiple CSV or JSON files to preload in batches.<br />
+              <div className='mt8' />
+              See the <a href="https://docs.architech.zone/preload.html" className='textLink' target='_blank' rel="noreferrer noopener">Architech Documentation</a> for more information.  
             </p>
             <div style={{width: 'fit-content'}} className='mb16'>
                 <Badge style={{fontSize: '16px'}}>

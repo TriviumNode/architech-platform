@@ -78,6 +78,8 @@ export const uploadImage = async (req: RequestWithUser, res: Response, next: Nex
 };
 
 const processFile = async (file: any, index: number, responses: any[]) => {
+  console.log('Uploading', file.originalname);
+
   const cid = await s3Upload(file);
   responses[index] = {
     cid,
