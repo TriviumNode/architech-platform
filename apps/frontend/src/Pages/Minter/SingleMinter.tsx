@@ -81,6 +81,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
 
       try {
         const result: minter.GetMintLimitResponse = await getMintLimit({ client: user.client, contract: collection.collectionMinter.minter_address, buyer: user.address });
+        console.log('*Buyer Mint Status*', result);
         setBuyerStatus(result);
       } catch (error: any) {
         console.error('Failed to check buyer whitelist status:', error.toString())
@@ -132,7 +133,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
       if (!collection.collectionMinter) throw new Error('Minter not found for this collection.')
       if (collection.collectionMinter.payment?.token || collection.collectionMinter.whitelist_payment?.token) throw new Error('Non-native payments are not supported.')
       if (!buyerStatus) throw new Error('Unable to fetch minter status.')
-      if (buyerStatus.mint_limit && (buyerStatus.mints || 0 > buyerStatus.mint_limit)) throw new Error('You are at the mint limit for this collection.')
+      if (buyerStatus.mint_limit && ((buyerStatus.mints || 0) > buyerStatus.mint_limit)) throw new Error('You are at the mint limit for this collection.')
       setLoadingTx(true);
 
       if (buyerStatus.whitelisted) {
