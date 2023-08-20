@@ -9,7 +9,7 @@ export const resolveArchId = async(client: ArchwayClient | SigningArchwayClient,
             }
         };
         const {names} = await client.queryContractSmart(contract, query)
-        console.log('ARCHID Response', names)
+        if (names.length > 1) console.log('ARCHID Response has Multiple Names:', names)
         return names[0]
     } catch (err: any) {
         console.error('Error resolving ArchID:', err)
