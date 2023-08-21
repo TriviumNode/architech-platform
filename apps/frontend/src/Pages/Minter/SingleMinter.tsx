@@ -1,5 +1,7 @@
 import { denomToHuman, epochToDate, findDenom, findToken, getConfig, getMintLimit, getMintStatus, mintWithMinter, noDenom, parseError, truncateAddress, unknownDenom } from "@architech/lib";
 import { cw721, GetCollectionResponse, Denom, minter, copyMinter, CollectionMinterI, cw2981 } from "@architech/types";
+import { ContractMetadata } from "@archwayhq/arch3.js/build";
+import { CodeDetails, Contract } from "@cosmjs/cosmwasm-stargate";
 import { faCheck, faChevronRight, faClock, faRefresh, faX } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FC, ReactElement, useEffect, useState } from "react";
@@ -17,6 +19,7 @@ import VerifiedBadge from "../../Components/Verified";
 import Vr from "../../Components/vr";
 import { useMint } from "../../Contexts/MintContext";
 import { useUser } from "../../Contexts/UserContext";
+import { DevInfo } from "../../Interfaces/interfaces";
 import { getApiUrl, refreshCollection } from "../../Utils/backend";
 import { calculatePrices, getPrice, Prices } from "../../Utils/data";
 import { getCollectionName } from "../../Utils/helpers";
@@ -69,10 +72,11 @@ const SingleMinter: FC<any> = (): ReactElement => {
     const [buyerStatus, setBuyerStatus] = useState<copyMinter.GetMintLimitResponse>();
     const [minterStatus, setMinterStatus] = useState<copyMinter.GetMintStatusResponse>();
     const [copyMetadata, setCopyMetadata] = useState<cw2981.Metadata>();
+    const [devInfo, setDevInfo] = useState<DevInfo>()
 
     const [now, setNow] = useState(new Date())
 
-    const { user, refreshProfile } = useUser()
+    const { user, refreshProfile, devMode } = useUser()
     const revalidator = useRevalidator()
 
     const checkWhitelist = async () => {
@@ -98,6 +102,12 @@ const SingleMinter: FC<any> = (): ReactElement => {
 
         const {config} = await getConfig({client: QueryClient, contract: collection.collectionMinter.minter_address})
         setCopyMetadata(config.metadata)
+
+        const contract = await QueryClient.getContract(collection.collectionMinter.minter_address)
+        const code = await QueryClient.getCodeDetails(contract.codeId)
+        const metadata = await QueryClient.getContractMetadata(collection.collectionMinter.minter_address)
+        setDevInfo({contract, code, metadata})
+
       } catch (error: any) {
         console.error('Failed to check minter status:', error.toString())
         console.error(error)
@@ -171,6 +181,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
       }
       checkWhitelist();
       queryMinter();
+      revalidator.revalidate();
     } catch(err: any) {
       console.error(err)
       toast.error(parseError(err))
@@ -318,6 +329,17 @@ const SingleMinter: FC<any> = (): ReactElement => {
               <FontAwesomeIcon icon={faRefresh} onClick={()=>handleRefresh()} size={"2x"} />
             </div>
           </div>
+
+          {/* ### Dev Mode Info ### */}
+          {devMode && 
+            !!devInfo ?
+              <div>
+                Code ID: {devInfo.contract.codeId}&nbsp;&nbsp;&nbsp;&nbsp;Hash: {devInfo.code.checksum}
+              </div>
+            : <SmallLoader />    
+          }
+
+
           <div className='d-flex flex-column' style={{flexGrow: 1 }} >
             { !!collection.collectionProfile.description &&
               <div style={{margin: '0 48px 12px 48px', width: 'fit-content', maxWidth: 'calc(100% - 96px)'}}>

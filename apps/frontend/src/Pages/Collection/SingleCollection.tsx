@@ -27,6 +27,9 @@ import { ADMINS } from "@architech/lib";
 import styles from './Collection.module.scss';
 import VerifiedBadge from "../../Components/Verified";
 import HiddenBanner from "../../Components/HiddenBanner/HiddenBanner";
+import SmallLoader from "../../Components/SmallLoader";
+import { QueryClient } from "../../Utils/queryClient";
+import { DevInfo } from "../../Interfaces/interfaces";
 
 const statusOptions = [
     'For Sale',
@@ -44,7 +47,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
     const [tokens, setTokens] = useState<Token[]>([])
     const { collection: fullCollection } = useLoaderData() as { collection: GetCollectionResponse};
     const collection = fullCollection?.collection; 
-    const { user: wallet } = useUser();
+    const { user: wallet, devMode } = useUser();
 
     const [isEditing, setIsEditing] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -54,6 +57,25 @@ const SingleCollection: FC<any> = (): ReactElement => {
     
     const [sortBy, setSortBy] = useState<SortOption>(sortOptions[0])
     const [page, setPage] = useState(1);
+    
+    const [devInfo, setDevInfo] = useState<DevInfo>()
+
+    const getDevInfo = async() => {
+      if (!devMode) return;
+      try {
+        const contract = await QueryClient.getContract(fullCollection.collection.address)
+        const code = await QueryClient.getCodeDetails(contract.codeId)
+        const metadata = await QueryClient.getContractMetadata(fullCollection.collection.address)
+        setDevInfo({contract, code, metadata})
+      } catch(err) {
+        console.error(err)
+        toast.error('Failed to load dev info. See the console for more information.')
+      }
+    }
+
+    useEffect(()=>{
+      getDevInfo();
+    },[devMode])
 
     const addTraitFilter = (trait: cw721.Trait) => {
         Object.keys(trait).forEach((key: any)=>{
@@ -167,6 +189,19 @@ const SingleCollection: FC<any> = (): ReactElement => {
                                 <CollectionStats collection={collection} asks={fullCollection.asks} />
                             </div>
                         </div>
+
+                        {/* ### Dev Mode Info ### */}
+                        {devMode && 
+                          <>{
+                            !!devInfo ?
+                              <div>
+                                Code ID: {devInfo.contract.codeId}&nbsp;&nbsp;&nbsp;&nbsp;Hash: {devInfo.code.checksum}
+                              </div>
+                            :
+                              <SmallLoader />  
+                          }</>
+                        }
+
                         <div style={{position: 'absolute', right: '16px', top: '16px'}}>
                             { (wallet && (collection.creator === wallet.address || ADMINS.includes(wallet.address))) &&
                                 <Col className='d-flex flex-col justify-content-center'>
