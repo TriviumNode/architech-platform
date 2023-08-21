@@ -127,6 +127,7 @@ export interface Config {
   beneficiary: Addr;
   launch_time: Timestamp;
   mint_limit?: number | null;
+  nft_admin: Addr;
   price: Payment;
   whitelist_launch_time?: Timestamp | null;
   wl_price?: Payment | null;
@@ -139,6 +140,7 @@ export interface GetMintLimitResponse {
 }
 export interface GetMintStatusResponse {
   launch_time: Uint64;
+  pending: number;
   remaining: number;
   whitelist_launch_time?: Uint64 | null;
 }

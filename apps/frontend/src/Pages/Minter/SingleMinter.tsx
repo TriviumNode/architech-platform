@@ -241,11 +241,13 @@ const SingleMinter: FC<any> = (): ReactElement => {
           {
             title: 'Available',
             //@ts-expect-error
-            value: minterStatus !== undefined ? minterStatus.remaining : <SmallLoader />,
+            value: minterStatus !== undefined ? minterStatus.remaining - minterStatus.pending || 0 : <SmallLoader />,
           },
           {
             title: 'Minted',
-            value: collection.totalTokens.toString(),
+            //@ts-expect-error
+            value: minterStatus !== undefined ? (collection.totalTokens + minterStatus?.pending || 0).toString() : <SmallLoader />,
+            // value: (collection.totalTokens + minterStatus?.pending || 0).toString(),
           },
           {
             title: 'Mint Limit',
