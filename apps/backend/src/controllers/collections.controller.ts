@@ -160,13 +160,13 @@ export const getCollectionByAddress = async (req: RequestWithOptionalUser, res: 
     const fullCollection = await queryDbCollectionByAddress(collectionAddress);
 
     if (fullCollection) {
-      if (
-        (fullCollection.collection.hidden || fullCollection.collection.admin_hidden) &&
-        fullCollection.collection.creator !== req.user?.address &&
-        fullCollection.collection.admin !== req.user?.address &&
-        !ADMINS.includes(req.user?.address || 'fake123')
-      )
-        throw new HttpException(404, 'Collection not found.');
+      // Hide Hidden collections from everyone except creator and Architech Admins
+      const isHidden = fullCollection.collection.hidden || fullCollection.collection.admin_hidden;
+      const isAdmin = req.user ? ADMINS.includes(req.user.address) : false;
+      const isCreator = req.user
+        ? fullCollection.collection.creator === req.user.address || fullCollection.collection.admin === req.user.address
+        : false;
+      if (isHidden && !isCreator && !isAdmin) throw new HttpException(404, 'Collection not found.');
 
       // Increment view count
       const updated = await addCollectionView({

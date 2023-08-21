@@ -53,15 +53,24 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
 export const getUserByAddress = async (req: RequestWithOptionalUser, res: Response, next: NextFunction) => {
   try {
     const userAddr: string = req.params.address;
+    const requesterIsUser = req.user ? userAddr === req.user.address : false;
+    const isAdmin = req.user ? ADMINS.includes(req.user.address) : false;
 
-    const hideHiddenUnlessOwner = userAddr === req.user?.address || ADMINS.includes(req.user?.address || 'fake1') ? {} : { hidden: false };
-
-    const ownedTokens: Token[] = await TokenModel.find({ owner: userAddr }).populate('collectionInfo');
+    // Get Created Collections. Hide hidden collections unless requester IS (the user OR an Architech Admin)
+    const hideHiddenUnlessOwner = requesterIsUser || isAdmin ? {} : { hidden: false, admin_hidden: false };
     const ownedCollections: Collection[] = await CollectionModel.find({ creator: userAddr, ...hideHiddenUnlessOwner });
     const fullCollections = await collectionsToResponse(ownedCollections);
+
+    // Get Owned Tokens
+    const ownedTokens: Token[] = await TokenModel.find({ owner: userAddr }).populate('collectionInfo');
+
+    // Get Favorites
     const favorites = await findUserFavorites(userAddr);
+
+    // Get User Profile
     const userData: User | undefined = await userModel.findOne({ address: userAddr }).lean();
 
+    // Resolve Arch ID
     const archId = await resolveArchId(queryClient, ARCHID_ADDRESS, userAddr);
 
     const response: GetUserProfileResponse = {
