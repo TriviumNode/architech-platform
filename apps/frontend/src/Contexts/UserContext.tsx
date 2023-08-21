@@ -50,6 +50,8 @@ export interface UserContextState {
   walletStatus: STATUS;
   connectWallet: (()=>void)
   refreshProfile: (()=>Promise<void>)
+  devMode: boolean;
+  toggleDevMode: ()=>void;
 }
 
 const whatever = async() => {}
@@ -60,7 +62,9 @@ const UserContext = createContext<UserContextState>({
   balances: undefined,
   connectWallet: whatever,
   refreshProfile: whatever,
+  toggleDevMode: whatever,
   user: undefined,
+  devMode: false,
 });
 
 const KEY = 'KEPLR_CONNECTED_ARCHITECH';
@@ -73,6 +77,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
   const [user, setUser] = useState<CurrentWallet>();
   const [balances, setBalances] = useState<Balances>();
   const [walletStatus, setWalletStatus] = useState<STATUS>('DISCONNECTED');
+  const [devMode, setDevMode] = useState(false);
 
   window.addEventListener("keplr_keystorechange", () => {
     console.log("Keplr wallet changed!");
@@ -101,6 +106,10 @@ export const UserProvider = ({ children }: Props): ReactElement => {
       // Display modal
       setWalletStatus('SWITCH')
     }
+  }
+
+  const toggleDevMode = () => {
+    setDevMode(!devMode);
   }
 
   // useEffect(()=>{   
@@ -248,7 +257,9 @@ export const UserProvider = ({ children }: Props): ReactElement => {
     balances,
     walletStatus,
     connectWallet,
-    refreshProfile
+    refreshProfile,
+    devMode,
+    toggleDevMode,
   };
 
   const LoadingModal = ({msg}: {msg: string}) =>

@@ -14,6 +14,7 @@ import styles from './Main.module.scss'
 export default function MainLayout() {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const {devMode} = useUser()
 
   const [latestBlockTime, setLatestBlockTime] = useState<Date>()
 
@@ -48,10 +49,10 @@ export default function MainLayout() {
 
       <header>
         <Navbar openMenu={()=>setMenuOpen(true)} />
-        { !process.env.REACT_APP_CHAIN_ID.startsWith('archway-') &&
+        { (!process.env.REACT_APP_CHAIN_ID.startsWith('archway-') || devMode) &&
           <div className='lightText10 d-flex flex-wrap card mb8 align-items-center justify-content-between mb8' style={{overflow: "hidden", minHeight: '48px', background: 'orange', padding: '0 16px'}}>
             <div className='d-flex'>
-              <h3 style={{color: '#222'}}>Testnet Mode  </h3>
+              <h3 style={{color: '#222'}}>{devMode ? 'Developer' : 'Testnet'} Mode</h3>
               <div className='ml16'>
                 <div>{process.env.REACT_APP_CHAIN_ID}</div>
                 <div>{process.env.REACT_APP_RPC_URL}</div>

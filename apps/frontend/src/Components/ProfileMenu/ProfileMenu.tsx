@@ -6,8 +6,11 @@ import { positionMatchWidth } from "@reach/popover";
 import styles from './hoverMenu.module.scss';
 import SmallLoader from "../SmallLoader";
 import { toast } from "react-toastify";
-import { claimRewards } from "@architech/lib";
+import { ADMINS, claimRewards } from "@architech/lib";
 import ArchDenom from "../ArchDenom";
+
+//@ts-expect-error
+import { Switch } from 'react-switch-input';
 
 interface HoverMenuProps {
     content: any;
@@ -15,7 +18,7 @@ interface HoverMenuProps {
 
 export default function ProfileMenu(props: HoverMenuProps) {
   let { content } = props;
-  const {user, balances} = useUser()
+  const {user, balances, devMode, toggleDevMode} = useUser()
 
   let [isOverButton, setIsOverButton] = useState(false);
   let [isOverList, setIsOverList] = useState(false);
@@ -158,6 +161,24 @@ export default function ProfileMenu(props: HoverMenuProps) {
           >
               <Link to={`nfts/import`}>Import Collection</Link>
           </MenuItem>
+          {(!!user && ADMINS.includes(user.address)) &&
+          <>
+            <MenuItem
+              onSelect={() => {
+                setIsOpen(false);
+              }}
+            >
+                <Link to={`admindash`}>Admin Dashboard</Link>
+            </MenuItem>
+            <div className='d-flex'>
+              <span>Developer Mode</span>
+              <Switch
+                checked={devMode}
+                onChange={(e: any) => toggleDevMode()}
+              />
+            </div>
+          </>
+          }
         </MenuItems>
       </MenuPopover>
     </Menu>

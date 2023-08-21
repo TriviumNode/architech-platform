@@ -1,3 +1,6 @@
+import { ContractMetadata } from "@archwayhq/arch3.js/build";
+import { CodeDetails, Contract } from "@cosmjs/cosmwasm-stargate";
+
 export interface ImportCollectionData {
     name: string;
     description: string;
@@ -22,4 +25,10 @@ export interface UpdateProfileData {
     discord: string;
     telegram: string;
     profileImage: File | undefined;    
+}
+
+export type DevInfo = {
+  contract: Contract;
+  code: CodeDetails;
+  metadata: ContractMetadata | undefined;
 }
