@@ -172,7 +172,6 @@ export const processCollectionTraits = async (collection: Collection) => {
 };
 
 export const ensureToken = async (collectionAddress: string, tokenId: string) => {
-  console.log('Ensuring tokenId', tokenId);
   // Check if already imported
   const findToken = await TokenModel.findOne({ collectionAddress, tokenId }).populate('collectionInfo').lean();
 

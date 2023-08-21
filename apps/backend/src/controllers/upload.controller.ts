@@ -6,6 +6,7 @@ import path from 'path';
 import AWS from 'aws-sdk';
 import { HttpException } from '@/exceptions/HttpException';
 import { FILEBASE_BUCKET, FILEBASE_S3_KEY, FILEBASE_S3_KEY_ID } from '@/config';
+import promiseConcurrency from 'promise-concurrency';
 
 const s3 = new AWS.S3({
   apiVersion: '2006-03-01',
@@ -76,21 +77,27 @@ export const uploadImage = async (req: RequestWithUser, res: Response, next: Nex
   // });
 };
 
+const processFile = async (file: any, index: number, responses: any[]) => {
+  console.log('Uploading', file.originalname);
+
+  const cid = await s3Upload(file);
+  responses[index] = {
+    cid,
+    fileName: file.originalname,
+  };
+};
+
 export const uploadImageBatch = async (req: Request, res: Response, next: NextFunction) => {
   const responses: {
     cid: string;
     fileName: string;
   }[] = [];
   //@ts-expect-error no type for file fields
-  for (let i = 0; i < req.files.images.length; i++) {
-    //@ts-expect-error no type for file fields
-    const file = req.files.images[i];
-    const cid = await s3Upload(file);
-    responses.push({
-      cid,
-      fileName: file.originalname,
-    });
-  }
+  const queue = req.files.images.map((f: File, i: number) => () => processFile(f, i, responses));
+
+  // Upload 5 at a time
+  await promiseConcurrency(queue, 5);
+
   res.status(200).json(responses);
 };
 
