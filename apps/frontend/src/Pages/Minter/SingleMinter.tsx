@@ -360,7 +360,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
                 ))}
               </div>
             </div>
-            { !!(collection.traits && collection.traits.length) &&
+            {/* { !!(collection.traits && collection.traits.length) &&
               <div style={{margin: '0 48px 12px 48px', width: 'fit-content', maxWidth: 'calc(100% - 96px)'}}>
                 <div className='lightText12 mb8'>Unique Traits</div>
                 <div className='d-flex flex-wrap gap8' style={{margin: '0 8px', width: 'calc(100% - 16px)'}}>
@@ -375,7 +375,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
                 })}
                 </div>
               </div>
-            }
+            } */}
           </div>
           <div style={{padding: '32px'}} className='d-flex flex-column gap8'>
             {!!collection.collectionMinter.whitelist_launch_time &&
