@@ -53,7 +53,7 @@ class CollectionsRoute implements Routes {
     this.router.get(`${this.path}/featured`, getTrendingFeaturedCollections);
 
     // Get collection details
-    // Authentication not required, only used to store view history
+    // Authentication not required, only used to store view history and to prevent non-owners from viewing hidden collections
     this.router.get(`${this.path}/:contractAddr`, optionalAuthMiddleware, getCollectionByAddress);
 
     // Import collection

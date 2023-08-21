@@ -54,10 +54,10 @@ export const getUserByAddress = async (req: RequestWithOptionalUser, res: Respon
   try {
     const userAddr: string = req.params.address;
 
-    const hideHiddenUnlessOwner = userAddr === req.user?.address ? {} : { hidden: false };
+    const hideHiddenUnlessOwner = userAddr === req.user?.address || ADMINS.includes(req.user?.address || 'fake1') ? {} : { hidden: false };
 
-    const ownedTokens: Token[] = await TokenModel.find({ owner: userAddr, ...hideHiddenUnlessOwner }).populate('collectionInfo');
-    const ownedCollections: Collection[] = await CollectionModel.find({ creator: userAddr });
+    const ownedTokens: Token[] = await TokenModel.find({ owner: userAddr }).populate('collectionInfo');
+    const ownedCollections: Collection[] = await CollectionModel.find({ creator: userAddr, ...hideHiddenUnlessOwner });
     const fullCollections = await collectionsToResponse(ownedCollections);
     const favorites = await findUserFavorites(userAddr);
     const userData: User | undefined = await userModel.findOne({ address: userAddr }).lean();

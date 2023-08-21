@@ -163,7 +163,8 @@ export const getCollectionByAddress = async (req: RequestWithOptionalUser, res: 
       if (
         (fullCollection.collection.hidden || fullCollection.collection.admin_hidden) &&
         fullCollection.collection.creator !== req.user?.address &&
-        fullCollection.collection.admin !== req.user?.address
+        fullCollection.collection.admin !== req.user?.address &&
+        !ADMINS.includes(req.user?.address || 'fake123')
       )
         throw new HttpException(404, 'Collection not found.');
 
