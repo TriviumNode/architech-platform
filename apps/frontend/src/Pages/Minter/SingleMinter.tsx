@@ -332,11 +332,15 @@ const SingleMinter: FC<any> = (): ReactElement => {
 
           {/* ### Dev Mode Info ### */}
           {devMode && 
-            !!devInfo ?
+          <>
+            {!!devInfo ?
               <div>
                 Code ID: {devInfo.contract.codeId}&nbsp;&nbsp;&nbsp;&nbsp;Hash: {devInfo.code.checksum}
               </div>
-            : <SmallLoader />    
+            :
+              <SmallLoader />  
+            }
+          </>  
           }
 
 
