@@ -49,6 +49,7 @@ export const MintProvider = ({ children }: Props): ReactElement => {
     if (pendingMints.length && !toastId.current) notify();
     else if (pendingMints.length) refresh();
     else {
+      console.log('Closing Websocket.')
       dismiss();
       if (ws) ws.close()
     }
@@ -89,9 +90,11 @@ export const MintProvider = ({ children }: Props): ReactElement => {
     const newMints = [...pendingMints, newMint];
     setPendingMints(newMints)
 
-    if (!ws){
+    if (!ws || ws.readyState > 1){
+      console.log('Setting up new WS...');
       const newWs = new WebSocket(WS_URL);
       newWs.addEventListener("open", (event) => {
+        console.log('Websocket opened!')
         const subscribe = {
           jsonrpc: "2.0",
           method: "subscribe",
@@ -104,6 +107,8 @@ export const MintProvider = ({ children }: Props): ReactElement => {
       });
       newWs.addEventListener("message", handleWsMessage);
       setWs(newWs)
+    } else {
+      console.log('Using existing WS');
     }
   }
 
@@ -142,7 +147,7 @@ export const MintProvider = ({ children }: Props): ReactElement => {
               <span style={{fontSize: '11px'}}>Click to view</span>
             </div>,
             {
-              autoClose: 15000
+              autoClose: false
             }
           )
           refreshProfile();
@@ -156,7 +161,7 @@ export const MintProvider = ({ children }: Props): ReactElement => {
             <span style={{fontSize: '11px'}}>Click to view</span>
           </div>,
           {
-            autoClose: 15000
+            autoClose: false
           }
         );
         refreshProfile();

@@ -571,12 +571,12 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
             console.log('Import Response', response)
             setStatus("COMPLETE")
             setTaskMessage(
-              <p>
+              <div>
                 Collection
                 <h5>{detailState.name}</h5>
                 has been created.<br /><br />
                 Here's some things to do next:
-              </p>)
+              </div>)
         } catch(err: any) {
             console.error(err)
             setStatus("ERROR")

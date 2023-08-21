@@ -4,7 +4,7 @@ export const getAddresses = (chainId: string) => {
             return {
                 CREDIT_ADDRESS: 'archway1dex9s7j726jd3an9vk0g00s9cm608jtznzjueczuzcvs2t9zralqhg4f5h',
                 MARKETPLACE_ADDRESS: 'archway1vg04jejq07cxulffmmgjtxs0gfsezx99a2ajtwuakrc8krf354rqgv8t4a',
-                NFT_FACTORY_ADDRESS: 'archway1snpedw2xryfl49c76qym66v4wvnupgmjwl08k5tep0nnfx5prjksz8qfg3',
+                NFT_FACTORY_ADDRESS: 'archway1u653qh27llk495e2fx4899gh6sntvgnkd6rd7sw3p6q8f6pzxmrsuy6h95',
                 CW721_CODE_ID: 44,
                 ARCHID_ADDRESS: 'archway1275jwjpktae4y4y0cdq274a2m0jnpekhttnfuljm6n59wnpyd62qppqxq0',
             };
@@ -13,7 +13,7 @@ export const getAddresses = (chainId: string) => {
             return {
                 CREDIT_ADDRESS: 'archway1xmlcasxa8xs9saz2avk9t4pcjyf6h94skhwdhm6vsqrsvhmvq96qnxvhku',
                 MARKETPLACE_ADDRESS: 'archway13f8fv36qm87kaj3hfl9fspyv2p6jusvu92z59z3f0vgs975xjy4qwdg4cg',
-                NFT_FACTORY_ADDRESS: 'archway147e5025c282fuy2v4an08px47ay8972hq2z9lqddkt5yc9msjvjqgs5aer',
+                NFT_FACTORY_ADDRESS: 'archway1t0cf6wljqcn4ygz6zkgwt2zcw0gj0zhs62pglf04ppcwvsw9zpuq7ltw3j',
                 CW721_CODE_ID: 219,
                 ARCHID_ADDRESS: 'archway1lr8rstt40s697hqpedv2nvt27f4cuccqwvly9gnvuszxmcevrlns60xw4r',
             };

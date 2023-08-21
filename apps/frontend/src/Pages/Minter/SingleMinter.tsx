@@ -1,4 +1,4 @@
-import { denomToHuman, epochToDate, findDenom, findToken, getConfig, getMintLimit, getMintStatus, mintWithMinter, noDenom, truncateAddress, unknownDenom } from "@architech/lib";
+import { denomToHuman, epochToDate, findDenom, findToken, getConfig, getMintLimit, getMintStatus, mintWithMinter, noDenom, parseError, truncateAddress, unknownDenom } from "@architech/lib";
 import { cw721, GetCollectionResponse, Denom, minter, copyMinter, CollectionMinterI, cw2981 } from "@architech/types";
 import { faCheck, faChevronRight, faClock, faRefresh, faX } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -81,7 +81,6 @@ const SingleMinter: FC<any> = (): ReactElement => {
 
       try {
         const result: minter.GetMintLimitResponse = await getMintLimit({ client: user.client, contract: collection.collectionMinter.minter_address, buyer: user.address });
-        console.log('*Buyer Mint Status*', result);
         setBuyerStatus(result);
       } catch (error: any) {
         console.error('Failed to check buyer whitelist status:', error.toString())
@@ -98,7 +97,6 @@ const SingleMinter: FC<any> = (): ReactElement => {
         setMinterStatus(status);
 
         const {config} = await getConfig({client: QueryClient, contract: collection.collectionMinter.minter_address})
-        console.log(config)
         setCopyMetadata(config.metadata)
       } catch (error: any) {
         console.error('Failed to check minter status:', error.toString())
@@ -120,7 +118,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
           revalidator.revalidate()
       } catch (err: any) {
           console.error('Error refreshing collection:', err);
-          toast.error(err.toString())
+          toast.error(parseError(err))
       } finally {
           // setIsRefreshing(false);
       }
@@ -171,9 +169,11 @@ const SingleMinter: FC<any> = (): ReactElement => {
         refreshProfile();
         toast.success('Successfully minted!')
       }
+      checkWhitelist();
+      queryMinter();
     } catch(err: any) {
       console.error(err)
-      toast.error(err.toString())
+      toast.error(parseError(err))
     } finally {
       setLoadingTx(false);
     }
@@ -338,9 +338,9 @@ const SingleMinter: FC<any> = (): ReactElement => {
               <div style={{margin: '0 48px 12px 48px', width: 'fit-content', maxWidth: 'calc(100% - 96px)'}}>
                 <div className='lightText12 mb8'>Unique Traits</div>
                 <div className='d-flex flex-wrap gap8' style={{margin: '0 8px', width: 'calc(100% - 16px)'}}>
-                {collection.traits.map(a=>{
+                {collection.traits.map((a, i)=>{
                   return (
-                    <div className={`${styles.trait} grayCard`}>
+                    <div className={`${styles.trait} grayCard`} key={i}>
                       <span className={styles.type}>{a.trait_type}</span>
                       <hr />
                       <span className={styles.value}>{a.value}</span>
@@ -408,9 +408,9 @@ const SingleMinter: FC<any> = (): ReactElement => {
                   <div style={{margin: '0 48px 12px 48px', width: 'fit-content', maxWidth: 'calc(100% - 96px)'}}>
                     <div className='lightText12 mb8'>Traits</div>
                     <div className='d-flex flex-wrap gap8' style={{margin: '0 8px', width: 'calc(100% - 16px)'}}>
-                    {copyMetadata.attributes.map(a=>{
+                    {copyMetadata.attributes.map((a, i)=>{
                       return (
-                        <div className={`${styles.trait} grayCard`}>
+                        <div className={`${styles.trait} grayCard`} key={i}>
                           <span className={styles.type}>{a.trait_type}</span>
                           <hr />
                           <span className={styles.value}>{a.value}</span>
