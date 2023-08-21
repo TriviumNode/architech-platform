@@ -6,7 +6,7 @@
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
 import { Coin, StdFee } from "@cosmjs/amino";
-import { ExecuteMsg, Addr, Uint64, Payment, Uint128, Metadata, Trait, Fee, InstantiateMsg, QueryMsg, GetMintersResponse, Minter, GetNoisProxyResponse, ArrayOfMinter } from "./Factory.types";
+import { ExecuteMsg, Addr, Uint64, Payment, Uint128, Binary, Metadata, Trait, Fee, InstantiateMsg, QueryMsg, GetMintersResponse, Minter, GetNoisProxyResponse, ArrayOfMinter } from "./Factory.types";
 export interface FactoryReadOnlyInterface {
   contractAddress: string;
   getMinters: () => Promise<GetMintersResponse>;
@@ -114,6 +114,25 @@ export interface FactoryInterface extends FactoryReadOnlyInterface {
   }: {
     newProxy: string;
   }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
+  changeRandomCode: ({
+    newCode
+  }: {
+    newCode: Uint64;
+  }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
+  changeCopyCode: ({
+    newCode
+  }: {
+    newCode: Uint64;
+  }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
+  migrateMinter: ({
+    migrateMsg,
+    minterAddress,
+    newCodeId
+  }: {
+    migrateMsg: Binary;
+    minterAddress: string;
+    newCodeId: Uint64;
+  }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
 }
 export class FactoryClient extends FactoryQueryClient implements FactoryInterface {
   client: SigningCosmWasmClient;
@@ -130,6 +149,9 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
     this.changeAdmin = this.changeAdmin.bind(this);
     this.changeFees = this.changeFees.bind(this);
     this.changeNoisProxy = this.changeNoisProxy.bind(this);
+    this.changeRandomCode = this.changeRandomCode.bind(this);
+    this.changeCopyCode = this.changeCopyCode.bind(this);
+    this.migrateMinter = this.migrateMinter.bind(this);
   }
 
   initRandomProject = async ({
@@ -262,6 +284,45 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
     return await this.client.execute(this.sender, this.contractAddress, {
       change_nois_proxy: {
         new_proxy: newProxy
+      }
+    }, fee, memo, funds);
+  };
+  changeRandomCode = async ({
+    newCode
+  }: {
+    newCode: Uint64;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      change_random_code: {
+        new_code: newCode
+      }
+    }, fee, memo, funds);
+  };
+  changeCopyCode = async ({
+    newCode
+  }: {
+    newCode: Uint64;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      change_copy_code: {
+        new_code: newCode
+      }
+    }, fee, memo, funds);
+  };
+  migrateMinter = async ({
+    migrateMsg,
+    minterAddress,
+    newCodeId
+  }: {
+    migrateMsg: Binary;
+    minterAddress: string;
+    newCodeId: Uint64;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      migrate_minter: {
+        migrate_msg: migrateMsg,
+        minter_address: minterAddress,
+        new_code_id: newCodeId
       }
     }, fee, memo, funds);
   };

@@ -50,6 +50,20 @@ export type ExecuteMsg = {
   change_nois_proxy: {
     new_proxy: string;
   };
+} | {
+  change_random_code: {
+    new_code: Uint64;
+  };
+} | {
+  change_copy_code: {
+    new_code: Uint64;
+  };
+} | {
+  migrate_minter: {
+    migrate_msg: Binary;
+    minter_address: string;
+    new_code_id: Uint64;
+  };
 };
 export type Addr = string;
 export type Uint64 = string;
@@ -67,6 +81,7 @@ export type Payment = {
   };
 };
 export type Uint128 = string;
+export type Binary = string;
 export interface Metadata {
   animation_url?: string | null;
   attributes?: Trait[] | null;
