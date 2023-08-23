@@ -13,7 +13,7 @@ class UploadRoute implements Routes {
   }
 
   private initializeRoutes() {
-    this.router.post(`${this.path}/batch`, authMiddleware, uploadBatch.fields([{ name: 'images', maxCount: 1000 }]), uploadImageBatch);
+    this.router.post(`${this.path}/batch`, authMiddleware, uploadBatch.fields([{ name: 'images', maxCount: 1050 }]), uploadImageBatch);
     this.router.post(`${this.path}`, authMiddleware, upload5mb.single('image'), uploadImage);
   }
 }
