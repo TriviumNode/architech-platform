@@ -122,7 +122,7 @@ export const editUser = async (req: RequestWithImages, res: Response, next: Next
       return;
     }
 
-    if (req.user._id !== userId && !ADMINS.includes(req.user.address)) {
+    if (req.user._id.toString() !== userId && !ADMINS.includes(req.user.address)) {
       res.status(403).send('Unauthorized');
       return;
     }
