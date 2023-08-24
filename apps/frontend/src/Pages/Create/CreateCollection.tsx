@@ -626,13 +626,13 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     </button>
                   </Col>
                   <Col>
-                    <button type='button' onClick={()=>selectType('RANDOM')} disabled={false} >
+                    <button type='button' onClick={()=>selectType('RANDOM')} disabled={true} >
                         <h3>Random Minter</h3>
                         <p className='lightText12'>
                             Preload NFTs in bulk, then distribute them one at a time randomly. 
                             Great for PFP collectons.
                         </p>
-                        {/* <h5>Available Soon</h5> */}
+                        <h5>Available Soon</h5>
                     </button>
                   </Col>
                   <Col>
