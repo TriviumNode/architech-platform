@@ -57,7 +57,7 @@ export const mintWithMinter = async({
             amount: '6000000000000000000',
             denom: process.env.GAS_DENOM,
           }],
-          gas: '1000000',
+          gas,
         },
         undefined,
         funds,
