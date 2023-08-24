@@ -1,4 +1,4 @@
-import { ContractMetadata } from "@archwayhq/arch3.js/build";
+import { ContractMetadata, ContractPremium } from "@archwayhq/arch3.js/build";
 import { CodeDetails, Contract } from "@cosmjs/cosmwasm-stargate";
 
 export interface ImportCollectionData {
@@ -31,4 +31,5 @@ export type DevInfo = {
   contract: Contract;
   code: CodeDetails;
   metadata: ContractMetadata | undefined;
+  premium: ContractPremium | undefined;
 }

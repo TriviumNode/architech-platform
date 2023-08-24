@@ -66,7 +66,8 @@ const SingleCollection: FC<any> = (): ReactElement => {
         const contract = await QueryClient.getContract(fullCollection.collection.address)
         const code = await QueryClient.getCodeDetails(contract.codeId)
         const metadata = await QueryClient.getContractMetadata(fullCollection.collection.address)
-        setDevInfo({contract, code, metadata})
+        const premium = await QueryClient.getContractPremium(fullCollection.collection.address)
+        setDevInfo({contract, code, metadata, premium})
       } catch(err) {
         console.error(err)
         toast.error('Failed to load dev info. See the console for more information.')

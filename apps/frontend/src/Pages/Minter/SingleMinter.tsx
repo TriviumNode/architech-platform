@@ -106,7 +106,8 @@ const SingleMinter: FC<any> = (): ReactElement => {
         const contract = await QueryClient.getContract(collection.collectionMinter.minter_address)
         const code = await QueryClient.getCodeDetails(contract.codeId)
         const metadata = await QueryClient.getContractMetadata(collection.collectionMinter.minter_address)
-        setDevInfo({contract, code, metadata})
+        const premium = await QueryClient.getContractPremium(collection.collectionMinter.minter_address)
+        setDevInfo({contract, code, metadata, premium})
 
       } catch (error: any) {
         console.error('Failed to check minter status:', error.toString())
@@ -339,7 +340,11 @@ const SingleMinter: FC<any> = (): ReactElement => {
           <>
             {!!devInfo ?
               <div>
-                Code ID: {devInfo.contract.codeId}&nbsp;&nbsp;&nbsp;&nbsp;Hash: {devInfo.code.checksum}
+                Code ID: {devInfo.contract.codeId}&nbsp;&nbsp;&nbsp;&nbsp;Hash: {devInfo.code.checksum}<br/>
+                Premium:&nbsp;
+                <code>
+                  {JSON.stringify(devInfo.premium?.flatFee,undefined,2)}
+                </code>
               </div>
             :
               <SmallLoader />  
