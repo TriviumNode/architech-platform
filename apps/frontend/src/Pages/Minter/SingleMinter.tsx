@@ -345,6 +345,11 @@ const SingleMinter: FC<any> = (): ReactElement => {
                 <code>
                   {JSON.stringify(devInfo.premium?.flatFee,undefined,2)}
                 </code>
+
+                Metadata:&nbsp;
+                <code>
+                  {JSON.stringify(devInfo.metadata,undefined,2)}
+                </code>
               </div>
             :
               <SmallLoader />  
