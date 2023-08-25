@@ -66,7 +66,7 @@ export const connectKeplrWallet = async(): Promise<{
 
     const {name: keyName} = await window.wallet.getKey(process.env.REACT_APP_CHAIN_ID)
     
-    const offlineSigner = window.wallet.getOfflineSigner(process.env.REACT_APP_CHAIN_ID);
+    const offlineSigner = await window.wallet.getOfflineSignerAuto(process.env.REACT_APP_CHAIN_ID);
     const accounts = await offlineSigner.getAccounts();
 
     const client = await SigningArchwayClient.connectWithSigner(process.env.REACT_APP_RPC_URL, offlineSigner);
