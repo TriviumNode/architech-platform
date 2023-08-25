@@ -1,13 +1,11 @@
-import { CATEGORIES } from "@architech/lib";
 import { FC, ReactElement, useEffect, useRef, useState } from "react";
 import { Col } from "react-bootstrap";
 import { toast } from "react-toastify";
-import MultiSelect from "../../../Components/MultiSelect";
 //@ts-ignore
 import Papa from 'papaparse';
 
 import styles from '../create.module.scss'
-import { cw2981 } from "@architech/types";
+import { cw2981, minter } from "@architech/types";
 import SmallLoader from "../../../Components/SmallLoader";
 import PreloadDropzone, { FileWithPreview } from "../../../Components/PreloadDropzone";
 import Badge from "../../../Components/Badge";
@@ -35,7 +33,8 @@ export interface IdMetadata extends cw2981.Metadata {
 const MinterPreloadPage: FC<{
     state: PreloadState,
     onChange: (detail: PreloadState)=>void;
-}> = ({state, onChange}): ReactElement => {
+    minterStatus: minter.GetMintStatusResponse | undefined;
+}> = ({state, onChange, minterStatus}): ReactElement => {
     const [errors, setErrors] = useState<Partial<PreloadState>>()
     const [parsingCsv, setParsingCsv] = useState(false)
     const [parsingJson, setParsingJson] = useState(false)
@@ -48,6 +47,7 @@ const MinterPreloadPage: FC<{
 
     useEffect(()=>{
         if (!state.json_file) return;
+        updateState({csv_file: undefined})
         setParsingJson(true);
         try {
             state.json_file.text().then((data)=>{
@@ -80,6 +80,7 @@ const MinterPreloadPage: FC<{
 
     useEffect(()=>{
         if (!state.csv_file) return;
+        updateState({json_file: undefined})
         setParsingCsv(true);
         Papa.parse(state.csv_file, {
             header: true,
@@ -126,16 +127,25 @@ const MinterPreloadPage: FC<{
             <div className='d-flex' style={{justifyContent: 'space-between'}}>
                 <h2 className='mb32'>Preload<br />Items</h2>
             </div>
-            <p>
-              Upload a CSV or JSON file to preload items into your random minter.<br />
-              Split large collections into multiple CSV or JSON files to preload in batches.<br />
-              <div className='mt8' />
-              See the <a href="https://docs.architech.zone/preload.html" className='textLink' target='_blank' rel="noreferrer noopener">Architech Documentation</a> for more information.  
-            </p>
-            <div style={{width: 'fit-content'}} className='mb16'>
-                <Badge style={{fontSize: '16px'}}>
-                    {state.items.length} NFTs found
-                </Badge>
+            <div style={{width: 'fit-content'}}>
+              <p>
+                Upload a CSV or JSON file to preload items into your random minter.<br />
+                Split large collections into multiple CSV or JSON files to preload in batches.<br />
+                <span className='mt8 d-block' />
+                See the <a href="https://docs.architech.zone/preload.html" className='textLink' target='_blank' rel="noreferrer noopener">Architech Documentation</a> for more information.  
+              </p>
+              <div className='mb16 d-flex justify-content-between'>
+                  <Badge style={{fontSize: '16px'}}>
+                      {!state.csv_file && !state.json_file ?
+                        'No File Selected'
+                      :
+                        `${state.items.length} NFTs Found in ${state.csv_file ? 'CSV' : state.json_file ? 'JSON' : 'ERROR: Uunknown File Type'}`
+                      }
+                  </Badge>
+                  <Badge style={{fontSize: '16px'}}>
+                      {minterStatus ? minterStatus.remaining : <SmallLoader />} NFTs Already Preloaded
+                  </Badge>
+              </div>
             </div>
             <form className={styles.form}>
                 <div className='d-flex mb24 flex-wrap'>
@@ -189,28 +199,9 @@ const MinterPreloadPage: FC<{
                 <div className='d-flex mb24 flex-wrap'>
                     <Col xs={12} md={true}>
                         <h4>Images</h4>
-                        {/* <label>
-                            Images
-                            <label className={styles.customfileupload}>
-                                <div className='ml16'>
-                                    { state.zip_file ? state.zip_file.name : 'Select a file' }
-                                </div>
-                                <img alt='Upload' src='/upload.svg' style={{maxHeight: '1em' }} className='mr16' />
-                                <input
-                                    type='file'
-                                    accept=".zip"
-                                    onChange={(e)=>{
-                                        if (e.target.files) updateState({zip_file: e.target.files[0]})
-                                    }}
-                                />
-                            </label>
-                        </label>
-                        <div className='lightText11' style={{margin: '4px 8px 0 8px', textAlign: 'right'}}>
-                            Upload a zip file containing images. Images should be PNG, JPG, or GIF and have a name matching the ID of an item uploaded above.
-                        </div> */}
                         <label>
-                            <span>Upload NFT images here. Max size: 5MB each.</span>
-                        <PreloadDropzone disabled={!state.items.length} images={state.images} invalidFiles={state.invalidFiles} setImages={(newImages)=>updateState({images: newImages})} />
+                          <span>Upload NFT images here. Max size: 5MB each.</span>
+                          <PreloadDropzone disabled={!state.items.length} images={state.images} invalidFiles={state.invalidFiles} setImages={(newImages)=>updateState({images: newImages})} />
                         </label>
                     </Col>
                 </div>

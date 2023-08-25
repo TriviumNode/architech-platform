@@ -8,11 +8,11 @@ import styles from './create.module.scss'
 import CollectionDetailPage, { DetailState } from "./CollectionSubPages/CollectionDetailPage";
 import { editCollection, uploadBatch } from "../../Utils/backend";
 import LinksPage, { LinkState } from "./CollectionSubPages/LinksPage";
-import { cw2981, GetCollectionResponse } from "@architech/types";
+import { cw2981, GetCollectionResponse, minter } from "@architech/types";
 import { toast } from "react-toastify";
 import equal from "fast-deep-equal";
 import RewardsPage, { DefaultRewardsState, RewardsState } from "./CollectionSubPages/RewardsPage";
-import { ADMINS, getMetadata, parseError, preloadData, setLaunchTime, setRewardsMetadata } from "@architech/lib";
+import { ADMINS, getMetadata, getMintStatus, parseError, preloadData, setLaunchTime, setRewardsMetadata } from "@architech/lib";
 import SmallLoader from "../../Components/SmallLoader";
 import { QueryClient } from "../../Utils/queryClient";
 import { ContractMetadata } from "@archwayhq/arch3.js/build";
@@ -127,6 +127,8 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     const [metadata, setMetadata] = useState<ContractMetadata>()
     const [loadingMetadata, setLoadingMetadata] = useState(true)
     const [loadMetadataError, setLoadMetadataError] = useState<string>();
+
+    const [minterStatus, setMinterStatus] = useState<minter.GetMintStatusResponse>()
 
     const [popupError, setPopupError] = useState<any>();
 
@@ -246,6 +248,23 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
         setPreloadReady(true);
     },[preloadState.items, preloadState.images])
 
+    const queryMinter = async () => {
+      if (!collection.collectionMinter) return;
+      setMinterStatus(undefined);
+      try {
+        const status = await getMintStatus({ client: QueryClient, contract: collection.collectionMinter.minter_address });
+        setMinterStatus(status);
+      } catch (error: any) {
+        console.error('Failed to check minter state:', error.toString())
+        console.error(error)
+        toast.error('Failed to check minter status')
+      }
+    }
+
+    useEffect(()=>{
+      queryMinter();
+    },[collection.collectionMinter])
+
     const handleDetailChange = (data: DetailState) => {
         setDetailState(data)
     }
@@ -259,7 +278,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
             case page.link==='rewards':
                 return <RewardsPage state={rewardsState} onChange={(data) => setRewardsState(data)} contractAddress={collection.address} metadata={metadata} loadingMetadata={loadingMetadata} loadingMetadataError={loadMetadataError} />
             case page.link==='preload':
-                return <MinterPreloadPage state={preloadState} onChange={(data) => setPreloadState(data)}  />
+                return <MinterPreloadPage state={preloadState} onChange={(data) => setPreloadState(data)} minterStatus={minterStatus} />
             case page.link==='launchtime':
               return <TimesPage state={timesState} onChange={(data) =>setTimesState(data)} collectionType={collection.collectionMinter?.minter_type} collectionMinter={collection.collectionMinter} />
             case page.link==='admin':
@@ -361,6 +380,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                 metadata: cleanMetadata,
             })
             console.log('Preload TX Result', result);
+            queryMinter()
             setPreloadStatus('COMPLETE')
         } catch(err: any) {
             console.error(err);

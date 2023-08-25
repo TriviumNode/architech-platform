@@ -142,7 +142,7 @@ export default function PreloadDropzone(
       color: disabled ? '#232323' : undefined
     }}>
     <section>
-      <div {...getRootProps({className: 'dropzone br8 mb8'})} style={{
+      <div {...getRootProps({className: 'dropzone br8'})} style={{
         padding: '8px',
         border: '2px dashed rgb(0,0,0,0.2)',
         cursor: disabled ? 'default' : 'pointer'
@@ -162,9 +162,11 @@ export default function PreloadDropzone(
 
 
     </section>
-    <aside onClick={noClick}>
-      <div className='grid-4 wide'>{files}</div>
-    </aside>
+    { !!files.length &&
+      <aside onClick={noClick}>
+        <div className='grid-4 wide mt8'>{files}</div>
+      </aside>
+    }
   </div>
   );
 }
