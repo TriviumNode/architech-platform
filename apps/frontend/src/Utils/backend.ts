@@ -55,7 +55,7 @@ export const getLatestListings = async(): Promise<GetLatestListingsResponse[]> =
     return data;
 }
 
-export const getTokens = async(contractAddr: string, query?: URLSearchParams, sortBy: SortOption = 'Name', page = 1, limit = 32): Promise<Token[]> => {
+export const getTokens = async(contractAddr: string, query?: URLSearchParams, sortBy: SortOption = 'Token ID', page = 1, limit = 32): Promise<Token[]> => {
     const url = getApiUrl(`/tokens/collection/${contractAddr}?page=${page}&limit=${limit}&sort=${sortBy}&${(query || '').toString()}`)
     const {data: tokens} = await axios.get(url)
     return tokens;

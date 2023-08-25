@@ -58,7 +58,7 @@ export const getCollectionTokens = async (req: Request, res: Response, next: Nex
     console.log('QUERY STRING', req.query);
     const collectionAddr: string = req.params.collectionAddr;
 
-    const sort: SortOption = (req.query.sort as SortOption) || 'Name';
+    const sort: SortOption = (req.query.sort as SortOption) || 'Token ID';
 
     let traitFilter: cw721.Trait[] = [];
     if (req.query.traits) {

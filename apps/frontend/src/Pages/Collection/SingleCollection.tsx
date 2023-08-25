@@ -11,18 +11,17 @@ import NftTile from "../../Components/NftTile/NftTile";
 import PlaceholdImg from "../../Components/PlaceholdImg";
 import SocialLinks from "../../Components/Socials";
 import SortByButton from "../../Components/SortByButton";
-import { sortOptions } from "../../Components/SortByButton/SortByButton";
+import { tokenSortOptions } from "../../Components/SortByButton/SortByButton";
 import { useUser } from "../../Contexts/UserContext";
 import { getApiUrl, getTokens, refreshCollection } from "../../Utils/backend";
 import { getCollectionName } from "../../Utils/helpers";
-import EditModal from "./EditModal";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowRotateRight, faCheckSquare, faCoffee, faPencil } from '@fortawesome/free-solid-svg-icons'
+import { faPencil } from '@fortawesome/free-solid-svg-icons'
 import { toast } from "react-toastify";
 import sleep from "../../Utils/sleep";
 import { Tooltip } from "react-tooltip";
-import { ADMINS, isAdmin, isCollectionCreator } from "@architech/lib";
+import { isAdmin, isCollectionCreator } from "@architech/lib";
 
 import styles from './Collection.module.scss';
 import VerifiedBadge from "../../Components/Verified";
@@ -56,7 +55,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
     const [statusFilter, setStatusFilter] = useState<string[]>([])
     const [traitFilter, setTraitFilter] = useState<Partial<cw721.Trait>[]>([]);
     
-    const [sortBy, setSortBy] = useState<SortOption>(sortOptions[0])
+    const [sortBy, setSortBy] = useState<SortOption>(tokenSortOptions[0])
     const [page, setPage] = useState(1);
     
     const [devInfo, setDevInfo] = useState<DevInfo>()
@@ -320,12 +319,12 @@ const SingleCollection: FC<any> = (): ReactElement => {
                     }}
                 >
                 <Col xs="auto">
-                    <SortByButton selectedOption={sortBy} setSelected={(option) => updateSortBy(option)} />
+                    <SortByButton selectedOption={sortBy} setSelected={(option) => updateSortBy(option)} sortOptions='TOKEN' />
                 </Col>
                 { tokens.length === 32*page &&
-                <Col xs="auto">
-                    <button type='button' onClick={()=>loadMore()}>Load More</button>
-                </Col>
+                  <Col xs="auto">
+                      <button type='button' onClick={()=>loadMore()}>Load More</button>
+                  </Col>
                 }
 
             </div>

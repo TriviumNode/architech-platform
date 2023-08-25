@@ -41,7 +41,7 @@ export async function findCollectionTokens(
   collectionAddress: string,
   page = 1,
   limit = 30,
-  sort: SortOption = 'Name',
+  sort: SortOption = 'Token ID',
   traitFilter: cw721.Trait[] = [],
 ) {
   if (isEmpty(collectionAddress)) throw new HttpException(400, 'Collection address is empty');
@@ -85,6 +85,11 @@ export async function findCollectionTokens(
     case 'Recently Created':
       sortFilter = {
         createdAt: -1,
+      };
+      break;
+    case 'Token ID':
+      sortFilter = {
+        tokenId: 'asc',
       };
       break;
     default:

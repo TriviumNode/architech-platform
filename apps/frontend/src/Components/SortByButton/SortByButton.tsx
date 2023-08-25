@@ -6,14 +6,16 @@ import { positionMatchWidth } from "@reach/popover";
 import styles from './SortByButton.module.scss';
 import { SortOption } from "@architech/types";
 
-interface HoverMenuProps {
-    selectedOption: SortOption | undefined,
-    setSelected: (option: SortOption)=>void;
+interface SortByProps {
+  selectedOption: SortOption | undefined,
+  setSelected: (option: SortOption)=>void;
+  sortOptions: 'COLLECTION' | 'TOKEN'
 }
 
-export const sortOptions: SortOption[] = ["Name", "Recently Created", "Most Viewed"];
+export const collectionSortOptions: SortOption[] = ["Name", "Recently Created", "Most Viewed"];
+export const tokenSortOptions: SortOption[] = ["Token ID", ...collectionSortOptions];
 
-export default function SortByButton(props: HoverMenuProps) {
+export default function SortByButton(props: SortByProps) {
   let { selectedOption, setSelected } = props;
 
   let [isOverButton, setIsOverButton] = useState(false);
@@ -22,6 +24,8 @@ export default function SortByButton(props: HoverMenuProps) {
   let [isTouchInput, setIsTouchInput] = useState<boolean>();
   let [hasClicked, setHasClicked] = useState<boolean>();
   let button: RefObject<HTMLButtonElement> = useRef(null);
+
+  const sortOptions = props.sortOptions === 'TOKEN' ? tokenSortOptions : collectionSortOptions;
 
   // useLayoutEffect(() => {
   //   if (!button.current) return;
