@@ -7,7 +7,7 @@ import { queryClient as client, queryClient } from '@/utils/chainClients';
 import sleep from '@/utils/sleep';
 import { cw721 } from '@architech/types';
 import equal from 'fast-deep-equal';
-import { updateCollection } from './collections.service';
+import { refreshCollection, updateCollection } from './collections.service';
 import { getAverageColor } from 'fast-average-color-node';
 import { getAllNftInfo, getAsk } from '@architech/lib';
 import TokenModel from '@models/tokens.model';
@@ -222,9 +222,10 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
     console.error('Error querying token Ask:', err);
   }
 
+  // ################################
+  // # Add Token to DB if Not Found #
+  // ################################
   if (!findToken) {
-    // Add to DB
-
     // Get average image color
     let averageColor = '#232323';
     if (metadataExtension.image) {
@@ -237,6 +238,8 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
         );
       }
     }
+
+    // Cleanup Attributes
     const cleanAttributes = [];
     if (metadataExtension.attributes)
       metadataExtension.attributes.forEach(a => {
@@ -262,10 +265,19 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
       averageColor,
       total_views: 0,
     };
+
+    // // Add Token ID to Collection Document
+    // await CollectionModel.updateOne({ collectionAddress }, { $addToSet: { tokenIds: tokenId } });
+
+    // Lets just refresh the entire damn collection
+    await refreshCollection(collectionAddress);
+
+    // Create Token Document, redundant after refresh but fuck it it upserts
     console.log('Creating new token document for', tokenId, 'on', collectionAddress);
     const newToken = await TokenModel.findOneAndUpdate({ tokenId, collectionAddress }, newTokenData, { upsert: true, new: true })
-      .populate('collectionInfo')
+      .populate('collectionInfo') // fresh shit we refreshed above
       .lean();
+
     console.log('New Token Response', newToken.collectionInfo);
     return newToken;
   } else if (
