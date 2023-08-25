@@ -340,6 +340,12 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                           onClick: ()=>setPage("Times & Limits")
                       });
                     }
+                    if (!timesState.unlimited_limit && !timesState.mint_limit) {
+                      newErrorTasks.push({
+                        content: `Enter a mint limit, or enable unlimited mints.`,
+                        onClick: ()=>setPage('Times & Limits')
+                      });
+                    }
                     if (whitelistState.whitelist_price && (whitelistState.amount === '' || !whitelistState.denom)) {
                         newErrorTasks.push({
                             content: `Enter a whitelist price, or disable whitelist pricing.`,
@@ -461,6 +467,18 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                             onClick: ()=>setPage('Financials')
                         })
                     }
+                    if (!timesState.unlimited_limit && !timesState.mint_limit) {
+                      newErrorTasks.push({
+                        content: `Enter a mint limit`,
+                        onClick: ()=>setPage('Times & Limits')
+                      });
+                    }
+                    if (!timesState.unlimited_copies && !timesState.max_copies) {
+                      newErrorTasks.push({
+                        content: `Enter a copy limit`,
+                        onClick: ()=>setPage('Times & Limits')
+                      });
+                    }
                     if (checkErrors(newErrorTasks)) return;
 
                     //@ts-expect-error
@@ -530,8 +548,8 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                       whitelist_launch_time: timesState.whitelist_launch_time ? (timesState.whitelist_launch_time.valueOf() / 1000).toString() : undefined,
                       end_time: timesState.end_time ? (timesState.end_time.valueOf() / 1000).toString() : undefined,
 
-                      mint_limit: timesState.mint_limit ? parseInt(timesState.mint_limit) : undefined,
-                      max_copies: timesState.max_copies ? parseInt(timesState.max_copies) : undefined,
+                      mint_limit: timesState.unlimited_limit ? undefined : parseInt(timesState.mint_limit),
+                      max_copies: timesState.unlimited_copies ? undefined : parseInt(timesState.max_copies),
                       whitelisted: whitelist,
 
                       nft_name: detailState.name,

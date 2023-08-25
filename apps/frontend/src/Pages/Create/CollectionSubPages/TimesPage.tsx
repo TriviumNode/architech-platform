@@ -42,6 +42,8 @@ export interface TimesState {
     end_time: Date | undefined;
     mint_limit: string;
     max_copies: string;
+    unlimited_limit: boolean;
+    unlimited_copies: boolean;
 }
 
 export const DefaultTimesState: TimesState = {
@@ -50,6 +52,8 @@ export const DefaultTimesState: TimesState = {
     end_time: undefined,
     mint_limit: '1',
     max_copies: '',
+    unlimited_limit: false,
+    unlimited_copies: true,
 }
 
 const TimesPage: FC<{
@@ -223,9 +227,14 @@ const TimesPage: FC<{
                                   Number of copies each address can mint.
                               </div>
                               <input
-                                  value={state.mint_limit}
+                                  value={state.unlimited_limit ? 'Unlimited' : state.mint_limit}
                                   onChange={(e)=>updateState({mint_limit: e.target.value.replace(/[^0-9]/gi, '')})}
+                                  disabled={state.unlimited_limit}
                               />
+                          </label>
+                          <label className='d-block' style={{textAlign: 'right'}}>
+                            <input type="checkbox" checked={state.unlimited_limit} onChange={(e)=>{updateState({unlimited_limit: !state.unlimited_limit})}} />
+                            Unlimited Mints
                           </label>
                       </Col>
                       { collectionType === 'COPY' &&
@@ -236,9 +245,14 @@ const TimesPage: FC<{
                                   Total number of copies that can be minted.
                               </div>
                               <input
-                                  value={state.max_copies}
+                                  value={state.unlimited_copies ? 'Unlimited' : state.max_copies}
                                   onChange={(e)=>updateState({max_copies: e.target.value.replace(/[^0-9]/gi, '')})}
+                                  disabled={state.unlimited_copies}
                               />
+                          </label>
+                          <label className='d-block' style={{textAlign: 'right'}}>
+                            <input type="checkbox" checked={state.unlimited_copies} onChange={(e)=>{updateState({unlimited_copies: !state.unlimited_copies})}} />
+                            Unlimited Copies
                           </label>
                       </Col>
                   }
