@@ -86,6 +86,15 @@ const TimesPage: FC<{
         onChange({...state, ...newState})
     }
 
+    const updateMintLimit = (e: any) => {
+      e.preventDefault();
+      let newNum = parseInt(e.target.value.replace(/[^0-9]/gi, ''));
+      if (newNum > 255) {
+        newNum = 255
+      }
+      updateState({mint_limit: newNum.toString()})
+    }
+
     const handleChangeLaunchTime = (e: any) => {
         if (!e.target.validity.valid) return;
 
@@ -145,20 +154,6 @@ const TimesPage: FC<{
                                 Time allow minting for any address.
                             </div>
                             <input
-                                // defaultValue={
-                                //   getDefaultValue(
-                                //     state.launch_time ? state.launch_time
-                                //     : collectionMinter?.launch_time ? new Date(parseInt(collectionMinter.launch_time) * 1000)
-                                //     : undefined
-                                //   )
-                                // }
-                                // value={
-                                //   getDefaultValue(
-                                //     state.launch_time ? state.launch_time
-                                //     : collectionMinter?.launch_time ? new Date(parseInt(collectionMinter.launch_time) * 1000)
-                                //     : undefined
-                                //   )
-                                // }
                                 value={
                                   getDefaultValue(
                                     state.launch_time ? state.launch_time
@@ -223,12 +218,12 @@ const TimesPage: FC<{
                       <Col xs={collectionType === 'COPY' ? 6 : 4}>
                           <label>
                               Mint Limit
-                              <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
-                                  Number of copies each address can mint.
+                              <div className='lightText10 d-flex justify-content-between' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
+                                  <div>Number of copies each address can mint.</div><div>Max: 255</div>
                               </div>
                               <input
                                   value={state.unlimited_limit ? 'Unlimited' : state.mint_limit}
-                                  onChange={(e)=>updateState({mint_limit: e.target.value.replace(/[^0-9]/gi, '')})}
+                                  onChange={updateMintLimit}
                                   disabled={state.unlimited_limit}
                               />
                           </label>
