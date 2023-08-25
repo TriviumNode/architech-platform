@@ -188,6 +188,14 @@ export const UserProvider = ({ children }: Props): ReactElement => {
 
   const connectKeplr = async (wallet: any) => {
     window.wallet = wallet;
+
+    if (window.keplr){
+      window.keplr.defaultOptions = {
+        sign: {
+          preferNoSetFee: true,
+        }
+      }
+    }
     try {
       setWalletStatus('LOADING_CONNECT');
       const { client, address, pubKey, keyName } = await connectKeplrWallet();

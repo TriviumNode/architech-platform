@@ -148,7 +148,6 @@ const SingleMinter: FC<any> = (): ReactElement => {
       if (buyerStatus.whitelisted) {
         console.log('Whitelist Mint')
         const result = await mintWithMinter({
-          gas: collection.collectionMinter.minter_type === 'RANDOM' ? '4000000' : undefined,
           client: user.client,
           signer: user.address,
           minter_contract: collection.collectionMinter.minter_address,
@@ -163,7 +162,6 @@ const SingleMinter: FC<any> = (): ReactElement => {
       } else {
         console.log('Public Mint')
         const result = await mintWithMinter({
-          gas: collection.collectionMinter.minter_type === 'RANDOM' ? '6000000' : undefined,
           client: user.client,
           signer: user.address,
           minter_contract: collection.collectionMinter.minter_address,

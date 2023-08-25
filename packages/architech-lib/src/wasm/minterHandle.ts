@@ -36,7 +36,6 @@ export const mintWithMinter = async({
     signer,
     minter_contract,
     funds,
-    gas = '1000000'
 }:{
     client: SigningArchwayClient,
     signer: string,
@@ -52,13 +51,7 @@ export const mintWithMinter = async({
         signer,
         minter_contract,
         msg,
-        {
-          amount: [{
-            amount: '6000000000000000000',
-            denom: process.env.GAS_DENOM,
-          }],
-          gas,
-        },
+        'auto',
         undefined,
         funds,
     )
