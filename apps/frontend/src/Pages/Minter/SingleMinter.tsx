@@ -313,7 +313,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
                 )}
               </div>
               <span className='lightText14'>Created by&nbsp;</span>
-              <Link style={{overflow: "hidden"}} to={`/profile/${collection.creator}`}>
+              <Link style={{overflow: "hidden"}} to={`/profile/${fullCollection.full_creator.address}`}>
                 {truncateAddress(fullCollection.full_creator.display, process.env.REACT_APP_NETWORK_PREFIX)}
               </Link>
             </div>
