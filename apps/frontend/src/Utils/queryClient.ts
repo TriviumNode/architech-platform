@@ -2,7 +2,7 @@ import { getAddresses } from "@architech/lib";
 import { ArchwayClient } from "@archwayhq/arch3.js";
 import { toast } from "react-toastify";
 
-export const { CREDIT_ADDRESS, MARKETPLACE_ADDRESS, CW721_CODE_ID, NFT_FACTORY_ADDRESS } = getAddresses(process.env.REACT_APP_CHAIN_ID)
+export const { CREDIT_ADDRESS, MARKETPLACE_ADDRESS, CW721_CODE_ID, NFT_FACTORY_ADDRESS, DISABLED_FEATURES } = getAddresses(process.env.REACT_APP_CHAIN_ID)
 console.log('frontend addresses', { CREDIT_ADDRESS, MARKETPLACE_ADDRESS, CW721_CODE_ID })
 
 export let QueryClient: ArchwayClient;

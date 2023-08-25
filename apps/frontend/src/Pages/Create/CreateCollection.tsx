@@ -17,7 +17,7 @@ import FinancialPage, { DefaultFinancialState, FinancialState } from "./CommonSu
 import NftDetailPage, { DefaultNftDetailState, NftDetailState } from "./NftSubPages/NftDetailPage";
 import TimesPage, { DefaultTimesState, TimesState } from "./CollectionSubPages/TimesPage";
 import WhitelistPage, { DefaultWhitelistState, WhitelistState } from "./CollectionSubPages/WhitelistPage";
-import { NFT_FACTORY_ADDRESS } from "../../Utils/queryClient";
+import { DISABLED_FEATURES, NFT_FACTORY_ADDRESS } from "../../Utils/queryClient";
 import { humanToDenom, parseError, randomString } from "@architech/lib";
 import secureRandom from "secure-random";
 import ImagePage from "./NftSubPages/NftImagePage";
@@ -626,22 +626,23 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     </button>
                   </Col>
                   <Col>
-                    <button type='button' onClick={()=>selectType('RANDOM')} disabled={true} >
+                    <button type='button' onClick={()=>selectType('RANDOM')} disabled={DISABLED_FEATURES.includes('RANDOMMINT')} >
                         <h3>Random Minter</h3>
                         <p className='lightText12'>
                             Preload NFTs in bulk, then distribute them one at a time randomly. 
                             Great for PFP collectons.
                         </p>
-                        <h5>Available Soon</h5>
+                        {DISABLED_FEATURES.includes('RANDOMMINT') && <h5>Available Soon</h5> }
                     </button>
                   </Col>
                   <Col>
-                    <button type='button' onClick={()=>selectType('COPY')} >
+                    <button type='button' onClick={()=>selectType('COPY')} disabled={DISABLED_FEATURES.includes('COPYMINT')} >
                         <h3>Copy Minter</h3>
                         <p className='lightText12'>
                             Sell or give away copies of an NFT. Optionally limit by number of copies or time. 
                             Great for tickets and limited edition art.
                         </p>
+                        {DISABLED_FEATURES.includes('COPYMINT') && <h5>Available Soon</h5> }
                     </button>
                   </Col>
                 </div>

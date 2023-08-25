@@ -1,4 +1,15 @@
-export const getAddresses = (chainId: string) => {
+export type Feature = 'RANDOMMINT' | 'COPYMINT'
+
+export type ChainConfig = {
+  CREDIT_ADDRESS: string;
+  MARKETPLACE_ADDRESS: string;
+  NFT_FACTORY_ADDRESS: string;
+  CW721_CODE_ID: number;
+  ARCHID_ADDRESS: string;
+  DISABLED_FEATURES: Feature[];
+}
+
+export const getAddresses = (chainId: string): ChainConfig => {
     switch(chainId){
         case 'archway-1':
             return {
@@ -7,6 +18,7 @@ export const getAddresses = (chainId: string) => {
                 NFT_FACTORY_ADDRESS: 'archway1974a8z4w0ph48nfexf5jt2nqxvmyzz3n9gahfv62d6yalr9fsm3qhln996',
                 CW721_CODE_ID: 44,
                 ARCHID_ADDRESS: 'archway1275jwjpktae4y4y0cdq274a2m0jnpekhttnfuljm6n59wnpyd62qppqxq0',
+                DISABLED_FEATURES: ['RANDOMMINT']
             };
             break;
         case 'constantine-3':
@@ -16,6 +28,7 @@ export const getAddresses = (chainId: string) => {
                 NFT_FACTORY_ADDRESS: 'archway1u5fkvp7q9f32fxjrm6smwgcm69v96fh5t8pfh3qatzgn2mgr5upq8xq7na',
                 CW721_CODE_ID: 219,
                 ARCHID_ADDRESS: 'archway1lr8rstt40s697hqpedv2nvt27f4cuccqwvly9gnvuszxmcevrlns60xw4r',
+                DISABLED_FEATURES: [],
             };
             break;
         case "localnet":
@@ -25,6 +38,7 @@ export const getAddresses = (chainId: string) => {
                 NFT_FACTORY_ADDRESS: 'archway1kjez6dlmzk95jufjrpagz4xfgh3kqgcwsa5pw6yhy5u4a6e6z96qr5fm5p',
                 CW721_CODE_ID: 213,
                 ARCHID_ADDRESS: '',
+                DISABLED_FEATURES: [],
             };
             break;
         default:
