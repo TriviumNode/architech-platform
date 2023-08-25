@@ -22,7 +22,7 @@ import { faArrowRotateRight, faCheckSquare, faCoffee, faPencil } from '@fortawes
 import { toast } from "react-toastify";
 import sleep from "../../Utils/sleep";
 import { Tooltip } from "react-tooltip";
-import { ADMINS } from "@architech/lib";
+import { ADMINS, isAdmin, isCollectionCreator } from "@architech/lib";
 
 import styles from './Collection.module.scss';
 import VerifiedBadge from "../../Components/Verified";
@@ -30,6 +30,7 @@ import HiddenBanner from "../../Components/HiddenBanner/HiddenBanner";
 import SmallLoader from "../../Components/SmallLoader";
 import { QueryClient } from "../../Utils/queryClient";
 import { DevInfo } from "../../Interfaces/interfaces";
+import RefreshButton from "../../Components/RefreshButton";
 
 const statusOptions = [
     'For Sale',
@@ -204,10 +205,11 @@ const SingleCollection: FC<any> = (): ReactElement => {
                         }
 
                         <div style={{position: 'absolute', right: '16px', top: '16px'}}>
-                            { (wallet && (collection.creator === wallet.address || ADMINS.includes(wallet.address))) &&
+                            {/* { (wallet && (collection.creator === wallet.address || ADMINS.includes(wallet.address))) && */}
+                            { (wallet && (isCollectionCreator(wallet.address, collection) || isAdmin(wallet.address))) &&
                                 <Col className='d-flex flex-col justify-content-center'>
                                     {/* <button type="button" onClick={()=>setIsEditing(true)}>Edit</button> */}
-                                    <button
+                                    {/* <button
                                         data-tooltip-id="my-tooltip"
                                         data-tooltip-content="Refresh Collection"
                                         data-tooltip-place="left"
@@ -218,7 +220,8 @@ const SingleCollection: FC<any> = (): ReactElement => {
                                         className='clearButton mr16'
                                     >
                                         <FontAwesomeIcon spin={isRefreshing} size='2x' icon={faArrowRotateRight} />
-                                    </button>
+                                    </button> */}
+                                    <RefreshButton refreshWhat="Collection" spin={isRefreshing} disabled={isRefreshing} onClick={()=>handleRefresh()} />
                                     <LinkButton
                                         style={{color: '#666666', padding: 0, background: '#00000000'}}
                                         to={`/nfts/edit/${collection.address}`}

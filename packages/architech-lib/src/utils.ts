@@ -1,5 +1,6 @@
-import { marketplace } from "@architech/types";
+import { Collection, marketplace } from "@architech/types";
 import BigNumber from "bignumber.js";
+import { ADMINS } from "./constants";
 
 export const resolveIpfs = (uri: string) => {
     const isIpfs = uri.startsWith('ipfs://');
@@ -52,4 +53,12 @@ export function randomString(length: number, chars = '0123456789abcdefghijklmnop
 export const epochToDate = (unixEpoch: number | string) => {
   if (typeof unixEpoch === 'string') unixEpoch = parseInt(unixEpoch);
   return new Date(unixEpoch * 1000)
+}
+
+export const isCollectionCreator = (address: string, collection: Collection) => {
+  return collection.creator === address || collection.admin === address
+}
+
+export const isAdmin = (address: string) => {
+  return ADMINS.includes(address);
 }

@@ -13,6 +13,7 @@ import { DenomImg } from "../../Components/ArchDenom";
 import Badge from "../../Components/Badge";
 import HiddenBanner from "../../Components/HiddenBanner/HiddenBanner";
 import Loader from "../../Components/Loader";
+import RefreshButton from "../../Components/RefreshButton";
 import SmallLoader from "../../Components/SmallLoader";
 import TokenImage from "../../Components/TokenImg";
 import VerifiedBadge from "../../Components/Verified";
@@ -73,6 +74,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
     const [minterStatus, setMinterStatus] = useState<copyMinter.GetMintStatusResponse>();
     const [copyMetadata, setCopyMetadata] = useState<cw2981.Metadata>();
     const [devInfo, setDevInfo] = useState<DevInfo>()
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     const [now, setNow] = useState(new Date())
 
@@ -123,7 +125,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
 
     const handleRefresh = async () => {
       try {
-          // setIsRefreshing(true);
+          setIsRefreshing(true);
           await refreshCollection(collection.address);
           await sleep(750)
           revalidator.revalidate()
@@ -131,7 +133,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
           console.error('Error refreshing collection:', err);
           toast.error(parseError(err))
       } finally {
-          // setIsRefreshing(false);
+          setIsRefreshing(false);
       }
   }
 
@@ -318,18 +320,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
               </Link>
             </div>
             <div className='d-flex align-items-center'>
-              {/* <div className="d-flex align-items-stretch" style={{gap: '16px'}}>
-                <button onClick={handleFavorite} disabled={!!!user} className='clearBtn' style={{padding: 0, height: 'unset'}}>
-                  <div className={styles.number}><img alt='' src={false ? '/red_heart.svg' : '/heart.svg'} style={{height: '1.3em'}} />&nbsp;0</div>
-                  <span className={styles.label}>Favorites</span>
-                </button>
-                <Vr />
-                <div style={{marginRight: '32px'}}>
-                  <div className={`${styles.number} d-flex align-items-center`}><img alt='' src='/eye.svg' style={{height: '1.3em'}} />&nbsp;0</div>
-                  <span className={styles.label}>Views</span>
-                </div>
-              </div> */}
-              <FontAwesomeIcon icon={faRefresh} onClick={()=>handleRefresh()} size={"2x"} />
+              <RefreshButton refreshWhat="Minter" spin={isRefreshing} disabled={isRefreshing} onClick={()=>handleRefresh()} />
             </div>
           </div>
 
