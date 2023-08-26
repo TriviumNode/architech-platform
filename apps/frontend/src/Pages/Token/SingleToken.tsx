@@ -232,7 +232,7 @@ const SingleToken: FC<any> = (): ReactElement => {
               </div>
               <div className='d-flex align-items-center'>
                 <div className="d-flex align-items-stretch" style={{gap: '16px'}}>
-                {(!!user && user.address === tokenResponse.token.owner) &&
+                {(!!user && user.address === tokenResponse.token.owner && !!!tokenResponse.ask) &&
                     <>
                       <Link
                         to='tasks'
