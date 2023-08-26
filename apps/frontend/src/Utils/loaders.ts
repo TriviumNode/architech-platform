@@ -1,4 +1,4 @@
-import { GetCollectionResponse } from "@architech/types";
+import { GetCollectionResponse, GetTokenResponse } from "@architech/types";
 import axios, { Axios, AxiosError } from "axios";
 import { getActiveMinters, getApiUrl, getCollection, getEndedMinters, getOwnedTokens, getToken, getTokens, getUserProfile } from "./backend";
 
@@ -27,7 +27,7 @@ export async function collectionLoader({ params, request }: any) {
 }
 
 // TODO have the backend just do this instead of 2 queries
-export async function tokenLoader({ params, request }: any) {
+export async function tokenLoader({ params, request }: any): Promise<{collection: GetCollectionResponse, token: GetTokenResponse}> {
     // const url = getApiUrl(`/collections/${params.contractAddr}`)
     // const {data: collection} = await axios.get(url)
     const tokenData = await getToken(params.contractAddr, params.tokenId)

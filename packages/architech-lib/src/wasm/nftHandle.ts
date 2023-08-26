@@ -22,7 +22,6 @@ export const sendNft = async({
         send_nft: {
             contract: recipient,
             token_id: tokenId,
-            // msg: Buffer.from(JSON.stringify(subMsg)).toString('base64'),
             msg: btoa(JSON.stringify(subMsg))
         }
     }
@@ -34,7 +33,6 @@ export const sendNft = async({
         'auto',
     )
     return result;
-
 }
 
 export const mintNft = async({
@@ -107,4 +105,33 @@ export const mintRoyaltyNft = async({
     )
     return result;
 
+}
+
+export const transferNft = async({
+  client,
+  signer,
+  contract,
+  tokenId,
+  recipient,
+}:{
+  client: SigningArchwayClient,
+  signer: string,
+  contract: string,
+  tokenId: string;
+  recipient: string;
+}) => {
+  const msg: ExecuteMsg = {
+    transfer_nft: {
+      token_id: tokenId,
+      recipient
+    }
+  }
+
+  const result = await client.execute(
+    signer,
+    contract,
+    msg,
+    'auto',
+  )
+  return result;
 }

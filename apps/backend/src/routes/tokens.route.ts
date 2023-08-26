@@ -42,7 +42,7 @@ class TokensRoute implements Routes {
     this.router.delete(`${this.path}/favorite/:tokenId`, authMiddleware, removeFavorite);
 
     // Refresh token metadata from chain
-    // Authentication probably not needed for this...
+    // Authentication not needed for this, UI triggers refresh on transfer
     this.router.get(`${this.path}/refresh/:collectionAddr/:tokenId`, refreshToken);
     this.router.post(`${this.path}/refresh/:collectionAddr/:tokenId`, refreshToken);
   }

@@ -1,8 +1,14 @@
-import { Collection } from "@architech/types";
+import { Collection, Token } from "@architech/types";
 import Color from "./color";
 
 export function getCollectionName(collection: Collection) {
     return collection.collectionProfile.name || collection.cw721_name
+}
+
+export const getTokenName = (token: Token) => {
+  const num = isNaN(token.tokenId as any) ? null : '#'
+  const nftName = !!token.metadataExtension?.name ? token.metadataExtension.name : `${num}${token?.tokenId}`
+  return nftName;
 }
 
 export const saturateColor = (input: string) => {

@@ -32,6 +32,7 @@ import SingleMinter from './Pages/Minter/SingleMinter';
 import { MintProvider } from './Contexts/MintContext';
 import AllMinters from './Pages/NFTs/AllMinters';
 import AllCollections from './Pages/NFTs/AllCollections';
+import TokenTasks from './Pages/TokenTasks/TokenTasks';
 
 
 const router = createBrowserRouter([
@@ -67,6 +68,11 @@ const router = createBrowserRouter([
       {
         path: "/nfts/:contractAddr/:tokenId",
         element: <SingleToken />,
+        loader: tokenLoader
+      },
+      {
+        path: "/nfts/:contractAddr/:tokenId/tasks",
+        element: <TokenTasks />,
         loader: tokenLoader
       },
       {

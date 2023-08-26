@@ -1,3 +1,7 @@
+[data-prefix="fas"] {
+  color: #666;
+}
+
 .halfMinus8 {
     width: calc(50% - 8px);
 }
@@ -39,10 +43,11 @@
 
         transition: flex-grow 0.15s ease-in-out;
 
-        [data-prefix="fas"] {
-            transition: transform 0.15s ease-in-out;
-            color: #666666;
-            font-size: 14px;
+        // [data-prefix="fas"] {
+        .fasArrrow {
+          transition: transform 0.15s ease-in-out;
+          color: #666666;
+          font-size: 14px;
         }
     }
     @media (max-width: 767.98px) {
@@ -59,8 +64,9 @@
         flex-grow: 1;
         overflow-y: auto;
 
-        [data-prefix="fas"] {
-            transform: rotate(90deg);
+        // [data-prefix="fas"] {
+        .fasArrrow {
+          transform: rotate(90deg);
         }
     }
 

@@ -1,6 +1,6 @@
 import { cancelListing, denomToHuman, findDenom, findToken, purchaseNative, truncateAddress, unknownDenom } from "@architech/lib";
 import { Collection, Token, cw721, GetTokenResponse, GetCollectionResponse, Denom } from "@architech/types";
-import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { faChevronRight, faPeopleArrows } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FC, ReactElement, useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
@@ -232,6 +232,21 @@ const SingleToken: FC<any> = (): ReactElement => {
               </div>
               <div className='d-flex align-items-center'>
                 <div className="d-flex align-items-stretch" style={{gap: '16px'}}>
+                {(!!user && user.address === tokenResponse.token.owner) &&
+                    <>
+                      <Link
+                        to='tasks'
+                        data-tooltip-id="transfer-tooltip"
+                        data-tooltip-content='Transfer NFT'
+                        data-tooltip-place="left"
+                        className='d-flex align-items-center justify-content-center'
+                      >
+                        <FontAwesomeIcon icon={faPeopleArrows} size='xl' />
+                      </Link>
+                      <Tooltip id="transfer-tooltip" />
+                      <Vr />
+                    </>
+                  }
                   <button onClick={handleFavorite} disabled={!!!user} className='clearBtn' style={{padding: 0, height: 'unset'}}>
                     <div className={styles.number}><img alt='' src={isFavorite ? '/red_heart.svg' : '/heart.svg'} style={{height: '1.3em'}} />&nbsp;{tokenResponse.favorites}</div>
                     <span className={styles.label}>Favorites</span>
@@ -242,7 +257,7 @@ const SingleToken: FC<any> = (): ReactElement => {
                     <span className={styles.label}>Views</span>
                   </div>
                 </div>
-                <FontAwesomeIcon icon={faChevronRight} />
+                {/* <FontAwesomeIcon icon={faChevronRight} /> */}
               </div>
             </div>
             <div className='d-flex flex-column' style={{flexGrow: 1 }} >
