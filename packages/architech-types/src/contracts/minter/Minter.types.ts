@@ -5,7 +5,9 @@
 */
 
 export type ExecuteMsg = {
-  mint: {};
+  mint: {
+    mints: number;
+  };
 } | {
   set_launch_time: {
     launch_time?: Uint64 | null;
@@ -149,6 +151,7 @@ export interface GetNftAddrResponse {
 }
 export interface GetPreloadResponse {
   preload: Metadata[];
+  start_after: number;
 }
 export interface GetPriceResponse {
   price: Payment;

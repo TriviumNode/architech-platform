@@ -13,6 +13,7 @@ import { DenomImg } from "../../Components/ArchDenom";
 import Badge from "../../Components/Badge";
 import HiddenBanner from "../../Components/HiddenBanner/HiddenBanner";
 import Loader from "../../Components/Loader";
+import MintModal from "../../Components/Modals/MintModal";
 import RefreshButton from "../../Components/RefreshButton";
 import SmallLoader from "../../Components/SmallLoader";
 import TokenImage from "../../Components/TokenImg";
@@ -75,6 +76,8 @@ const SingleMinter: FC<any> = (): ReactElement => {
     const [copyMetadata, setCopyMetadata] = useState<cw2981.Metadata>();
     const [devInfo, setDevInfo] = useState<DevInfo>()
     const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const [modalOpen, setModalOpen] = useState(false);
 
     const [now, setNow] = useState(new Date())
 
@@ -145,6 +148,12 @@ const SingleMinter: FC<any> = (): ReactElement => {
       if (collection.collectionMinter.payment?.token || collection.collectionMinter.whitelist_payment?.token) throw new Error('Non-native payments are not supported.')
       if (!buyerStatus) throw new Error('Unable to fetch minter status.')
       if (buyerStatus.mint_limit && ((buyerStatus.mints || 0) > buyerStatus.mint_limit)) throw new Error('You are at the mint limit for this collection.')
+
+      if (buyerStatus.mint_limit && buyerStatus.mint_limit > 1 && collection.collectionMinter.minter_type === 'RANDOM') {
+        setModalOpen(true);
+        return;
+      }
+
       setLoadingTx(true);
 
       if (buyerStatus.whitelisted) {
@@ -191,6 +200,12 @@ const SingleMinter: FC<any> = (): ReactElement => {
     } finally {
       setLoadingTx(false);
     }
+  }
+
+  const onMint = () => {
+    checkWhitelist();
+    queryMinter();
+    revalidator.revalidate();
   }
 
   const handleCalculatePrices = async() => {
@@ -290,6 +305,16 @@ const SingleMinter: FC<any> = (): ReactElement => {
   return (
     <>
 
+    <MintModal
+      open={modalOpen}
+      onClose={()=>setModalOpen(false)}
+      prices={prices}
+      buyerStatus={buyerStatus}
+      minterStatus={minterStatus as any}
+      collection={collection}
+      onMint={onMint}
+    />
+  
     {!!collection.hidden &&
       <HiddenBanner page='MINTER' collectionAddress={collection.address} />
     }

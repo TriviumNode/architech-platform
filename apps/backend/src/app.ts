@@ -123,8 +123,8 @@ class App {
           const mintedTokenId: string = object.result.events['wasm.token_id'][0];
           const architechApp: string = object.result.events['wasm.architech_app'][0];
           console.log(`Token ID ${mintedTokenId} minted for ${recipient} on collection ${collectionAddress} using app ${architechApp}!`);
-          // Todo: Update collection or ensure ensureToken updates the collection. Make sure to prevent race conditions.
-          ensureToken(collectionAddress, mintedTokenId);
+          // ensureToken(collectionAddress, mintedTokenId);
+          refreshCollection(collectionAddress);
           break;
         case `wasm.architech_action='edit_minter'`: {
           // Handle Edit Minter

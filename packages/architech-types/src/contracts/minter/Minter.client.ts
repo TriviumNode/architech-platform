@@ -75,7 +75,11 @@ export class MinterQueryClient implements MinterReadOnlyInterface {
 export interface MinterInterface extends MinterReadOnlyInterface {
   contractAddress: string;
   sender: string;
-  mint: (fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
+  mint: ({
+    mints
+  }: {
+    mints: number;
+  }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
   setLaunchTime: ({
     launchTime,
     whitelistLaunchTime
@@ -132,9 +136,15 @@ export class MinterClient extends MinterQueryClient implements MinterInterface {
     this.noisReceive = this.noisReceive.bind(this);
   }
 
-  mint = async (fee: number | StdFee | "auto" = "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> => {
+  mint = async ({
+    mints
+  }: {
+    mints: number;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> => {
     return await this.client.execute(this.sender, this.contractAddress, {
-      mint: {}
+      mint: {
+        mints
+      }
     }, fee, memo, funds);
   };
   setLaunchTime = async ({

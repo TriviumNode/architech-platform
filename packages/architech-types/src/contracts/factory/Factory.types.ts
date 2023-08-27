@@ -64,6 +64,11 @@ export type ExecuteMsg = {
     minter_address: string;
     new_code_id: Uint64;
   };
+} | {
+  set_minter_premium: {
+    minter_address: string;
+    new_fee: Coin;
+  };
 };
 export type Addr = string;
 export type Uint64 = string;
@@ -104,6 +109,11 @@ export interface Fee {
   decimal_places: number;
   rate: number;
   recipient: string;
+  [k: string]: unknown;
+}
+export interface Coin {
+  amount: Uint128;
+  denom: string;
   [k: string]: unknown;
 }
 export interface InstantiateMsg {

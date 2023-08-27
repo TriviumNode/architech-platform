@@ -9,7 +9,7 @@ interface ModalProps {
     onClose: () => any;
     children: any;
     style?: CSSProperties;
-    title?: string;
+    title?: any;
     closeButton?: boolean;
 }
 

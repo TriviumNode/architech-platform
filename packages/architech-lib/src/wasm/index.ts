@@ -11,4 +11,7 @@ export * from './minterHandle';
 export * from './minterQuery';
 
 
+export * from './randomMinterHandle';
+
+
 export * from './archId';

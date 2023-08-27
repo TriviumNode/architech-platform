@@ -33,6 +33,7 @@ export type Price = {
   denom: Denom;
   displayAmount: string;
   displayUsd: string;
+  denomAmount: number;
 }
 
 export type Prices = {
@@ -70,7 +71,7 @@ export const calculatePrices = async (collectionMinter: CollectionMinterI, getUs
       }
     }
 
-    return { displayAmount: saleAmount, displayUsd: usdAmount, denom: saleDenom }
+    return { displayAmount: saleAmount, displayUsd: usdAmount, denom: saleDenom, denomAmount: payment?.amount ? parseInt(payment.amount) : 0 }
   })()
 
   const privatePrice: Price | undefined = await(async()=>{
@@ -100,7 +101,7 @@ export const calculatePrices = async (collectionMinter: CollectionMinterI, getUs
       }
     }
 
-    return { displayAmount: saleAmount, displayUsd: usdAmount, denom: saleDenom }
+    return { displayAmount: saleAmount, displayUsd: usdAmount, denom: saleDenom, denomAmount: payment?.amount ? parseInt(payment.amount) : 0 }
   })()
 
   return({

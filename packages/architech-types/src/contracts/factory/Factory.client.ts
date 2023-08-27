@@ -5,8 +5,8 @@
 */
 
 import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate";
-import { Coin, StdFee } from "@cosmjs/amino";
-import { ExecuteMsg, Addr, Uint64, Payment, Uint128, Binary, Metadata, Trait, Fee, InstantiateMsg, QueryMsg, GetMintersResponse, Minter, GetNoisProxyResponse, ArrayOfMinter } from "./Factory.types";
+import { StdFee } from "@cosmjs/amino";
+import { ExecuteMsg, Addr, Uint64, Payment, Uint128, Binary, Metadata, Trait, Fee, Coin, InstantiateMsg, QueryMsg, GetMintersResponse, Minter, GetNoisProxyResponse, ArrayOfMinter } from "./Factory.types";
 export interface FactoryReadOnlyInterface {
   contractAddress: string;
   getMinters: () => Promise<GetMintersResponse>;
@@ -133,6 +133,13 @@ export interface FactoryInterface extends FactoryReadOnlyInterface {
     minterAddress: string;
     newCodeId: Uint64;
   }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
+  setMinterPremium: ({
+    minterAddress,
+    newFee
+  }: {
+    minterAddress: string;
+    newFee: Coin;
+  }, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]) => Promise<ExecuteResult>;
 }
 export class FactoryClient extends FactoryQueryClient implements FactoryInterface {
   client: SigningCosmWasmClient;
@@ -152,6 +159,7 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
     this.changeRandomCode = this.changeRandomCode.bind(this);
     this.changeCopyCode = this.changeCopyCode.bind(this);
     this.migrateMinter = this.migrateMinter.bind(this);
+    this.setMinterPremium = this.setMinterPremium.bind(this);
   }
 
   initRandomProject = async ({
@@ -323,6 +331,20 @@ export class FactoryClient extends FactoryQueryClient implements FactoryInterfac
         migrate_msg: migrateMsg,
         minter_address: minterAddress,
         new_code_id: newCodeId
+      }
+    }, fee, memo, funds);
+  };
+  setMinterPremium = async ({
+    minterAddress,
+    newFee
+  }: {
+    minterAddress: string;
+    newFee: Coin;
+  }, fee: number | StdFee | "auto" = "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> => {
+    return await this.client.execute(this.sender, this.contractAddress, {
+      set_minter_premium: {
+        minter_address: minterAddress,
+        new_fee: newFee
       }
     }, fee, memo, funds);
   };
