@@ -149,7 +149,10 @@ const SingleMinter: FC<any> = (): ReactElement => {
       if (!buyerStatus) throw new Error('Unable to fetch minter status.')
       if (buyerStatus.mint_limit && ((buyerStatus.mints || 0) > buyerStatus.mint_limit)) throw new Error('You are at the mint limit for this collection.')
 
-      if (buyerStatus.mint_limit && buyerStatus.mint_limit > 1 && collection.collectionMinter.minter_type === 'RANDOM') {
+      if (
+        collection.collectionMinter.minter_type === 'RANDOM'
+        && (!buyerStatus.mint_limit || buyerStatus.mint_limit > 1)
+      ) {
         setModalOpen(true);
         return;
       }
