@@ -6,7 +6,7 @@
 
 export type ExecuteMsg = {
   mint: {
-    mints: number;
+    mints?: number | null;
   };
 } | {
   set_launch_time: {
