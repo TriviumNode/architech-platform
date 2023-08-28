@@ -46,11 +46,13 @@ export default function MintModal({open, minterStatus, buyerStatus, prices, coll
       )
     }
 
+    const maxLimit = 15;
+
     const buyerMintLimit = buyerStatus.mint_limit ?
       buyerStatus.mint_limit - (buyerStatus.mints || 0)
-      : 10;
+      : maxLimit;
     const buyerMax = buyerMintLimit > minterStatus.remaining ? minterStatus.remaining : buyerMintLimit
-    const max = buyerMax > 10 ? 10 : buyerMax;
+    const max = buyerMax > maxLimit ? maxLimit : buyerMax;
 
     const price = buyerStatus.whitelisted && prices.private ? prices.private : prices.public;
 
@@ -66,6 +68,8 @@ export default function MintModal({open, minterStatus, buyerStatus, prices, coll
 
       try {
         if (!user) throw new Error('Wallet is not connected.')
+
+        if (quantity > max) throw new Error(`Maximum number of mints is ${max}`)
         setLoading(true);
 
         const funds = collection.collectionMinter.payment?.denom ? [{amount: denomTotal.toString(), denom: collection.collectionMinter.payment.denom}] : []
@@ -99,6 +103,14 @@ export default function MintModal({open, minterStatus, buyerStatus, prices, coll
       }
     }
 
+    const handleChange = (input: number) => {
+      if (input > max){
+        setQuantity(max);
+      } else {
+        setQuantity(input);
+      }
+    }
+
     return(
       <ModalV2 open={open} onClose={onClose} style={{width: 'fit-content'}} title={<span>Minting <b>{collectionName}</b></span>} closeButton={true}>
         <Row className='mb16 justify-content-center mt16 mb16'>
@@ -110,7 +122,7 @@ export default function MintModal({open, minterStatus, buyerStatus, prices, coll
               min={1}
               max={max}
               value={quantity}
-              onChange={(v: number)=>setQuantity(v)}
+              onChange={handleChange}
               style={{
                 input: {
                   width: '100%'
