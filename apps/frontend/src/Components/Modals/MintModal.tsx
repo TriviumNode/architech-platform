@@ -46,7 +46,7 @@ export default function MintModal({open, minterStatus, buyerStatus, prices, coll
       )
     }
 
-    const maxLimit = 15;
+    const maxLimit = 10;
 
     const buyerMintLimit = buyerStatus.mint_limit ?
       buyerStatus.mint_limit - (buyerStatus.mints || 0)

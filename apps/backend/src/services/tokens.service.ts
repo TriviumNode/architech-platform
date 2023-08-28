@@ -275,7 +275,8 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
     // await CollectionModel.updateOne({ collectionAddress }, { $addToSet: { tokenIds: tokenId } });
 
     // Lets just refresh the entire damn collection
-    await refreshCollection(collectionAddress);
+    // NVM it gets crazy, fuck it
+    // await refreshCollection(collectionAddress);
 
     // Create Token Document, redundant after refresh but fuck it it upserts
     console.log('Creating new token document for', tokenId, 'on', collectionAddress);
@@ -283,7 +284,6 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
       .populate('collectionInfo') // fresh shit we refreshed above
       .lean();
 
-    console.log('New Token Response', newToken.collectionInfo);
     return newToken;
   } else if (
     !equal(

@@ -159,7 +159,6 @@ export const refreshCollection = async (contract: string) => {
   console.log('Processed Tokens', processedTokens);
 
   // Check for minter info
-  // const { minter, actual_creator } = await getMinterInfo(creator);
   const minterResponse = await getMinterInfo(creator);
   const cleanNew = removeNullUndefined(minterResponse.minter || {});
 
