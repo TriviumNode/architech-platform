@@ -48,8 +48,9 @@ export default function MintModal({open, minterStatus, buyerStatus, prices, coll
 
     const buyerMintLimit = buyerStatus.mint_limit ?
       buyerStatus.mint_limit - (buyerStatus.mints || 0)
-      : 50;
-    const max = buyerMintLimit > minterStatus.remaining ? minterStatus.remaining : buyerMintLimit
+      : 10;
+    const buyerMax = buyerMintLimit > minterStatus.remaining ? minterStatus.remaining : buyerMintLimit
+    const max = buyerMax > 10 ? 10 : buyerMax;
 
     const price = buyerStatus.whitelisted && prices.private ? prices.private : prices.public;
 
