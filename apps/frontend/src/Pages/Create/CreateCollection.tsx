@@ -372,7 +372,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                         whitelist_launch_time: timesState.whitelist_launch_time ? (timesState.whitelist_launch_time.valueOf() / 1000).toString() : undefined,
                         
                         whitelisted: whitelist,
-                        mint_limit: timesState.mint_limit ? parseInt(timesState.mint_limit) : undefined,
+                        mint_limit: timesState.unlimited_limit ? undefined : parseInt(timesState.mint_limit),
 
                         mint_price: financialState.denom.nativeDenom ? 
                             {
