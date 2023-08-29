@@ -140,7 +140,7 @@ export default function ListModal({open, token, onClose, onList}: Props) {
                         <span className="lightText12">{feeAmount.toLocaleString(undefined, {maximumFractionDigits: selectedOption.value.decimals})}&nbsp;{selectedOption.value.displayDenom}</span>
                     </div>
                     <div className='d-flex justify-content-between mb8'>
-                        <span>Royalty&nbsp;<span className='lightText10'>({royaltyRate.toLocaleString(undefined, {maximumFractionDigits: selectedOption.value.decimals})}%)</span></span>
+                        <span>Royalty&nbsp;<span className='lightText10'>({(royaltyRate*100).toLocaleString(undefined, {maximumFractionDigits: selectedOption.value.decimals})}%)</span></span>
                         <span className="lightText12">{loadingRoyalty ? <SmallLoader /> : `${royaltyAmount} ${selectedOption.value.displayDenom}`}</span>
                     </div>
                     <div className='d-flex justify-content-between'>
