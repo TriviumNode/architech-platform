@@ -71,11 +71,11 @@ export default function MainLayout() {
           <Outlet />
       {/* </div> */}
       <footer className={styles.footer}>
-        {/* <div style={{display: 'flex', alignItems: 'center'}}> */}
-          <div style={{display: 'flex', alignItems: 'center'}}>
+          <div style={{display: 'flex', alignItems: 'center'}} className='mb24'>
             <img src='/logo.svg' style={{maxHeight: '1em', marginRight: '0.5em'}} />
             <h2>Architech</h2>
           </div>
+
           <div style={{display: 'flex', justifyContent: 'space-between', width: '100%'}}>
             <p>© Architech 2023</p>
             <Row>
@@ -94,7 +94,10 @@ export default function MainLayout() {
               </Col>
             </Row>
           </div>
-        {/* </div> */}
+          
+          <div style={{display: 'flex', justifyContent: 'flex-end', width: '100%'}}>
+              <a style={{textDecoration: 'underline', color: '#666'}} target='blank' rel='noreferrer noopener' href='https://docs.architech.zone'>Documentation</a>
+          </div>
       </footer>
     </Container>
 
