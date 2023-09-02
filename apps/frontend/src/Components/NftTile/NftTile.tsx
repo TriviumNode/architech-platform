@@ -1,5 +1,6 @@
 import { denomToHuman, findDenom, findToken, getPrice, unknownDenom } from "@architech/lib";
 import { Collection, Denom, Token } from "@architech/types"
+import millify from "millify";
 import React from "react";
 import { FC, ReactElement } from "react"
 import { Col } from "react-bootstrap"
@@ -31,14 +32,16 @@ const NftTile: FC<any> = ({token}: Props): ReactElement => {
       if (denom) {
         saleDenom = denom;
         const num = denomToHuman(token.ask.price, denom.decimals)
-        saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+        // saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+        saleAmount = millify(num);
       }
     } else {
       const denom = findDenom(process.env.REACT_APP_NETWORK_DENOM);
       if (denom) {
         saleDenom = denom;
         const num = denomToHuman(token.ask.price, denom.decimals)
-        saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+        // saleAmount = num.toLocaleString("en-US", { maximumFractionDigits: parseInt(process.env.REACT_APP_NETWORK_DECIMALS) })
+        saleAmount = millify(num);
       }
     }
   }
