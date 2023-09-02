@@ -16,9 +16,9 @@ const AdminEditPage: FC<{
   collection: Collection
 }> = ({collection}): ReactElement => {
   const {user} = useUser();
-  const [admin_hidden, setAdminHidden] = useState(collection.admin_hidden);
-  const [featured, setFeatured] = useState(collection.admin_hidden);
-  const [verified, setVerified] = useState(collection.verified);
+  const [admin_hidden, setAdminHidden] = useState(collection.admin_hidden || false);
+  const [featured, setFeatured] = useState(collection.featured || false);
+  const [verified, setVerified] = useState(collection.verified || false);
   const [dark_banner, setDarkBanner] = useState(collection.collectionProfile.dark_banner || false);
   const [saving, setSaving] = useState(false);
 
