@@ -98,14 +98,18 @@ export async function queryDbCollectionByAddress(collectionAddress: string): Pro
     }
     // Otherwise query minter status and refresh if sold out
     else {
-      const minterStatus = await getMintStatus({
-        client: queryClient,
-        contract: collection.collectionMinter.minter_address,
-      });
-      //@ts-expect-error Different minter types but checking them both
-      if (minterStatus.remaining === 0 || (minterStatus.max_copies && minterStatus.minted >= minterStatus.max_copies)) {
-        console.log('Minter is sold out');
-        collection = await refreshCollection(collection.address);
+      try {
+        const minterStatus = await getMintStatus({
+          client: queryClient,
+          contract: collection.collectionMinter.minter_address,
+        });
+        //@ts-expect-error Different minter types but checking them both
+        if (minterStatus.remaining === 0 || (minterStatus.max_copies && minterStatus.minted >= minterStatus.max_copies)) {
+          console.log('Minter is sold out');
+          collection = await refreshCollection(collection.address);
+        }
+      } catch (error) {
+        console.error('Failed to query Mint Status:', error.toString());
       }
     }
   }
