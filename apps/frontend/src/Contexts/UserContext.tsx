@@ -91,13 +91,14 @@ export const UserProvider = ({ children }: Props): ReactElement => {
 
   const onChangeWallet = async () => {
     if (!user) {
-      connectWallet()
+      // connectWallet()
       return;
     }
     if (!window.wallet) throw new Error('window.wallet was not defined.')
 
     const keyResult = await window.wallet.getKey(process.env.REACT_APP_CHAIN_ID)
-    console.log('New Key', keyResult)
+    console.log('New Address', keyResult.bech32Address)
+    console.log('Current Address', user.address);
 
     if (keyResult.bech32Address === user.address) {
       // Hide modal if switching back to previous wallet
@@ -111,10 +112,6 @@ export const UserProvider = ({ children }: Props): ReactElement => {
   const toggleDevMode = () => {
     setDevMode(!devMode);
   }
-
-  // useEffect(()=>{   
-  //   if (!wallet && connectedKeplr === 'true') connectKeplr();
-  // },[])
 
   const handleChangeWallet = async () => {
     try {
@@ -365,6 +362,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
             onClose={()=>setWalletStatus('DISCONNECTED')}
             title={walletStatus === 'SWITCH' ? 'Change Wallet' : 'Connect Wallet'}
             style={{maxWidth: '400px'}}
+            locked={true}
           >
             {modalContent()}
         </ModalV2>
