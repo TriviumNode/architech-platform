@@ -24,7 +24,6 @@ const SocialLinks: FC<Props> = (props: Props): ReactElement => {
         github,
         color,
     } = props;
-    console.log('COLOR', color)
     return (
         <div className='d-flex align-items-center align-content-center' style={{gap: '24px', height: '24px'}}> 
             {
