@@ -78,4 +78,8 @@ export class EditCollectionBodyDto {
   @IsOptional()
   @IsString()
   public verified?: string;
+
+  @IsOptional()
+  @IsString()
+  public dark_banner?: string;
 }

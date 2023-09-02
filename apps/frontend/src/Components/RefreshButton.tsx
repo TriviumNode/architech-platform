@@ -7,9 +7,10 @@ type Props = {
   spin: boolean;
   onClick?: (e: any)=>any;
   refreshWhat: string;
+  color?: string;
 }
 
-const RefreshButton = ({disabled, spin, onClick, refreshWhat}: Props) => {
+const RefreshButton = ({disabled, spin, onClick, refreshWhat, color}: Props) => {
   return (
     <>
       <button
@@ -22,7 +23,7 @@ const RefreshButton = ({disabled, spin, onClick, refreshWhat}: Props) => {
         type='button'
         className='clearButton mr16'
       >
-        <FontAwesomeIcon spin={spin} size='2x' icon={faArrowRotateRight} />
+        <FontAwesomeIcon spin={spin} size='2x' icon={faArrowRotateRight} color={color} />
       </button>
       <Tooltip id="refresh-tooltip" />
     </>

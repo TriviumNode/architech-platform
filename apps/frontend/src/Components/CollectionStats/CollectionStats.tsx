@@ -43,24 +43,26 @@ const CollectionStats: FC<Props> = ({collection, asks}): ReactElement => {
         queryVolume()
     },[collection, QueryClient])
 
+    const labelClass = collection.collectionProfile.dark_banner ? `${styles.label} ${styles.lightLabel}` : styles.label
+
     return (
         <div className={styles.statsContainer}>
             <div className='d-flex flex-column justify-content-center'>
                 <div className={styles.number}>{collection.totalTokens}</div>
-                <span className={styles.label}>Items</span>
+                <span className={labelClass}>Items</span>
             </div>
             <div className='d-flex flex-column justify-content-center'>
                 <div className={styles.number}>{asks?.length === undefined ? <SmallLoader /> : asks.length}</div>
-                <span className={styles.label}>Listed</span>
+                <span className={labelClass}>Listed</span>
             </div>
             <div className={`${styles.vr}  className='d-flex flex-column justify-content-center'`} />
             <div className='d-flex flex-column justify-content-center'>
                 <div className={`${styles.number} d-flex align-items-center`}>{floorAmount || '--'}&nbsp;<ArchDenom /></div>
-                <span className={styles.label}>Floor</span>
+                <span className={labelClass}>Floor</span>
             </div>
             <div className='d-flex flex-column justify-content-center'>
                 <div className={`${styles.number} d-flex align-items-center`}>{(volume === undefined ? <SmallLoader /> : volume) || '--'}&nbsp;<ArchDenom /></div>
-                <span className={styles.label}>Total Volume</span>
+                <span className={labelClass}>Total Volume</span>
             </div>
         </div>
     )

@@ -150,6 +150,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
             backgroundSize: 'cover',
+            color: !!collection.collectionProfile.dark_banner ? 'white' : undefined,
         }
     : {};
 
@@ -220,7 +221,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
                                     >
                                         <FontAwesomeIcon spin={isRefreshing} size='2x' icon={faArrowRotateRight} />
                                     </button> */}
-                                    <RefreshButton refreshWhat="Collection" spin={isRefreshing} disabled={isRefreshing} onClick={()=>handleRefresh()} />
+                                    <RefreshButton color={collection.collectionProfile.dark_banner ? '#999' : '#666'} refreshWhat="Collection" spin={isRefreshing} disabled={isRefreshing} onClick={()=>handleRefresh()} />
                                     <LinkButton
                                         style={{color: '#666666', padding: 0, background: '#00000000'}}
                                         to={`/nfts/edit/${collection.address}`}
@@ -231,6 +232,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
                                             data-tooltip-content="Edit Collection"
                                             data-tooltip-place="left"
                                             size='2x' icon={faPencil}
+                                            color={collection.collectionProfile.dark_banner ? '#999' : '#666'}
                                         />
                                     </LinkButton>
                                     <Tooltip id="my-tooltip" />
@@ -239,7 +241,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
                             }
                         </div>
                         <div style={{position: 'absolute', right: '16px', bottom: '16px'}}>
-                            <SocialLinks discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} website={collection.collectionProfile.website} />
+                            <SocialLinks color={collection.collectionProfile.dark_banner ? '#999' : '#666'} discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} website={collection.collectionProfile.website} />
                         </div>
                 </Col>
             </div>

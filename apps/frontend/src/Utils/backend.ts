@@ -241,6 +241,9 @@ export const editCollection = async(collectionId: string, request: Partial<Impor
 
     if (typeof request.verified === 'boolean')
       formData.append('verified', request.verified.toString());
+
+    if (typeof request.dark_banner === 'boolean')
+      formData.append('dark_banner', request.dark_banner.toString());
     
     console.log('Edit Request', request)
     try {

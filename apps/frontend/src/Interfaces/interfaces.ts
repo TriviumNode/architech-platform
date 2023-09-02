@@ -8,6 +8,7 @@ export interface ImportCollectionData {
     admin_hidden?: boolean;
     featured?: boolean;
     verified?: boolean;
+    dark_banner?: boolean;
     profileImage?: File;
     bannerImage?: File;
     twitter?: string;

@@ -51,6 +51,8 @@ export interface CollectionProfile {
 
   // file name in public folder
   banner_image?: string;
+
+  dark_banner?: boolean;
 }
 
 export interface CollectionModel {

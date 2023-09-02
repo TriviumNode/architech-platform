@@ -217,6 +217,7 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
     validator.admin_hidden = req.body.admin_hidden;
     validator.featured = req.body.featured;
     validator.verified = req.body.verified;
+    validator.dark_banner = req.body.dark_banner;
 
     // Verify Input
     await validate(validator);
@@ -248,6 +249,7 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
       telegram: validator.telegram,
       profile_image,
       banner_image,
+      dark_banner: validator.dark_banner ? validator.dark_banner === 'true' : undefined,
     };
 
     // Strip undefined fields

@@ -106,6 +106,9 @@ class CollectionProfileClass implements CollectionProfile {
 
   @prop({ type: String })
   public banner_image?: string;
+
+  @prop({ type: Boolean })
+  public dark_banner?: boolean;
 }
 
 @index(

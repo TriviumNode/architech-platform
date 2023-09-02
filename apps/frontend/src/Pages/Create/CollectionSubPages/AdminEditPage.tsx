@@ -19,6 +19,7 @@ const AdminEditPage: FC<{
   const [admin_hidden, setAdminHidden] = useState(collection.admin_hidden);
   const [featured, setFeatured] = useState(collection.admin_hidden);
   const [verified, setVerified] = useState(collection.verified);
+  const [dark_banner, setDarkBanner] = useState(collection.collectionProfile.dark_banner || false);
   const [saving, setSaving] = useState(false);
 
 
@@ -27,7 +28,7 @@ const AdminEditPage: FC<{
     if (e) e.preventDefault();
     setSaving(true)
     try {
-      const result = await editCollection(collection._id.toString(), { admin_hidden, featured, verified })
+      const result = await editCollection(collection._id.toString(), { admin_hidden, featured, verified, dark_banner })
       console.log('Admin Edit Result', result)
       toast.success('Saved Admin Settings')
     } catch(err: any) {
@@ -71,6 +72,15 @@ const AdminEditPage: FC<{
                           Admin Hidden
                           <div className='lightText12'>Hide this collection from the public.</div>
                           <input type='checkbox' checked={admin_hidden} onChange={(e)=>setAdminHidden(e.target.checked)} />
+                      </label>
+                  </Col>
+              </div>
+              <div className='d-flex mb24'>
+                  <Col>
+                      <label>
+                          Dark Banner
+                          <div className='lightText12' style={{minHeight: '1em'}}>Invert colors of text over banner.</div>
+                          <input type='checkbox' checked={dark_banner} onChange={(e)=>setDarkBanner(e.target.checked)} />
                       </label>
                   </Col>
               </div>
