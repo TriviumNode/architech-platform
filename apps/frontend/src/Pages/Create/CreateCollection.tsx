@@ -253,7 +253,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
 
                     try {
                         whitelist = filtered.map((v, i)=>{
-                            v = v.trim();
+                            v = v.trim().toLowerCase();
                             console.log(v)
                             try {
                                 bech32.decode(v);   
