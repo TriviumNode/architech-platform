@@ -295,9 +295,10 @@ const SingleToken: FC<any> = (): ReactElement => {
           </div>
 
           <div className={`${styles.accordionItem} ${activeItem === 'item2' && styles.activeItem} flex-column`} /*onClick={()=>setActiveItem('item2')}*/ >
-            <div style={{margin: '32px'}}>
+            <div className={styles.accordianInternal}>
               <div className={`${styles.itemTitle} lightText14`}>
                 <span className='d-flex align-items-center'><img alt='' src='/database.svg' style={{height: '1.2em'}} className='mr8' />Price History</span>
+
                 {/* <FontAwesomeIcon icon={faChevronRight} /> */}
                 <span>Coming Soon</span>
               </div>
@@ -305,7 +306,7 @@ const SingleToken: FC<any> = (): ReactElement => {
           </div>
 
           <div className={`${styles.accordionItem} ${activeItem === 'item3' && styles.activeItem} flex-column`} /*onClick={()=>setActiveItem('item3')}*/ >
-            <div style={{margin: '32px'}}>
+            <div className={styles.accordianInternal}>
               <div className={`${styles.itemTitle} lightText14`}>
                 <span className='d-flex align-items-center'><img alt='' src='/crosshair.svg' style={{height: '1.2em'}} className='mr8' />Listings</span>
                 {/* <FontAwesomeIcon icon={faChevronRight} /> */}
@@ -315,7 +316,7 @@ const SingleToken: FC<any> = (): ReactElement => {
           </div>
 
           <div className={`${styles.accordionItem} ${activeItem === 'item4' && styles.activeItem} flex-column`} style={{marginBottom: 0}} /*onClick={()=>setActiveItem('item4')}*/ >
-            <div style={{margin: '32px'}}>
+            <div className={styles.accordianInternal}>
               <div className={`${styles.itemTitle} lightText14`}>
                 <span className='d-flex align-items-center'><img alt='' src='/zap.svg' style={{height: '1.2em'}} className='mr8' />Offers</span>
                 {/* <FontAwesomeIcon icon={faChevronRight} /> */}

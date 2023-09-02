@@ -39,9 +39,13 @@
         border-radius: 8px;
         overflow: hidden;
         margin-bottom: 8px;
-        height: 89px;
+        height: 64px;
 
         transition: flex-grow 0.15s ease-in-out;
+
+        .accordianInternal {
+          margin: auto 32px;
+        }
 
         // [data-prefix="fas"] {
         .fasArrrow {
