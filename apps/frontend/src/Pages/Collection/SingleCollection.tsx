@@ -60,6 +60,19 @@ const SingleCollection: FC<any> = (): ReactElement => {
     
     const [devInfo, setDevInfo] = useState<DevInfo>()
 
+    // Set filter state from URL searchParams on initial render
+    useEffect(()=>{
+      const newStatus = [...statusFilter];
+      if (
+        searchParams.has('sale')
+        && searchParams.get('sale') === 'true'
+        && !newStatus.includes('For Sale')
+      ) {
+        newStatus.push('For Sale')
+      }
+      setStatusFilter(newStatus);
+    },[])
+
     const getDevInfo = async() => {
       if (!devMode) return;
       try {
@@ -88,7 +101,6 @@ const SingleCollection: FC<any> = (): ReactElement => {
         setTraitFilter(newFilter)
         searchParams.set('traits', JSON.stringify(newFilter));
         setSearchParams(searchParams);
-        // setSearchParams({ traits: JSON.stringify(newFilter) })
     }
 
     const removeTraitFilter = (trait: cw721.Trait) => {
@@ -97,15 +109,18 @@ const SingleCollection: FC<any> = (): ReactElement => {
         const newFilter = [...traitFilter];
         newFilter.splice(index, 1);
         setTraitFilter(newFilter)
-        setSearchParams({ traits: JSON.stringify(newFilter) })
+        searchParams.set('traits', JSON.stringify(newFilter))
+        setSearchParams(searchParams);
     }
 
     const loadTokens = async(pageNumber = page) => {
-        let fetchTokens = await getTokens(collection.address, searchParams, sortBy, 1, pageNumber*32)
-        if (statusFilter.includes('For Sale')) {
-            const filtered = fetchTokens.filter(t=>fullCollection.asks.findIndex(ask=>ask.token_id===t.tokenId) > -1)
-            fetchTokens = filtered;
-        }
+        let fetchTokens = await getTokens(
+          collection.address,
+          searchParams,
+          sortBy,
+          1,
+          pageNumber*32,
+        )
         setTokens(fetchTokens);
     }
 
@@ -138,11 +153,24 @@ const SingleCollection: FC<any> = (): ReactElement => {
         }
     }
 
+    const handleChangeStatusFilter = () => {
+      if (statusFilter.includes('For Sale')) {
+        searchParams.set('sale', 'true')
+      } else {
+        searchParams.delete('sale')
+      }
+      setSearchParams(searchParams);
+    }
+
+    useEffect(() => {
+      handleChangeStatusFilter();
+    },[statusFilter]);
+
     useEffect(()=>{
         if (!collection) return;
 
         loadTokens()
-    },[collection, traitFilter, statusFilter, sortBy])
+    },[collection, traitFilter, sortBy, searchParams])
 
     const bgStyle: CSSProperties = collection.collectionProfile.banner_image ?
         {

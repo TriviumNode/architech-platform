@@ -55,10 +55,9 @@ export const getTokensByOwner = async (req: Request, res: Response, next: NextFu
 
 export const getCollectionTokens = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('QUERY STRING', req.query);
     const collectionAddr: string = req.params.collectionAddr;
-
     const sort: SortOption = (req.query.sort as SortOption) || 'Token ID';
+    const sale: string = (req.query.sale as string) || 'false';
 
     let traitFilter: cw721.Trait[] = [];
     if (req.query.traits) {
@@ -72,6 +71,7 @@ export const getCollectionTokens = async (req: Request, res: Response, next: Nex
       req.query.limit ? parseInt(req.query.limit as string) : undefined,
       sort,
       traitFilter,
+      sale === 'true',
     );
 
     res.status(200).json(findAllTokensData);

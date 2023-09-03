@@ -43,9 +43,19 @@ export async function findCollectionTokens(
   limit = 30,
   sort: SortOption = 'Token ID',
   traitFilter: cw721.Trait[] = [],
+  saleOnly = false,
 ) {
   if (isEmpty(collectionAddress)) throw new HttpException(400, 'Collection address is empty');
 
+  // ###############################
+  // # Create trait filter queries #
+  // ###############################
+
+  /* Traits are seperated into categories by trait_type
+    { 
+      $trait_type: cw721.Trait[];
+    }
+  */
   const byTrait = {};
   traitFilter.forEach(t => {
     if (byTrait[t.trait_type]) {
@@ -55,20 +65,31 @@ export async function findCollectionTokens(
     }
   });
 
+  // trait_type categories are filtered with $OR
+  // Nfts with ANY of the traits in the category are matched
+  // These $OR matches are then matches in $AND
+  // Matched NFTs will contain a trait from each of the $OR categories
   const andFilters = [];
   Object.keys(byTrait).forEach(key => {
+    // Get trait_type category
     const traits = byTrait[key];
+    // create $OR filter
     const orFilters = buildOrFilter(traits);
+    // Add $OR filter to $AND filter
     andFilters.push(orFilters);
   });
 
+  // Filter for sale NFTs
+  const saleFilter = saleOnly ? { ask: { $exists: true, $not: { $type: 'null' } } } : {};
+  console.log('saleFilter', saleFilter);
   const fullFilter = andFilters.length
     ? {
         $and: andFilters,
+        ...saleFilter,
       }
-    : {};
-
-  // const filter = buildOrFilter(traitFilter);
+    : {
+        ...saleFilter,
+      };
 
   let sortFilter;
   switch (sort) {
