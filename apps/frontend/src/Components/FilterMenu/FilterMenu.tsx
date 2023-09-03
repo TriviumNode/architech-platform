@@ -98,7 +98,7 @@ export default function FilterMenu(props: HoverMenuProps) {
                 <div className='d-flex align-items-center'>
                   {option}
                 </div>
-                <input type="checkbox" checked={selected.includes(option)} onChange={handleChange} />
+                <input type="checkbox" value={option} checked={selected.includes(option)} onChange={handleChange} />
               </div>
             )
           })}
