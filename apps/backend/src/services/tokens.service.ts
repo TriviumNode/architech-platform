@@ -14,6 +14,8 @@ import TokenModel from '@models/tokens.model';
 import CollectionModel from '@/models/collections.model';
 import { MARKETPLACE_ADDRESS } from '@/config';
 
+const saleOnlyFilter = { ask: { $exists: true, $not: { $type: 'null' } } };
+
 export async function findAllTokens(): Promise<Token[]> {
   const tokens: Token[] = await tokenModel.find();
   return tokens;
@@ -80,8 +82,8 @@ export async function findCollectionTokens(
   });
 
   // Filter for sale NFTs
-  const saleFilter = saleOnly ? { ask: { $exists: true, $not: { $type: 'null' } } } : {};
-  console.log('saleFilter', saleFilter);
+  const saleFilter = saleOnly ? saleOnlyFilter : {};
+
   const fullFilter = andFilters.length
     ? {
         $and: andFilters,
@@ -92,6 +94,7 @@ export async function findCollectionTokens(
       };
 
   let sortFilter;
+  let numericOrdering: boolean = undefined;
   switch (sort) {
     case 'Name':
       sortFilter = {
@@ -113,9 +116,23 @@ export async function findCollectionTokens(
         tokenId: 'asc',
       };
       break;
+    case 'Lowest Price':
+      sortFilter = {
+        ask: 'desc',
+        'ask.price': 1,
+      };
+      numericOrdering = true;
+      break;
+    case 'Highest Price':
+      sortFilter = {
+        'ask.price': -1,
+      };
+      numericOrdering = true;
+      break;
     default:
       sortFilter = {};
   }
+
   const { docs }: { docs: any[] } = await tokenModel.paginate(
     {
       collectionAddress: collectionAddress,
@@ -127,6 +144,7 @@ export async function findCollectionTokens(
       populate: 'collectionInfo',
       lean: true,
       sort: sortFilter,
+      collation: { locale: 'en_US', numericOrdering },
     },
   );
   // .populate('collectionInfo');

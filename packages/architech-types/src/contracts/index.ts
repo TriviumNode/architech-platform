@@ -9,4 +9,4 @@ export * as tiers from './tiers/Tiers.types'
 export * as factory from './factory/Factory.types'
 
 
-export type SortOption = 'Token ID' | 'Name' | 'Most Viewed' | 'Recently Created'
+export type SortOption = 'Token ID' | 'Name' | 'Most Viewed' | 'Recently Created' | 'Lowest Price' | 'Highest Price'

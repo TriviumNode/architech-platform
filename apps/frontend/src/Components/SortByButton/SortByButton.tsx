@@ -12,7 +12,7 @@ interface SortByProps {
   sortOptions: 'COLLECTION' | 'TOKEN'
 }
 
-export const collectionSortOptions: SortOption[] = ["Name", "Recently Created", "Most Viewed"];
+export const collectionSortOptions: SortOption[] = ["Name", "Recently Created", "Most Viewed", "Lowest Price", "Highest Price"];
 export const tokenSortOptions: SortOption[] = ["Token ID", ...collectionSortOptions];
 
 export default function SortByButton(props: SortByProps) {
