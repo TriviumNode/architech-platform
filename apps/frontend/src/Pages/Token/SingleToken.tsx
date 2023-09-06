@@ -95,7 +95,7 @@ const SingleToken: FC<any> = (): ReactElement => {
           amount: tokenResponse.ask.price,
           denom: process.env.REACT_APP_NETWORK_DENOM,
         })
-        await refreshToken(tokenResponse.token.collectionAddress, tokenResponse.token.tokenId);
+        // await refreshToken(tokenResponse.token.collectionAddress, tokenResponse.token.tokenId);
         revalidator.revalidate();
       } catch(err: any) {
         console.error(err)

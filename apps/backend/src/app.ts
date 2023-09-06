@@ -71,6 +71,27 @@ class App {
         },
       };
       this.send(JSON.stringify(subscribeEdit));
+
+      const subscribeMarketplace = {
+        jsonrpc: '2.0',
+        method: 'subscribe',
+        id: 1,
+        params: {
+          query: "wasm.architech_app='marketplace'",
+        },
+      };
+      this.send(JSON.stringify(subscribeMarketplace));
+
+      const subscribeTransfer = {
+        jsonrpc: '2.0',
+        method: 'subscribe',
+        id: 1,
+        params: {
+          query: "wasm.action='transfer_nft'",
+        },
+      };
+      this.send(JSON.stringify(subscribeTransfer));
+
       console.log('WS Subscribed.');
     });
 
@@ -115,7 +136,6 @@ class App {
     }
 
     if (Object.keys(object.result).length) {
-      console.log('WS Message!', object);
       switch (object.result.query) {
         case `wasm.architech_action='mint'`: {
           // Handle Mint
@@ -152,23 +172,14 @@ class App {
           break;
         }
         case `wasm.action='transfer_nft'`: {
-          console.log('AAAAAAAAAAAA');
-          console.log('AAAAAAAAAAAA');
-          console.log('AAAAAAAAAAAA');
-          console.log('AAAAAAAAAAAA');
-          console.log('AAAAAAAAAAAA');
-          console.log('AAAAAAAAAAAA');
-          console.log('AAAAAAAAAAAA');
           // Handle NFT Transfer
-          // const collectionAddress: string = object.result.events['wasm.collection'][0];
+          const collectionAddress: string = object.result.events['execute._contract_address'][0];
           const tokenId: string = object.result.events['wasm.token_id'][0];
           const recipient: string = object.result.events['wasm.recipient'][0];
           const sender: string = object.result.events['wasm.sender'][0];
 
-          console.log(JSON.stringify(object, undefined, 2));
-
-          console.log(`Token ID ${tokenId} from collection ${undefined} was transfered from ${sender} to ${recipient}!`);
-          // ensureToken(collectionAddress, tokenId);
+          console.log(`Token ID ${tokenId} from collection ${collectionAddress} was transfered from ${sender} to ${recipient}!`);
+          ensureToken(collectionAddress, tokenId);
 
           break;
         }

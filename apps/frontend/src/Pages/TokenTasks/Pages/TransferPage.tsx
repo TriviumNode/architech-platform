@@ -33,7 +33,7 @@ const TransferPage: FC<{
     try {
       const result = await transferNft({client: user.client, signer: user.address, contract: collectionAddress, tokenId, recipient});
       console.log('*Transfer TX Result*', result);
-      await refreshToken(collectionAddress, tokenId);
+      // await refreshToken(collectionAddress, tokenId);
       toast.success(<>NFT <span style={{fontWeight: 800}}>{tokenName}</span> Transferred</>)
       navigate(`/nfts/${collectionAddress}/${tokenId}`)
     } catch(error) {
