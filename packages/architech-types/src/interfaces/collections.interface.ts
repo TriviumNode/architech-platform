@@ -65,7 +65,6 @@ export interface CollectionModel {
   categories: string[];
   traits: cw721.Trait[];
   traitTypes: string[];
-  uniqueTraits: number;
   tokenIds: string[];
   totalTokens: number;
   importComplete: boolean;

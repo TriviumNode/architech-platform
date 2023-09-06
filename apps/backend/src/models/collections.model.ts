@@ -122,7 +122,7 @@ class CollectionProfileClass implements CollectionProfile {
     },
   },
 )
-@plugin(mongoosastic, { esClient: esClient }) // ElasticSearch
+// @plugin(mongoosastic, { esClient: esClient }) // ElasticSearch
 @modelOptions({ schemaOptions: { collection: 'collections', timestamps: true } })
 export class CollectionClass extends PaginatedModel {
   //implements CollectionModelInterface {
@@ -157,9 +157,6 @@ export class CollectionClass extends PaginatedModel {
 
   @prop({ type: () => [String], required: true, default: [] })
   public traitTypes!: string[];
-
-  @prop({ type: Number, required: true })
-  public uniqueTraits: number;
 
   @prop({ type: () => [String], required: true, default: [] })
   public tokenIds!: string[];

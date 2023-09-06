@@ -7,7 +7,7 @@ import { queryClient as client, queryClient } from '@/utils/chainClients';
 import sleep from '@/utils/sleep';
 import { cw721 } from '@architech/types';
 import equal from 'fast-deep-equal';
-import { refreshCollection, updateCollection } from './collections.service';
+import { addTokenId, addTraits, refreshCollection, updateCollection } from './collections.service';
 import { getAverageColor } from 'fast-average-color-node';
 import { getAllNftInfo, getAsk } from '@architech/lib';
 import TokenModel from '@models/tokens.model';
@@ -167,7 +167,7 @@ export const processCollectionTokens = async (collection: Collection, tokenList:
     console.log('Processing', token_id, 'on', collection.address);
 
     await ensureToken(collection.address, token_id);
-    await sleep(500);
+    await sleep(250);
   }
   processCollectionTraits(collection);
 };
@@ -191,12 +191,12 @@ export const processCollectionTraits = async (collection: Collection) => {
   const updateCollectionData: Partial<Collection> = {
     traits: uniqueTraits,
     traitTypes,
-    uniqueTraits: uniqueTraits.length,
   };
 
   await updateCollection(collection._id, updateCollectionData);
 };
 
+// Imports a token if it does not exist. Updates existing tokens if needed.
 export const ensureToken = async (collectionAddress: string, tokenId: string) => {
   // Check if already imported
   const findToken = await TokenModel.findOne({ collectionAddress, tokenId }).populate('collectionInfo').lean();
@@ -210,12 +210,13 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
       return undefined;
     }
   }
-  let ask: marketplace.Ask;
+
   let owner = findToken?.owner;
   let metadataExtension = findToken?.metadataExtension;
   let metadataUri = findToken?.metadataUri;
+  let ask: marketplace.Ask;
 
-  // Get NFT Info
+  // Get NFT Info (owner and metadata)
   try {
     const {
       info: { extension, token_uri },
@@ -292,21 +293,25 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
       total_views: 0,
     };
 
-    // // Add Token ID to Collection Document
-    // await CollectionModel.updateOne({ collectionAddress }, { $addToSet: { tokenIds: tokenId } });
+    // Add Token ID to Collection Document
+    await addTokenId(collectionAddress, tokenId);
 
-    // Lets just refresh the entire damn collection
-    // NVM it gets crazy, fuck it
-    // await refreshCollection(collectionAddress);
+    // Add traits to collection document
+    await addTraits(collectionAddress, cleanAttributes);
 
     // Create Token Document, redundant after refresh but fuck it it upserts
     console.log('Creating new token document for', tokenId, 'on', collectionAddress);
     const newToken = await TokenModel.findOneAndUpdate({ tokenId, collectionAddress }, newTokenData, { upsert: true, new: true })
-      .populate('collectionInfo') // fresh shit we refreshed above
+      .populate('collectionInfo') // fresh shit we updated above
       .lean();
 
     return newToken;
-  } else if (
+  }
+
+  // ###################################
+  // # Update Existing Token if Needed #
+  // ###################################
+  if (
     !equal(
       {
         ask,
@@ -339,5 +344,11 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
     return populated;
   } else {
     return findToken;
+  }
+};
+
+export const ensureMultiple = async (collectionAddress: string, tokenIds: string[]) => {
+  for (const tokenId of tokenIds) {
+    await ensureToken(collectionAddress, tokenId);
   }
 };

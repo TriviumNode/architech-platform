@@ -18,7 +18,7 @@ import proxy from 'express-http-proxy';
 import bodyParser from 'body-parser';
 import NodeCache from 'node-cache';
 import { RawData, WebSocket } from 'ws';
-import { ensureToken } from './services/tokens.service';
+import { ensureMultiple, ensureToken } from './services/tokens.service';
 import { refreshCollection } from './services/collections.service';
 
 export const cache = new NodeCache({ stdTTL: 15 });
@@ -104,7 +104,7 @@ class App {
 
   public handleWsMessage(data: RawData, isBinary: boolean) {
     if (isBinary) {
-      console.log('WS returned binaey data???:', data);
+      console.log('WS returned binary data???:', data);
       return;
     }
 
@@ -115,17 +115,22 @@ class App {
     }
 
     if (Object.keys(object.result).length) {
+      console.log('WS Message!', object);
       switch (object.result.query) {
-        case `wasm.architech_action='mint'`:
+        case `wasm.architech_action='mint'`: {
           // Handle Mint
           const recipient: string = object.result.events['wasm.recipient'][0];
           const collectionAddress: string = object.result.events['wasm.collection'][0];
-          const mintedTokenId: string = object.result.events['wasm.token_id'][0];
+          const mintedTokenIds: string[] = object.result.events['wasm.token_id'];
           const architechApp: string = object.result.events['wasm.architech_app'][0];
-          console.log(`Token ID ${mintedTokenId} minted for ${recipient} on collection ${collectionAddress} using app ${architechApp}!`);
-          // ensureToken(collectionAddress, mintedTokenId);
-          refreshCollection(collectionAddress);
+
+          for (const mintedTokenId of mintedTokenIds) {
+            console.log(`Token ID ${mintedTokenId} minted for ${recipient} on collection ${collectionAddress} using app ${architechApp}!`);
+          }
+          ensureMultiple(collectionAddress, mintedTokenIds);
+
           break;
+        }
         case `wasm.architech_action='edit_minter'`: {
           // Handle Edit Minter
           const collectionAddress: string = object.result.events['wasm.collection'][0];
@@ -133,6 +138,38 @@ class App {
           const architechApp: string = object.result.events['wasm.architech_app'][0];
           console.log(`${architechApp} ${minterAddress} for collection ${collectionAddress} was edited!`);
           refreshCollection(collectionAddress);
+          break;
+        }
+        case `wasm.architech_app='marketplace'`: {
+          // Handle Marketplace Buy/List/Cancel
+          const collectionAddress: string = object.result.events['wasm.collection'][0];
+          const tokenId: string = object.result.events['wasm.token_id'][0];
+          const action: string = object.result.events['wasm.architech_action'][0];
+
+          console.log(`Token ID ${tokenId} from collection ${collectionAddress} was ${action} on the marketplace!`);
+          ensureToken(collectionAddress, tokenId);
+
+          break;
+        }
+        case `wasm.action='transfer_nft'`: {
+          console.log('AAAAAAAAAAAA');
+          console.log('AAAAAAAAAAAA');
+          console.log('AAAAAAAAAAAA');
+          console.log('AAAAAAAAAAAA');
+          console.log('AAAAAAAAAAAA');
+          console.log('AAAAAAAAAAAA');
+          console.log('AAAAAAAAAAAA');
+          // Handle NFT Transfer
+          // const collectionAddress: string = object.result.events['wasm.collection'][0];
+          const tokenId: string = object.result.events['wasm.token_id'][0];
+          const recipient: string = object.result.events['wasm.recipient'][0];
+          const sender: string = object.result.events['wasm.sender'][0];
+
+          console.log(JSON.stringify(object, undefined, 2));
+
+          console.log(`Token ID ${tokenId} from collection ${undefined} was transfered from ${sender} to ${recipient}!`);
+          // ensureToken(collectionAddress, tokenId);
+
           break;
         }
       }

@@ -6,7 +6,7 @@ import { isContract, queryClient as client, queryClient } from '@/utils/chainCli
 
 import equal from 'fast-deep-equal';
 import { findCollectionTokenCount, processCollectionTokens, processCollectionTraits } from './tokens.service';
-import { Collection, copyMinter, GetCollectionResponse, minter, MinterPaymentI, User } from '@architech/types';
+import { Collection, copyMinter, cw721, GetCollectionResponse, minter, MinterPaymentI, User } from '@architech/types';
 
 import { CreateCollectionData } from '@/interfaces/collections.interface';
 import CollectionModel from '@models/collections.model';
@@ -28,9 +28,10 @@ import { isArray, isBoolean } from 'class-validator';
 import fetch from 'node-fetch';
 import { hashBuffer, saveBuffer } from '@/middlewares/fileUploadMiddleware';
 import mime from 'mime-types';
-import mongoose from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
 import { ARCHID_ADDRESS, MARKETPLACE_ADDRESS } from '@/config';
 import UserModel from '@/models/users.model';
+import { queryDbCollectionById } from '@/queriers/collection.querier';
 
 const removeNullUndefined = (obj: any) => Object.entries(obj).reduce((a, [k, v]) => (v == null ? a : ((a[k] = v), a)), {});
 const removeId = (obj: any) => Object.entries(obj).reduce((a, [k, v]) => (k == '_id' ? a : ((a[k] = v), a)), {});
@@ -144,42 +145,49 @@ const refreshCollectionTokenList = async (collectionId: string, collectionData: 
 };
 
 // Internal Use
-// Refreshes collection if needed
+// Refreshes collection only if needed
 export const refreshCollection = async (contract: string) => {
-  console.log('Trying Refresh for', contract);
   const knownCollectionData = await findCollectionByAddress(contract);
-  console.log('Known Total Tokens', knownCollectionData.totalTokens);
 
   // Query collection info from chain
-  const numTokens = await getNumTokens({ client, contract });
+  const numTokensOnChain = await getNumTokens({ client, contract });
   const { admin, creator } = await client.getContract(contract);
 
   // Get processed tokens from DB
-  const processedTokens = await findCollectionTokenCount(contract);
-  console.log('Processed Tokens', processedTokens);
+  const numTokensInDB = await findCollectionTokenCount(contract);
 
   // Check for minter info
-  const minterResponse = await getMinterInfo(creator);
-  const cleanNew = removeNullUndefined(minterResponse.minter || {});
+  const { minter } = await getMinterInfo(creator);
 
-  const cleanOld = removeId(removeNullUndefined(knownCollectionData.collectionMinter || {}));
-  // Check if update is needed
+  // Cleanup undefined fields for comparison
+  const cleanNewMinter = removeNullUndefined(minter || {});
+  const cleanOldMinter = removeId(removeNullUndefined(knownCollectionData.collectionMinter || {}));
+
+  // ##################################
+  // # Refresh tokens async if needed #
+  // ##################################
   if (
-    !equal(knownCollectionData.totalTokens, numTokens) ||
-    !equal(knownCollectionData.admin, admin) ||
+    !equal(knownCollectionData.totalTokens, numTokensOnChain) ||
     !equal(knownCollectionData.totalTokens, knownCollectionData.tokenIds.length) ||
-    !equal(cleanOld, cleanNew) ||
-    knownCollectionData.tokenIds.length < numTokens ||
-    processedTokens < numTokens ||
+    knownCollectionData.tokenIds.length < numTokensOnChain ||
+    numTokensInDB < numTokensOnChain
+  ) {
+    console.log('Updating token list for collection', contract);
+    refreshCollectionTokenList(knownCollectionData._id.toString(), knownCollectionData, numTokensOnChain);
+  }
+
+  // ###############################
+  // # Update other info if needed #
+  // ###############################
+  if (
+    !equal(knownCollectionData.admin, admin) ||
+    !equal(cleanOldMinter, cleanNewMinter) ||
+    !equal(knownCollectionData.totalTokens, numTokensOnChain) ||
     !knownCollectionData.collectionProfile.profile_image
   ) {
-    console.log('Refreshing Collection!');
-
-    // ensure pfp
+    // Ensure pfp
     let pfp = knownCollectionData.collectionProfile.profile_image;
-    console.log('Existing PFP', pfp);
     if (!pfp && knownCollectionData.tokenIds.length) {
-      console.log('Ensuring PFP');
       const ensured = await getEnsuredPfp(contract, knownCollectionData.tokenIds);
       pfp = ensured ? ensured : pfp;
     }
@@ -187,26 +195,19 @@ export const refreshCollection = async (contract: string) => {
     // Save admin, total, and pfp
     const updateData: Partial<Collection> = {
       admin,
-      totalTokens: numTokens,
+      totalTokens: numTokensOnChain,
       collectionProfile: {
         profile_image: pfp,
       },
-      collectionMinter: minterResponse.minter,
+      collectionMinter: minter,
     };
     const updatedCollection = await updateCollection(knownCollectionData._id, updateData);
 
-    // Start refreshing tokens
-    refreshCollectionTokenList(updatedCollection._id.toString(), updatedCollection, numTokens);
-
     // Return updated data
     return updatedCollection;
-  } else {
-    // No differences found, but lets update trait stats async
-    processCollectionTraits(knownCollectionData);
   }
 
-  // Return what we already know if nothing else was returned
-  console.log('No Refresh needed. Returning DB Collection.');
+  // Else: Return what we already know
   return knownCollectionData;
 };
 
@@ -293,7 +294,6 @@ export const importCollection = async (
     totalTokens,
     importComplete: false,
     traits: [],
-    uniqueTraits: 0,
     hidden: hidden,
     tokenIds: tokenIdList,
     collectionMinter: minterResponse.minter,
@@ -472,4 +472,33 @@ const getMinterInfo = async (creator: string) => {
     }
   }
   return { minter: undefined, actual_creator: creator };
+};
+
+// Add an array of traits to a collection's document if they are not already added
+export const addTraits = async (collectionAddress: string, traits: cw721.Trait[]) => {
+  const collection = await CollectionModel.findOne({ address: collectionAddress }).lean();
+  if (!collection) {
+    throw new Error(
+      `Unable to add trait to collection not in database!\n
+       Collection Address: ${collectionAddress}\n
+       Traits: ${JSON.stringify(traits, undefined, 2)}`,
+    );
+  }
+
+  const newTraits: cw721.Trait[] = [...collection.traits];
+  const traitTypes: string[] = [...collection.traitTypes];
+
+  for (const trait of traits) {
+    if (newTraits.find(t => t.trait_type === trait.trait_type && t.value === trait.value)) continue;
+    if (!traitTypes.includes(trait.trait_type)) traitTypes.push(trait.trait_type);
+    newTraits.push(trait);
+  }
+
+  const updateCollectionData: Partial<Collection> = { traits, traitTypes };
+
+  return await updateCollection(collection._id, updateCollectionData);
+};
+
+export const addTokenId = async (collectionAddress: string, tokenId: string) => {
+  await CollectionModel.updateOne({ address: collectionAddress }, { $addToSet: { tokenIds: tokenId } });
 };
