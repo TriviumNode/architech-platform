@@ -94,7 +94,7 @@ export async function findCollectionTokens(
       };
 
   let sortFilter;
-  let numericOrdering: boolean = undefined;
+  let numericOrdering = false;
   switch (sort) {
     case 'Name':
       sortFilter = {
