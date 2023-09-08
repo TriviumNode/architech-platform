@@ -113,7 +113,7 @@ export async function findCollectionTokens(
       break;
     case 'Token ID':
       sortFilter = {
-        tokenId: 'asc',
+        tokenId: 1,
       };
       numericOrdering = true;
       break;
