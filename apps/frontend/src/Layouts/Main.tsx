@@ -31,9 +31,8 @@ export default function MainLayout() {
 
   useEffect(()=>{
     if (!QueryClient) return;
-    if (process.env.REACT_APP_CHAIN_ID.startsWith('archway-')) return;
     getBlockTime();
-  },[QueryClient])
+  },[QueryClient, devMode])
 
   const page: HeaderPage =
     location.pathname.toLowerCase().includes('nfts') ? 'NFTS' :
@@ -59,7 +58,7 @@ export default function MainLayout() {
               </div>
             </div>
 
-            <div>Block Tme: {latestBlockTime ? latestBlockTime.toLocaleString() : <SmallLoader />}</div>
+            <div>Block Time: {latestBlockTime ? latestBlockTime.toLocaleString() : <SmallLoader />}</div>
             <div>
               <div>Marketplace: {MARKETPLACE_ADDRESS}</div>
               <div>Credits: {CREDIT_ADDRESS}  </div>
