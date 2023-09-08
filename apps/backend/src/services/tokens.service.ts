@@ -115,6 +115,7 @@ export async function findCollectionTokens(
       sortFilter = {
         tokenId: 'asc',
       };
+      numericOrdering = true;
       break;
     case 'Lowest Price':
       sortFilter = {
