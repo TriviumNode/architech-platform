@@ -7,7 +7,7 @@ import styles from './create.module.scss'
 import astyles from './admin.module.scss'
 import { useUser } from "../../Contexts/UserContext";
 import SmallLoader from "../../Components/SmallLoader";
-import { CREDIT_ADDRESS, MARKETPLACE_ADDRESS, NFT_FACTORY_ADDRESS, QueryClient } from "../../Utils/queryClient";
+import { CREDIT_ADDRESS, MARKETPLACE_ADDRESS, NFT_FACTORY_ADDRESS, NOIS_PROXY, QueryClient } from "../../Utils/queryClient";
 import { ContractMetadata } from "@archwayhq/arch3.js/build";
 import Loader from "../../Components/Loader";
 import { Contract } from "@cosmjs/cosmwasm-stargate";
@@ -30,7 +30,8 @@ type LookupResult = {
 type ArchitechContractRewards = {
     credits: CInfo,
     marketplace: CInfo,
-    factory: CInfo,
+    factory?: CInfo,
+    proxy?: CInfo,
 }
 
 const AdminRewardsPage: FC<{}> = (): ReactElement => {
@@ -99,9 +100,15 @@ const AdminRewardsPage: FC<{}> = (): ReactElement => {
                 return await QueryClient.getContractMetadata(NFT_FACTORY_ADDRESS);
                 } catch { return undefined }
             })();
+            const proxy_metadata = await (async function() {
+              try {
+              return await QueryClient.getContractMetadata(NOIS_PROXY);
+              } catch { return undefined }
+          })();
             const credits_info = await QueryClient.getContract(CREDIT_ADDRESS);
             const marketplace_info = await QueryClient.getContract(MARKETPLACE_ADDRESS);
             const factory_info = await QueryClient.getContract(NFT_FACTORY_ADDRESS);
+            const proxy_info = await QueryClient.getContract(NOIS_PROXY);
             const r: ArchitechContractRewards = {
                 credits: {
                     metadata: credits_metadata,
@@ -115,6 +122,10 @@ const AdminRewardsPage: FC<{}> = (): ReactElement => {
                     metadata: factory_metadata,
                     info: factory_info,
                 },
+                proxy: {
+                  metadata: proxy_metadata,
+                  info: proxy_info,
+              },
             }
             console.log(r);
             setRewards(r)
@@ -176,6 +187,20 @@ const AdminRewardsPage: FC<{}> = (): ReactElement => {
                             <p><span>Admin</span><br/>{rewards.factory.info.admin}</p>
                             <p><span>Owner</span><br/>{rewards.factory.metadata?.ownerAddress || 'Not Configured'}</p>
                             <p><span>Reward Recipient</span><br/>{rewards.factory.metadata?.rewardsAddress || 'Not Configured'}</p>
+                        </>
+                    }
+                </Col>
+                <Col xs={6}>
+                    <h5>NOIS Proxy</h5>
+                    <div className='lightText10' style={{marginLeft: '4px'}}>{NOIS_PROXY}</div>
+                    {
+                        !rewards.proxy ?
+                            <p>Not Configured</p>
+                        :
+                        <>
+                            <p><span>Admin</span><br/>{rewards.proxy.info.admin}</p>
+                            <p><span>Owner</span><br/>{rewards.proxy.metadata?.ownerAddress || 'Not Configured'}</p>
+                            <p><span>Reward Recipient</span><br/>{rewards.proxy.metadata?.rewardsAddress || 'Not Configured'}</p>
                         </>
                     }
                 </Col>

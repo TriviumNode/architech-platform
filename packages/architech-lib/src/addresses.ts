@@ -7,6 +7,9 @@ export type ChainConfig = {
   CW721_CODE_ID: number;
   ARCHID_ADDRESS: string;
   DISABLED_FEATURES: Feature[];
+
+  NOIS_PROXY: string;
+  NOIS_PAYMENT_CONTRACT: string;
 }
 
 export const getAddresses = (chainId: string): ChainConfig => {
@@ -18,7 +21,11 @@ export const getAddresses = (chainId: string): ChainConfig => {
                 NFT_FACTORY_ADDRESS: 'archway1974a8z4w0ph48nfexf5jt2nqxvmyzz3n9gahfv62d6yalr9fsm3qhln996',
                 CW721_CODE_ID: 44,
                 ARCHID_ADDRESS: 'archway1275jwjpktae4y4y0cdq274a2m0jnpekhttnfuljm6n59wnpyd62qppqxq0',
-                DISABLED_FEATURES: ['RANDOMMINT']
+                DISABLED_FEATURES: ['RANDOMMINT'],
+
+                // Nois Contracts
+                NOIS_PROXY: 'archway10f3aasgsnpv84ymjyld50jayc4ecu267sdpjamauwm8nvxlzex9qj4dkwr',
+                NOIS_PAYMENT_CONTRACT: 'nois1rf3qhpwrs6zy0hun9qua56har9jrfau97c006czg7mjmhq7c09uqa2l7rg',
             };
             break;
         case 'constantine-3':
@@ -29,6 +36,9 @@ export const getAddresses = (chainId: string): ChainConfig => {
                 CW721_CODE_ID: 219,
                 ARCHID_ADDRESS: 'archway1lr8rstt40s697hqpedv2nvt27f4cuccqwvly9gnvuszxmcevrlns60xw4r',
                 DISABLED_FEATURES: [],
+
+                NOIS_PROXY: 'archway1agttusk2xyffuuq2f5cefkatavrv2ywt8005pf3w05pcfsy2kuyqf93vqk',
+                NOIS_PAYMENT_CONTRACT: 'nois1lzswfaf7v4wyypfrnc0czsdcm4u0mavpfffx3d9uhqwgt84pq3wqm8e508',
             };
             break;
         case "localnet":
@@ -39,6 +49,9 @@ export const getAddresses = (chainId: string): ChainConfig => {
                 CW721_CODE_ID: 638,
                 ARCHID_ADDRESS: '',
                 DISABLED_FEATURES: [],
+
+                NOIS_PAYMENT_CONTRACT: '',
+                NOIS_PROXY: '',
             };
             break;
         default:

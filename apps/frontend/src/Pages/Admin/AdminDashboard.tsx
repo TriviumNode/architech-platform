@@ -8,11 +8,13 @@ import AdminTasksPage from "./TasksPage";
 import { ADMINS } from "@architech/lib";
 import AdminRewardsPage from "./RewardsPage";
 import AdminMinterQueries from "./MinterQueries";
+import AdminNoisStatusPage from "./NoisStatusPage";
 
-export type Page = 'Maintenance Tasks' | 'Rewards' | 'Minter Queries'
+export type Page = 'Maintenance Tasks' | 'Rewards' | 'Minter Queries' | 'NOIS Status'
 
 export const Pages: Page[] = [
     'Rewards',
+    'NOIS Status',
     'Minter Queries',
     'Maintenance Tasks',
 ]
@@ -30,6 +32,8 @@ const AdminDashboard: FC<any> = (): ReactElement => {
                 return <AdminMinterQueries />
             case 'Maintenance Tasks':
                 return <AdminTasksPage />
+              case 'NOIS Status':
+                return <AdminNoisStatusPage />
             default:
                 return <div style={{margin: '32px', textAlign: 'center'}}><h2 style={{color: 'red'}}>Something went wrong</h2><p>The application encounted an error: `Tried to navigate to undefined page.`<br />Please try to navigate to another page using the menu on the left.</p></div>
         }
