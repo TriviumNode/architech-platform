@@ -11,6 +11,7 @@ import ArchDenom, { DenomImg } from "../../Components/ArchDenom";
 import Badge from "../../Components/Badge";
 import CollectionStats from "../../Components/CollectionStats/CollectionStats";
 import HiddenBanner from "../../Components/HiddenBanner/HiddenBanner";
+import LinkButton from "../../Components/LinkButton";
 import Loader from "../../Components/Loader";
 import Modal from "../../Components/Modal";
 import ListModal from "../../Components/Modals/ListModal";
@@ -232,21 +233,6 @@ const SingleToken: FC<any> = (): ReactElement => {
               </div>
               <div className='d-flex align-items-center'>
                 <div className="d-flex align-items-stretch" style={{gap: '16px'}}>
-                {(!!user && user.address === tokenResponse.token.owner && !!!tokenResponse.ask) &&
-                    <>
-                      <Link
-                        to='tasks'
-                        data-tooltip-id="transfer-tooltip"
-                        data-tooltip-content='Transfer NFT'
-                        data-tooltip-place="left"
-                        className='d-flex align-items-center justify-content-center'
-                      >
-                        <FontAwesomeIcon icon={faPeopleArrows} size='xl' />
-                      </Link>
-                      <Tooltip id="transfer-tooltip" />
-                      <Vr />
-                    </>
-                  }
                   <button onClick={handleFavorite} disabled={!!!user} className='clearBtn' style={{padding: 0, height: 'unset'}}>
                     <div className={styles.number}><img alt='' src={isFavorite ? '/red_heart.svg' : '/heart.svg'} style={{height: '1.3em'}} />&nbsp;{tokenResponse.favorites}</div>
                     <span className={styles.label}>Favorites</span>
@@ -357,6 +343,12 @@ const SingleToken: FC<any> = (): ReactElement => {
               :
                 tokenResponse.token.owner === user?.address && 
                 <>
+                <LinkButton
+                  to='tasks'
+                  style={{fontSize: '12px', textDecoration: 'none'}}
+                >
+                  Transfer NFT
+                </LinkButton>
                 <button
                   type='button'
                   onClick={()=>setIsListing(true)}
