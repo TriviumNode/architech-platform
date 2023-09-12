@@ -355,7 +355,7 @@ export const updateCollectionBanner = async(collectionId: string, file: File): P
     return data;
 }
 
-export const uploadImage = async(file: File): Promise<any> => {
+export const uploadImage = async(file: File): Promise<string> => {
     if (!file) throw new Error('No File to upload!')
     const url = getApiUrl(`/upload`);
 
@@ -397,6 +397,29 @@ export const uploadBatch = async(files: File[], onUploadProgress?: (progressEven
         }
     )
     return data;
+}
+
+export type ProgressReport = {
+  total: number;
+  uploaded: number;
+}
+
+export const uploadMultiple = async(files: File[], onUploadProgress?: (progressReport: ProgressReport)=>void) => {
+  const results = [];
+  try {
+    for (const file of files) {
+      const cid = await uploadImage(file);
+      results.push({
+        file,
+        cid,
+      })
+      if (onUploadProgress) onUploadProgress({total: files.length, uploaded: results.length})
+    }
+    return results;
+  } catch (err: any) {
+    console.error('Failed to upload', err)
+    throw err;
+  }
 }
 
 export const refreshCollection = async(collectionAddress: string): Promise<Collection> => {

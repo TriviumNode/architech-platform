@@ -6,7 +6,7 @@ import { ImportCollectionData } from "../../Interfaces/interfaces";
 
 import styles from './create.module.scss'
 import CollectionDetailPage, { DetailState } from "./CollectionSubPages/CollectionDetailPage";
-import { editCollection, uploadBatch } from "../../Utils/backend";
+import { editCollection, ProgressReport, uploadBatch, uploadMultiple } from "../../Utils/backend";
 import LinksPage, { LinkState } from "./CollectionSubPages/LinksPage";
 import { cw2981, GetCollectionResponse, minter } from "@architech/types";
 import { toast } from "react-toastify";
@@ -343,8 +343,14 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
       setTimesState(currentTimes);
     }
 
-    const handleProgress = (progressEvent: AxiosProgressEvent) => {
+    const handleAxiosProgress = (progressEvent: AxiosProgressEvent) => {
       const percent = Math.ceil((progressEvent.progress || 0) * 100);
+      setUploadPercent(percent);
+      if (percent === 100) setPreloadStatus('PROCESSING');
+    }
+
+    const handleProgress = (progressReport: ProgressReport) => {
+      const percent = Math.ceil((progressReport.uploaded / progressReport.total) * 100);
       setUploadPercent(percent);
       if (percent === 100) setPreloadStatus('PROCESSING');
     }
@@ -354,11 +360,13 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
         if (!fullCollection.collection.collectionMinter) throw new Error(`This collection doesn't have a Minter.`);
         setPreloadStatus('UPLOADING');
         try {
-            const uploadResult = await uploadBatch(preloadState.images.map(i=>i.file), handleProgress);
+            // const uploadResult = preloadState.images.length ? await uploadBatch(preloadState.images.map(i=>i.file), handleProgress) : undefined;
+            const uploadResult = preloadState.images.length ? await uploadMultiple(preloadState.images.map(i=>i.file), handleProgress) : [];
             setPreloadStatus('PROCESSING');
             const cleanMetadata: cw2981.Metadata[] = preloadState.items.map(i=>{
+                console.log('Processing', i.name)
                 if (!i.image) {
-                    const findImg = uploadResult.find((r: any)=>r.fileName === i.file_name);
+                    const findImg = uploadResult.find((r)=>r.file.name === i.file_name);
                     if (!findImg) throw new Error(`Unable to find filename ${i.file_name} in upload result.`)
                     const metadata: cw2981.Metadata = {
                         ...{...i, file_name: undefined},
