@@ -13,6 +13,7 @@ import { getCollectionName } from "../../Utils/helpers";
 import { denomToHuman, mintRandom, parseError } from "@architech/lib";
 import { useMint } from "../../Contexts/MintContext";
 import { toast } from "react-toastify";
+import { isRandomnessReady } from "../../Pages/Minter/SingleMinter";
 
 interface Props {
   open: boolean;
@@ -72,6 +73,9 @@ export default function MintModal({open, minterStatus, buyerStatus, prices, coll
         if (quantity > max) throw new Error(`Maximum number of mints is ${max}`)
         setLoading(true);
 
+        // Query NOIS payment contract to ensure enough funds.
+        await isRandomnessReady()
+
         const funds = collection.collectionMinter.payment?.denom ? [{amount: denomTotal.toString(), denom: collection.collectionMinter.payment.denom}] : []
         console.log('FUNDS', funds)
         const result = await mintRandom({
@@ -100,6 +104,7 @@ export default function MintModal({open, minterStatus, buyerStatus, prices, coll
         setLoading(false);
         console.error(err)
         toast.error(parseError(err))
+        onClose();
       }
     }
 

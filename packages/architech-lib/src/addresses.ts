@@ -10,6 +10,7 @@ export type ChainConfig = {
 
   NOIS_PROXY: string;
   NOIS_PAYMENT_CONTRACT: string;
+  RANDOMNESS_COST: number;
 }
 
 export const getAddresses = (chainId: string): ChainConfig => {
@@ -26,6 +27,7 @@ export const getAddresses = (chainId: string): ChainConfig => {
                 // Nois Contracts
                 NOIS_PROXY: 'archway10f3aasgsnpv84ymjyld50jayc4ecu267sdpjamauwm8nvxlzex9qj4dkwr',
                 NOIS_PAYMENT_CONTRACT: 'nois1rf3qhpwrs6zy0hun9qua56har9jrfau97c006czg7mjmhq7c09uqa2l7rg',
+                RANDOMNESS_COST: 25,
             };
             break;
         case 'constantine-3':
@@ -39,6 +41,7 @@ export const getAddresses = (chainId: string): ChainConfig => {
 
                 NOIS_PROXY: 'archway1agttusk2xyffuuq2f5cefkatavrv2ywt8005pf3w05pcfsy2kuyqf93vqk',
                 NOIS_PAYMENT_CONTRACT: 'nois1lzswfaf7v4wyypfrnc0czsdcm4u0mavpfffx3d9uhqwgt84pq3wqm8e508',
+                RANDOMNESS_COST: 1,
             };
             break;
         case "localnet":
@@ -50,8 +53,9 @@ export const getAddresses = (chainId: string): ChainConfig => {
                 ARCHID_ADDRESS: '',
                 DISABLED_FEATURES: [],
 
-                NOIS_PAYMENT_CONTRACT: '',
-                NOIS_PROXY: '',
+                NOIS_PROXY: 'archway1agttusk2xyffuuq2f5cefkatavrv2ywt8005pf3w05pcfsy2kuyqf93vqk',
+                NOIS_PAYMENT_CONTRACT: 'nois1lzswfaf7v4wyypfrnc0czsdcm4u0mavpfffx3d9uhqwgt84pq3wqm8e508',
+                RANDOMNESS_COST: 1,
             };
             break;
         default:

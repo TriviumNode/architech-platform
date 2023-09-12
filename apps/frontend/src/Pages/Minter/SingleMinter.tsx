@@ -25,8 +25,9 @@ import { DevInfo } from "../../Interfaces/interfaces";
 import { getApiUrl, refreshCollection } from "../../Utils/backend";
 import { calculatePrices, getPrice, Prices } from "../../Utils/data";
 import { getCollectionName } from "../../Utils/helpers";
-import { QueryClient } from "../../Utils/queryClient";
+import { NoisQueryClient, NOIS_PAYMENT_CONTRACT, QueryClient, RANDOMNESS_COST } from "../../Utils/queryClient";
 import sleep from "../../Utils/sleep";
+import { queryPaymentContractBalance } from "../../Utils/wasm/proxyQuery";
 
 import styles from './minter.module.scss';
 
@@ -59,6 +60,29 @@ const isMintingAvailable = (status: TimeStatus, whitelisted = false) => {
   if (status.public) return true;
   if (status.private && whitelisted) return true;
   return false;
+}
+
+// Queries NOIS payment contract to ensure enough funds.
+export const isRandomnessReady = async () => {
+  try {
+    const balance = await queryPaymentContractBalance({
+      client: NoisQueryClient,
+      address: NOIS_PAYMENT_CONTRACT
+    });
+    const minimum = RANDOMNESS_COST * 500;
+    
+    console.log(`Randomness Balance: ${balance}\nRandomness Minimum: ${minimum}\nRandomness Cost: ${RANDOMNESS_COST}`)
+    if (balance < minimum) {
+      // console.error(`Randomness Balance: ${balance}\nRandomness Minimum: ${minimum}\nRandomness Cost: ${RANDOMNESS_COST}`)
+      throw new Error('Randomness payment contract has insufficent funds. Please contract Architech support.')
+    }
+  } catch(e: any) {
+    if (e.toString().includes('has insufficent funds')) throw e;
+    else {
+      console.error(`Unable to verify randomness contract:\n`, e);
+      throw new Error(`Unable to verify randomness contract: ${e.toString()}`)
+    }
+  }
 }
 
 const SingleMinter: FC<any> = (): ReactElement => {
@@ -158,6 +182,9 @@ const SingleMinter: FC<any> = (): ReactElement => {
       }
 
       setLoadingTx(true);
+
+      // Query NOIS payment contract to ensure enough funds.
+      await isRandomnessReady()
 
       if (buyerStatus.whitelisted) {
         console.log('Whitelist Mint')

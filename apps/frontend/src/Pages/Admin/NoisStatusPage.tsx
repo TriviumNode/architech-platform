@@ -1,4 +1,4 @@
-import { FC, ReactElement, useState } from "react";
+import { FC, ReactElement, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import { useUser } from "../../Contexts/UserContext";
@@ -7,22 +7,26 @@ import { NoisQueryClient, NOIS_PAYMENT_CONTRACT } from "../../Utils/queryClient"
 import { queryPaymentContractBalance } from "../../Utils/wasm/proxyQuery";
 
 const AdminNoisStatusPage: FC<{}> = (): ReactElement => {
-    const { user } = useUser()
-    const [loading, setLoading] = useState(false);
-    const [balance, setBalance] = useState<number>();
+  const { user } = useUser()
+  const [loading, setLoading] = useState(false);
+  const [balance, setBalance] = useState<number>();
 
-    const handleGetBalance = async () => {
-      setLoading(true);
-      try {
-        const result = await queryPaymentContractBalance({ client: NoisQueryClient, address: NOIS_PAYMENT_CONTRACT})
-        console.log(result);
-        setBalance(result);
-      } catch (err: any) {
-        console.error(err)
-        toast.error(err.toString());
-      }
-      setLoading(false);
+  const handleGetBalance = async () => {
+    setLoading(true);
+    try {
+      const result = await queryPaymentContractBalance({ client: NoisQueryClient, address: NOIS_PAYMENT_CONTRACT})
+      console.log(result);
+      setBalance(result);
+    } catch (err: any) {
+      console.error(err)
+      toast.error(err.toString());
     }
+    setLoading(false);
+  }
+
+  useEffect(()=>{
+    handleGetBalance();
+  },[]);
 
   return (
     <div style={{margin: '48px'}} className='d-flex flex-column'>
