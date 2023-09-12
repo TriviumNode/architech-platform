@@ -163,7 +163,7 @@ export default function PreloadDropzone(
 
     </section>
     { !!files.length &&
-      <aside onClick={noClick}>
+      <aside onClick={noClick} style={{ maxHeight: '650px', overflowY: 'auto' }}>
         <div className='grid-4 wide mt8'>{files}</div>
       </aside>
     }
