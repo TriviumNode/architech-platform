@@ -3,17 +3,15 @@ import { useUser } from "../../Contexts/UserContext";
 import ArchDenom from "../ArchDenom";
 import ProfileMenu from "../ProfileMenu";
 import SmallLoader from "../SmallLoader";
-import Vr from "../vr";
 import { useLocation } from 'react-router-dom'
 
 import  styles from './Navbar.module.scss';
 import { truncateAddress } from "@architech/lib";
 import SearchBar from "../SearchBar/SearchBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faHamburger, faMagnifyingGlass, faWallet, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
-import HoverMenu from "../HoverMenu";
+import { faBars, faMagnifyingGlass, faWallet, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { HoverMenuLink } from "../HoverMenu/HoverMenu";
+import { useState } from "react";
 
 
 export type HeaderPage = 'NFTS' | 'DROPS' | 'DAOS' | 'HOME';
@@ -81,6 +79,8 @@ const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
   const {user, balances, connectWallet, walletStatus} = useUser()
   const location = useLocation();
 
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+
   const page: HeaderPage =
     location.pathname.toLowerCase().includes('drops') ? 'DROPS' :
     location.pathname.toLowerCase().includes('nfts') ? 'NFTS' :
@@ -94,30 +94,52 @@ const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
   }
   const handleWalletButton = async(e: any) => {
     e.preventDefault();
+    setShowMobileSearch(false);
     if (!user) await connectWallet()
     else openMenu();
   }
+
+  const handleMenuButton = (e?: any) => {
+    if (e.preventDefault) e.preventDefault();
+    setShowMobileSearch(false);
+    openMenu();
+  }
+
+  const handleMobileSearch = (e?: any) => {
+    if (e.preventDefault) e.preventDefault();
+    setShowMobileSearch(true);
+  }
+
+  
 
     return (
       <>
       <nav id="navBar"  className={`${styles.navbar} grayCard`}>
 
         <div className={styles.navbarInternal}>
+
+          {/* Mobile Menu */}
           <div className='d-md-none d-flex wide tall align-items-center' style={{position: 'relative'}}>
-            <button type='button' className='noButton' style={{color: '#777'}} onClick={()=>openMenu()}>
+            <button type='button' className='noButton' style={{color: '#777'}} onClick={handleMenuButton}>
               <FontAwesomeIcon size='2x' icon={faBars} />
             </button>
             <div style={{position: "absolute", top: '50%', left: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center'}}>
               <img alt='Architech' src='/logo.svg' />
               <h5 className='ml8' style={{fontSize: '18px', fontWeight: '400'}}>Beta</h5>
             </div>
-            <button type='button' className='noButton' style={{color: '#777', marginLeft: 'auto'}}>
-              <FontAwesomeIcon size='2x' icon={faMagnifyingGlass} />
-            </button>
+            {!showMobileSearch ?
+              <button type='button' className='noButton' style={{color: '#777', marginLeft: 'auto'}} onClick={handleMobileSearch}>
+                <FontAwesomeIcon size='2x' icon={faMagnifyingGlass} />
+              </button>
+            :
+              <SearchBar style={{marginLeft: 'auto'}} />
+            }
             <button type='button' className='noButton' style={{color: !!user ? '#0366fc' : '#777', margin: '0 16px'}} onClick={handleWalletButton}>
               <FontAwesomeIcon size='2x' icon={faWallet} />
             </button>
           </div>
+          {/* END Mobile Menu */}
+
             <Link to="/" className={`${styles.logoLink} d-none d-md-flex align-items-center`} style={{color: '#666 !important'}}><img src='/logo.svg' alt="Architech"/><h5 className='ml8' style={{fontSize: '18px', fontWeight: '400'}}>Beta</h5></Link>
             <Link style={{marginRight: '12px'}} to={`nfts`} className={`${page === 'NFTS' ? styles.activeLink : undefined} d-none d-md-flex`}>NFTs</Link>
             <Link to={`/nfts/drops`} className={`${page === 'DROPS' ? styles.activeLink : undefined} d-none d-md-flex`}>Drops</Link>
