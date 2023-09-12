@@ -69,7 +69,7 @@ export const isRandomnessReady = async () => {
       client: NoisQueryClient,
       address: NOIS_PAYMENT_CONTRACT
     });
-    const minimum = RANDOMNESS_COST * 500;
+    const minimum = RANDOMNESS_COST * 5;
     
     console.log(`Randomness Balance: ${balance}\nRandomness Minimum: ${minimum}\nRandomness Cost: ${RANDOMNESS_COST}`)
     if (balance < minimum) {
