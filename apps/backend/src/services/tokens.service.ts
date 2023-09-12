@@ -93,12 +93,14 @@ export async function findCollectionTokens(
 
   let sortFilter;
   let numericOrdering = false;
-  let sortLowest = false;
+  const sortLowest = false;
+  let extraFilter = {};
   switch (sort) {
     case 'Name':
       sortFilter = {
         'metadataExtension.name': 'asc',
       };
+      numericOrdering = true;
       break;
     case 'Most Viewed':
       sortFilter = {
@@ -118,15 +120,18 @@ export async function findCollectionTokens(
       break;
     case 'Lowest Price':
       sortFilter = {
-        ask: 'desc',
+        // ask: -1,
         'ask.price': 1,
+        tokenId: 1,
       };
       numericOrdering = true;
-      sortLowest = true;
+      // sortLowest = true;
+      extraFilter = saleOnlyFilter;
       break;
     case 'Highest Price':
       sortFilter = {
         'ask.price': -1,
+        tokenId: 1,
       };
       numericOrdering = true;
       break;
@@ -138,6 +143,7 @@ export async function findCollectionTokens(
     {
       collectionAddress: collectionAddress,
       ...fullFilter,
+      ...extraFilter,
     },
     {
       page,
