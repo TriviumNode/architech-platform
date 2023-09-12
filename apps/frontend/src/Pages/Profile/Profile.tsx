@@ -96,9 +96,9 @@ const ProfilePage: FC<any> = (): ReactElement => {
                             { (userProfile.profile?.address === wallet?.address) ?
                                 <>
                                     <h2 className='mb16'>You haven't created any collections yet.</h2>
-                                    <button>
+                                    <LinkButton to='/nfts/create'>
                                         Start Creating
-                                    </button>
+                                    </LinkButton>
                                 </>
 
                                 :
