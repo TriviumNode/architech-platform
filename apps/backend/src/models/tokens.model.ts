@@ -21,6 +21,30 @@ class TraitClass implements cw721.Trait {
   public display_type?: string | null;
 }
 
+//@ts-expect-error it's fucky
+export class AskClass implements marketplace.Ask {
+  @prop({ type: Number, required: true })
+  public id: number;
+
+  @prop({ type: String, required: true, index: true })
+  public collection: string;
+
+  @prop({ type: String, required: true })
+  public token_id: string;
+
+  @prop({ type: String, required: true })
+  public seller: string;
+
+  @prop({ type: String, required: true, index: true })
+  public price: string;
+
+  @prop({ type: String })
+  public denom?: string;
+
+  @prop({ type: String })
+  public cw20_contract?: string;
+}
+
 @plugin(paginate)
 export class PaginatedModel {
   static paginate: <T extends PaginatedModel>(
@@ -61,8 +85,8 @@ export class TokenClass extends PaginatedModel {
   @prop({ type: () => [TraitClass], required: true, default: [] })
   public traits!: TraitClass[];
 
-  @prop({ type: mongoose.Schema.Types.Mixed })
-  public ask?: marketplace.Ask;
+  @prop({ type: AskClass })
+  public ask?: AskClass;
 }
 
 export interface TokenType extends TokenClass {

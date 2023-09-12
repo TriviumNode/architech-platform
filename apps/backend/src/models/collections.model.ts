@@ -1,5 +1,5 @@
 import { prop, getModelForClass, modelOptions, mongoose, plugin, index } from '@typegoose/typegoose';
-import { CollectionProfile, cw721, MinterType, PaymentType, CollectionMinterI, MinterPaymentI } from '@architech/types';
+import { CollectionProfile, cw721, MinterType, PaymentType, CollectionMinterI, MinterPaymentI, marketplace } from '@architech/types';
 import mongoosastic from 'mongoosastic';
 import { esClient } from '@/utils/elasticsearch';
 import paginate from 'mongoose-paginate-v2';
