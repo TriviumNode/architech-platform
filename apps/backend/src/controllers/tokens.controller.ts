@@ -1,10 +1,18 @@
 import { NextFunction, Request, Response } from 'express';
 import { queryClient } from '@/utils/chainClients';
 import * as tokenService from '@/services/tokens.service';
-import { cw721, GetLatestListingsResponse, GetTokenResponse, RequestWithOptionalUser, SortOption, Token } from '@architech/types';
+import {
+  cw721,
+  GetLatestListingsResponse,
+  GetTokenResponse,
+  marketplace,
+  RequestWithOptionalUser,
+  RequestWithUser,
+  SortOption,
+  Token,
+} from '@architech/types';
 
-import { getAllAsks, resolveArchId } from '@architech/lib';
-import TokenModel from '@/models/tokens.model';
+import { ADMINS, getAllAsks, resolveArchId } from '@architech/lib';
 import { HttpException } from '@/exceptions/HttpException';
 import CollectionModel from '@/models/collections.model';
 import { findFavoritesCount } from '@/services/favorites.service';
@@ -128,7 +136,7 @@ export const getCollectionTokenId = async (req: RequestWithOptionalUser, res: Re
 
       const response: GetTokenResponse = {
         token: tokenData as unknown as Token,
-        ask: tokenData.ask,
+        ask: tokenData.ask as unknown as marketplace.Ask,
         favorites: count,
         ownerName,
       };
@@ -149,6 +157,33 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
     const tokenData = await tokenService.ensureToken(collectionAddr, tokenId);
 
     res.status(200).json(tokenData);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const purgeAsks = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  try {
+    const collectionAddr: string = req.params.collectionAddr;
+    if (!req.user) throw new HttpException(403, 'Unauthorized');
+    if (!ADMINS.includes(req.user.address)) throw new HttpException(403, 'Forbidden');
+
+    const result = await tokenService.purgeCollectionAsks(collectionAddr);
+    console.log('Purge Result', result);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const refreshAsks = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  try {
+    const collectionAddr: string = req.params.collectionAddr;
+
+    if (!req.user) throw new HttpException(403, 'Unauthorized');
+    if (!ADMINS.includes(req.user.address)) throw new HttpException(403, 'Forbidden');
+
+    res.status(200).json(await tokenService.refreshCollectionAsks(collectionAddr));
   } catch (error) {
     next(error);
   }

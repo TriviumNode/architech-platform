@@ -6,6 +6,8 @@ import {
   getCollectionTokens,
   getLatestListings,
   getTokensByOwner,
+  purgeAsks,
+  refreshAsks,
   refreshToken,
 } from '@/controllers/tokens.controller';
 import authMiddleware, { optionalAuthMiddleware } from '@/middlewares/auth.middleware';
@@ -31,6 +33,12 @@ class TokensRoute implements Routes {
 
     // Get details of specific token_id
     this.router.get(`${this.path}/collection/:collectionAddr/:tokenId`, optionalAuthMiddleware, getCollectionTokenId);
+
+    // Purge asks from DB for a specified collection
+    this.router.get(`${this.path}/purgeAsks/:collectionAddr`, authMiddleware, purgeAsks);
+
+    // Import asks from on chain into DB for a specified collection
+    this.router.get(`${this.path}/refreshAsks/:collectionAddr`, authMiddleware, refreshAsks);
 
     // Get details of tokens owned by specific address
     this.router.get(`${this.path}/owner/:owner`, getTokensByOwner);

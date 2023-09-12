@@ -1,15 +1,13 @@
-import { hash } from 'bcrypt';
-import { Collection, marketplace, SortOption, Token } from '@architech/types';
+import { Collection, SortOption, Token } from '@architech/types';
 import { HttpException } from '@exceptions/HttpException';
-import tokenModel, { TokenClass } from '@models/tokens.model';
+import tokenModel, { AskClass, TokenClass } from '@models/tokens.model';
 import { isEmpty, processAverageColor } from '@utils/util';
-import { queryClient as client, queryClient } from '@/utils/chainClients';
+import { queryClient } from '@/utils/chainClients';
 import sleep from '@/utils/sleep';
 import { cw721 } from '@architech/types';
 import equal from 'fast-deep-equal';
-import { addTokenId, addTraits, refreshCollection, updateCollection } from './collections.service';
-import { getAverageColor } from 'fast-average-color-node';
-import { getAllNftInfo, getAsk } from '@architech/lib';
+import { addTokenId, addTraits, updateCollection } from './collections.service';
+import { getAllNftInfo, getAsk, getCollectionAsks } from '@architech/lib';
 import TokenModel from '@models/tokens.model';
 import CollectionModel from '@/models/collections.model';
 import { MARKETPLACE_ADDRESS } from '@/config';
@@ -95,6 +93,7 @@ export async function findCollectionTokens(
 
   let sortFilter;
   let numericOrdering = false;
+  let sortLowest = false;
   switch (sort) {
     case 'Name':
       sortFilter = {
@@ -123,6 +122,7 @@ export async function findCollectionTokens(
         'ask.price': 1,
       };
       numericOrdering = true;
+      sortLowest = true;
       break;
     case 'Highest Price':
       sortFilter = {
@@ -134,7 +134,7 @@ export async function findCollectionTokens(
       sortFilter = {};
   }
 
-  const { docs }: { docs: any[] } = await tokenModel.paginate(
+  let { docs }: { docs: any[] } = await tokenModel.paginate(
     {
       collectionAddress: collectionAddress,
       ...fullFilter,
@@ -148,8 +148,16 @@ export async function findCollectionTokens(
       collation: { locale: 'en_US', numericOrdering },
     },
   );
-  // .populate('collectionInfo');
   if (!docs) throw new HttpException(404, 'No tokens found');
+
+  // Fuck it this works
+  if (sortLowest)
+    docs = docs.sort((a, b) => {
+      if (!a.ask && !b.ask) return 0;
+      if (a.ask && !b.ask) return -1;
+      if (!a.ask && b.ask) return 1;
+      return parseInt(a.ask.price) - parseInt(b.ask.price);
+    });
 
   return docs;
 }
@@ -186,7 +194,7 @@ export const processCollectionTokens = async (collection: Collection, tokenList:
     console.log('Processing', token_id, 'on', collection.address);
 
     await ensureToken(collection.address, token_id);
-    await sleep(250);
+    await sleep(100);
   }
   processCollectionTraits(collection);
 };
@@ -233,7 +241,7 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
   let owner = findToken?.owner;
   let metadataExtension = findToken?.metadataExtension;
   let metadataUri = findToken?.metadataUri;
-  let ask: marketplace.Ask;
+  let ask: AskClass;
 
   // Get NFT Info (owner and metadata)
   try {
@@ -261,7 +269,10 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
       token_id: tokenId,
     });
     if (currentAsk) {
-      ask = currentAsk;
+      ask = {
+        ...currentAsk,
+        price_int: parseInt(currentAsk.price),
+      };
       if (owner === MARKETPLACE_ADDRESS) owner = currentAsk.seller;
     }
   } catch (err: any) {
@@ -349,7 +360,7 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
     // Update DB
     console.log('Updating token in DB for', tokenId, 'on', collectionAddress);
     const handleAsk = ask ? { ask } : { $unset: { ask: '' } };
-    const newTokenData: Partial<Token> = {
+    const newTokenData: Partial<TokenClass> = {
       owner,
       metadataExtension,
       metadataUri,
@@ -369,5 +380,21 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
 export const ensureMultiple = async (collectionAddress: string, tokenIds: string[]) => {
   for (const tokenId of tokenIds) {
     await ensureToken(collectionAddress, tokenId);
+  }
+};
+
+export const purgeCollectionAsks = async (collectionAddress: string) => {
+  return await TokenModel.updateMany({ ...saleOnlyFilter, collectionAddress }, { ask: null });
+};
+
+export const refreshCollectionAsks = async (collectionAddress: string) => {
+  const asks = await getCollectionAsks({ client: queryClient, contract: MARKETPLACE_ADDRESS, collection: collectionAddress });
+  console.log('Asks Length', asks.length);
+
+  for (const ask of asks) {
+    const tokenDoc = await tokenModel.findOne({ collectionAddress, tokenId: ask.token_id }).lean();
+    if (!tokenDoc) await ensureToken(collectionAddress, ask.token_id);
+
+    await tokenModel.updateOne({ collectionAddress, tokenId: ask.token_id }, { ask: { ...ask, price_int: parseInt(ask.price) } });
   }
 };

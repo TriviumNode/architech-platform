@@ -7,12 +7,12 @@ import MultiSelect from "../../Components/MultiSelect";
 import { Switch } from 'react-switch-input';
 
 import styles from './create.module.scss'
-import { purgeCollection, purgeTokens, refreshCollection } from "../../Utils/backend";
+import { purgeAsks, purgeCollection, purgeTokens, refreshAsks, refreshCollection } from "../../Utils/backend";
 import ConnectWallet from "../../Components/ConnectWallet";
 import { useUser } from "../../Contexts/UserContext";
 import SmallLoader from "../../Components/SmallLoader";
 
-type LOADING = 'refresh' | 'purge' | 'purgetokens'
+type LOADING = 'refresh' | 'purge' | 'purgetokens' | 'refreshasks' | 'purgeasks'
 const AdminTasksPage: FC<{}> = (): ReactElement => {
     const { user } = useUser()
     const [collectionAddress, setCollectionAddress] = useState('');
@@ -63,6 +63,36 @@ const AdminTasksPage: FC<{}> = (): ReactElement => {
         setLoading(undefined);
     }
 
+    const handlePurgeAsks = async (e: any) => {
+      e.preventDefault();
+
+      setLoading('purgeasks');
+      try {
+        const result = await purgeAsks(collectionAddress);
+        console.log(result);
+        toast.success('Purged Asks')
+      } catch (err: any) {
+        console.error(err)
+        toast.error(err.toString());
+      }
+      setLoading(undefined);
+    }
+
+    const handleRefreshAsks = async (e: any) => {
+      e.preventDefault();
+
+      setLoading('refreshasks');
+      try {
+        const result = await refreshAsks(collectionAddress);
+        console.log(result);
+        toast.success('Refreshed Asks')
+      } catch (err: any) {
+        console.error(err)
+        toast.error(err.toString());
+      }
+      setLoading(undefined);
+    }
+
     return (
         <div style={{margin: '48px'}} className='d-flex flex-column'>
             <div className='d-flex' style={{justifyContent: 'space-between'}}>
@@ -81,6 +111,8 @@ const AdminTasksPage: FC<{}> = (): ReactElement => {
             </form>
             <div className='d-flex gap8 justify-content-center'>
                 <button type='button' disabled={!!loading} onClick={handleRefresh}>Refresh Collection{loading==='refresh' && <>&nbsp;<SmallLoader /></>}</button>
+                <button type='button' disabled={!!loading} onClick={handleRefreshAsks}>Refresh Asks{loading==='refreshasks' && <>&nbsp;<SmallLoader /></>}</button>
+                <button type='button' disabled={!!loading} onClick={handlePurgeAsks}>Purge Asks{loading==='purgeasks' && <>&nbsp;<SmallLoader /></>}</button>
                 <button type='button' disabled={!!loading} onClick={handlePurgeTokens}>Purge Tokens{loading==='purgetokens' && <>&nbsp;<SmallLoader /></>}</button>
                 <button type='button' disabled={!!loading} onClick={handlePurge} style={{background: 'red'}}>Purge Collection{loading==='purge' && <>&nbsp;<SmallLoader /></>}</button>
             </div>

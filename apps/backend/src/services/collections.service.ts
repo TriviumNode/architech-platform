@@ -226,11 +226,8 @@ export const importCollection = async (
   const totalTokens = await getNumTokens({ client, contract: contractAddress });
   const { admin, creator } = await client.getContract(contractAddress);
   const tokenIdList = await getAllTokens({ client, contract: contractAddress });
-  console.log('cw721 stuff', { cw721_name, cw721_symbol, admin, creator, tokenIdList });
 
   // Check if there is an Architech minter contract for this collection
-  // let minter: CollectionMinterClass;
-  // let actual_creator = creator;
   const minterResponse = await getMinterInfo(creator);
 
   // Only allow creator to import

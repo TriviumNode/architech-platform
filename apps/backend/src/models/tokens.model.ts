@@ -43,6 +43,9 @@ export class AskClass implements marketplace.Ask {
 
   @prop({ type: String })
   public cw20_contract?: string;
+
+  @prop({ type: Number, required: true })
+  public price_int: number;
 }
 
 @plugin(paginate)

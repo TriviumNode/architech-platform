@@ -97,6 +97,18 @@ export const checkLogin = async(userAddress: string): Promise<GetUserProfileResp
     return data;
 }
 
+export const refreshAsks = async(contractAddr: string): Promise<Token[]> => {
+  const url = getApiUrl(`/tokens/refreshAsks/${contractAddr}`);
+  const {data} = await axios.get(url)
+  return data;
+}
+
+export const purgeAsks = async(contractAddr: string): Promise<any> => {
+  const url = getApiUrl(`/tokens/purgeAsks/${contractAddr}`);
+  const {data} = await axios.get(url)
+  return data;
+}
+
 
 
 // ### POST
