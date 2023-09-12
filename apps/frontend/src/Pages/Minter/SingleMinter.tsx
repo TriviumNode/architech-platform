@@ -453,7 +453,12 @@ const SingleMinter: FC<any> = (): ReactElement => {
                 onComplete={()=>setNow(new Date())}
               />
             }
-            {!!collection.collectionMinter.launch_time &&
+            {(
+              // if has a launch time
+              !!collection.collectionMinter.launch_time
+              // or public mint is open and has an end time
+              || (timeStatus.public && collection.collectionMinter.end_time)
+            ) &&
               <SaleTimeRow
                 saleType='Public'
                 startTime={startDate}

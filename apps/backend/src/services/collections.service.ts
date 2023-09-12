@@ -443,7 +443,7 @@ const getMinterInfo = async (creator: string) => {
 
             // Determine if ended
             let ended = false;
-            if (minted >= max_copies) ended = true;
+            if (max_copies && minted >= max_copies) ended = true;
             if (config.end_time && new Date(parseInt(config.end_time) / 1000000000).valueOf() < new Date().valueOf()) ended = true;
             // Set minter data
             const minter: CollectionMinterClass = {

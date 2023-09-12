@@ -27,7 +27,7 @@ export const purchaseNative = async({
             token_id,
         }
     }
-    console.log(msg)
+
     const result = await client.execute(
         signer,
         marketplace_contract,
