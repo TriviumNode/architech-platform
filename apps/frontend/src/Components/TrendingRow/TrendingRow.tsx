@@ -18,10 +18,10 @@ const TrendingRow: FC<
     console.log('Trending Result', result)
 
     // const floor = millify(findFloor(result.asks, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)));
-    const floor = result.floor ? 
+    const floor: string = result.floor ? 
       millify(denomToHuman(result.floor, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)))
     :
-      millify(findFloor(result.asks, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)));
+      '--';
     const volume = millify(parseInt(result.volume.find(v=>v.denom === process.env.REACT_APP_NETWORK_DENOM)?.amount || '0'));
     const humanVolume = denomToHuman(volume, parseInt(process.env.REACT_APP_NETWORK_DECIMALS))
     const collectionName = getCollectionName(result.collection)
@@ -55,7 +55,7 @@ const TrendingRow: FC<
             </div>
         </Col>
         <Col xs={'auto'} className='d-flex flex-column justify-content-center' style={{textAlign: 'center'}}>
-            <span>{floor || '--'}&nbsp;<ArchDenom /></span>
+            <span>{floor}&nbsp;<ArchDenom /></span>
         </Col>
         <Col xs={'auto'} className='d-flex flex-column justify-content-center' style={{textAlign: 'center'}}>
             <span>{humanVolume ? parseFloat(humanVolume.toFixed(2)) : '--'}&nbsp;<ArchDenom /></span>

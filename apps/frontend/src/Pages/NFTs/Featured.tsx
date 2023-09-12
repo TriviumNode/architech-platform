@@ -36,7 +36,7 @@ const FeaturedCarousel: FC<any> = (): ReactElement => {
   const items = featured.map((f,i)=>{
     const collectionName = getCollectionName(f.collection);
     // const floor = findFloor(f.asks, parseInt(process.env.REACT_APP_NETWORK_DECIMALS));
-    const floor = denomToHuman(f.floor, parseInt(process.env.REACT_APP_NETWORK_DECIMALS))
+    const floor: number = denomToHuman(f.floor || 0, parseInt(process.env.REACT_APP_NETWORK_DECIMALS))
 
     const classNames = (()=>{
       if (featured.length === 1) return '';

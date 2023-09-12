@@ -21,7 +21,7 @@ const CollectionTile: FC<Props> = ({ fullCollection, style, className }): ReactE
   const collectionName = getCollectionName(collection);
 
   // const floor = findFloor(fullCollection.asks, parseInt(process.env.REACT_APP_NETWORK_DECIMALS));
-  const floor = denomToHuman(fullCollection.floor, parseInt(process.env.REACT_APP_NETWORK_DECIMALS))
+  const floor: number = denomToHuman(fullCollection.floor || 0, parseInt(process.env.REACT_APP_NETWORK_DECIMALS))
   const imgUrl = collection.collectionProfile?.profile_image ? getApiUrl(`/public/${collection.collectionProfile?.profile_image}`) : undefined;
   return (
     <Link to={`/nfts/${collection.address}`} style={style} className={className}>
