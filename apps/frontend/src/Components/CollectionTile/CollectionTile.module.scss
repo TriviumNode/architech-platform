@@ -16,21 +16,22 @@
 }
 
 .collectionCard .overlay {
-    width: calc(100% - 16px - 24px);
+    width: calc(100% - 16px - 24px - 24px);
     margin-left: 8px;
     margin-right: 8px;
     position: absolute;
     bottom: 8px;
     backdrop-filter: blur(12px) brightness(80%);
-    height: calc(98px - 24px);
-    padding-left: 24px;
-    padding-top: 24px;
+    height: calc(98px - 24px - 16px);
+    padding: 24px;
     
     border-radius: 8px;
 
     font-weight: 400;
     font-size: 12px;
     line-height: 15px;
+    // display: flex;
+    // align-items: flex-end;
 }
 
 .collectionCard > img {
