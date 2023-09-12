@@ -71,6 +71,11 @@ const SingleCollection: FC<any> = (): ReactElement => {
         newStatus.push('For Sale')
       }
       setStatusFilter(newStatus);
+
+      if (
+        searchParams.has('sortBy')
+        && tokenSortOptions.includes(searchParams.get('sortBy') as SortOption)
+      ) setSortBy(searchParams.get('sortBy') as SortOption);
     },[])
 
     const getDevInfo = async() => {
