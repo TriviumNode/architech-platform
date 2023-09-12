@@ -11,12 +11,17 @@ import PlaceholdImg from "../PlaceholdImg"
 
 const TrendingRow: FC<
     {
-        result: TrendingCollectionResult
+      result: TrendingCollectionResult
     }
     > = ({result}): ReactElement => {
+    
+    console.log('Trending Result', result)
 
     // const floor = millify(findFloor(result.asks, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)));
-    const floor = millify(denomToHuman(result.floor, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)));
+    const floor = result.floor ? 
+      millify(denomToHuman(result.floor, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)))
+    :
+      millify(findFloor(result.asks, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)));
     const volume = millify(parseInt(result.volume.find(v=>v.denom === process.env.REACT_APP_NETWORK_DENOM)?.amount || '0'));
     const humanVolume = denomToHuman(volume, parseInt(process.env.REACT_APP_NETWORK_DECIMALS))
     const collectionName = getCollectionName(result.collection)
