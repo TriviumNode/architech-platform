@@ -6,6 +6,7 @@ import { Collection, copyMinter, GetCollectionResponse } from '@architech/types'
 import { ARCHID_ADDRESS, MARKETPLACE_ADDRESS } from '@/config';
 import UserModel from '@/models/users.model';
 import { refreshCollection } from '@/services/collections.service';
+import { findFloor } from '@/services/tokens.service';
 
 export const collectionsToResponse = async (collections: Collection[]): Promise<GetCollectionResponse[]> => {
   // Get array of cw721 addresses
@@ -42,6 +43,7 @@ export const collectionsToResponse = async (collections: Collection[]): Promise<
           address: c,
           display,
         },
+        floor: await findFloor(collection.address),
       });
     }
     return result;
@@ -56,7 +58,13 @@ export const collectionsToResponse = async (collections: Collection[]): Promise<
       const collection = collections[i];
       const c = collection.collectionMinter?.minter_admin || collection.creator;
       const user = await UserModel.findOne({ address: c }).lean();
-      result.push({ collection, asks: [], volume: [], full_creator: { address: c, display: user.username || c } });
+      result.push({
+        collection,
+        asks: [],
+        volume: [],
+        full_creator: { address: c, display: user.username || c },
+        floor: await findFloor(collection.address),
+      });
     }
     return result;
   }

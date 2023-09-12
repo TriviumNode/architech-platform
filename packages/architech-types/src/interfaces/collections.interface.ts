@@ -90,6 +90,7 @@ export interface GetCollectionResponse {
   collection: Collection;
   asks: marketplace.Ask[];
   volume: marketplace.Volume[];
+  floor: string;
   full_creator: {
     display: string;
     address: string;
@@ -103,4 +104,5 @@ export type TrendingCollectionResult = {
   count: number;
   asks: marketplace.Ask[];
   volume: marketplace.Volume[];
+  floor: string;
 };

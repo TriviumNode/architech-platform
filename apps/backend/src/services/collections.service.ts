@@ -5,7 +5,7 @@ import { isEmpty } from '@utils/util';
 import { isContract, queryClient as client, queryClient } from '@/utils/chainClients';
 
 import equal from 'fast-deep-equal';
-import { findCollectionTokenCount, processCollectionTokens, processCollectionTraits } from './tokens.service';
+import { findCollectionTokenCount, findFloor, processCollectionTokens, processCollectionTraits } from './tokens.service';
 import { Collection, copyMinter, cw721, GetCollectionResponse, minter, MinterPaymentI, User } from '@architech/types';
 
 import { CreateCollectionData } from '@/interfaces/collections.interface';
@@ -62,6 +62,7 @@ export const getFullCollection = async (collectionAddress: string): Promise<GetC
       display,
       address: creator,
     },
+    floor: await findFloor(collectionAddress),
   };
 };
 

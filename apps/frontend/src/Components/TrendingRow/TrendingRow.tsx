@@ -15,7 +15,8 @@ const TrendingRow: FC<
     }
     > = ({result}): ReactElement => {
 
-    const floor = millify(findFloor(result.asks, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)));
+    // const floor = millify(findFloor(result.asks, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)));
+    const floor = millify(denomToHuman(result.floor, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)));
     const volume = millify(parseInt(result.volume.find(v=>v.denom === process.env.REACT_APP_NETWORK_DENOM)?.amount || '0'));
     const humanVolume = denomToHuman(volume, parseInt(process.env.REACT_APP_NETWORK_DECIMALS))
     const collectionName = getCollectionName(result.collection)

@@ -398,3 +398,22 @@ export const refreshCollectionAsks = async (collectionAddress: string) => {
     await tokenModel.updateOne({ collectionAddress, tokenId: ask.token_id }, { ask: { ...ask, price_int: parseInt(ask.price) } });
   }
 };
+
+export const findFloor = async (collectionAddress: string): Promise<string> => {
+  const result = await tokenModel
+    .find({
+      collectionAddress,
+      ...saleOnlyFilter,
+    })
+    .sort({ 'ask.price': 1 })
+    .collation({
+      locale: 'en_US',
+      numericOrdering: true,
+    })
+    .limit(1)
+    .lean();
+
+  if (!result || !result.length) return undefined;
+  if (!result[0].ask) throw `No ask on token returned with ask only filter... This shouldn't happen but just making typescript happy.`;
+  return result[0].ask.price;
+};

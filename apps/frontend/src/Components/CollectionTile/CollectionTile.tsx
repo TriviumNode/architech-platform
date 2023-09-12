@@ -1,4 +1,4 @@
-import { findFloor } from "@architech/lib"
+import { denomToHuman, findFloor } from "@architech/lib"
 import { Collection, GetCollectionResponse, Token } from "@architech/types"
 import { CSSProperties, FC, ReactElement } from "react"
 import { Col, Row } from "react-bootstrap"
@@ -20,7 +20,8 @@ const CollectionTile: FC<Props> = ({ fullCollection, style, className }): ReactE
   const { collection } = fullCollection;
   const collectionName = getCollectionName(collection);
 
-  const floor = findFloor(fullCollection.asks, parseInt(process.env.REACT_APP_NETWORK_DECIMALS));
+  // const floor = findFloor(fullCollection.asks, parseInt(process.env.REACT_APP_NETWORK_DECIMALS));
+  const floor = denomToHuman(fullCollection.floor, parseInt(process.env.REACT_APP_NETWORK_DECIMALS))
   const imgUrl = collection.collectionProfile?.profile_image ? getApiUrl(`/public/${collection.collectionProfile?.profile_image}`) : undefined;
   return (
     <Link to={`/nfts/${collection.address}`} style={style} className={className}>
