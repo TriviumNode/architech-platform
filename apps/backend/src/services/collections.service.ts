@@ -1,11 +1,11 @@
 import { HttpException } from '@exceptions/HttpException';
-import collectionsModel, { CollectionMinterClass, MinterPaymentClass } from '@models/collections.model';
+import collectionsModel, { CollectionMinterClass } from '@models/collections.model';
 
 import { isEmpty } from '@utils/util';
 import { isContract, queryClient as client, queryClient } from '@/utils/chainClients';
 
 import equal from 'fast-deep-equal';
-import { findCollectionTokenCount, findFloor, processCollectionTokens, processCollectionTraits } from './tokens.service';
+import { findCollectionTokenCount, findFloor, importUnknownTokens } from './tokens.service';
 import { Collection, copyMinter, cw721, GetCollectionResponse, minter, MinterPaymentI, User } from '@architech/types';
 
 import { CreateCollectionData } from '@/interfaces/collections.interface';
@@ -28,10 +28,9 @@ import { isArray, isBoolean } from 'class-validator';
 import fetch from 'node-fetch';
 import { hashBuffer, saveBuffer } from '@/middlewares/fileUploadMiddleware';
 import mime from 'mime-types';
-import mongoose, { ObjectId } from 'mongoose';
+import mongoose from 'mongoose';
 import { ARCHID_ADDRESS, MARKETPLACE_ADDRESS } from '@/config';
 import UserModel from '@/models/users.model';
-import { queryDbCollectionById } from '@/queriers/collection.querier';
 
 const removeNullUndefined = (obj: any) => Object.entries(obj).reduce((a, [k, v]) => (v == null ? a : ((a[k] = v), a)), {});
 const removeId = (obj: any) => Object.entries(obj).reduce((a, [k, v]) => (k == '_id' ? a : ((a[k] = v), a)), {});
@@ -140,7 +139,8 @@ const refreshCollectionTokenList = async (collectionId: string, collectionData: 
   }
   if (workingTokens.length) {
     const updatedCollection = await updateCollectionTokens(collectionId, workingTokens, numTokens);
-    processCollectionTokens(collectionData, workingTokens);
+    importUnknownTokens(collectionData, workingTokens);
+
     return updatedCollection;
   } else return collectionData;
 };

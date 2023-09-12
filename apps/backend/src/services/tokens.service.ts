@@ -194,7 +194,23 @@ export async function findTokenIdInCollection(tokenId: string, collectionAddress
   return findToken;
 }
 
-export const processCollectionTokens = async (collection: Collection, tokenList: string[]) => {
+export const importUnknownTokens = async (collection: Collection, tokenList: string[]) => {
+  const collectionAddress = collection.address;
+
+  const knownTokenIds: string[] = (await tokenModel.find({ collectionAddress }, { tokenId: 1, _id: 0 }).lean()).map(doc => doc.tokenId);
+  console.log(knownTokenIds);
+
+  for (const tokenId of tokenList) {
+    if (knownTokenIds.includes(tokenId)) continue;
+
+    console.log('Importing', tokenId, 'on', collectionAddress);
+    await ensureToken(collectionAddress, tokenId);
+    await sleep(100);
+  }
+  await processCollectionTraits(collection);
+};
+
+export const refreshCollectionTokens = async (collection: Collection, tokenList: string[]) => {
   for (let i = 0; i < tokenList.length; i++) {
     const token_id = tokenList[i];
     console.log('Processing', token_id, 'on', collection.address);
