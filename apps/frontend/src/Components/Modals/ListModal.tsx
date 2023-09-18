@@ -46,7 +46,7 @@ const defaultState: State = {
 
 
 export default function ListModal({open, token, onClose, onList}: Props) {
-    const { user } = useUser()
+    const { user, refreshProfile } = useUser()
 
     const [selectedOption, setSelectedOption] = useState<SelectOption>(selectOptions[0])
     const [formState, setFormState] = useState<State>(defaultState);
@@ -95,6 +95,7 @@ export default function ListModal({open, token, onClose, onList}: Props) {
                 marketplace_contract: MARKETPLACE_ADDRESS,              
             });
             console.log('TX Result', response)
+            refreshProfile();
             onList();
             onClose();
         } catch (err: any) {

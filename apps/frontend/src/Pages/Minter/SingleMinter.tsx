@@ -105,7 +105,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
 
     const [now, setNow] = useState(new Date())
 
-    const { user, refreshProfile, devMode } = useUser()
+    const { user, refreshProfile, devMode, refreshBalances } = useUser()
     const revalidator = useRevalidator()
 
     const checkWhitelist = async () => {
@@ -210,6 +210,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
         })
         console.log('Mint Result', result);
       }
+      refreshBalances();
 
       if (collection.collectionMinter.minter_type === "RANDOM")
         waitForMint({

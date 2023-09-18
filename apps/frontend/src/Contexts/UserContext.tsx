@@ -52,6 +52,7 @@ export interface UserContextState {
   refreshProfile: (()=>Promise<void>)
   devMode: boolean;
   toggleDevMode: ()=>void;
+  refreshBalances: ()=>void;
 }
 
 const whatever = async() => {}
@@ -63,6 +64,7 @@ const UserContext = createContext<UserContextState>({
   connectWallet: whatever,
   refreshProfile: whatever,
   toggleDevMode: whatever,
+  refreshBalances: whatever,
   user: undefined,
   devMode: false,
 });
@@ -126,6 +128,11 @@ export const UserProvider = ({ children }: Props): ReactElement => {
       console.error('Failed to change wallets:', error)
       setWalletStatus('DISCONNECTED')
     }
+  }
+
+  const refreshBalances = () => {
+    if (!user) return
+    getBalances(user.client, user.address)
   }
 
   const getBalances = async(client = user?.client, addr = user?.address) => {
@@ -252,9 +259,10 @@ export const UserProvider = ({ children }: Props): ReactElement => {
 
   const refreshProfile = async() => {
     if (!user) throw 'Unable to refresh profile when user is not set.'
+    refreshBalances();
     const newProfile = await getUserProfile(user?.address);
     const newUser: CurrentWallet = {...user, profile: newProfile}
-    setUser(newUser)
+    setUser(newUser);
   }
 
   const values: UserContextState = {
@@ -265,6 +273,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
     refreshProfile,
     devMode,
     toggleDevMode,
+    refreshBalances,
   };
 
   const LoadingModal = ({msg}: {msg: string}) =>
