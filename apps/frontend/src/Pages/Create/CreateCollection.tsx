@@ -213,6 +213,117 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
         } else return false;
     }
 
+    const verifyWhitelistState = (whitelist: string[]): Task[] => {
+      const returnTasks: Task[] = []
+
+      // Add Error IF whitelist pricing is enabled AND any of the following are true:
+      // whitelistAmount is blank
+      // whitelist amount is 0 or less
+      // payment denom is undefined
+      if (
+        whitelistState.whitelist_price && (
+          whitelistState.amount === ''
+          || parseInt(whitelistState.amount) <= 0
+          || !whitelistState.denom
+        )
+      ) {
+        returnTasks.push({
+            content: `Enter a whitelist price, or disable whitelist pricing.`,
+            onClick: ()=>setPage('Whitelist')
+        });
+      }
+
+      if (whitelistState.whitelist_price && !whitelist.length){
+        returnTasks.push({
+          content: `Whitelist pricing is enabled, but no addresses are whitelisted.`,
+          onClick: ()=>setPage('Whitelist')
+        });
+      }
+
+      if (timesState.whitelist_launch_time && !whitelist.length){
+        returnTasks.push({
+          content: `A whitelist launch time is set, but no addresses are whitelisted.`,
+          onClick: ()=>setPage('Whitelist')
+        });
+      }
+
+      return returnTasks;
+    }
+
+    const verifyFinancialState = (required: boolean): Task[] => {
+      const noAmount = !financialState.amount || parseFloat(financialState.amount) === 0;
+      const noBeneficiary = !financialState.beneficiary_address;
+      const returnTasks: Task[] = [];
+
+      if ((noAmount && required) || (!noAmount && noBeneficiary)){
+        returnTasks.push({
+          content: `Enter a ${
+            noAmount ?
+              noBeneficiary ?
+                    'Sale Amount and Beneficiary'
+                :
+                    'Sale Amount'
+            : noBeneficiary ?
+                'Beneficiary'
+            : 'UNKNOWN'
+          } on the Financials page`,
+          onClick: ()=>setPage('Financials')
+        })
+      };
+
+      if (financialState.beneficiary_address){
+        let badAddr = false;
+        try {
+          const decoded = bech32.decode(financialState.beneficiary_address.trim())
+          if (decoded.prefix !== process.env.REACT_APP_NETWORK_PREFIX) throw new Error()
+        } catch(e) {
+          console.error(e)
+          badAddr = true;
+        };
+        if (badAddr){
+          returnTasks.push({
+            content: `Invalid Beneficiary Address`,
+            onClick: ()=>setPage("Financials")
+          })
+        }
+      }
+
+      return returnTasks;
+    };
+
+    const verifyTimes = (randomCollection: boolean) => {
+      const oneHour = new Date(new Date().valueOf() + (60 * 60_000));
+      const compareTime = randomCollection ? oneHour : new Date();
+
+      const returnTasks: Task[] = [];
+
+      // Ensure random collections have a launch time set
+      if (randomCollection && !timesState.launch_time) {
+        returnTasks.push({
+          content: `Enter a launch time.`,
+          onClick: ()=>setPage("Times & Limits")
+        });
+      }
+        
+      //Ensure launch time is sufficently in the future
+      if (timesState.launch_time && timesState.launch_time.valueOf() < compareTime.valueOf()) {
+        returnTasks.push({
+          content: `Launch time must be ${randomCollection ? 'at least one hour' : ''} in the future. ${randomCollection ? 'Preloading must be complete before the launch time.' : ''}`,
+          onClick: ()=>setPage("Times & Limits")
+        });
+      }
+
+      // Ensure random collection's whitelist launch time is in the future, if set
+      if (randomCollection && timesState.whitelist_launch_time && timesState.whitelist_launch_time.valueOf() < compareTime.valueOf()) {
+        returnTasks.push({
+          content: `Whitelist launch time must be ${randomCollection ? 'at least one hour' : ''} in the future. ${randomCollection ? 'Preloading must be complete before the launch time.' : ''}`,
+          onClick: ()=>setPage("Whitelist")
+        });
+      }
+
+      return returnTasks;
+    }
+
     const handleCreate = async (e: any) => {
         if (e) e.preventDefault();
         try {
@@ -311,47 +422,25 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
 
 
 
+                } else if (collectionType === 'RANDOM') {
                 // #########################
                 // #-----------------------#
                 // #- Init Random Project -#
                 // #-----------------------#
                 // #########################
-                } else if (collectionType === 'RANDOM') {
-                    
+
                     // Check for Errors
-                    if (!financialState.amount || !financialState.beneficiary_address){
-                        newErrorTasks.push({
-                            content: `Enter a ${
-                                !financialState.amount ?
-                                    !financialState.beneficiary_address ?
-                                        'Sale Amount and Beneficiary'
-                                    :
-                                        'Sale Amount'
-                                : !financialState.beneficiary_address ?
-                                    'Beneficiary'
-                                : 'UNKNOWN'
-                            } on the Financials page`,
-                            onClick: ()=>setPage('Financials')
-                        })
-                    }
-                    if (!timesState.launch_time) {
-                      newErrorTasks.push({
-                          content: `Enter a launch time.`,
-                          onClick: ()=>setPage("Times & Limits")
-                      });
-                    }
-                    if (!timesState.unlimited_limit && !timesState.mint_limit) {
-                      newErrorTasks.push({
-                        content: `Enter a mint limit, or enable unlimited mints.`,
-                        onClick: ()=>setPage('Times & Limits')
-                      });
-                    }
-                    if (whitelistState.whitelist_price && (whitelistState.amount === '' || !whitelistState.denom)) {
-                        newErrorTasks.push({
-                            content: `Enter a whitelist price, or disable whitelist pricing.`,
-                            onClick: ()=>setPage('Whitelist')
-                        });
-                    }
+
+                    // Verify whitelist price is set if it is enabled, and that addresses are hitelisted if whitelist features are enabled
+                    newErrorTasks.push(...verifyWhitelistState(whitelist))
+
+                    // Verifies that if a sale amount is entered, if it is required. Verifies that a benefeciary is set if needed
+                    newErrorTasks.push(...verifyFinancialState(true))
+
+                    // Verify launch and whitelist launch times
+                    newErrorTasks.push(...verifyTimes(true))
+
+
                     console.log('newErrorTasks', newErrorTasks)
                     // Show Error Tasks
                     if (checkErrors(newErrorTasks)) return;
@@ -425,13 +514,12 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     newNftAddr = nftAddress;
                 
                 
+                } else if (collectionType === 'COPY') {
                 // ##################
                 // #----------------#
                 // #- Copy Project -#
                 // #----------------#
                 // ##################
-                } else if (collectionType === 'COPY') {
-
     
                     // Clean NFT Attributes
                     const badAttributes = nftDetailState.attributes.filter((attribute: cw721.Trait)=>
@@ -439,10 +527,36 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                     )
                     const goodAttributes = nftDetailState.attributes.filter(a=>!!a.trait_type && !!a.value);
                     
-                    // CLean NFT Details
+                    // Clean NFT Details
                     const cleanedNftDetails = { ...nftDetailState, attributes: goodAttributes };
 
-                    //verify required data
+                    // Verify whitelist price is set if it is enabled, and that addresses are whitelisted if whitelist features are enabled
+                    newErrorTasks.push(...verifyWhitelistState(whitelist))
+
+                    // If sale amount is entered, verifies that a benefeciary is set.
+                    newErrorTasks.push(...verifyFinancialState(false))
+
+                    // Verify launch and whitelist launch times
+                    newErrorTasks.push(...verifyTimes(false))
+
+                    // Verify royalty address
+                    if (parseInt(financialState.royalty_percent || '0')){
+                      let badAddr = false;
+                      try {
+                        const decoded = bech32.decode(financialState.royalty_address)
+                        if (decoded.prefix !== process.env.REACT_APP_NETWORK_PREFIX) throw new Error()
+                      } catch(e) {
+                        badAddr = true;
+                      };
+                      if (badAddr){
+                        newErrorTasks.push({
+                          content: `Invalid Royalty Payment Address`,
+                          onClick: ()=>setPage("Financials")
+                        })
+                      }
+                    }
+
+                    // Verify NFT Details
                     if (!cleanedNftDetails.name){
                         newErrorTasks.push({
                             content: `Enter a Name for the NFT`,
@@ -461,31 +575,14 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                             onClick: ()=>setPage('NFT Details')
                         })
                     }
-                    if (financialState.amount && !financialState.beneficiary_address){
-                        newErrorTasks.push({
-                            content: `Enter a Beneficiary to receive the funds`,
-                            onClick: ()=>setPage('Financials')
-                        })
-                    }
-                    if (!timesState.unlimited_limit && !timesState.mint_limit) {
-                      newErrorTasks.push({
-                        content: `Enter a mint limit`,
-                        onClick: ()=>setPage('Times & Limits')
-                      });
-                    }
-                    if (!timesState.unlimited_copies && !timesState.max_copies) {
-                      newErrorTasks.push({
-                        content: `Enter a copy limit`,
-                        onClick: ()=>setPage('Times & Limits')
-                      });
-                    }
+
                     if (checkErrors(newErrorTasks)) return;
 
                     //@ts-expect-error
                     const cid = await uploadImage(cleanedNftDetails.image);
 
                     const mint_price = 
-                      !financialState.amount ? undefined
+                      (!parseFloat(financialState.amount || '0')) ? undefined
                       : financialState.denom.nativeDenom ? 
                         {
                           native_payment: {
@@ -562,7 +659,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
                         attributes: cleanedNftDetails.attributes,
                         external_url: cleanedNftDetails.externalLink ? cleanedNftDetails.externalLink : undefined,
                         royalty_payment_address: financialState.royalty_address ? financialState.royalty_address : undefined,
-                        royalty_percentage: financialState.royalty_percent ? parseInt(financialState.royalty_percent) : undefined,
+                        royalty_percentage: parseInt(financialState.royalty_percent || '0') ? parseInt(financialState.royalty_percent) : undefined,
                         image: `ipfs://${cid}`,
                       },
                       mint_price,

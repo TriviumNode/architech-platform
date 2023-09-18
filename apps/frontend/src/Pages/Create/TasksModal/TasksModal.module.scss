@@ -10,6 +10,8 @@
         align-items: center;
         padding-right: 8px !important;
         text-align: left;
+        min-height: 48px;
+        height: fit-content !important;
     }
     button:hover {
         // background: linear-gradient(190deg, #02FFFF66 0%, #0166DC66 60%, #017EBA88 100%);
