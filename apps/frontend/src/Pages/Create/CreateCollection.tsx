@@ -317,7 +317,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
       if (randomCollection && timesState.whitelist_launch_time && timesState.whitelist_launch_time.valueOf() < compareTime.valueOf()) {
         returnTasks.push({
           content: `Whitelist launch time must be ${randomCollection ? 'at least one hour' : ''} in the future. ${randomCollection ? 'Preloading must be complete before the launch time.' : ''}`,
-          onClick: ()=>setPage("Whitelist")
+          onClick: ()=>setPage("Times & Limits")
         });
       }
 
