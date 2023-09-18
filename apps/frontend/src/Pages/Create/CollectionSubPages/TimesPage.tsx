@@ -88,11 +88,24 @@ const TimesPage: FC<{
 
     const updateMintLimit = (e: any) => {
       e.preventDefault();
-      let newNum = parseInt(e.target.value.replace(/[^0-9]/gi, ''));
+      let newNum = parseInt(e.target.value.replace(/[^0-9]/gi, '') || '1');
       if (newNum > 255) {
         newNum = 255
+      } else if (newNum < 1) {
+        newNum = 1
       }
       updateState({mint_limit: newNum.toString()})
+    }
+
+    const updateCopyLimit = (e: any) => {
+      e.preventDefault();
+      let newNum = parseInt(e.target.value.replace(/[^0-9]/gi, '') || '1');
+      if (newNum > 65535) {
+        newNum = 65535
+      } else if (newNum < 1) {
+        newNum = 1
+      }
+      updateState({max_copies: newNum.toString()})
     }
 
     const handleChangeLaunchTime = (e: any) => {
@@ -241,7 +254,7 @@ const TimesPage: FC<{
                               </div>
                               <input
                                   value={state.unlimited_copies ? 'Unlimited' : state.max_copies}
-                                  onChange={(e)=>updateState({max_copies: e.target.value.replace(/[^0-9]/gi, '')})}
+                                  onChange={updateCopyLimit}
                                   disabled={state.unlimited_copies}
                               />
                           </label>
