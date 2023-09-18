@@ -47,7 +47,7 @@ export const getActiveMinters = async (req: Request, res: Response, next: NextFu
     const page = req.query.page ? parseInt(req.query.page as string) : undefined;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
 
-    const response = await queryDbCollections({ 'collectionMinter.ended': false }, page, limit);
+    const response = await queryDbCollections({ 'collectionMinter.ended': false, hidden: false, admin_hidden: false }, page, limit);
 
     res.status(200).json(response);
   } catch (error) {
@@ -60,7 +60,7 @@ export const getEndedMinters = async (req: Request, res: Response, next: NextFun
     const page = req.query.page ? parseInt(req.query.page as string) : undefined;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
 
-    const response = await queryDbCollections({ 'collectionMinter.ended': true }, page, limit);
+    const response = await queryDbCollections({ 'collectionMinter.ended': true, hidden: false, admin_hidden: false }, page, limit);
 
     res.status(200).json(response);
   } catch (error) {
