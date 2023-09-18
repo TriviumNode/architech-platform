@@ -175,13 +175,22 @@ const RoyaltyRow = ({
   state: FinancialState;
   updateState: (newState: Partial<FinancialState>)=>void;
 }) => {
+  const updateRoyalty = (e: any) => {
+    if (e.preventDefault) e.preventDefault();
+
+    let int = parseInt(e.target.value.replace(/[^0-9]/gi, '') || 0);
+    if (int > 100) int = 100;
+    
+    updateState({royalty_percent: int.toString()})
+  }
+
   return (
     <div className='d-flex mb24'>
       <Col xs={4}>
         <label>
           Royalty Percentage
           <div className='d-flex flex-column wide'>
-            <input value={state.royalty_percent} onChange={e=>updateState({royalty_percent: e.target.value})} placeholder='0' /><span className={styles.percent}>%</span>
+            <input value={state.royalty_percent} onChange={updateRoyalty} placeholder='0' /><span className={styles.percent}>%</span>
           </div>
         </label>
       </Col>
