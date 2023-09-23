@@ -20,6 +20,7 @@ const AdminEditPage: FC<{
   const [featured, setFeatured] = useState(collection.featured || false);
   const [verified, setVerified] = useState(collection.verified || false);
   const [dark_banner, setDarkBanner] = useState(collection.collectionProfile.dark_banner || false);
+  const [minting_disabled, setMintingDisabled] = useState(collection.collectionMinter?.minting_disabled || false);
   const [saving, setSaving] = useState(false);
 
 
@@ -83,6 +84,14 @@ const AdminEditPage: FC<{
                           <input type='checkbox' checked={dark_banner} onChange={(e)=>setDarkBanner(e.target.checked)} />
                       </label>
                   </Col>
+                  { !!collection.collectionMinter &&
+                    <Col>
+                        <label>
+                            Disable Minting
+                            <input type='checkbox' checked={minting_disabled} onChange={(e)=>setMintingDisabled(e.target.checked)} />
+                        </label>
+                    </Col>
+                  }
               </div>
               <div className='d-flex'>
                 <button type='submit' disabled={saving}>Save Changes {saving && <SmallLoader />}</button>

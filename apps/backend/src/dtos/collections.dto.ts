@@ -82,4 +82,8 @@ export class EditCollectionBodyDto {
   @IsOptional()
   @IsString()
   public dark_banner?: string;
+
+  @IsOptional()
+  @IsString()
+  minting_disabled?: string;
 }

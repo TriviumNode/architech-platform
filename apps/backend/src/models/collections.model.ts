@@ -69,6 +69,9 @@ export class CollectionMinterClass implements CollectionMinterI {
 
   @prop({ type: Boolean, required: true, default: false })
   public ended: boolean;
+
+  @prop({ type: Boolean, required: true, default: false })
+  public minting_disabled: boolean;
 }
 
 @index(

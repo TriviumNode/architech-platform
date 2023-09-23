@@ -29,6 +29,7 @@ export interface CollectionMinterI {
   mint_limit?: number;
 
   ended: boolean;
+  minting_disabled: boolean
 }
 
 export interface MinterPaymentI {

@@ -540,11 +540,13 @@ const SingleMinter: FC<any> = (): ReactElement => {
             </div>
             }
               <button
-                disabled={loadingTx || !mintingAvailable}
+                disabled={loadingTx || !mintingAvailable || collection.collectionMinter.minting_disabled}
                 type='button'
                 onClick={handleMint}
               >
-                { mintingAvailable ?
+                { collection.collectionMinter.minting_disabled ?
+                  'Minting Paused'
+                : mintingAvailable ?
                   <>Mint now{loadingTx && <>&nbsp;<SmallLoader /></>}</>
                 : timeStatus.ended ?
                   'Ended'

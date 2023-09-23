@@ -218,12 +218,18 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
     validator.featured = req.body.featured;
     validator.verified = req.body.verified;
     validator.dark_banner = req.body.dark_banner;
+    validator.minting_disabled = req.body.minting_disabled;
 
     // Verify Input
     await validate(validator);
 
     // Check if Admin Only settings were changed, and verify if sender is an Admin if so
-    if (validator.admin_hidden !== undefined || validator.featured !== undefined || validator.verified !== undefined) {
+    if (
+      validator.admin_hidden !== undefined ||
+      validator.featured !== undefined ||
+      validator.verified !== undefined ||
+      validator.minting_disabled !== undefined
+    ) {
       if (!ADMINS.includes(req.user.address)) {
         res.status(403).send('Not authorized to change these settings');
         return;
@@ -257,6 +263,8 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
     console.log('Validator', validator);
     const updateCollection: Partial<CollectionClass> = {
       collectionProfile: profileData,
+      // @ts-expect-error fuck it
+      collectionMinter: validator.minting_disabled ? { minting_disabled: validator.minting_disabled === 'true' } : undefined,
       hidden: validator.hidden ? validator.hidden === 'true' : undefined,
       admin_hidden: validator.admin_hidden ? validator.admin_hidden === 'true' : false,
       featured: validator.featured ? validator.featured === 'true' : undefined,

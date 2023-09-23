@@ -98,6 +98,10 @@ export async function updateCollection(collectionId: mongoose.Types.ObjectId, co
     collectionData.collectionProfile = { ...findCollection.collectionProfile, ...collectionData.collectionProfile };
   }
 
+  if (collectionData.collectionMinter) {
+    collectionData.collectionMinter = { ...findCollection.collectionMinter, ...collectionData.collectionMinter };
+  }
+
   const updateCollectionById: Collection = await collectionsModel.findByIdAndUpdate(collectionId, collectionData, { new: true });
   if (!updateCollectionById) throw new HttpException(404, 'Collection not found');
 
@@ -401,6 +405,7 @@ const getMinterInfo = async (creator: string) => {
               mint_limit: config.mint_limit,
               max_copies: undefined,
               ended,
+              minting_disabled: false,
             };
             const actual_creator = config.admin;
             return { minter, actual_creator };
@@ -459,6 +464,7 @@ const getMinterInfo = async (creator: string) => {
               mint_limit: config.mint_limit,
               max_copies: config.max_copies,
               ended,
+              minting_disabled: false,
             };
             const actual_creator = config.minter_admin;
             return { minter, actual_creator };
