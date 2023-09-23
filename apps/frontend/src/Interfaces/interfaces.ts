@@ -6,6 +6,7 @@ export interface ImportCollectionData {
     description: string;
     hidden: boolean;
     admin_hidden?: boolean;
+    minting_disabled?: boolean;
     featured?: boolean;
     verified?: boolean;
     dark_banner?: boolean;

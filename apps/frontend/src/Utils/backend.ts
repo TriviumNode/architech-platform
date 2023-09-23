@@ -256,6 +256,9 @@ export const editCollection = async(collectionId: string, request: Partial<Impor
 
     if (typeof request.dark_banner === 'boolean')
       formData.append('dark_banner', request.dark_banner.toString());
+
+    if (typeof request.minting_disabled === 'boolean')
+      formData.append('minting_disabled', request.minting_disabled.toString());
     
     console.log('Edit Request', request)
     try {

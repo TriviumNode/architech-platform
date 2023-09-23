@@ -88,6 +88,7 @@ const AdminEditPage: FC<{
                     <Col>
                         <label>
                             Disable Minting
+                            <div className='lightText12' style={{minHeight: '1em'}} />
                             <input type='checkbox' checked={minting_disabled} onChange={(e)=>setMintingDisabled(e.target.checked)} />
                         </label>
                     </Col>
