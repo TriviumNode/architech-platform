@@ -274,6 +274,7 @@ export const editCollection = async (req: RequestWithImages, res: Response, next
     };
 
     Object.keys(updateCollection).forEach(key => updateCollection[key] === undefined && delete updateCollection[key]);
+    console.log('Update Data', updateCollection);
 
     const updated: Collection = await collectionService.updateCollection(new mongoose.Types.ObjectId(collectionId), updateCollection);
     res.status(200).json(updated);
