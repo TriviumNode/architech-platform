@@ -29,7 +29,7 @@ const AdminEditPage: FC<{
     if (e) e.preventDefault();
     setSaving(true)
     try {
-      const result = await editCollection(collection._id.toString(), { admin_hidden, featured, verified, dark_banner })
+      const result = await editCollection(collection._id.toString(), { admin_hidden, featured, verified, dark_banner, minting_disabled })
       console.log('Admin Edit Result', result)
       toast.success('Saved Admin Settings')
     } catch(err: any) {
