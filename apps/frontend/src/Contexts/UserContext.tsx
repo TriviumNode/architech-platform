@@ -21,6 +21,7 @@ import ModalV2 from '../Components/ModalV2';
 import styles from './WalletModal.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMobileScreenButton } from '@fortawesome/free-solid-svg-icons';
+import { Keplr } from '@keplr-wallet/types';
 
 interface Props {
   children: ReactNode;
@@ -301,7 +302,23 @@ export const UserProvider = ({ children }: Props): ReactElement => {
       case 'SELECT':
         return (
           <div className={styles.selectWalletContainer}>
-            <Col className={styles.walletTile}>
+            {getWalletList().map(w=>
+              <Col className={styles.walletTile} key={w.name}>
+                <button onClick={()=>connectKeplr(w.provider)} disabled={typeof w.provider === "undefined"}>
+                  <div>
+                    <img src={`/images/wallets/${w.name}.svg`} />
+                    <div>
+                      <h2>{w.name}</h2>
+                    </div>
+                  </div>
+                  { w.mobile && <FontAwesomeIcon icon={faMobileScreenButton} size={'2x'} /> }
+                </button>
+                { typeof w.provider === "undefined" ?
+                  <a href={w.link} target='_blank' rel='noreferrer noopener'>Get {w.name} Wallet</a> : <div style={{height: '1em'}} />
+                }
+              </Col>  
+            )}
+            {/* <Col className={styles.walletTile}>
               <button onClick={()=>connectKeplr(window.keplr)} disabled={typeof window.keplr === "undefined"}>
                 <div>
                   <img src='/images/wallets/keplr.png' />
@@ -316,7 +333,6 @@ export const UserProvider = ({ children }: Props): ReactElement => {
             </Col>
 
             <Col className={styles.walletTile}>
-              {/* @ts-expect-error */}
               <button onClick={()=>connectKeplr(window.archx)} disabled={typeof window.archx === "undefined"}>
                 <div>
                   <img src='/images/wallets/archx.svg' />
@@ -326,13 +342,11 @@ export const UserProvider = ({ children }: Props): ReactElement => {
                 </div>
                 <FontAwesomeIcon icon={faMobileScreenButton} size={'2x'} />
               </button>
-              {/* @ts-expect-error */}
               { typeof window.archx === "undefined" ?
                 <a href='https://archx.io' target='_blank' rel='noreferrer noopener'>Get ArchX Wallet</a> : <div style={{height: '1em'}} />
               }
             </Col>
             <Col className={styles.walletTile}>
-              {/* @ts-expect-error */}
               <button onClick={()=>connectKeplr(window.leap)} disabled={typeof window.leap === "undefined"}>
                 <div>
                   <img src='/images/wallets/leap.svg' />
@@ -342,7 +356,6 @@ export const UserProvider = ({ children }: Props): ReactElement => {
                 </div>
                 <FontAwesomeIcon icon={faMobileScreenButton} size={'2x'} />
               </button>
-              {/* @ts-expect-error */}
               { typeof window.leap === "undefined" ?
                 <a href='https://www.leapwallet.io/download' target='_blank' rel='noreferrer noopener'>Get Leap Wallet</a> : <div style={{height: '1em'}} />
               }
@@ -360,7 +373,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
               { typeof window.cosmostation === "undefined" ?
                 <a href='https://cosmostation.io/products/cosmostation_extension' target='_blank' rel='noreferrer noopener'>Get Cosmostation Wallet</a> : <div style={{height: '1em'}} />
               }
-            </Col>
+            </Col> */}
           </div>
         )
       case 'LOADING_SIG':
@@ -406,3 +419,56 @@ export const UserProvider = ({ children }: Props): ReactElement => {
 
 // created custom hook
 export const useUser = (): UserContextState => useContext(UserContext);
+
+type WalletConfig = {
+  name: string;
+  provider: Keplr | undefined;
+  link: string;
+  mobile: boolean;
+}
+
+const keplrConfig: WalletConfig = {
+  name: 'Keplr',
+  provider: window.keplr,
+  link: 'https://www.keplr.app/download',
+  mobile: false,
+};
+
+const archxConfig: WalletConfig = {
+  name: 'ArchX',
+  provider: window.archx,
+  link: 'https://archx.io',
+  mobile: true,
+};
+
+const leapConfig: WalletConfig = {
+  name: 'Leap',
+  provider: window.leap,
+  link: 'https://www.leapwallet.io/download',
+  mobile: true,
+};
+
+const cosmostationConfig: WalletConfig = {
+  name: 'Cosmostation',
+  provider: window.cosmostation?.providers?.keplr,
+  link: 'https://cosmostation.io/products/cosmostation_extension',
+  mobile: false,
+};
+
+const getWalletList = () => {
+  const wallets: WalletConfig[] = [];
+
+  if (window.archx) wallets.push(archxConfig);
+  if (window.leap) wallets.push(leapConfig);
+  if (window.cosmostation) wallets.push(cosmostationConfig);
+
+  // if (wallets.length) keplrConfig.provider = undefined;
+  if (window.keplr) wallets.push(keplrConfig);
+
+  if (!wallets.find(w=>w.name === keplrConfig.name)) wallets.push(keplrConfig);
+  if (!wallets.find(w=>w.name === archxConfig.name)) wallets.push(archxConfig);
+  if (!wallets.find(w=>w.name === leapConfig.name)) wallets.push(leapConfig);
+  if (!wallets.find(w=>w.name === cosmostationConfig.name)) wallets.push(cosmostationConfig);
+
+  return wallets;
+}
