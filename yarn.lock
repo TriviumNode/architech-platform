@@ -2439,6 +2439,18 @@
   resolved "https://registry.yarnpkg.com/@cosmjs/utils/-/utils-0.30.1.tgz#6d92582341be3c2ec8d82090253cfa4b7f959edb"
   integrity sha512-KvvX58MGMWh7xA+N+deCfunkA/ZNDvFLw4YbOmX3f/XBIkqrVY7qlotfy2aNb1kgp6h4B6Yc8YawJPDTfvWX7g==
 
+"@cosmostation/extension@^0.0.13":
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/@cosmostation/extension/-/extension-0.0.13.tgz#dbdcad3b298387ea0755a75fac51d34998111918"
+  integrity sha512-qRSX4hG0Jnnq/0DOfi6DLvvmfqEvVQxnZJeHgUYaV/AHBpGEXZNNj5feh+XhliG/oC+YWy7hfzbsePQtMGWkNQ==
+  dependencies:
+    "@cosmostation/wallets" "^2.0.5"
+
+"@cosmostation/wallets@^2.0.5":
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/@cosmostation/wallets/-/wallets-2.0.6.tgz#89dca8317c4ffd603f8d54f2a6c127cdc484abd7"
+  integrity sha512-UypsEw5g4zktw4F2YinVVJeXbvJqHA0/aOVgjBtjvcWQw2stePomzaifhF2IZx9R7vnUBJszijYfiSEBufAAhA==
+
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/@cspotcode/source-map-support/-/source-map-support-0.8.1.tgz#00629c35a688e05a88b1cda684fb9d5e73f000a1"

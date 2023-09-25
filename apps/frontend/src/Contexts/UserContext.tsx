@@ -91,6 +91,11 @@ export const UserProvider = ({ children }: Props): ReactElement => {
     onChangeWallet();
   })
 
+  window.addEventListener("cosmostation_keystorechange", () => {
+    console.log("Cosmostation wallet changed!");
+    onChangeWallet();
+  })
+
   const onChangeWallet = async () => {
     if (!user) {
       // connectWallet()
@@ -199,6 +204,13 @@ export const UserProvider = ({ children }: Props): ReactElement => {
           preferNoSetFee: true,
         }
       }
+    }
+    if (window.cosmostation){
+      window.cosmostation.providers.keplr.defaultOptions = {
+        sign: {
+          preferNoSetFee: true,
+        },
+      };
     }
     try {
       setWalletStatus('LOADING_CONNECT');
@@ -333,6 +345,20 @@ export const UserProvider = ({ children }: Props): ReactElement => {
               {/* @ts-expect-error */}
               { typeof window.leap === "undefined" ?
                 <a href='https://www.leapwallet.io/download' target='_blank' rel='noreferrer noopener'>Get Leap Wallet</a> : <div style={{height: '1em'}} />
+              }
+            </Col>
+
+            <Col className={styles.walletTile}>
+              <button onClick={()=>connectKeplr(window.cosmostation.providers.keplr)} disabled={typeof window.cosmostation === "undefined"}>
+                <div>
+                  <img src='/images/wallets/cosmostation.svg' />
+                  <div>
+                    <h2>Cosmostation</h2>
+                  </div>
+                </div>
+              </button>
+              { typeof window.cosmostation === "undefined" ?
+                <a href='https://cosmostation.io/products/cosmostation_extension' target='_blank' rel='noreferrer noopener'>Get Cosmostation Wallet</a> : <div style={{height: '1em'}} />
               }
             </Col>
           </div>
