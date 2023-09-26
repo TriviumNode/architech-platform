@@ -306,7 +306,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
               <Col className={styles.walletTile} key={w.name}>
                 <button onClick={()=>connectKeplr(w.provider)} disabled={typeof w.provider === "undefined"}>
                   <div>
-                    <img src={`/images/wallets/${w.name}.svg`} />
+                    <img src={`/images/wallets/${w.name.toLowerCase()}.svg`} />
                     <div>
                       <h2>{w.name}</h2>
                     </div>
