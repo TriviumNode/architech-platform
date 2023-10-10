@@ -379,28 +379,28 @@ export const uploadImage = async(file: File): Promise<string> => {
     return data.cid;
 }
 
-export const uploadBatch = async(files: File[], onUploadProgress?: (progressEvent: AxiosProgressEvent)=>void): Promise<any> => {
-    const url = getApiUrl(`/upload/batch`);
+// export const uploadBatch = async(files: File[], onUploadProgress?: (progressEvent: AxiosProgressEvent)=>void): Promise<any> => {
+//     const url = getApiUrl(`/upload/batch`);
 
-    const formData = new FormData();
-    files.forEach(file=>{
-        formData.append('images', file);
-    });
+//     const formData = new FormData();
+//     files.forEach(file=>{
+//         formData.append('images', file);
+//     });
 
-    const {data}: {data: {cid: string}} = await axios(
-        url,
-        {
-            method: 'POST',
-            withCredentials: true,
-            data: formData,
-            headers: {
-                "Content-Type": "multipart/form-data"
-            },
-            onUploadProgress
-        }
-    )
-    return data;
-}
+//     const {data}: {data: {cid: string}} = await axios(
+//         url,
+//         {
+//             method: 'POST',
+//             withCredentials: true,
+//             data: formData,
+//             headers: {
+//                 "Content-Type": "multipart/form-data"
+//             },
+//             onUploadProgress
+//         }
+//     )
+//     return data;
+// }
 
 export type ProgressReport = {
   total: number;
