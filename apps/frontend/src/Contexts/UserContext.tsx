@@ -434,12 +434,12 @@ const keplrConfig: WalletConfig = {
   mobile: false,
 };
 
-const archxConfig: WalletConfig = {
-  name: 'ArchX',
-  provider: window.archx,
-  link: 'https://archx.io',
-  mobile: true,
-};
+// const archxConfig: WalletConfig = {
+//   name: 'ArchX',
+//   provider: window.archx,
+//   link: 'https://archx.io',
+//   mobile: true,
+// };
 
 const leapConfig: WalletConfig = {
   name: 'Leap',
@@ -458,7 +458,7 @@ const cosmostationConfig: WalletConfig = {
 const getWalletList = () => {
   const wallets: WalletConfig[] = [];
 
-  if (window.archx) wallets.push(archxConfig);
+  // if (window.archx) wallets.push(archxConfig);
   if (window.leap) wallets.push(leapConfig);
   if (window.cosmostation) wallets.push(cosmostationConfig);
 
@@ -466,7 +466,7 @@ const getWalletList = () => {
   if (window.keplr) wallets.push(keplrConfig);
 
   if (!wallets.find(w=>w.name === keplrConfig.name)) wallets.push(keplrConfig);
-  if (!wallets.find(w=>w.name === archxConfig.name)) wallets.push(archxConfig);
+  // if (!wallets.find(w=>w.name === archxConfig.name)) wallets.push(archxConfig);
   if (!wallets.find(w=>w.name === leapConfig.name)) wallets.push(leapConfig);
   if (!wallets.find(w=>w.name === cosmostationConfig.name)) wallets.push(cosmostationConfig);
 
