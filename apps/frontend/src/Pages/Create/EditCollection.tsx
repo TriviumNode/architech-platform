@@ -6,7 +6,7 @@ import { ImportCollectionData } from "../../Interfaces/interfaces";
 
 import styles from './create.module.scss'
 import CollectionDetailPage, { DetailState } from "./CollectionSubPages/CollectionDetailPage";
-import { editCollection, ProgressReport, uploadBatch, uploadMultiple } from "../../Utils/backend";
+import { editCollection, ProgressReport, uploadMultiple } from "../../Utils/backend";
 import LinksPage, { LinkState } from "./CollectionSubPages/LinksPage";
 import { cw2981, GetCollectionResponse, minter } from "@architech/types";
 import { toast } from "react-toastify";

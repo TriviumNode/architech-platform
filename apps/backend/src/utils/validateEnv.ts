@@ -14,6 +14,7 @@ const validateEnv = () => {
     FILEBASE_S3_KEY_ID: str(),
     FILEBASE_S3_KEY: str(),
     FILEBASE_BUCKET: str(),
+    JACKAL_API_URL: str(),
   });
 };
 

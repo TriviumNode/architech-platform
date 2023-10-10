@@ -3,10 +3,11 @@ import { Response, NextFunction, Request } from 'express';
 import crypto from 'crypto';
 import path from 'path';
 
-import AWS from 'aws-sdk';
+import AWS, { AlexaForBusiness } from 'aws-sdk';
 import { HttpException } from '@/exceptions/HttpException';
 import { FILEBASE_BUCKET, FILEBASE_S3_KEY, FILEBASE_S3_KEY_ID } from '@/config';
 import promiseConcurrency from 'promise-concurrency';
+import axios from 'axios';
 
 const s3 = new AWS.S3({
   apiVersion: '2006-03-01',
@@ -38,43 +39,57 @@ const s3 = new AWS.S3({
 // });
 
 export const uploadImage = async (req: RequestWithUser, res: Response, next: NextFunction) => {
-  console.log('Upload req.file', req.file);
-  if (!req.file) {
-    res.status(400).send('No files uploaded');
-    return;
-  }
-  const buffer = req.file.buffer;
+  try {
+    if (!req.file) {
+      res.status(400).send('No files uploaded');
+      return;
+    }
+    const buffer = req.file.buffer;
 
-  // Create hash using file buffer
-  const hash = crypto.createHash('sha256');
-  hash.update(buffer);
+    // Create hash using file buffer
+    const hash = crypto.createHash('sha256');
+    hash.update(buffer);
 
-  // Filename `hash.ext`
-  const fileName = `${hash.digest('hex')}${path.extname(req.file.originalname)}`;
+    // Filename `hash.ext`
+    const fileName = `${hash.digest('hex')}${path.extname(req.file.originalname)}`;
 
-  const params = {
-    Bucket: FILEBASE_BUCKET,
-    Key: `uploads/${fileName}`,
-    ContentType: req.file.mimetype,
-    Body: buffer,
-    ACL: 'public-read',
-  };
+    const params = {
+      Bucket: FILEBASE_BUCKET,
+      Key: `uploads/${fileName}`,
+      ContentType: req.file.mimetype,
+      Body: buffer,
+      ACL: 'public-read',
+    };
 
-  const request = s3.putObject(params);
-  request.on('httpHeaders', (statusCode, headers) => {
-    console.log(`CID: ${headers['x-amz-meta-cid']}`);
-    if (!headers['x-amz-meta-cid']) throw new HttpException(500, 'Unable to fetch IPFS hash.');
-    res.status(200).json({
-      cid: headers['x-amz-meta-cid'],
+    const request = s3.putObject(params);
+    request.on('httpHeaders', async (statusCode, headers) => {
+      console.log(`CID: ${headers['x-amz-meta-cid']}`);
+      if (!headers['x-amz-meta-cid']) throw new HttpException(500, 'Unable to fetch IPFS hash.');
+      const cid = headers['x-amz-meta-cid'];
+
+      // Backup on Jackal
+      const url = `${process.env.JACKAL_API_URL}/ipfs/${cid}`;
+      console.log(url);
+      axios
+        .get(url)
+        .then(() => {
+          res.status(200).json({ cid });
+        })
+        .catch(() => {
+          res.status(500).send('Failed to backup upload to Jackal Protocol');
+        });
     });
-  });
-  request.send();
-  // const { ETag } = (await s3.putObject(params).promise()) as any;
-  // console.log(ETag);
+    request.send();
+    // const { ETag } = (await s3.putObject(params).promise()) as any;
+    // console.log(ETag);
 
-  // res.status(200).json({
-  //   cid: ETag,
-  // });
+    // res.status(200).json({
+    //   cid: ETag,
+    // });
+  } catch (error) {
+    console.error('File upload error:', error.toString());
+    next(error.toString());
+  }
 };
 
 const processFile = async (file: any, index: number, responses: any[]) => {

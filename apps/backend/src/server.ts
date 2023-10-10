@@ -5,6 +5,7 @@ import UsersRoute from '@routes/users.route';
 import validateEnv from '@utils/validateEnv';
 import AdminRoute from './routes/admin.route';
 import CollectionsRoute from './routes/collections.route';
+import IpfsRoute from './routes/ipfs.route';
 import TokensRoute from './routes/tokens.route';
 import UploadRoute from './routes/upload.route';
 import { initClients } from './utils/chainClients';
@@ -15,6 +16,7 @@ const main = async () => {
   validateEnv();
 
   const app = new App([
+    new IpfsRoute(),
     new IndexRoute(),
     new UsersRoute(),
     new AuthRoute(),
