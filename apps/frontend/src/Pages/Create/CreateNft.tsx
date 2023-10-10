@@ -184,6 +184,19 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
                 console.error('Minting Error', err)
                 setStatus("ERROR")
                 setError(`Error minting: ${parseError(err)}`);
+                const newErrorContent = (
+                  <div className='mb16'>
+                    <h3 className='mb8'>Error minting</h3>
+                    <code>{parseError(err)}</code>
+                  </div>
+                )
+                const eTask = {
+                  content: `Retry`,
+                  onClick: ()=>setPage('Review')
+                }
+                setErrorTasks([eTask]);
+                setErrorTaskMessage(newErrorContent);
+                setStatus("ERROR")
                 return;
             }
         }
