@@ -118,6 +118,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
 
     const [unsaved, setUnsaved] = useState(false);
     const [saving, setSaving] = useState(false);
+
     const [preloadStatus, setPreloadStatus] = useState<PreloadStatus>();
     const [preloadReady, setPreloadReady] = useState(false);
     const [uploadPercent, setUploadPercent] = useState(0);
@@ -135,6 +136,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     useEffect(()=>{
       if (ADMINS.includes(wallet?.address || 'notadmin') && Pages.findIndex(p=>p.link === 'admin') === -1 ) Pages.push({ link: 'admin', title: 'Admin' })
     },[wallet])
+
     const changePage = (newLink: string) => {
         setPage(Pages.find(p=>p.link===newLink) as Page);
     }
@@ -234,7 +236,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
 
                 // Show an error if an item with no URL doesnt have an image uploaded
                 if (preloadState.images.findIndex(image=>image.file.name === noImage.file_name) === -1) {
-                    setPopupError(`File ${noImages[i].file_name} is missing.`)
+                    setPopupError(`Image ${noImages[i].file_name} is missing.`)
                     setPreloadReady(false);
                     // Stop checking after finding one error.
                     return;
@@ -337,10 +339,19 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     }
 
     const handleCancel = (e: any) => {
-      if (e) e.preventDefault();
+      if (e.preventDefault) e.preventDefault();
       setDetailState(currentDetail);
       setLinkState(currentLinks);
       setTimesState(currentTimes);
+    }
+
+    const handleResetPreload = (e: any) => {
+      if (e.preventDefault) e.preventDefault();
+      setPreloadStatus(undefined);
+      setPreloadReady(false);
+      setUploadPercent(0);
+      setPreloadState(DefaultPreloadState);
+      setPopupError(undefined);
     }
 
     const handleAxiosProgress = (progressEvent: AxiosProgressEvent) => {
@@ -489,6 +500,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
         { popupError &&
             <div className={styles.saveToast}>
                 <div style={{margin: '0 24px 0 8px', whiteSpace: 'nowrap'}}>{popupError}</div>
+                <button disabled={saving} onClick={handleResetPreload} className='mr8'>Start Over</button>
             </div>
         }
         { preloadReady &&
@@ -507,10 +519,16 @@ type PModalProps = {
 
 const PreloadModal = ({preloadStatus, getStatusMessage}: PModalProps) => {
   return (
-    <ModalV2 open={!!preloadStatus} locked={true} closeButton={false} onClose={()=>{}} title={'Preloading Minter'} style={{width: '256px'}} >
-      <div className='d-flex flex-column justify-content-center align-items-center' style={{textAlign: 'center', paddingTop: '16px'}}>
+    <ModalV2 open={!!preloadStatus} locked={true} closeButton={false} onClose={()=>{}} title={'Preloading Minter'} style={{width: '280px'}} >
+      <div className='d-flex flex-column justify-content-center align-items-center mb8' style={{textAlign: 'center', paddingTop: '16px', textTransform: 'none'}}>
         {getStatusMessage()}
       </div>
+      {(preloadStatus === "UPLOADING" || preloadStatus === "PROCESSING") &&
+        <div className='d-flex justify-content-between' style={{gap: '32px', margin: '8px', width: 'calc(100% - 16px)'}}>
+          <img src='/images/ipfs.png' alt='IPFS' style={{width: '96px'}} />
+          <img src='/images/jackal.png' alt='Jackal' style={{width: '96px'}} />
+        </div>
+      }
     </ModalV2>
   )
 }

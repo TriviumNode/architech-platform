@@ -267,7 +267,13 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
         <Modal open={!!status && status !== 'ERROR' && status !== 'COMPLETE'} locked={true} onClose={()=>{}} style={{width: error ? '50vw' : undefined}} >
             <Row className="px-4 pt-4 justify-content-center">
                 <Col xs='auto' style={{textAlign: 'center'}}>
-                    { status === "UPLOADING" && <><p>Uploading image to IPFS...</p><Loader /></>}
+                    { status === "UPLOADING" && <div className='mb16'>
+                      <p>Uploading image...</p><Loader />
+                      <div className='d-flex justify-content-between wide' style={{gap: '32px'}}>
+                        <img src='/images/ipfs.png' alt='IPFS' style={{width: '96px'}} />
+                        <img src='/images/jackal.png' alt='Jackal' style={{width: '96px'}} />
+                      </div>
+                    </div>}
                     { status === "MINTING" && <><p>Minting NFT on chain...<br />Please approve the transaction in your wallet.</p><Loader /></>}
                     { status === "IMPORTING" && <><p>Importing collection into Architech...</p><Loader /></>}
                     { status === "COMPLETE" && <p>{detailState.name} has been created. <Link to={`/nfts/${collection?.address}/${encodeURIComponent(detailState.tokenId)}`}>View your NFT.</Link></p>}
