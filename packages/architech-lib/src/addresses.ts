@@ -27,7 +27,7 @@ export const getAddresses = (chainId: string): ChainConfig => {
                 // Nois Contracts
                 NOIS_PROXY: 'archway10f3aasgsnpv84ymjyld50jayc4ecu267sdpjamauwm8nvxlzex9qj4dkwr',
                 NOIS_PAYMENT_CONTRACT: 'nois1rf3qhpwrs6zy0hun9qua56har9jrfau97c006czg7mjmhq7c09uqa2l7rg',
-                RANDOMNESS_COST: 25,
+                RANDOMNESS_COST: 1,
             };
             break;
         case 'constantine-3':
