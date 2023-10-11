@@ -347,10 +347,10 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
 
     const handleResetPreload = (e: any) => {
       if (e.preventDefault) e.preventDefault();
+      setPreloadState(DefaultPreloadState);
       setPreloadStatus(undefined);
       setPreloadReady(false);
       setUploadPercent(0);
-      setPreloadState(DefaultPreloadState);
       setPopupError(undefined);
     }
 
@@ -506,6 +506,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
         { preloadReady &&
             <div className={styles.saveToast}>
                 <div style={{margin: '0 24px 0 8px', whiteSpace: 'nowrap'}}>You have {preloadState.items.length} NFTs to preload</div>
+                <button disabled={saving} onClick={handleResetPreload} className='mr8 clearBtn'>Start Over</button>
                 <button disabled={!!preloadStatus} onClick={()=>handlePreload()}>Preload{!!preloadStatus && <SmallLoader />}</button>
             </div>
         }

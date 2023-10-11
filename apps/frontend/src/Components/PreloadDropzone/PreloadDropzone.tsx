@@ -36,13 +36,20 @@ export default function PreloadDropzone(
     invalidFilesRef.current = invalidFiles;
     disabledRef.current = disabled;
 
+    useEffect(()=>{
+      if (disabled && acceptedFiles.length) setAcceptedFiles([])
+    },[acceptedFiles])
+
     const onDrop = useCallback((files: File[]) => {
       if (disabledRef.current) return;
+
       const newFiles: FileWithPreview[] = []
       files.forEach(f=>{
         if (filesRef.current.findIndex(fi=>fi.file.name === f.name) === -1)
           newFiles.push({file: f, preview: undefined});
       })
+
+      if (disabledRef.current) return;
       setAcceptedFiles([...filesRef.current, ...newFiles]);
 
     
@@ -62,19 +69,27 @@ export default function PreloadDropzone(
 
     useEffect(()=>{
       acceptedFiles.filter(f=>!f.preview).forEach((f, i)=>{
+        if (disabledRef.current) return;
         processFile(f.file)
       })
     },[acceptedFiles]);
 
     const processFile = async (file: File) => {
+      if (disabledRef.current) return;
+
       const preview = await blobToData(file);
       const index = acceptedFiles.findIndex(a=>a.file.name === file.name);
       if (index > -1){
         const newFiles = [...acceptedFiles];
         newFiles[index] = {file, preview}
+
+        if (disabledRef.current) return;
         setAcceptedFiles(newFiles);
       }
-      else setAcceptedFiles([...acceptedFiles, {file, preview}])
+      else {
+        if (disabledRef.current) return;
+        setAcceptedFiles([...acceptedFiles, {file, preview}])
+      }
     }
 
     const removeImage = (index: number) => {

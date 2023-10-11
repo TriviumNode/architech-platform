@@ -13,7 +13,7 @@ import Badge from "../../../Components/Badge";
 export interface PreloadState {
     items: IdMetadata[],
     csv_file: File | undefined,
-    json_file: File | undefined,
+    // json_file: File | undefined,
     images: FileWithPreview[],
     invalidFiles: string[],
 }
@@ -21,7 +21,7 @@ export interface PreloadState {
 export const DefaultPreloadState: PreloadState = {
     items: [],
     csv_file: undefined,
-    json_file: undefined,
+    // json_file: undefined,
     images: [],
     invalidFiles: [],
 }
@@ -37,7 +37,7 @@ const MinterPreloadPage: FC<{
 }> = ({state, onChange, minterStatus}): ReactElement => {
     const [errors, setErrors] = useState<Partial<PreloadState>>()
     const [parsingCsv, setParsingCsv] = useState(false)
-    const [parsingJson, setParsingJson] = useState(false)
+    const [parsingJson, setParsingJson] = useState<string>()
     const stateRef = useRef(state);
     stateRef.current = state;
 
@@ -45,42 +45,75 @@ const MinterPreloadPage: FC<{
         onChange({...stateRef.current, ...newDetailState})
     }
 
-    useEffect(()=>{
-        if (!state.json_file) return;
-        updateState({csv_file: undefined})
-        setParsingJson(true);
-        try {
-            state.json_file.text().then((data)=>{
-                const obj: IdMetadata[] = JSON.parse(data);
-                const newMetadata: IdMetadata[] = [];
-                obj.forEach(m=>{
-                    newMetadata.push({
-                        file_name: m.file_name,
-                        name: m.name,
-                        description: m.description,
-                        royalty_payment_address: m.royalty_payment_address,
-                        royalty_percentage: m.royalty_percentage,
-                        image: m.image,
-                        attributes: m.attributes,
-                        animation_url: m.animation_url,
-                        background_color: m.background_color,
-                        external_url: m.external_url,
-                        image_data: m.image_data,
-                        youtube_url: m.youtube_url,
-                    })
-                })
-                updateState({items: newMetadata})
-                setParsingJson(false);
-            })
-        } catch(error: any) {
-            console.error('Failed to parse JSON', error)
-            toast.error(error.toString())
-        }
-    },[state.json_file])
+    const importJson = (json_file: File) => {
+      if (!json_file) return;
+      setParsingJson(json_file.name);
+      try {
+          json_file.text().then((data)=>{
+              const obj: IdMetadata[] = JSON.parse(data);
+              const newMetadata: IdMetadata[] = [];
+              obj.forEach(m=>{
+                  newMetadata.push({
+                      file_name: m.file_name,
+                      name: m.name,
+                      description: m.description,
+                      royalty_payment_address: m.royalty_payment_address,
+                      royalty_percentage: m.royalty_percentage,
+                      image: m.image,
+                      attributes: m.attributes,
+                      animation_url: m.animation_url,
+                      background_color: m.background_color,
+                      external_url: m.external_url,
+                      image_data: m.image_data,
+                      youtube_url: m.youtube_url,
+                  })
+              })
+              updateState({items: [...state.items, ...newMetadata]})
+              setParsingJson(undefined);
+          })
+      } catch(error: any) {
+        console.error(`Failed to parse JSON ${json_file.name}:`, error)
+        toast.error(error.toString())
+        setParsingJson(undefined);
+      }
+    }
+
+    // useEffect(()=>{
+    //     if (!state.json_file) return;
+    //     updateState({csv_file: undefined})
+    //     setParsingJson(true);
+    //     try {
+    //         state.json_file.text().then((data)=>{
+    //             const obj: IdMetadata[] = JSON.parse(data);
+    //             const newMetadata: IdMetadata[] = [];
+    //             obj.forEach(m=>{
+    //                 newMetadata.push({
+    //                     file_name: m.file_name,
+    //                     name: m.name,
+    //                     description: m.description,
+    //                     royalty_payment_address: m.royalty_payment_address,
+    //                     royalty_percentage: m.royalty_percentage,
+    //                     image: m.image,
+    //                     attributes: m.attributes,
+    //                     animation_url: m.animation_url,
+    //                     background_color: m.background_color,
+    //                     external_url: m.external_url,
+    //                     image_data: m.image_data,
+    //                     youtube_url: m.youtube_url,
+    //                 })
+    //             })
+    //             updateState({items: newMetadata})
+    //             setParsingJson(false);
+    //         })
+    //     } catch(error: any) {
+    //         console.error('Failed to parse JSON', error)
+    //         toast.error(error.toString())
+    //     }
+    // },[state.json_file])
 
     useEffect(()=>{
         if (!state.csv_file) return;
-        updateState({json_file: undefined})
+        // updateState({json_file: undefined})
         setParsingCsv(true);
         Papa.parse(state.csv_file, {
             header: true,
@@ -136,10 +169,10 @@ const MinterPreloadPage: FC<{
               </p>
               <div className='mb16 d-flex justify-content-between'>
                   <Badge style={{fontSize: '16px'}}>
-                      {!state.csv_file && !state.json_file ?
-                        'No File Selected'
+                      {!state.csv_file && !state.items.length ?
+                        'No Files Selected'
                       :
-                        `${state.items.length} NFTs Found in ${state.csv_file ? 'CSV' : state.json_file ? 'JSON' : 'ERROR: Uunknown File Type'}`
+                        `${state.items.length} NFTs selected`
                       }
                   </Badge>
                   <Badge style={{fontSize: '16px'}}>
@@ -177,16 +210,16 @@ const MinterPreloadPage: FC<{
                             JSON
                             <label className={styles.customfileupload}>
                                 <div className='ml16'>
-                                    { state.json_file ? state.json_file.name : 'Select a file' }
+                                    { state.items.length ? 'Select another file to add more items' : 'Select a file' }
                                 </div>
                                 {parsingJson && <SmallLoader />}
                                 <img alt='Upload' src='/upload.svg' style={{maxHeight: '1em' }} className='mr16' />
                                 <input
                                     type='file'
                                     accept=".json"
-                                    disabled={parsingJson}
+                                    disabled={!!parsingJson}
                                     onChange={(e)=>{
-                                        if (e.target.files) updateState({json_file: e.target.files[0]})
+                                        if (e.target.files) importJson(e.target.files[0]); //updateState({json_file: e.target.files[0]})
                                     }}
                                 />
                             </label>
