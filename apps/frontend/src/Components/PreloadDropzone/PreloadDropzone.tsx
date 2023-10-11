@@ -40,7 +40,7 @@ export default function PreloadDropzone(
       if (disabled && acceptedFiles.length) setAcceptedFiles([])
     },[acceptedFiles])
 
-    const onDrop = useCallback((files: File[]) => {
+    const onDrop = useCallback(async (files: File[]) => {
       if (disabledRef.current) return;
 
       const newFiles: FileWithPreview[] = []
@@ -52,35 +52,21 @@ export default function PreloadDropzone(
       if (disabledRef.current) return;
       setAcceptedFiles([...filesRef.current, ...newFiles]);
 
-    
-      // files.forEach((f)=>{
-      //   var fr = new FileReader();
-      //   fr.onload = function () {
-      //     console.log('GOT IT', acceptedFiles)
-      //     setAcceptedFiles([...acceptedFiles, {file: f, preview: fr.result}]);
-      //   }
-      //   fr.readAsDataURL(f);
-      //   console.log('WAIT')
-      // })
-      
-    }, [])
-    const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
-
-
-    useEffect(()=>{
-      acceptedFiles.filter(f=>!f.preview).forEach((f, i)=>{
+      for (const f of [...filesRef.current, ...newFiles].filter(f=>!f.preview)) {
         if (disabledRef.current) return;
-        processFile(f.file)
-      })
-    },[acceptedFiles]);
+        await processFile(f.file)
+      };      
+    }, [])
+
+    const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
 
     const processFile = async (file: File) => {
       if (disabledRef.current) return;
 
       const preview = await blobToData(file);
-      const index = acceptedFiles.findIndex(a=>a.file.name === file.name);
+      const index = filesRef.current.findIndex(a=>a.file.name === file.name);
       if (index > -1){
-        const newFiles = [...acceptedFiles];
+        const newFiles = [...filesRef.current];
         newFiles[index] = {file, preview}
 
         if (disabledRef.current) return;
@@ -88,27 +74,16 @@ export default function PreloadDropzone(
       }
       else {
         if (disabledRef.current) return;
-        setAcceptedFiles([...acceptedFiles, {file, preview}])
+        setAcceptedFiles([...filesRef.current, {file, preview}])
       }
     }
 
-    const removeImage = (index: number) => {
-      const newFiles = [...filesRef.current];
-      newFiles.splice(index,1)
-      console.log(newFiles)
-      setAcceptedFiles(newFiles);
-    }
-
-  // useEffect(()=>{
-  //   acceptedFiles.forEach((f, i)=>{
-  //     var fr = new FileReader();
-  //     fr.onload = function () {
-  //         const newPreviews = [...previews]
-  //         previews[i] = fr.result
-  //     }
-  //     fr.readAsDataURL(f);
-  //   })
-  // },[acceptedFiles]);
+  const removeImage = (index: number) => {
+    const newFiles = [...filesRef.current];
+    newFiles.splice(index,1)
+    console.log(newFiles)
+    setAcceptedFiles(newFiles);
+  }
 
   const handleRemoveImage = (e: any) => { 
     e.preventDefault();
