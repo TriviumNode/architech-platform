@@ -17,7 +17,7 @@ import SmallLoader from "../../Components/SmallLoader";
 import { QueryClient } from "../../Utils/queryClient";
 import { ContractMetadata } from "@archwayhq/arch3.js/build";
 import ConnectWallet from "../../Components/ConnectWallet";
-import MinterPreloadPage, { DefaultPreloadState, PreloadState } from "./CollectionSubPages/MinterPreloadPage";
+import PreloadJsonPage, { DefaultPreloadState, PreloadState } from "./CollectionSubPages/PreloadJsonPage";
 
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import {Buffer} from 'buffer';
@@ -26,6 +26,8 @@ import Loader from "../../Components/Loader";
 import { AxiosProgressEvent } from "axios";
 import AdminEditPage from "./CollectionSubPages/AdminEditPage";
 import TimesPage, { DefaultTimesState, TimesState } from "./CollectionSubPages/TimesPage";
+import PreloadCsvPage from "./CollectionSubPages/PreloadCsvPage";
+import PreloadLandingPage from "./CollectionSubPages/PreloadLandingPage";
 
 
 
@@ -33,6 +35,21 @@ import TimesPage, { DefaultTimesState, TimesState } from "./CollectionSubPages/T
 export type Page = {
     link: string;
     title: string;
+}
+
+const preloadLandingPage: Page = {
+  link: 'preload',
+  title: 'IF YOU SEE THIS, THIS IS A BUG!',
+}
+
+const preloadCsvPage: Page = {
+  link: 'preloadcsv',
+  title: 'Preload with CSV',
+}
+
+const preloadJsonPage: Page = {
+  link: 'preloadjson',
+  title: 'Preload with JSON',
 }
 
 export const PAGES: Page[] = [
@@ -58,16 +75,16 @@ export const MinterPAGES: Page[] = [
 ]
 
 export const RandomPAGES: Page[] = [
-    ...PAGES,
-    ...MinterPAGES,
-    {
-        link: 'preload',
-        title: 'Preload Minter',
-    },
+  // ...PAGES,
+  ...MinterPAGES,
+  preloadCsvPage,
+  preloadJsonPage,
 ]
 
+
+
 export const CopyPAGES: Page[] = [
-  ...PAGES,
+  // ...PAGES,
   ...MinterPAGES,
 ]
 
@@ -79,9 +96,12 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     const navigate = useNavigate();
     const params = useParams()
 
-    const [Pages, setPages] = useState<Page[]>(fullCollection.collection.collectionMinter?.minter_type === 'RANDOM' ? RandomPAGES : fullCollection.collection.collectionMinter?.minter_type === 'COPY' ? CopyPAGES : PAGES);
-
-    const findPage = Pages.find(p=>p.link.toLowerCase() === params.page?.toLowerCase()) || Pages[0]
+    // const [Pages, setPages] = useState<Page[]>(fullCollection.collection.collectionMinter?.minter_type === 'RANDOM' ? RandomPAGES : fullCollection.collection.collectionMinter?.minter_type === 'COPY' ? CopyPAGES : PAGES);
+    const minterPages = !fullCollection.collection.collectionMinter ? [] : fullCollection.collection.collectionMinter.minter_type === 'RANDOM' ? RandomPAGES : CopyPAGES
+    const allPages = [...PAGES, ...minterPages]
+    // allPages.push(preloadLandingPage)
+    
+    const findPage = [...allPages, preloadLandingPage].find(p=>p.link.toLowerCase() === params.page?.toLowerCase()) || allPages[0]
 
     
     const revalidator = useRevalidator();
@@ -134,11 +154,11 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     const [popupError, setPopupError] = useState<any>();
 
     useEffect(()=>{
-      if (ADMINS.includes(wallet?.address || 'notadmin') && Pages.findIndex(p=>p.link === 'admin') === -1 ) Pages.push({ link: 'admin', title: 'Admin' })
+      if (ADMINS.includes(wallet?.address || 'notadmin') && PAGES.findIndex(p=>p.link === 'admin') === -1 ) PAGES.push({ link: 'admin', title: 'Admin' })
     },[wallet])
 
     const changePage = (newLink: string) => {
-        setPage(Pages.find(p=>p.link===newLink) as Page);
+        setPage(allPages.find(p=>p.link===newLink) as Page);
     }
 
     useEffect(()=>{
@@ -280,7 +300,11 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
             case page.link==='rewards':
                 return <RewardsPage state={rewardsState} onChange={(data) => setRewardsState(data)} contractAddress={collection.address} metadata={metadata} loadingMetadata={loadingMetadata} loadingMetadataError={loadMetadataError} />
             case page.link==='preload':
-                return <MinterPreloadPage state={preloadState} onChange={(data) => setPreloadState(data)} minterStatus={minterStatus} />
+                return <PreloadLandingPage collection={collection} setCsvPage={()=>setPage(preloadCsvPage)} setJsonPage={()=>setPage(preloadJsonPage)} />
+            case page.link==='preloadcsv':
+              return <PreloadCsvPage state={preloadState} onChange={(data) => setPreloadState(data)} minterStatus={minterStatus} />
+            case page.link==='preloadjson':
+              return <PreloadJsonPage state={preloadState} onChange={(data) => setPreloadState(data)} minterStatus={minterStatus} />
             case page.link==='launchtime':
               return <TimesPage state={timesState} onChange={(data) =>setTimesState(data)} collectionType={collection.collectionMinter?.minter_type} collectionMinter={collection.collectionMinter} />
             case page.link==='admin':
@@ -474,11 +498,21 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                         <h2 className='d-inline-block ml16'>Edit<br/>Collection</h2>
                     </div>
                     <div className={styles.navLinks}>
-                        { Pages.map((p: Page)=>
+                        { PAGES.map((p: Page)=>
                             <button type='button' onClick={()=>{setPage(p)}} disabled={page.link === p.link} key={p.link}>
                                 {p.title}
                             </button>)
                         }
+                    </div>
+                    <div className='d-flex align-items-center' style={{marginTop: '48px'}}>
+                      <h2 className='d-inline-block ml16'>Edit Minter</h2>
+                    </div>
+                    <div className={styles.navLinks}>
+                      { minterPages.map((p: Page)=>
+                        <button type='button' onClick={()=>{setPage(p)}} disabled={page.link === p.link} key={p.link}>
+                          {p.title}
+                        </button>)
+                      }
                     </div>
                 </div>
             </Col>

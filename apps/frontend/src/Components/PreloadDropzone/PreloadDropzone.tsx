@@ -22,12 +22,14 @@ export default function PreloadDropzone(
     images: acceptedFiles,
     setImages: setAcceptedFiles,
     invalidFiles,
-    disabled
+    disabled,
+    fileType,
   }:{ 
     images: FileWithPreview[];
     setImages: (newImages: FileWithPreview[])=>void;
     invalidFiles: string[];
     disabled: boolean;
+    fileType: string;
   }){
     const filesRef = useRef<FileWithPreview[]>(acceptedFiles);
     const invalidFilesRef = useRef<string[]>(invalidFiles);
@@ -143,7 +145,7 @@ export default function PreloadDropzone(
           isDragActive && !disabled ?
             <p>Drop the images here ...</p> :
             disabled ?
-              <p>Upload a CSV or JSON before uploading images.</p>
+              <p>Upload a {fileType} file before uploading images.</p>
             : <p>Click or tap to select images, or drag and drop images here.</p>
         }
         </div>
