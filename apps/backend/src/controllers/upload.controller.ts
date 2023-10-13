@@ -68,16 +68,17 @@ export const uploadImage = async (req: RequestWithUser, res: Response, next: Nex
       const cid = headers['x-amz-meta-cid'];
 
       // Backup on Jackal
+      // TODO: Waiting takes too long... Maybe also default to jackal for frontend gateway?
       const url = `${process.env.JACKAL_API_URL}/ipfs/${cid}`;
-      console.log(url);
-      axios
-        .get(url)
-        .then(() => {
-          res.status(200).json({ cid });
-        })
-        .catch(() => {
-          res.status(500).send('Failed to backup upload to Jackal Protocol');
-        });
+      axios.get(url);
+      // .then(() => {
+      //   res.status(200).json({ cid });
+      // })
+      // .catch(() => {
+      //   res.status(500).send('Failed to backup upload to Jackal Protocol');
+      // });
+
+      res.status(200).json({ cid });
     });
     request.send();
     // const { ETag } = (await s3.putObject(params).promise()) as any;
