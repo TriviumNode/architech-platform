@@ -504,16 +504,19 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                             </button>)
                         }
                     </div>
-                    <div className='d-flex align-items-center' style={{marginTop: '48px'}}>
-                      <h2 className='d-inline-block ml16'>Edit Minter</h2>
-                    </div>
-                    <div className={styles.navLinks}>
-                      { minterPages.map((p: Page)=>
-                        <button type='button' onClick={()=>{setPage(p)}} disabled={page.link === p.link} key={p.link}>
-                          {p.title}
-                        </button>)
-                      }
-                    </div>
+                    {!!collection.collectionMinter &&
+                    <>
+                      <div className='d-flex align-items-center' style={{marginTop: '48px'}}>
+                        <h2 className='d-inline-block ml16'>Edit Minter</h2>
+                      </div>
+                      <div className={styles.navLinks}>
+                        { minterPages.map((p: Page)=>
+                          <button type='button' onClick={()=>{setPage(p)}} disabled={page.link === p.link} key={p.link}>
+                            {p.title}
+                          </button>)
+                        }
+                      </div>
+                    </>}
                 </div>
             </Col>
             <Col
