@@ -304,7 +304,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
           <div className={styles.selectWalletContainer}>
             {getWalletList().map(w=>
               <Col className={styles.walletTile} key={w.name}>
-                <button onClick={()=>connectKeplr(w.provider)} disabled={typeof w.provider === "undefined"}>
+                <button onClick={()=>connectKeplr(w.provider)} disabled={!!!w.provider}>
                   <div>
                     <img src={`/images/wallets/${w.name.toLowerCase()}.svg`} />
                     <div>
@@ -313,7 +313,8 @@ export const UserProvider = ({ children }: Props): ReactElement => {
                   </div>
                   { w.mobile && <FontAwesomeIcon icon={faMobileScreenButton} size={'2x'} /> }
                 </button>
-                { typeof w.provider === "undefined" ?
+                {/* { typeof w.provider === "undefined" ? */}
+                { !!!w.provider ?
                   <a href={w.link} target='_blank' rel='noreferrer noopener'>Get {w.name} Wallet</a> : <div style={{height: '1em'}} />
                 }
               </Col>  
@@ -458,13 +459,13 @@ const cosmostationConfig: WalletConfig = {
 const getWalletList = () => {
   const wallets: WalletConfig[] = [];
 
-  // if (window.archx) wallets.push(archxConfig);
+  // // Show installed wallets first
+  //if (window.archx) wallets.push(archxConfig);
   if (window.leap) wallets.push(leapConfig);
   if (window.cosmostation) wallets.push(cosmostationConfig);
-
-  // if (wallets.length) keplrConfig.provider = undefined;
   if (window.keplr) wallets.push(keplrConfig);
 
+  // Show other wallets after installed wallets
   if (!wallets.find(w=>w.name === keplrConfig.name)) wallets.push(keplrConfig);
   // if (!wallets.find(w=>w.name === archxConfig.name)) wallets.push(archxConfig);
   if (!wallets.find(w=>w.name === leapConfig.name)) wallets.push(leapConfig);
