@@ -359,7 +359,7 @@ const getMinterInfo = async (creator: string) => {
           if (subStr === 'random_minter::msg::QueryMsg') {
             // Get minter config
             const { config }: { config: minter.Config } = await getConfig({ client: queryClient, contract: creator });
-            const { remaining } = await getMintStatus({ client: queryClient, contract: creator });
+            const { pending, remaining } = await getMintStatus({ client: queryClient, contract: creator });
             console.log('Minter Config', config);
             const payment: MinterPaymentI = config.price
               ? {
@@ -376,7 +376,13 @@ const getMinterInfo = async (creator: string) => {
 
             // Determine if ended
             let ended = false;
-            if (remaining === 0) ended = true;
+            // If launch  time is past (or not set), and out of stock, set ended to true.
+            // This ensures random minters are not marked as ended before they are preloaded
+            if (
+              (!config.launch_time || new Date(parseInt(config.launch_time) / 1000000).valueOf() < new Date().valueOf()) &&
+              remaining - pending <= 0
+            )
+              ended = true;
 
             const whitelist_payment: MinterPaymentI = config.wl_price
               ? {
