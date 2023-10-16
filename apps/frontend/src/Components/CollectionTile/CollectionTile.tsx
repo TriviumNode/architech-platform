@@ -36,10 +36,14 @@ const CollectionTile: FC<Props> = ({ fullCollection, style, className }): ReactE
 
     // Check if Minting is Open or in Future
     if (
-        // No end time
-        !end_time ||
-        // Or end time if in future
-        end_time.valueOf() > new Date().valueOf()
+        (
+          // No end time
+          !end_time ||
+          // Or end time if in future
+          end_time.valueOf() > new Date().valueOf()
+        )
+        // And not marked as ended
+        && !collection.collectionMinter.ended
       )
     { 
       link = `/nfts/mint/${collection.address}`
@@ -81,7 +85,7 @@ const CollectionTile: FC<Props> = ({ fullCollection, style, className }): ReactE
       <div className={styles.collectionCard}>
           <PlaceholdImg style={{width: '100%'}} src={imgUrl} alt={collectionName} />
           <div className={styles.overlay}>
-            <div style={{width: 'fit-content', height: '100%'}} className='d-flex flex-column justify-content-end'>
+            <div className='d-flex flex-column justify-content-end tall wide'>
               <div>
                 <h2 className='twoLineLimit'>{collectionName}</h2>
               </div>

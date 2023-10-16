@@ -25,6 +25,8 @@ interface Props {
   onMint?: () => any;
 }
 
+const limitSingleTx = 10;
+
 
 export default function MintModal({open, minterStatus, buyerStatus, prices, collection, onClose, onMint = ()=>{}}: Props) {
     const { user, refreshProfile } = useUser()
@@ -47,16 +49,21 @@ export default function MintModal({open, minterStatus, buyerStatus, prices, coll
       )
     }
 
-    const maxLimit = 10;
-
+    // Calculate how many NFT's the buyer is allowed to still purchase, otherwise use TX purchase limit
     const buyerMintLimit = buyerStatus.mint_limit ?
       buyerStatus.mint_limit - (buyerStatus.mints || 0)
-      : maxLimit;
+      : limitSingleTx;
+    
+    // If limit is above remaining stock, set limit to remaining stock
     const buyerMax = buyerMintLimit > minterStatus.remaining ? minterStatus.remaining : buyerMintLimit
-    const max = buyerMax > maxLimit ? maxLimit : buyerMax;
 
+    // If calculated max is above single TX limit, set max to single TX limit
+    const max = buyerMax > limitSingleTx ? limitSingleTx : buyerMax;
+
+    // Determint if buyer pays public or private price
     const price = buyerStatus.whitelisted && prices.private ? prices.private : prices.public;
 
+    // Calculate total for purchase
     const denomTotal = price.denomAmount * quantity;
     const denomDisplay = denomToHuman(denomTotal, price.denom.decimals);
 
@@ -70,6 +77,7 @@ export default function MintModal({open, minterStatus, buyerStatus, prices, coll
       try {
         if (!user) throw new Error('Wallet is not connected.')
 
+        if (quantity > minterStatus.remaining) throw new Error(`Requested quantity exceeds available stock. Only ${minterStatus.remaining} NFTs are available in this minter.`)
         if (quantity > max) throw new Error(`Maximum number of mints is ${max}`)
         setLoading(true);
 
