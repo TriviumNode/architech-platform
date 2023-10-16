@@ -9,11 +9,10 @@ import { Prices } from "../../Utils/data";
 import Loader from "../Loader";
 import { Collection, minter } from "@architech/types";
 import ModalV2 from "../ModalV2";
-import { getCollectionName } from "../../Utils/helpers";
+import { getCollectionName, isRandomnessReady } from "../../Utils/helpers";
 import { denomToHuman, mintRandom, parseError } from "@architech/lib";
 import { useMint } from "../../Contexts/MintContext";
 import { toast } from "react-toastify";
-import { isRandomnessReady } from "../../Pages/Minter/SingleMinter";
 
 interface Props {
   open: boolean;
@@ -26,7 +25,6 @@ interface Props {
 }
 
 const limitSingleTx = 10;
-
 
 export default function MintModal({open, minterStatus, buyerStatus, prices, collection, onClose, onMint = ()=>{}}: Props) {
     const { user, refreshProfile } = useUser()

@@ -1,8 +1,6 @@
-import { denomToHuman, epochToDate, findDenom, findToken, getConfig, getMintLimit, getMintStatus, mintWithMinter, noDenom, parseError, truncateAddress, unknownDenom } from "@architech/lib";
-import { cw721, GetCollectionResponse, Denom, minter, copyMinter, CollectionMinterI, cw2981 } from "@architech/types";
-import { ContractMetadata } from "@archwayhq/arch3.js/build";
-import { CodeDetails, Contract } from "@cosmjs/cosmwasm-stargate";
-import { faCheck, faChevronRight, faClock, faRefresh, faX } from "@fortawesome/free-solid-svg-icons";
+import { epochToDate, getConfig, getMintLimit, getMintStatus, mintWithMinter, parseError, truncateAddress } from "@architech/lib";
+import { GetCollectionResponse, minter, copyMinter, CollectionMinterI, cw2981 } from "@architech/types";
+import { faCheck, faChevronRight, faClock, faX } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FC, ReactElement, useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
@@ -18,21 +16,25 @@ import RefreshButton from "../../Components/RefreshButton";
 import SmallLoader from "../../Components/SmallLoader";
 import TokenImage from "../../Components/TokenImg";
 import VerifiedBadge from "../../Components/Verified";
-import Vr from "../../Components/vr";
 import { useMint } from "../../Contexts/MintContext";
 import { useUser } from "../../Contexts/UserContext";
 import { DevInfo } from "../../Interfaces/interfaces";
 import { getApiUrl, refreshCollection } from "../../Utils/backend";
-import { calculatePrices, getPrice, Prices } from "../../Utils/data";
-import { getCollectionName } from "../../Utils/helpers";
-import { NoisQueryClient, NOIS_PAYMENT_CONTRACT, QueryClient, RANDOMNESS_COST } from "../../Utils/queryClient";
+import { calculatePrices, Prices } from "../../Utils/data";
+import { getCollectionName, getMinterDates, isRandomnessReady } from "../../Utils/helpers";
+import { QueryClient } from "../../Utils/queryClient";
 import sleep from "../../Utils/sleep";
-import { queryPaymentContractBalance } from "../../Utils/wasm/proxyQuery";
 
 import styles from './minter.module.scss';
 
-type TimeStatus = { public: boolean, private: boolean, ended: boolean }
+type TimeStatus = {
+  // True if launch_time is in the past. True if launch_time is undefined.
+  public: boolean,
+  // True if whitelist_launch_time is in the past. launch_time is used if whitelist_launch_time is undefined.
+  private: boolean,
+}
 
+// Determines if public and private launch times have passed
 const getTimeStatus = (minter: CollectionMinterI, now: Date): TimeStatus => {
   const getPublic = () => {
     if (!minter.launch_time) return true;
@@ -46,43 +48,20 @@ const getTimeStatus = (minter: CollectionMinterI, now: Date): TimeStatus => {
       if (epochToDate(minter.whitelist_launch_time).valueOf() < now.valueOf()) return true;
       return false;
     })(),
-    ended: (()=>{
-      if (!minter.end_time) return false;
-      if (epochToDate(minter.end_time).valueOf() > now.valueOf()) return false;
-      console.log('Minter has ended', minter.end_time, now)
-      return true;
-    })()
+    // ended: (()=>{
+    //   if (!minter.end_time) return false;
+    //   if (epochToDate(minter.end_time).valueOf() > now.valueOf()) return false;
+    //   console.log('Minter has ended', minter.end_time, now)
+    //   return true;
+    // })()
   }
 }
 
+// Returns true is the user can mint, based on launch time and whitelist status
 const isMintingAvailable = (status: TimeStatus, whitelisted = false) => {
-  if (status.ended) return false;
   if (status.public) return true;
   if (status.private && whitelisted) return true;
   return false;
-}
-
-// Queries NOIS payment contract to ensure enough funds.
-export const isRandomnessReady = async () => {
-  try {
-    const balance = await queryPaymentContractBalance({
-      client: NoisQueryClient,
-      address: NOIS_PAYMENT_CONTRACT
-    });
-    const minimum = RANDOMNESS_COST * 25;
-    
-    console.log(`Randomness Balance: ${balance}\nRandomness Minimum: ${minimum}\nRandomness Cost: ${RANDOMNESS_COST}`)
-    if (balance < minimum) {
-      // console.error(`Randomness Balance: ${balance}\nRandomness Minimum: ${minimum}\nRandomness Cost: ${RANDOMNESS_COST}`)
-      throw new Error('Randomness payment contract has insufficent funds. Please contract Architech support.')
-    }
-  } catch(e: any) {
-    if (e.toString().includes('has insufficent funds')) throw e;
-    else {
-      console.error(`Unable to verify randomness contract:\n`, e);
-      throw new Error(`Unable to verify randomness contract: ${e.toString()}`)
-    }
-  }
 }
 
 const SingleMinter: FC<any> = (): ReactElement => {
@@ -264,20 +243,8 @@ const SingleMinter: FC<any> = (): ReactElement => {
 
   const timeStatus = getTimeStatus(collection.collectionMinter, now);
   const mintingAvailable = isMintingAvailable(timeStatus, buyerStatus?.whitelisted);
-
   const collectionName = getCollectionName(collection);
-
-  const startDate = collection.collectionMinter.launch_time ?
-    epochToDate(collection.collectionMinter.launch_time)
-  : undefined;
-
-  const wlStartDate = collection.collectionMinter.whitelist_launch_time ?
-    epochToDate(collection.collectionMinter.whitelist_launch_time)
-  : undefined;
-
-  const endDate = collection.collectionMinter.end_time ?
-  epochToDate(collection.collectionMinter.end_time)
-  : undefined;
+  const { startDate, wlStartDate, endDate } = getMinterDates(collection.collectionMinter)
 
   const Stats = (): {title: string; value: any}[] => {
     switch (collection.collectionMinter?.minter_type) {
@@ -331,6 +298,42 @@ const SingleMinter: FC<any> = (): ReactElement => {
     if (collection.collectionMinter?.minter_type === 'COPY' && copyMetadata?.image) return copyMetadata.image;
     if (collection.collectionProfile?.profile_image) return getApiUrl(`/public/${collection.collectionProfile?.profile_image}`)
     return undefined;
+  })()
+
+  const isSoldOut = (()=>{
+    console.log('minterStatus', minterStatus)
+
+    if (collection.collectionMinter?.minter_type === 'RANDOM') {
+      const randomMintStatus = minterStatus as unknown as minter.GetMintStatusResponse | undefined
+      if ((randomMintStatus?.remaining || 999) - (randomMintStatus?.pending || 0) <= 0) return true;
+    } else if (collection.collectionMinter?.minter_type === 'COPY') {
+      if (!minterStatus?.max_copies) return false;
+      if (minterStatus?.minted >= minterStatus?.max_copies) return true;
+    };
+
+    // Else
+    return false;
+  })()
+
+  const mintButtonProps: {disabled: boolean, content: any} = (()=>{
+    // Check if sold out
+    if (isSoldOut) return { disabled: true, content: 'Sold Out'}
+
+    // Check if past end date
+    if (endDate && endDate.valueOf() < new Date().valueOf()) return { disabled: true, content: 'Ended'}
+
+    // Check if user has exceeded mint limit
+    if (buyerStatus?.mint_limit && (buyerStatus.mints || 0) >= buyerStatus.mint_limit) return { disabled: true, content: 'Limit Reached'}
+
+    // // Check if before launch time
+    // if ((startDate && startDate.valueOf() > new Date().valueOf()) || !mintingAvailable) return { disabled: true, content: 'Minting Soon'}
+    if (!mintingAvailable) return { disabled: true, content: 'Minting Soon'}
+
+    // Check if minting is paused
+    if (collection.collectionMinter.minting_disabled) return { disabled: true, content: 'Minting Paused'}
+
+    // Otherwise assume minting is OK, the TX simulation will error if it's not.
+    return { disabled: false, content: <>Mint now{loadingTx && <>&nbsp;<SmallLoader /></>}</>};
   })()
 
   return (
@@ -540,19 +543,11 @@ const SingleMinter: FC<any> = (): ReactElement => {
             </div>
             }
               <button
-                disabled={loadingTx || !mintingAvailable || collection.collectionMinter.minting_disabled}
+                disabled={mintButtonProps.disabled || loadingTx }
                 type='button'
                 onClick={handleMint}
               >
-                { collection.collectionMinter.minting_disabled ?
-                  'Minting Paused'
-                : mintingAvailable ?
-                  <>Mint now{loadingTx && <>&nbsp;<SmallLoader /></>}</>
-                : timeStatus.ended ?
-                  'Ended'
-                :
-                  'Minting soon'
-                }
+                { mintButtonProps.content }
               </button>
           </div>
           </div>
