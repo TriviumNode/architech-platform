@@ -301,11 +301,12 @@ const SingleMinter: FC<any> = (): ReactElement => {
   })()
 
   const isSoldOut = (()=>{
-    console.log('minterStatus', minterStatus)
-
     if (collection.collectionMinter?.minter_type === 'RANDOM') {
       const randomMintStatus = minterStatus as unknown as minter.GetMintStatusResponse | undefined
-      if ((randomMintStatus?.remaining || 999) - (randomMintStatus?.pending || 0) <= 0) return true;
+      const remaining = typeof(randomMintStatus?.remaining) === 'undefined' ? 999 : randomMintStatus.remaining
+      const pending = typeof(randomMintStatus?.pending) === 'undefined' ? 0 : randomMintStatus.pending
+
+      if (remaining - pending <= 0) return true;
     } else if (collection.collectionMinter?.minter_type === 'COPY') {
       if (!minterStatus?.max_copies) return false;
       if (minterStatus?.minted >= minterStatus?.max_copies) return true;
@@ -453,6 +454,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
                     <div style={{fontSize: '28px'}}>{prices.public.displayAmount} <DenomImg denom={prices.public.denom} size='medium' /></div>
                 }
                 eligible={buyerStatus?.whitelisted || false}
+                soldOut
                 now={now}
                 onComplete={()=>setNow(new Date())}
               />
@@ -472,6 +474,7 @@ const SingleMinter: FC<any> = (): ReactElement => {
                   <div style={{fontSize: '28px'}}>{prices.public.displayAmount} <DenomImg denom={prices.public.denom} size='medium' /></div>
                   : <SmallLoader />
                 }
+                soldOut
                 now={now}
                 onComplete={()=>setNow(new Date())}
               />
@@ -586,6 +589,7 @@ const endRenderer = ({ days, hours, minutes, seconds, completed }: any) => {
 };
 
 type TimeRowProps = {
+  soldOut: boolean;
   saleType: string;
   startTime: Date | undefined;
   endTime: Date | undefined;
@@ -597,12 +601,15 @@ type TimeRowProps = {
   onComplete: ()=>void;
 }
 
-const SaleTimeRow: FC<TimeRowProps> = ({saleType, startTime, endTime, endCountdown = true, ended, price, eligible = true, now, onComplete}): ReactElement => {
+const SaleTimeRow: FC<TimeRowProps> = ({soldOut, saleType, startTime, endTime, endCountdown = true, ended, price, eligible = true, now, onComplete}): ReactElement => {
   let status;
   let icon;
 
   if (ended || (endTime && now > endTime)){
     status = 'Ended';
+    icon = faX;
+  } else if (soldOut) {
+    status = 'Sold Out';
     icon = faX;
   } else if (startTime && now < startTime){
     status = <Countdown
