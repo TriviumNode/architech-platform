@@ -461,9 +461,22 @@ const getWalletList = () => {
 
   // // Show installed wallets first
   //if (window.archx) wallets.push(archxConfig);
-  if (window.leap) wallets.push(leapConfig);
-  if (window.cosmostation) wallets.push(cosmostationConfig);
-  if (window.keplr) wallets.push(keplrConfig);
+  if (window.keplr) {
+    console.log('Found Keplr Wallet')
+    keplrConfig.provider = window.keplr
+    wallets.push(keplrConfig);
+  }
+  if (window.leap) {
+    console.log('Found Leap Wallet')
+    leapConfig.provider = window.leap
+    wallets.push(leapConfig);
+  }
+  if (window.cosmostation) {
+    console.log('Found Cosmostation Wallet')
+    cosmostationConfig.provider = window.cosmostation.providers.keplr
+    wallets.push(cosmostationConfig);
+  }
+
 
   // Show other wallets after installed wallets
   if (!wallets.find(w=>w.name === keplrConfig.name)) wallets.push(keplrConfig);

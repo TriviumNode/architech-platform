@@ -15,8 +15,6 @@ const TrendingRow: FC<
     }
     > = ({result}): ReactElement => {
     
-    console.log('Trending Result', result)
-
     // const floor = millify(findFloor(result.asks, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)));
     const floor: string = result.floor ? 
       millify(denomToHuman(result.floor, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)))
