@@ -454,9 +454,9 @@ const SingleMinter: FC<any> = (): ReactElement => {
                     <div style={{fontSize: '28px'}}>{prices.public.displayAmount} <DenomImg denom={prices.public.denom} size='medium' /></div>
                 }
                 eligible={buyerStatus?.whitelisted || false}
-                soldOut
+                soldOut={isSoldOut}
                 now={now}
-                onComplete={()=>setNow(new Date())}
+                onComplete={()=>setNow(new Date(new Date().valueOf() + 5_000))}
               />
             }
             {(
@@ -474,9 +474,9 @@ const SingleMinter: FC<any> = (): ReactElement => {
                   <div style={{fontSize: '28px'}}>{prices.public.displayAmount} <DenomImg denom={prices.public.denom} size='medium' /></div>
                   : <SmallLoader />
                 }
-                soldOut
+                soldOut={isSoldOut}
                 now={now}
-                onComplete={()=>setNow(new Date())}
+                onComplete={()=>setNow(new Date(new Date().valueOf() + 5_000))}
               />
             }
 
