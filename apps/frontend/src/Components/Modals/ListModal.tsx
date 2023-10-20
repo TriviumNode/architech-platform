@@ -1,4 +1,4 @@
-import { calculateFee, denomToHuman, findDenom, getRoyalty, humanToDenom, listToken } from "@architech/lib";
+import { calculateFee, denomToHuman, findDenom, getRoyalty, humanToDenom, listToken, trimNonNumeric } from "@architech/lib";
 import { Denom, Token } from "@architech/types";
 import { useState, ChangeEvent, useEffect } from "react";
 import { Row, Col } from "react-bootstrap";
@@ -55,12 +55,12 @@ export default function ListModal({open, token, onClose, onList}: Props) {
     const [loadingRoyalty, setLoadingRoyalty] = useState(false)
 
     const handleSelect = (selected: SelectOption) => {
-        setSelectedOption(selected);
-        setFormState({...formState, denom: selected.value})
+      setSelectedOption(selected);
+      setFormState({...formState, denom: selected.value})
     }
 
     const updateAmount = (e: any) => {
-        setFormState({...formState, amount: e.target.value})
+      setFormState({...formState, amount: trimNonNumeric(e.target.value)})
     }
 
     const queryRoyalty = async () => {

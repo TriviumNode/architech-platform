@@ -62,3 +62,7 @@ export const isCollectionCreator = (address: string, collection: Collection) => 
 export const isAdmin = (address: string) => {
   return ADMINS.includes(address);
 }
+
+export const trimNonNumeric = (str: string) => {
+  return str.replace(/[^0-9.]/gi, '');
+}
