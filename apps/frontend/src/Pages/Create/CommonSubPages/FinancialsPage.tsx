@@ -166,6 +166,8 @@ const BeneficiaryRow = ({
   )
 }
 
+const MAX_ROYALTY = 20;
+
 const RoyaltyRow = ({
   user,
   state,
@@ -179,8 +181,8 @@ const RoyaltyRow = ({
     if (e.preventDefault) e.preventDefault();
 
     let int = parseInt(e.target.value.replace(/[^0-9]/gi, '') || 0);
-    if (int > 100) int = 100;
-    
+    if (int > MAX_ROYALTY) int = MAX_ROYALTY;
+    console.log('INT', int)
     updateState({royalty_percent: int.toString()})
   }
 
@@ -189,6 +191,9 @@ const RoyaltyRow = ({
       <Col xs={4}>
         <label>
           Royalty Percentage
+          <div className='lightText10' style={{margin: '2px 8px 0 8px', lineHeight: '100%'}}>
+            Max Royalty: 20%
+          </div>
           <div className='d-flex flex-column wide'>
             <input value={state.royalty_percent} onChange={updateRoyalty} placeholder='0' /><span className={styles.percent}>%</span>
           </div>
@@ -196,6 +201,7 @@ const RoyaltyRow = ({
       </Col>
       <Col xs={8}>
         <label>
+          <div className='lightText10' style={{margin: '2px 8px 0 8px', lineHeight: '100%', height: '1em'}} />
           Royalty Payment Wallet
           <input value={state.royalty_address} onChange={e=>updateState({royalty_address: e.target.value})} placeholder='archway1a2b...' />
         </label>
