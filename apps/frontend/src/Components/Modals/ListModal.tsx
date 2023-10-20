@@ -53,6 +53,7 @@ export default function ListModal({open, token, onClose, onList}: Props) {
     const [loading, setLoading] = useState(false);
     const [royaltyRate, setRoyaltyRate] = useState<number>(0)
     const [loadingRoyalty, setLoadingRoyalty] = useState(false)
+    const [amountError, setAmountError] = useState('')
 
     const handleSelect = (selected: SelectOption) => {
       setSelectedOption(selected);
@@ -61,6 +62,7 @@ export default function ListModal({open, token, onClose, onList}: Props) {
 
     const updateAmount = (e: any) => {
       setFormState({...formState, amount: trimNonNumeric(e.target.value)})
+      setAmountError('')
     }
 
     const queryRoyalty = async () => {
@@ -83,24 +85,27 @@ export default function ListModal({open, token, onClose, onList}: Props) {
     const handleList = async(e: any) => {
         e.preventDefault();
         setLoading(true);
-        if (!user) throw new Error('Wallet is not connected.')
-        const denomAmount = humanToDenom(formState.amount, formState.denom?.decimals)
         try {
-            const response = await listToken({
-                client: user.client,
-                signer: user.address,
-                amount: denomAmount,
-                token_id: token.tokenId,
-                cw721_contract: token.collectionAddress,  
-                marketplace_contract: MARKETPLACE_ADDRESS,              
-            });
-            console.log('TX Result', response)
-            refreshProfile();
-            onList();
-            onClose();
+          if (!user) throw new Error('Wallet is not connected.');
+          if (parseInt(formState.amount) <= 0) throw new Error('List Amount must be greater than 0');
+
+          const denomAmount = humanToDenom(formState.amount, formState.denom?.decimals)
+          const response = await listToken({
+            client: user.client,
+            signer: user.address,
+            amount: denomAmount,
+            token_id: token.tokenId,
+            cw721_contract: token.collectionAddress,  
+            marketplace_contract: MARKETPLACE_ADDRESS,              
+          });
+          console.log('TX Result', response)
+          refreshProfile();
+          onList();
+          onClose();
         } catch (err: any) {
-            console.error(err)
-            toast.error(err.message || err.response?.msg || err.toString())
+          console.error(err)
+          toast.error(err.message || err.response?.msg || err.toString())
+          if (err.toString().includes('List Amount must be greater than 0')) setAmountError('Must be greater than 0')
         }
         setLoading(false);
     }
@@ -127,7 +132,7 @@ export default function ListModal({open, token, onClose, onList}: Props) {
                 <Col xs={6}>
                     <label className='d-flex flex-column'>
                         Amount<br />
-                        <input value={formState.amount} onChange={updateAmount} className='mt8'  />
+                        <input value={formState.amount} onChange={updateAmount} className={`mt8 ${!!amountError ? 'error' : ''}`}  />
                     </label>
                 </Col>
             </Row>
