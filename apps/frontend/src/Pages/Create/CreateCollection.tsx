@@ -223,7 +223,7 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
       if (
         whitelistState.whitelist_price && (
           whitelistState.amount === ''
-          || parseInt(whitelistState.amount) <= 0
+          || parseFloat(whitelistState.amount) <= 0
           || !whitelistState.denom
         )
       ) {
