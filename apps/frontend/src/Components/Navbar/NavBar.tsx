@@ -61,7 +61,8 @@ export const BurgerMenu = ({page, open, handleClose}:{page: HeaderPage, open: bo
         </div>
       }
       <div className={`ml8 mt16 ${styles.mobileLinks}`}>
-        <Link onClick={()=>handleClose()} to={`nfts`}>NFTs</Link>
+        <Link onClick={()=>handleClose()} to={`/nfts`}>NFTs</Link>
+        <Link onClick={()=>handleClose()} to={`/nfts/drops`}>Drops</Link>
         { !!user &&
         <>
           <Link onClick={()=>handleClose()} to={`/profile/${user.address}`}>My Profile</Link>
