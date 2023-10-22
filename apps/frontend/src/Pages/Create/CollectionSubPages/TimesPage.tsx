@@ -100,8 +100,8 @@ const TimesPage: FC<{
     const updateCopyLimit = (e: any) => {
       e.preventDefault();
       let newNum = parseInt(e.target.value.replace(/[^0-9]/gi, '') || '1');
-      if (newNum > 65535) {
-        newNum = 65535
+      if (newNum > 65000) {
+        newNum = 65000
       } else if (newNum < 1) {
         newNum = 1
       }
@@ -249,8 +249,8 @@ const TimesPage: FC<{
                       <Col xs={6}>
                           <label>
                               Maximum Copies
-                              <div className='lightText10' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
-                                  Total number of copies that can be minted.
+                              <div className='lightText10 d-flex justify-content-between' style={{margin: '4px 8px 0 8px', lineHeight: '100%'}}>
+                                  <div>Total number of copies that can be minted.</div><div>Max Limit: 65,000</div>
                               </div>
                               <input
                                   value={state.unlimited_copies ? 'Unlimited' : state.max_copies}
