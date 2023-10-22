@@ -18,7 +18,7 @@ interface HoverMenuProps {
 
 export default function ProfileMenu(props: HoverMenuProps) {
   let { content } = props;
-  const {user, balances, devMode, toggleDevMode} = useUser()
+  const {user, balances, devMode, toggleDevMode, refreshBalances} = useUser()
 
   let [isOverButton, setIsOverButton] = useState(false);
   let [isOverList, setIsOverList] = useState(false);
@@ -40,6 +40,9 @@ export default function ProfileMenu(props: HoverMenuProps) {
         address: user.address,
         num_records: balances.rewards_records
       })
+      console.log('Claim TX Result:', result);
+      refreshBalances();
+      toast.success('Claimed Arch Rewards')
     } catch (err: any) {
       console.error('Failed to claim Archway Rewards:', err);
       toast.error(err.toString())
