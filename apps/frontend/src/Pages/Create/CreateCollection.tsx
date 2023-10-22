@@ -321,6 +321,14 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
         });
       }
 
+      // Ensure end time (if set) is in the future
+      if (timesState.end_time && timesState.end_time.valueOf() < compareTime.valueOf()) {
+        returnTasks.push({
+          content: `End time must be ${randomCollection ? 'at least one hour' : ''} in the future.`,
+          onClick: ()=>setPage("Times & Limits")
+        });
+      }
+
       return returnTasks;
     }
 
