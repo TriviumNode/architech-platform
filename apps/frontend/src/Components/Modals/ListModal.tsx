@@ -12,6 +12,7 @@ import { MARKETPLACE_ADDRESS, QueryClient } from "../../Utils/queryClient";
 import { DenomImg } from "../ArchDenom";
 import SelectMenu, { SelectOption } from "../SelectMenu/SelectMenu";
 import SmallLoader from "../SmallLoader";
+import styles from './ListModal.module.scss'
 
 interface Props {
     open: boolean;
@@ -120,7 +121,7 @@ export default function ListModal({open, token, onClose, onList}: Props) {
 
     const total = parseFloat(formState.amount || '0') - royaltyAmount - feeAmount
     return(
-        <Modal open={open} onClose={onClose} style={{width: '40%'}}>
+        <Modal open={open} onClose={onClose} className={styles.listModal}>
             <form onSubmit={handleList}>
             <Row className='mb16'>
                 <Col xs={6}>

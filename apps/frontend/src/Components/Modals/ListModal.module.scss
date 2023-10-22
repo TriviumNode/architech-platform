@@ -1,0 +1,13 @@
+.listModal {
+  @media (max-width: 499.98px) {
+    width: 95vw
+  }
+
+  @media (min-width: 500px) and (max-width: 767.98px) {
+    width: 80vw
+  }
+
+  @media (min-width: 768px) {
+    width: 40vw
+  }
+}
