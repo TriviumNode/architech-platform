@@ -92,7 +92,7 @@ const NftDetailPage: FC<{
     const validateForm = () => {
         const errors: Partial<NftDetailState> = {}
         if (!state.name) errors.name='true';
-        if (!state.tokenId) errors.tokenId='true';
+        if (!isCollection && !state.tokenId) errors.tokenId='true';
         if(Object.keys(errors).length){
             setErrors(errors);
             return true;
