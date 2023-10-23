@@ -55,6 +55,7 @@ export const getUserByAddress = async (req: RequestWithOptionalUser, res: Respon
     const userAddr: string = req.params.address;
     const requesterIsUser = req.user ? userAddr === req.user.address : false;
     const isAdmin = req.user ? ADMINS.includes(req.user.address) : false;
+    const canSeeHidden = requesterIsUser || isAdmin;
 
     // Get Created Collections. Hide hidden collections unless requester IS (the user OR an Architech Admin)
     const hideHiddenUnlessOwner = requesterIsUser || isAdmin ? {} : { hidden: false, admin_hidden: false };
@@ -65,7 +66,10 @@ export const getUserByAddress = async (req: RequestWithOptionalUser, res: Respon
     const fullCollections = await collectionsToResponse(ownedCollections);
 
     // Get Owned Tokens
-    const ownedTokens: Token[] = await TokenModel.find({ owner: userAddr }).populate('collectionInfo');
+    const allOwnedTokens: Token[] = await TokenModel.find({ owner: userAddr }).populate('collectionInfo');
+
+    // Hide tokens that belong to hidden collections unless requestor is: the owner, or an architech admin.
+    const ownedTokens = canSeeHidden ? allOwnedTokens : allOwnedTokens.filter(t => !t.collectionInfo.hidden);
 
     // Get Favorites
     const favorites = await findUserFavorites(userAddr);
