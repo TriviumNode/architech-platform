@@ -11,6 +11,7 @@ import ArchDenom from "../ArchDenom";
 
 //@ts-expect-error
 import { Switch } from 'react-switch-input';
+import ArchRewardsClaim from "../ArchRewardsClaim/ArchRewardsClaim";
 
 interface HoverMenuProps {
     content: any;
@@ -26,29 +27,6 @@ export default function ProfileMenu(props: HoverMenuProps) {
   let [isTouchInput, setIsTouchInput] = useState<boolean>();
   let [hasClicked, setHasClicked] = useState<boolean>();
   let button: RefObject<HTMLButtonElement> = useRef(null);
-
-  const [claiming, setClaiming] = useState(false);
-
-  const handleClaimRewards = async () => {
-    try {
-      if (!user) throw new Error('Wallet is not connected.')
-      if (!balances?.rewards_records) throw new Error('Number of rewards records is 0 or unknown.')
-      setClaiming(true);
-
-      const result = await claimRewards({
-        client: user.client,
-        address: user.address,
-        num_records: balances.rewards_records
-      })
-      console.log('Claim TX Result:', result);
-      refreshBalances();
-      toast.success('Claimed Arch Rewards')
-    } catch (err: any) {
-      console.error('Failed to claim Archway Rewards:', err);
-      toast.error(err.toString())
-    }
-    setClaiming(false);
-  }
 
   // useLayoutEffect(() => {
   //   if (!button.current) return;
@@ -114,28 +92,8 @@ export default function ProfileMenu(props: HoverMenuProps) {
             setIsOverList(false);
           }}
         >
-          {!!balances?.rewards &&
-            <div style={{
-              border: '1px solid #676767',
-              borderRadius: '8px',
+          <ArchRewardsClaim />
 
-            }}>
-                <div style={{
-                  margin: '8px',
-                }}>
-                  <span className='lightText12'>Arch Rewards</span><br/>
-                  <div style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: 'center'
-                  }}>
-                    <span className='d-flex align-items-center'>{balances?.rewards.toFixed(3) || 0}&nbsp;<ArchDenom /></span> {/* </div><span style={{fontSize: '11px'}}>ARCH</span></span> */}
-                    <button style={{height: 'unset', padding: '12px'}} disabled={claiming} onClick={()=>handleClaimRewards()}>{claiming ? <SmallLoader /> : 'Claim'}</button>
-                  </div>
-
-                </div>
-            </div>
-          }
           <MenuItem
             onSelect={() => {
               setIsOpen(false);

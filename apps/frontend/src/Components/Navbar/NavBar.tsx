@@ -6,12 +6,15 @@ import SmallLoader from "../SmallLoader";
 import { useLocation } from 'react-router-dom'
 
 import  styles from './Navbar.module.scss';
-import { truncateAddress } from "@architech/lib";
+import { ADMINS, truncateAddress } from "@architech/lib";
 import SearchBar from "../SearchBar/SearchBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faMagnifyingGlass, faWallet, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { HoverMenuLink } from "../HoverMenu/HoverMenu";
 import { useState } from "react";
+import ArchRewardsClaim from "../ArchRewardsClaim/ArchRewardsClaim";
+//@ts-expect-error
+import { Switch } from 'react-switch-input';
 
 
 export type HeaderPage = 'NFTS' | 'DROPS' | 'DAOS' | 'HOME';
@@ -29,7 +32,7 @@ const nftLinks: HoverMenuLink[] = [
 
 
 export const BurgerMenu = ({page, open, handleClose}:{page: HeaderPage, open: boolean, handleClose: ()=>any}) => {
-  const { user, balances } = useUser()
+  const { user, balances, devMode, toggleDevMode } = useUser()
 
   const handleClick = (e: any)=>{
     handleClose()
@@ -51,15 +54,18 @@ export const BurgerMenu = ({page, open, handleClose}:{page: HeaderPage, open: bo
         <button type='button' onClick={()=>handleClose()}><FontAwesomeIcon size='2x' icon={faXmark} /></button>
       </div>
       
-      {!!user &&
+      {!!user && <>
         <div className='mb8 ml16' style={{width: 'fit-content'}}>
           <span>{truncateAddress(user.profile.display_name, process.env.REACT_APP_NETWORK_PREFIX)}</span>
           <div className='d-flex justify-content-between'>
-                      <div style={{fontSize: '12px'}} className='d-flex align-items-center'>{balances?.arch ? balances.arch.toFixed(3) : <SmallLoader />}&nbsp;<ArchDenom /></div>
-                      <div style={{fontSize: '12px'}} className='d-flex align-items-center'>{balances?.credits === undefined ? <SmallLoader /> : balances.credits}&nbsp;Credits</div>
-                    </div>
+            <div style={{fontSize: '12px'}} className='d-flex align-items-center'>{balances?.arch ? balances.arch.toFixed(3) : <SmallLoader />}&nbsp;<ArchDenom /></div>
+            <div style={{fontSize: '12px'}} className='d-flex align-items-center ml16'>{balances?.credits === undefined ? <SmallLoader /> : balances.credits.toLocaleString()}&nbsp;Credits</div>
+          </div>
         </div>
-      }
+        <div style={{maxWidth: '288px'}}>
+          <ArchRewardsClaim />
+        </div>
+      </>}
       <div className={`ml8 mt16 ${styles.mobileLinks}`}>
         <Link onClick={()=>handleClose()} to={`/nfts`}>NFTs</Link>
         <Link onClick={()=>handleClose()} to={`/nfts/drops`}>Drops</Link>
@@ -69,6 +75,19 @@ export const BurgerMenu = ({page, open, handleClose}:{page: HeaderPage, open: bo
           <Link onClick={()=>handleClose()} to={`/nfts/createcollection`}>Create Collection</Link>
           <Link onClick={()=>handleClose()} to={`/nfts/create`}>Create NFT</Link>
           <Link onClick={()=>handleClose()} to={`/nfts/import`}>Import Collection</Link>
+          {(ADMINS.includes(user.address)) &&
+          <>
+            {/* <Link to={`admindash`}>Admin Dashboard</Link> */}
+            <Link onClick={()=>handleClose()} to={`/admindash`}>Admin Dashboard</Link>
+            <div className='d-flex'>
+              <span>Developer Mode</span>
+              <Switch
+                checked={devMode}
+                onChange={(e: any) => toggleDevMode()}
+              />
+            </div>
+          </>
+          }
         </>
         }
       </div>
