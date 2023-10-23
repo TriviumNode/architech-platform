@@ -88,7 +88,7 @@ export default function ListModal({open, token, onClose, onList}: Props) {
         setLoading(true);
         try {
           if (!user) throw new Error('Wallet is not connected.');
-          if (parseInt(formState.amount) <= 0) throw new Error('List Amount must be greater than 0');
+          if (parseFloat(formState.amount) <= 0) throw new Error('List Amount must be greater than 0');
 
           const denomAmount = humanToDenom(formState.amount, formState.denom?.decimals)
           const response = await listToken({
