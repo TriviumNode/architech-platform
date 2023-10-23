@@ -134,6 +134,7 @@ export async function findCollectionTokens(
         tokenId: 1,
       };
       numericOrdering = true;
+      extraFilter = saleOnlyFilter;
       break;
     default:
       sortFilter = {};
