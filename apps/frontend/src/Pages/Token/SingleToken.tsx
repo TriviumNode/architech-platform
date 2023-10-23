@@ -202,7 +202,7 @@ const SingleToken: FC<any> = (): ReactElement => {
           <h4 className='ml16 d-md-none'>{collectionName}</h4>
           <div style={{paddingRight: '24px'}}  className='d-flex justify-content-between align-items-center'>
             <CollectionStats collection={collection} asks={fullCollection.asks} />
-            <SocialLinks discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} website={collection.collectionProfile.website} />
+            <SocialLinks discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} telegram={collection.collectionProfile.telegram} website={collection.collectionProfile.website} />
           </div>
         </Col>
       </div>

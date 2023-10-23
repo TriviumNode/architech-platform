@@ -1,14 +1,14 @@
-import { faDiscord, faGithub, faTelegram, faTwitter } from "@fortawesome/free-brands-svg-icons";
-import { faCircle, faGlobe } from "@fortawesome/free-solid-svg-icons";
+import { faDiscord, faGithub, faTwitter } from "@fortawesome/free-brands-svg-icons";
+import { faGlobe, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FC, ReactElement } from "react";
-import { Col } from "react-bootstrap"
+import { Tooltip } from "react-tooltip";
 
 interface Props {
-    website?: string;
-    twitter?: string;
-    discord?: string;
-    telegram?: string;
+    website: string | undefined;
+    twitter: string | undefined;
+    discord: string | undefined;
+    telegram: string | undefined;
     github?: string;
     color?: string;
 }
@@ -30,10 +30,12 @@ const SocialLinks: FC<Props> = (props: Props): ReactElement => {
             !!twitter && 
                 <div>
                     <a target='_blank' rel='noreferrer' href={`https://twitter.com/${twitter.replace('@','')}`}>
-                      {/* <img src="/twitter.svg" alt='Twitter' style={{height: '24px', color: '#000'}} /> */}
-
                       {/* @ts-expect-error */}
-                      <FontAwesomeIcon icon={faTwitter} size='2x' color={color} />
+                      <FontAwesomeIcon icon={faTwitter} size='2x' color={color}
+                        data-tooltip-id="socials-tooltip"
+                        data-tooltip-content="Twitter"
+                        data-tooltip-place="top"
+                      />
                     </a>
                 </div>
             }
@@ -42,10 +44,12 @@ const SocialLinks: FC<Props> = (props: Props): ReactElement => {
             !!discord && 
                 <div>
                   <a target='_blank' rel='noreferrer' href={discord}>
-                    {/* <img src="/discord.svg" alt='Discord' style={{height: '24px'}} /> */}
-
                     {/* @ts-expect-error */}
-                    <FontAwesomeIcon icon={faDiscord} size='2x' color={color} />
+                    <FontAwesomeIcon icon={faDiscord} size='2x' color={color}
+                      data-tooltip-id="socials-tooltip"
+                      data-tooltip-content="Discord"
+                      data-tooltip-place="top"
+                    />
                   </a>
                 </div>
             }
@@ -54,10 +58,11 @@ const SocialLinks: FC<Props> = (props: Props): ReactElement => {
             !!telegram && 
                 <div>
                   <a target='_blank' rel='noreferrer' href={telegram}>
-                    {/* <img src="/telegram.svg" alt='Telegram' style={{height: '24px'}} /> */}
-
-                    {/* @ts-expect-error */}
-                    <FontAwesomeIcon icon={faTelegram} size='2x' color={color} />
+                    <FontAwesomeIcon icon={faPaperPlane} size='2x' color={color}
+                      data-tooltip-id="socials-tooltip"
+                      data-tooltip-content="Telegram"
+                      data-tooltip-place="top"
+                    />
                   </a>
                 </div>
             }
@@ -66,10 +71,12 @@ const SocialLinks: FC<Props> = (props: Props): ReactElement => {
             !!github && 
                 <div>
                   <a target='_blank' rel='noreferrer' href={github}>
-                    {/* <img src="/github.svg" alt='Github' style={{height: '24px'}} /> */}
-
                     {/* @ts-expect-error */}
-                    <FontAwesomeIcon icon={faGithub} size='2x' color={color} />
+                    <FontAwesomeIcon icon={faGithub} size='2x' color={color}
+                      data-tooltip-id="socials-tooltip"
+                      data-tooltip-content="GitHub"
+                      data-tooltip-place="top"
+                    />
                   </a>
                 </div>
             }
@@ -77,12 +84,15 @@ const SocialLinks: FC<Props> = (props: Props): ReactElement => {
             !!website && 
                 <div>
                     <a target='_blank' rel='noreferrer' href={website}>
-                      {/* <img src="/website.svg" alt='Website' style={{height: '24px'}} /> */}
-
-                      <FontAwesomeIcon icon={faGlobe} size='2x' color={color} />
+                      <FontAwesomeIcon icon={faGlobe} size='2x' color={color}
+                        data-tooltip-id="socials-tooltip"
+                        data-tooltip-content="Website"
+                        data-tooltip-place="top"
+                      />
                     </a>
                 </div>
             }
+            <Tooltip id="socials-tooltip" />
         </div>
     )
 }

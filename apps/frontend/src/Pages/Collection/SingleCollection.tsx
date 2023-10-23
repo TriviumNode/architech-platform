@@ -274,7 +274,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
                             }
                         </div>
                         <div style={{position: 'absolute', right: '16px', bottom: '16px'}}>
-                            <SocialLinks color={collection.collectionProfile.dark_banner ? '#999' : '#666'} discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} website={collection.collectionProfile.website} />
+                            <SocialLinks color={collection.collectionProfile.dark_banner ? '#999' : '#666'} discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} telegram={collection.collectionProfile.telegram} website={collection.collectionProfile.website} />
                         </div>
                 </Col>
             </div>
