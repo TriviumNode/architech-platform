@@ -200,6 +200,10 @@ textarea {
   column-gap: 8px !important;
 }
 
+.rowGap8 {
+  row-gap: 8px !important;
+}
+
 .px8 {
   padding-left: 8px !important;
   padding-right: 8px !important;

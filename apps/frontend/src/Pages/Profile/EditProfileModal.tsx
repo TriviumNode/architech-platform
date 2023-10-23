@@ -47,65 +47,59 @@ export default function EditProfileModal({open, userId, onClose}: Props) {
 
 
     return(
-        <ModalV2 open={open} onClose={onClose}>
-            <form onSubmit={handleEdit}>
-            <Row>
-                <Col xs={12} md={6}>
-                    <Row className='mb8'>
+        <ModalV2 open={open} onClose={onClose} title='Edit Profile' closeButton={true}>
+            <form onSubmit={handleEdit} className='mt16'>
+            <Row className='rowGap8'>
+                <Col xs={12} md={6} className='d-flex flex-column gap8'>
+                    <Row>
                         <label>
                             Username:<br />
                             <input  value={formState.username} onChange={(e)=> updateFormState({username: e.target.value})} />
                         </label>
                     </Row>
-                    <Row className='mb8'>
-                        <label>
+                    <Row>
+                      <label>
+                        Profile Image:<br />
+                        <FileSelect selected={formState.profileImage} onChange={(newFile)=>updateFormState({profileImage: newFile})} />
+                      </label>
+                    </Row>
+                    <Row style={{flexGrow: 1}}>
+                        <label className='d-flex flex-column'>
                             Bio:<br />
-                            <textarea value={formState.bio} onChange={(e)=> updateFormState({bio: e.target.value})} style={{width: 'calc(100% - 32px)'}}  />
+                            <textarea value={formState.bio} onChange={(e)=> updateFormState({bio: e.target.value})} style={{boxSizing: 'border-box', height: '100%'}} /*style={{width: 'calc(100% - 32px)'}}*/  />
                         </label>
                     </Row>
                 </Col>
                 <Col xs={12} md={6}>
-                    <Row className='mb8'>
+                    <Row className='mb8 rowGap8'>
+                      <Col xs={6} md={12}>
                         <label>
-                            Website:<br />
-                            <input  value={formState.website} onChange={(e)=> updateFormState({website: e.target.value})} />
+                          Website:<br />
+                          <input  value={formState.website} onChange={(e)=> updateFormState({website: e.target.value})} />
                         </label>
-                    </Row>
-                    <Row className='mb8'>
+                      </Col>
+                      <Col xs={true} md={12}>
                         <label>
-                            Twitter:<br />
-                            <input value={formState.twitter} onChange={(e)=> updateFormState({twitter: e.target.value})}  />
+                          Twitter:<br />
+                          <input value={formState.twitter} onChange={(e)=> updateFormState({twitter: e.target.value})}  />
                         </label>
+                      </Col>
                     </Row>
-                    <Row className='mb8'>
+
+                    <Row className='rowGap8'>
+                      <Col xs={6} md={12}>
                         <label>
-                            Discord:<br />
-                            <input value={formState.discord} onChange={(e)=> updateFormState({discord: e.target.value})}  />
+                          Discord:<br />
+                          <input value={formState.discord} onChange={(e)=> updateFormState({discord: e.target.value})}  />
                         </label>
-                    </Row>
-                    <Row className='mb8'>
+                      </Col>
+                      <Col xs={true} md={12}>
                         <label>
-                            Telegram:<br />
-                            <input value={formState.telegram} onChange={(e)=> updateFormState({telegram: e.target.value})}  />
+                          Telegram:<br />
+                          <input value={formState.telegram} onChange={(e)=> updateFormState({telegram: e.target.value})}  />
                         </label>
+                      </Col>
                     </Row>
-                </Col>
-            </Row>
-            <Row>
-                <Col xs="12">
-                    <label>
-                        Profile Image:<br />
-                        {/* <input
-                            type="file"
-                            onChange={(e)=> {
-                                if (e.target.files) {
-                                    updateFormState({profileImage: e.target.files[0]})
-                                }
-                            }}
-                            accept="image/*"
-                        /> */}
-                        <FileSelect selected={formState.profileImage} onChange={(newFile)=>updateFormState({profileImage: newFile})} />
-                    </label>
                 </Col>
             </Row>
             <Row style={{marginTop: '20px'}}>
