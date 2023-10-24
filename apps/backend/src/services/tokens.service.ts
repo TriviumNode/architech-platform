@@ -265,6 +265,7 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
       return undefined;
     }
   }
+  console.log('Ensuring Token', tokenId, 'on collection', collection.collectionProfile.name || collection.cw721_name);
 
   let owner = findToken?.owner;
   let metadataExtension = findToken?.metadataExtension;
