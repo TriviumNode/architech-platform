@@ -58,7 +58,7 @@ const NftDetailPage: FC<{
     },[])
 
     const updateTokenId = (newId: string) => {
-        const filtered = newId//.replace(/[^a-zA-Z0-9]/gi, '');
+        const filtered = newId.replace(/[^a-zA-Z0-9]/gi, '');
         updateDetailState({ tokenId: filtered })
     }
 
