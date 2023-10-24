@@ -22,7 +22,7 @@ export const DefaultLinksState: LinkState = {
 const LinksPage: FC<{
     state: LinkState,
     onChange: (newState: LinkState)=>void;
-    next: ()=>void;
+    next?: ()=>void;
 }> = ({state, onChange, next}): ReactElement => {
 
     const updateDetailState = (newDetailState: Partial<LinkState>) => {
@@ -31,8 +31,8 @@ const LinksPage: FC<{
     return (
         <div style={{margin: '48px'}} className='d-flex flex-column'>
             <div className='d-flex' style={{justifyContent: 'space-between'}}>
-                <h2 className='mb32'>Collection<br />Links</h2>
-                <button type='button' onClick={()=>next()}>Next</button>
+              <h2 className='mb32'>Collection<br />Links</h2>
+              { !!next && <button type='button' onClick={()=>next()}>Next</button> }
             </div>
             <form className={styles.form}>
             <div className='d-flex mb24'>

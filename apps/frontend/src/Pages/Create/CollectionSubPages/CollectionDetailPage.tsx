@@ -32,7 +32,7 @@ const CollectionDetailPage: FC<{
     isEditing?: boolean,
     isImporting?: boolean,
     onChange: (detail: DetailState)=>void;
-    next: ()=>void;
+    next?: ()=>void;
 }> = ({state, current, isEditing, isImporting, onChange, next}): ReactElement => {
     const [errors, setErrors] = useState<Partial<DetailState>>()
 
@@ -42,6 +42,8 @@ const CollectionDetailPage: FC<{
 
     const handleNext = (e: any) => {
         e.preventDefault();
+        if (!next) return;
+
         if (validateForm()) {
             toast.error('Please fill all required fields.')
         } else {
@@ -62,8 +64,8 @@ const CollectionDetailPage: FC<{
     return (
         <div style={{margin: '48px'}} className='d-flex flex-column'>
             <div className='d-flex' style={{justifyContent: 'space-between'}}>
-                <h2 className='mb32'>Collection<br />Details</h2>
-                <button type='button' onClick={handleNext}>Next</button>
+              <h2 className='mb32'>Collection<br />Details</h2>
+              { !!next && <button type='button' onClick={handleNext}>Next</button> }
             </div>
             
             <form className={styles.form}>

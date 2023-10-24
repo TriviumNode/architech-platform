@@ -294,9 +294,9 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
     const getPage = () => {
         switch(true) {
             case page.link==='details':
-                return <CollectionDetailPage current={currentDetail} state={detailState} isEditing={true} onChange={handleDetailChange} next={()=>changePage('Links')} />
+                return <CollectionDetailPage current={currentDetail} state={detailState} isEditing={true} onChange={handleDetailChange} />
             case page.link==='links':
-                return <LinksPage state={linkState} onChange={(newState) => setLinkState(newState)} next={()=>changePage('Rewards')} />
+                return <LinksPage state={linkState} onChange={(newState) => setLinkState(newState)} />
             case page.link==='rewards':
                 return <RewardsPage state={rewardsState} onChange={(data) => setRewardsState(data)} contractAddress={collection.address} metadata={metadata} loadingMetadata={loadingMetadata} loadingMetadataError={loadMetadataError} />
             case page.link==='preload':
