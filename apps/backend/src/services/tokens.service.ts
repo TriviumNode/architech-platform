@@ -265,7 +265,15 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
       return undefined;
     }
   }
-  console.log('Ensuring Token', tokenId, 'on collection', collection?.collectionProfile?.name || collection.cw721_name);
+  const collectionName =
+    collection?.collectionProfile.name ||
+    //@ts-expect-error fuck off
+    findToken?.collectionInfo.collectionProfile.name ||
+    collection?.cw721_name ||
+    //@ts-expect-error stfu
+    findToken?.collectionInfo.cw721_name;
+
+  console.log('Ensuring Token', tokenId, 'on collection', collectionName);
 
   let owner = findToken?.owner;
   let metadataExtension = findToken?.metadataExtension;
