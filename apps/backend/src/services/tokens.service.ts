@@ -248,6 +248,11 @@ export const processCollectionTraits = async (collection: Collection) => {
 
 // Imports a token if it does not exist. Updates existing tokens if needed.
 export const ensureToken = async (collectionAddress: string, tokenId: string) => {
+  if (tokenId.includes('%')) {
+    console.error(`Token ID '${tokenId}' in collection ${collectionAddress} contains invalid character '%' and will not be imported.`);
+    return undefined;
+  }
+
   // Check if already imported
   const findToken = await TokenModel.findOne({ collectionAddress, tokenId }).populate('collectionInfo').lean();
 
