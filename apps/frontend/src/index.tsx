@@ -39,85 +39,91 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
-    errorElement: <ErrorPage />,
+    // errorElement: <ErrorPage />,
     children: [
       {
-        path: "/",
-        element: <Home />,
-      },
-      {
-        path: "/nfts",
-        element: <NftPage />,
-        loader: allCollectionsLoader
-      },
-      {
-        path: "/nfts/collections",
-        element: <AllCollections />,
-        loader: allCollectionsLoader
-      },
-      {
-        path: "/nfts/drops",
-        element: <AllMinters />,
-        loader: activeMintersLoader
-      },
-      {
-        path: "/nfts/mint/:contractAddr",
-        element: <SingleMinter />,
-        loader: collectionLoader,
-      },
-      {
-        path: "/nfts/:contractAddr/:tokenId",
-        element: <SingleToken />,
-        loader: tokenLoader
-      },
-      {
-        path: "/nfts/:contractAddr/:tokenId/tasks",
-        element: <TokenTasks />,
-        loader: tokenLoader
-      },
-      {
-        path: "/nfts/:contractAddr",
-        element: <SingleCollection />,
-        loader: collectionLoader,
-      },
-      {
-        path: "/nfts/import",
-        element: <ImportCollectionPage />,
-      },
-      {
-        path: "/nfts/createcollection",
-        element: <CreateCollectionPage />,
-      },
-      {
-        path: "/nfts/create",
-        element: <CreateSingleNftPage />,
-        loader: collectionLoader,
-      },
-      {
-        path: "/nfts/create/:contractAddr",
-        element: <CreateSingleNftPage />,
-        loader: collectionLoader,
-      },
-      {
-        path: "/nfts/edit/:contractAddr",
-        element: <EditCollectionPage />,
-        loader: collectionLoader,
-      },
-      {
-        path: "/nfts/edit/:contractAddr/:page",
-        element: <EditCollectionPage />,
-        loader: collectionLoader,
-      },
-      {
-        path: "/profile/:userAddress",
-        element: <ProfilePage />,
-        loader: userProfileloader
-      },
-      {
-        path: "/admindash",
-        element: <AdminDashboard />,
-      },
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            path: "/",
+            element: <Home />,
+          },
+          {
+            path: "/nfts",
+            element: <NftPage />,
+            loader: allCollectionsLoader
+          },
+          {
+            path: "/nfts/collections",
+            element: <AllCollections />,
+            loader: allCollectionsLoader
+          },
+          {
+            path: "/nfts/drops",
+            element: <AllMinters />,
+            loader: activeMintersLoader
+          },
+          {
+            path: "/nfts/mint/:contractAddr",
+            element: <SingleMinter />,
+            loader: collectionLoader,
+          },
+          {
+            path: "/nfts/:contractAddr/:tokenId",
+            element: <SingleToken />,
+            loader: tokenLoader
+          },
+          {
+            path: "/nfts/:contractAddr/:tokenId/tasks",
+            element: <TokenTasks />,
+            loader: tokenLoader
+          },
+          {
+            path: "/nfts/:contractAddr",
+            element: <SingleCollection />,
+            loader: collectionLoader,
+          },
+          {
+            path: "/nfts/import",
+            element: <ImportCollectionPage />,
+          },
+          {
+            path: "/nfts/createcollection",
+            element: <CreateCollectionPage />,
+          },
+          {
+            path: "/nfts/create",
+            element: <CreateSingleNftPage />,
+            loader: collectionLoader,
+          },
+          {
+            path: "/nfts/create/:contractAddr",
+            element: <CreateSingleNftPage />,
+            loader: collectionLoader,
+          },
+          {
+            path: "/nfts/edit/:contractAddr",
+            element: <EditCollectionPage />,
+            loader: collectionLoader,
+          },
+          {
+            path: "/nfts/edit/:contractAddr/:page",
+            element: <EditCollectionPage />,
+            loader: collectionLoader,
+          },
+          {
+            path: "/profile/:userAddress",
+            element: <ProfilePage />,
+            loader: userProfileloader
+          },
+          {
+            path: "/admindash",
+            element: <AdminDashboard />,
+          },
+        ],
+      }
     ],
+
   },
   // {
   //   path: "contacts/:contactId",
