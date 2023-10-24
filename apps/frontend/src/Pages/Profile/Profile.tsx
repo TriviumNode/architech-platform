@@ -13,6 +13,7 @@ import EditProfileModal from "./EditProfileModal";
 import LinkButton from "../../Components/LinkButton";
 import PlaceholdImg from "../../Components/PlaceholdImg";
 import styles from './Profile.module.scss';
+import SocialLinks from "../../Components/Socials";
 
 const emptyToUndefined =(str: string) => {
     return str.length ? str : undefined;
@@ -143,7 +144,12 @@ const ProfilePage: FC<any> = (): ReactElement => {
                             }
                         </div>
                         <div style={{position: 'absolute', right: '16px', bottom: '16px'}}>
-                            {/* <SocialLinks discord={userProfile.profile.} twitter={collection.collectionProfile.twitter} website={collection.collectionProfile.website} /> */}
+                          <SocialLinks
+                            color={'#666'}
+                            discord={userProfile.profile?.discord}
+                            twitter={userProfile.profile?.twitter}
+                            telegram={userProfile.profile?.telegram} website={userProfile.profile?.website}
+                          />
                         </div>
 
                     </Col>
