@@ -265,15 +265,6 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
       return undefined;
     }
   }
-  const collectionName =
-    collection?.collectionProfile.name ||
-    //@ts-expect-error fuck off
-    findToken?.collectionInfo.collectionProfile.name ||
-    collection?.cw721_name ||
-    //@ts-expect-error stfu
-    findToken?.collectionInfo.cw721_name;
-
-  console.log('Ensuring Token', tokenId, 'on collection', collectionName);
 
   let owner = findToken?.owner;
   let metadataExtension = findToken?.metadataExtension;
@@ -320,6 +311,9 @@ export const ensureToken = async (collectionAddress: string, tokenId: string) =>
   // # Add Token to DB if Not Found #
   // ################################
   if (!findToken) {
+    const collectionName = collection.collectionProfile.name || collection.cw721_name;
+    console.log('Importing Token', tokenId, 'on collection', collectionName);
+
     // Get average image color
     let averageColor = '#232323';
     if (metadataExtension.image) {
