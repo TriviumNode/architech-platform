@@ -236,13 +236,21 @@ export const editCollection = async(collectionId: string, request: Partial<Impor
 
     // Socials
     if (request.website)
-        formData.append('website', request.website);
+      formData.append('website', request.website);
+    else formData.append('website', '');
+
     if (request.twitter)
-        formData.append('twitter', request.twitter);
+      formData.append('twitter', request.twitter);
+    else formData.append('twitter', '');
+
     if (request.discord)
-        formData.append('discord', request.discord);
+      formData.append('discord', request.discord);
+    else formData.append('discord', '');
+
     if (request.telegram)
-        formData.append('telegram', request.telegram);
+      formData.append('telegram', request.telegram);
+    else formData.append('telegram', '');
+  
 
     // Admin Settings
     if (typeof request.admin_hidden === 'boolean')
@@ -296,14 +304,21 @@ export const editProfile = async(address: string, request: Partial<UpdateProfile
 
     // Socials
     if (request.website)
-        formData.append('website', request.website);
+      formData.append('website', request.website);
+    else formData.append('website', '');
+
     if (request.twitter)
-        formData.append('twitter', request.twitter);
+      formData.append('twitter', request.twitter);
+    else formData.append('twitter', '');
+
     if (request.discord)
-        formData.append('discord', request.discord);
+      formData.append('discord', request.discord);
+    else formData.append('discord', '');
+
     if (request.telegram)
-        formData.append('telegram', request.telegram);
-    
+      formData.append('telegram', request.telegram);
+    else formData.append('telegram', '');
+
     const {data}: {data: User} = await axios(
         url,
         {

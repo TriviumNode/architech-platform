@@ -114,7 +114,9 @@ const ProfilePage: FC<any> = (): ReactElement => {
 
     const displayImage = userProfile.profile?.profile_image ? getApiUrl(`/public/${userProfile.profile.profile_image}`) : undefined;
     return (<>
-                <EditProfileModal open={editProfile} onClose={()=>setEditProfile(false)} userId={userProfile.profile?._id || ''} />
+                { !!userProfile.profile && 
+                  <EditProfileModal open={editProfile} onClose={()=>setEditProfile(false)} userId={userProfile.profile?._id || ''} userProfile={userProfile.profile} />
+                }
                 <div className={styles.picRow}>
                     <Col xs={{span: 8, offset: 2}} md={{span: 3, offset: 0}} className='card square'>
                         <PlaceholdImg src={displayImage} alt={ userProfile.display_name } className='tall wide imgCover' />
