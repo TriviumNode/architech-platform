@@ -20,6 +20,7 @@ import styles from './create.module.scss'
 import { mintAndList } from "../../Utils/wasm/multi_handles";
 import TasksModal, { Task } from "./TasksModal/TasksModal";
 import { getCollectionName } from "../../Utils/helpers";
+import { bech32 } from "bech32";
 
 export type Page = 'Collection' | 'Details' | 'Image' | 'Review' | 'Financials'
 
@@ -120,6 +121,24 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
                     content: `Make sure all Attributes have a Type and Value`,
                     onClick: ()=>setPage('Details')
                 })
+            }
+
+            // Verify royalty payment address
+            if (financialState.royalty_address){
+              let badAddr = false;
+              try {
+                const decoded = bech32.decode(financialState.royalty_address.trim())
+                if (decoded.prefix !== process.env.REACT_APP_NETWORK_PREFIX) throw new Error()
+              } catch(e) {
+                console.error(e)
+                badAddr = true;
+              };
+              if (badAddr){
+                newErrorTasks.push({
+                  content: `Invalid Royalty Payment Address`,
+                  onClick: ()=>setPage("Financials")
+                })
+              }
             }
 
             // Show modal if errors are found

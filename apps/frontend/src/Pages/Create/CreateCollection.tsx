@@ -288,6 +288,23 @@ const CreateCollectionPage: FC<any> = (): ReactElement => {
         }
       }
 
+      if (financialState.royalty_address){
+        let badAddr = false;
+        try {
+          const decoded = bech32.decode(financialState.royalty_address.trim())
+          if (decoded.prefix !== process.env.REACT_APP_NETWORK_PREFIX) throw new Error()
+        } catch(e) {
+          console.error(e)
+          badAddr = true;
+        };
+        if (badAddr){
+          returnTasks.push({
+            content: `Invalid Royalty Payment Address`,
+            onClick: ()=>setPage("Financials")
+          })
+        }
+      }
+
       return returnTasks;
     };
 
