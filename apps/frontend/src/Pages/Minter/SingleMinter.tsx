@@ -24,6 +24,7 @@ import { calculatePrices, Prices } from "../../Utils/data";
 import { getCollectionName, getMinterDates, isRandomnessReady } from "../../Utils/helpers";
 import { QueryClient } from "../../Utils/queryClient";
 import sleep from "../../Utils/sleep";
+import { CollectionDetailRow } from "../Token/SingleToken";
 
 import styles from './minter.module.scss';
 
@@ -353,6 +354,8 @@ const SingleMinter: FC<any> = (): ReactElement => {
     {!!collection.hidden &&
       <HiddenBanner page='MINTER' collectionAddress={collection.address} />
     }
+
+    <CollectionDetailRow fullCollection={fullCollection} />
 
     {/* Main Row */}
     <div className='d-flex gap8 mb8 flex-wrap' style={{minWidth: 0}}>

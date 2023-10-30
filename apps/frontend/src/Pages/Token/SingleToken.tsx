@@ -38,6 +38,46 @@ export type Prices = {
   displayUsd: string;
 }
 
+export const CollectionDetailRow: FC<any> = ({fullCollection}:{fullCollection: GetCollectionResponse}): ReactElement => {
+  const collection = fullCollection.collection;
+  const collectionName = getCollectionName(collection)
+  return (
+    <div className='d-flex gap8' style={{height: '64px', marginBottom: '8px'}}>
+      <Col className='tall square br8' xs="auto">
+        <Link
+          to={`/nfts/${collection.address}`}
+          data-tooltip-id="collection-tooltip"
+          data-tooltip-content="View Collection"
+          data-tooltip-place="top"
+        >
+          <PlaceholdImg alt={collectionName} src={getApiUrl(`/public/${collection.collectionProfile.profile_image}`)} className='tall wide imgCover' />
+        </Link>
+      </Col>
+      <Col className='card d-flex flex-row justify-content-between align-items-center'>
+        <Link
+          to={`/nfts/${collection.address}`}
+          // data-tooltip-id="collection-tooltip"
+          // data-tooltip-content="View Collection"
+          // data-tooltip-place="top"
+        >
+          <div className='d-flex align-items-center gap8'>
+            <h2 className='ml16 d-none d-md-block'>{collectionName}</h2>
+            {!!collection.verified &&
+              <VerifiedBadge content="Collection" />
+            }
+          </div>
+        </Link>
+        <h4 className='ml16 d-md-none'>{collectionName}</h4>
+        <div style={{paddingRight: '24px'}}  className='d-flex justify-content-between align-items-center'>
+          <CollectionStats collection={collection} asks={fullCollection.asks} />
+          <SocialLinks discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} telegram={collection.collectionProfile.telegram} website={collection.collectionProfile.website} />
+        </div>
+      </Col>
+      <Tooltip id="collection-tooltip" />
+    </div>
+  )
+}
+
 const SingleToken: FC<any> = (): ReactElement => {
     const { token: tokenResponse, collection: fullCollection } = useLoaderData() as { token: GetTokenResponse, collection: GetCollectionResponse};
     const collection = fullCollection?.collection;
@@ -185,27 +225,7 @@ const SingleToken: FC<any> = (): ReactElement => {
         />
       </Modal>
 
-      {/*  Collection Row */}
-      <div className='d-flex gap8' style={{height: '64px', marginBottom: '8px'}}>
-        <Col className='tall square br8' xs="auto">
-          <Link to={`/nfts/${collection.address}`}>
-            <PlaceholdImg alt={collectionName} src={getApiUrl(`/public/${collection.collectionProfile.profile_image}`)} className='tall wide imgCover' />
-          </Link>
-        </Col>
-        <Col className='card d-flex flex-row justify-content-between align-items-center'>
-          <div className='d-flex align-items-center gap8'>
-            <h2 className='ml16 d-none d-md-block'>{collectionName}</h2>
-            {!!collection.verified &&
-              <VerifiedBadge content="Collection" />
-            }
-          </div>
-          <h4 className='ml16 d-md-none'>{collectionName}</h4>
-          <div style={{paddingRight: '24px'}}  className='d-flex justify-content-between align-items-center'>
-            <CollectionStats collection={collection} asks={fullCollection.asks} />
-            <SocialLinks discord={collection.collectionProfile.discord} twitter={collection.collectionProfile.twitter} telegram={collection.collectionProfile.telegram} website={collection.collectionProfile.website} />
-          </div>
-        </Col>
-      </div>
+      <CollectionDetailRow fullCollection={fullCollection} />
 
       {!!collection.hidden &&
         <HiddenBanner page='NFT' collectionAddress={collection.address} />
