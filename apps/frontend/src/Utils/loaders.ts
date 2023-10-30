@@ -1,3 +1,4 @@
+import { parseError } from "@architech/lib";
 import { GetCollectionResponse, GetTokenResponse } from "@architech/types";
 import axios, { Axios, AxiosError } from "axios";
 import { getActiveMinters, getApiUrl, getCollection, getEndedMinters, getOwnedTokens, getToken, getTokens, getUserProfile } from "./backend";
@@ -19,21 +20,27 @@ export async function endedMintersLoader({ params }: any): Promise<{ collections
 }
 
 export async function collectionLoader({ params, request }: any) {
+  try {
     if (!params.contractAddr) return { collection: undefined }
 
     const url = getApiUrl(`/collections/${params.contractAddr}`)
     const {data: collection}: {data: GetCollectionResponse} = await axios.get(url)
     return { collection };
+  } catch (e: any) {
+    throw new Error(parseError(e))
+  }
 }
 
 // TODO have the backend just do this instead of 2 queries
 export async function tokenLoader({ params, request }: any): Promise<{collection: GetCollectionResponse, token: GetTokenResponse}> {
-    // const url = getApiUrl(`/collections/${params.contractAddr}`)
-    // const {data: collection} = await axios.get(url)
+  try {
     const tokenData = await getToken(params.contractAddr, params.tokenId)
 
     const collectionData = await getCollection(tokenData.token.collectionAddress)
     return { collection: collectionData, token: tokenData };
+  } catch (e: any) {
+    throw new Error(parseError(e))
+  }
 }
 
 export async function userProfileloader({ params }: any) {
