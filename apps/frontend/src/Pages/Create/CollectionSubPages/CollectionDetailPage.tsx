@@ -73,7 +73,7 @@ const CollectionDetailPage: FC<{
                     <Col>
                         <label>
                             Collection Name
-                            <input value={state.name} onChange={(e)=>updateDetailState({name: e.target.value})}  className={errors?.name && 'error'} />
+                            <input value={state.name} onChange={(e)=>updateDetailState({name: e.target.value.replace(/[<>]/gi, '')})}  className={errors?.name && 'error'} />
                             {!!errors?.name &&
                                 <div className='inputAlert'>
                                     <img alt='alert' src='/alert.svg' style={{height:'1.5em'}} />
@@ -178,7 +178,7 @@ const CollectionDetailPage: FC<{
                     <Col>
                         <label>
                             Description
-                            <textarea value={state.description} onChange={(e)=>updateDetailState({description: e.target.value})} />
+                            <textarea value={state.description} onChange={(e)=>updateDetailState({description: e.target.value.replace(/[<>]/gi, '')})} />
                         </label>
                     </Col>
                 </div>

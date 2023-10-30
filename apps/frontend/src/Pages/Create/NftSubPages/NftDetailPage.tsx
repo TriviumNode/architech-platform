@@ -226,7 +226,7 @@ const NftDetailPage: FC<{
                                     <div className='lightText10' style={{margin: '2px 8px 0 8px', lineHeight: '100%'}}>
                                         Display name for this NFT. Does not have to be unique.
                                     </div>
-                                    <input type='text' disabled={!state.customName} value={state.name} onChange={(e)=>updateDetailState({name: e.target.value})} className={errors?.name && styles.error} />
+                                    <input type='text' disabled={!state.customName} value={state.name} onChange={(e)=>updateDetailState({name: e.target.value.replace(/[<>]/gi, '')})} className={errors?.name && styles.error} />
                                     {!!errors?.name &&
                                         <div className={styles.alert}>
                                             <img alt='Alert' src='/alert.svg' style={{height:'1.5em'}} />
@@ -265,52 +265,12 @@ const NftDetailPage: FC<{
                         <PlaceholdImg src={state.preview} className='imgCover wide tall square br8' />
                     </Col>
                 </div>                
-                {/* <div className='d-flex flex-wrap mb24'>
-                    <Col xs={12} md={isCollection ? 12 : 6} lg={isCollection ? 12 : 8}>
-                        <label>
-                            NFT Name
-                            <div className='lightText10' style={{margin: '4px 8px 0 8px', minHeight: '2em', lineHeight: '100%'}}>
-                                Display name for this NFT. Does not have to be unique.
-                            </div>
-                            <input type='text' disabled={!state.customName} value={state.name} onChange={(e)=>updateDetailState({name: e.target.value})} className={errors?.name && styles.error} />
-                            {!!errors?.name &&
-                                <div className={styles.alert}>
-                                    <img alt='Alert' src='/alert.svg' style={{height:'1.5em'}} />
-                                </div>
-                            }
-                            {!isCollection &&
-                                <div style={{textAlign: 'right'}}>
-                                    <input type='checkbox' checked={state.customName} onChange={()=>updateDetailState({customName: !state.customName})} />Customize Name
-                                </div>
-                            }
-                        </label>
-                    </Col>
-                    {!isCollection &&
-                        <Col xs={12} md={true}>
-                            <label>
-                                Token ID
-                                <div className='lightText10' style={{margin: '4px 8px 0 8px', minHeight: '2em', lineHeight: '100%'}}>
-                                    Unique ID for this NFT.<br/>May only contain letters and numbers.
-                                </div>
-                                <input type='text' disabled={!state.customId} value={state.tokenId} onChange={(e)=>updateTokenId(e.target.value)} className={errors?.tokenId && styles.error}  />
-                                {!!errors?.tokenId &&
-                                    <div className={styles.alert}>
-                                        <img alt='Alert' src='/alert.svg' style={{height:'1.5em'}} />
-                                    </div>
-                                }
-                                    <div style={{textAlign: 'right'}}>
-                                        <input type='checkbox' checked={state.customId} onChange={()=>updateDetailState({customId: !state.customId})} />Customize ID
-                                    </div>
-                                
-                            </label>
-                        </Col>
-                    }
-                </div> */}
+
                 <div className='d-flex mb24'>
                     <Col>
                         <label>
                             Description
-                            <textarea placeholder='Type here' value={state.description} onChange={(e)=>updateDetailState({description: e.target.value})} />
+                            <textarea placeholder='Type here' value={state.description} onChange={(e)=>updateDetailState({description: e.target.value.replace(/[<>]/gi, '')})} />
                         </label>
                     </Col>
                 </div>
@@ -319,7 +279,7 @@ const NftDetailPage: FC<{
                         <label>
                             Attribute Label
                             { !!state.attributes[0] && 
-                                <input type='text' value={state.attributes[0].trait_type} onChange={(e)=>updateAttribute(0, {trait_type: e.target.value})} />
+                                <input type='text' value={state.attributes[0].trait_type} onChange={(e)=>updateAttribute(0, {trait_type: e.target.value.replace(/[<>]/gi, '')})} />
                             }
                         </label>
                     </Col>
@@ -327,7 +287,7 @@ const NftDetailPage: FC<{
                         <label>
                             Attribute Value
                             { !!state.attributes[0] && 
-                                <input type='text' value={state.attributes[0].value} onChange={(e)=>updateAttribute(0, {value: e.target.value})} />
+                                <input type='text' value={state.attributes[0].value} onChange={(e)=>updateAttribute(0, {value: e.target.value.replace(/[<>]/gi, '')})} />
                             }
                         </label>
                     </Col>
@@ -343,12 +303,12 @@ const NftDetailPage: FC<{
                     return (<div className='d-flex mb8' key={index}>
                         <Col>
                             <label>
-                                <input type='text' value={attribute.trait_type} onChange={(e)=>updateAttribute(index, {trait_type: e.target.value})} />
+                                <input type='text' value={attribute.trait_type} onChange={(e)=>updateAttribute(index, {trait_type: e.target.value.replace(/[<>]/gi, '')})} />
                             </label>
                         </Col>
                         <Col>
                             <label>
-                                <input type='text' value={attribute.value} onChange={(e)=>updateAttribute(index, {value: e.target.value})} />
+                                <input type='text' value={attribute.value} onChange={(e)=>updateAttribute(index, {value: e.target.value.replace(/[<>]/gi, '')})} />
                             </label>
                         </Col>
                         <Col xs={'auto'} className='d-flex align-items-end'>
