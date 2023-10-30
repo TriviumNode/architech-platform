@@ -22,7 +22,7 @@ export const getAddresses = (chainId: string): ChainConfig => {
                 NFT_FACTORY_ADDRESS: 'archway1974a8z4w0ph48nfexf5jt2nqxvmyzz3n9gahfv62d6yalr9fsm3qhln996',
                 CW721_CODE_ID: 44,
                 ARCHID_ADDRESS: 'archway1275jwjpktae4y4y0cdq274a2m0jnpekhttnfuljm6n59wnpyd62qppqxq0',
-                DISABLED_FEATURES: ['RANDOMMINT'],
+                DISABLED_FEATURES: [],
 
                 // Nois Contracts
                 NOIS_PROXY: 'archway10f3aasgsnpv84ymjyld50jayc4ecu267sdpjamauwm8nvxlzex9qj4dkwr',
