@@ -167,7 +167,7 @@ const BeneficiaryRow = ({
   )
 }
 
-const MAX_ROYALTY = 20;
+export const MAX_ROYALTY = 20;
 
 const RoyaltyRow = ({
   user,

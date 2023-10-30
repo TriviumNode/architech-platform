@@ -7,6 +7,7 @@ import { cw2981, minter } from "@architech/types";
 import SmallLoader from "../../../Components/SmallLoader";
 import PreloadDropzone, { FileWithPreview } from "../../../Components/PreloadDropzone";
 import Badge from "../../../Components/Badge";
+import { MAX_ROYALTY } from "../CommonSubPages/FinancialsPage";
 
 export interface PreloadState {
   items: IdMetadata[],
@@ -40,32 +41,32 @@ const PreloadJsonPage: FC<{
         onChange({...stateRef.current, ...newDetailState})
     }
 
-    const importJson = (json_file: File) => {
+    const importJson = async (json_file: File) => {
       if (!json_file) return;
       setParsingJson(json_file.name);
       try {
-          json_file.text().then((data)=>{
-              const obj: IdMetadata[] = JSON.parse(data);
-              const newMetadata: IdMetadata[] = [];
-              obj.forEach(m=>{
-                  newMetadata.push({
-                      file_name: m.file_name,
-                      name: m.name,
-                      description: m.description,
-                      royalty_payment_address: m.royalty_payment_address,
-                      royalty_percentage: m.royalty_percentage,
-                      image: m.image,
-                      attributes: m.attributes,
-                      animation_url: m.animation_url,
-                      background_color: m.background_color,
-                      external_url: m.external_url,
-                      image_data: m.image_data,
-                      youtube_url: m.youtube_url,
-                  })
-              })
-              updateState({items: [...state.items, ...newMetadata]})
-              setParsingJson(undefined);
+        const data = await json_file.text()
+        const obj: IdMetadata[] = JSON.parse(data);
+        const newMetadata: IdMetadata[] = [];
+        obj.forEach(m=>{
+          if (m.royalty_percentage && m.royalty_percentage > MAX_ROYALTY) throw new Error(`Item '${m.file_name}' exceeds max royalty of 20%. Is currently ${m.royalty_percentage}%`);
+          newMetadata.push({
+            file_name: m.file_name,
+            name: m.name,
+            description: m.description,
+            royalty_payment_address: m.royalty_payment_address,
+            royalty_percentage: m.royalty_percentage,
+            image: m.image,
+            attributes: m.attributes,
+            animation_url: m.animation_url,
+            background_color: m.background_color,
+            external_url: m.external_url,
+            image_data: m.image_data,
+            youtube_url: m.youtube_url,
           })
+        })
+        updateState({items: [...state.items, ...newMetadata]})
+        setParsingJson(undefined);
       } catch(error: any) {
         console.error(`Failed to parse JSON ${json_file.name}:`, error)
         toast.error(error.toString())
