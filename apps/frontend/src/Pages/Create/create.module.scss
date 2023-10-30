@@ -226,7 +226,14 @@
     background: #fff;
     border-radius: 8px;
     overflow: hidden;
-    height: calc(100vh - 64px - 16px - 8px);
+
+    @media (min-width: 905px) {
+      height: calc(100vh - 64px - 16px - 8px);
+    }
+    @media (max-width: 904.98px) {
+      // min-height: calc(100vh - 64px - 16px - 8px);
+      height: 768px;
+    }
     width: 100%;
 
     .inner {
