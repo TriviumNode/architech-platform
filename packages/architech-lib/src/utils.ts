@@ -66,3 +66,12 @@ export const isAdmin = (address: string) => {
 export const trimNonNumeric = (str: string) => {
   return str.replace(/[^0-9.]/gi, '');
 }
+
+// If the collection is hidden: Returns true is the user address is the collection owner / an architech admin. Otherwise returns false.
+// If the collection is not hidden: Returns true.
+export const canSeeCollection = (collection: Collection, userAddress?: string): boolean => {
+  const isHidden = collection.hidden || collection.admin_hidden;
+  const canSeeHidden = userAddress && (userAddress === collection.creator || userAddress === collection.admin || ADMINS.includes(userAddress));
+  if (isHidden) return canSeeHidden;
+  else return true;
+};

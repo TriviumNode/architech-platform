@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { queryClient } from '@/utils/chainClients';
 import * as tokenService from '@/services/tokens.service';
 import {
+  Collection,
   cw721,
   GetLatestListingsResponse,
   GetTokenResponse,
@@ -12,7 +13,7 @@ import {
   Token,
 } from '@architech/types';
 
-import { ADMINS, getAllAsks, resolveArchId } from '@architech/lib';
+import { ADMINS, canSeeCollection, getAllAsks, resolveArchId } from '@architech/lib';
 import { HttpException } from '@/exceptions/HttpException';
 import CollectionModel from '@/models/collections.model';
 import { findFavoritesCount } from '@/services/favorites.service';
@@ -109,6 +110,10 @@ export const getCollectionTokenId = async (req: RequestWithOptionalUser, res: Re
     const collectionAddr: string = req.params.collectionAddr;
     const tokenId: string = req.params.tokenId;
     let tokenData = await tokenService.ensureToken(collectionAddr, tokenId);
+
+    // Ensure hidden collections can't be viewed by unauthorized addresses.
+    if (!canSeeCollection(tokenData.collectionInfo as Collection, req.user?.address)) throw new HttpException(404, 'Token not found.');
+
     if (tokenData) {
       // Increment view count
       const userId: string = req.user?._id;
