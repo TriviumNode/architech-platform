@@ -1,5 +1,5 @@
 import { calculateFee, denomToHuman, findDenom, humanToDenom } from "@architech/lib";
-import { Denom } from "@architech/types";
+import { Collection, Denom } from "@architech/types";
 import { FC, ReactElement, useState } from "react";
 import { Col } from "react-bootstrap";
 import { DenomImg } from "../../../Components/ArchDenom";
@@ -44,9 +44,10 @@ export const DefaultFinancialState: FinancialState = {
 const FinancialPage: FC<{
     state: FinancialState,
     collectionType?: CollectionType,
+    collection?: Collection,
     onChange: (data: FinancialState)=>void;
     next: ()=>void;
-}> = ({state, collectionType, onChange, next}): ReactElement => {
+}> = ({state, collectionType, collection, onChange, next}): ReactElement => {
     const {user} = useUser()
     const [selectedOption, setSelectedOption] = useState<SelectOption>(selectOptions[0])
 
@@ -82,7 +83,7 @@ const FinancialPage: FC<{
                 { (!!!collectionType || collectionType === 'COPY') &&
                   RoyaltyRow({user, state, updateState})
                 }
-                { !!!collectionType &&
+                { (!!!collectionType && (collection && !collection.hidden && !collection.admin_hidden)) &&
                   <>
                     <div className='d-flex align-items-center mb24 mt16'>
                       <Switch

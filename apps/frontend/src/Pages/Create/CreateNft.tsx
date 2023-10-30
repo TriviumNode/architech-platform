@@ -67,7 +67,7 @@ const CreateSingleNftPage: FC<any> = (): ReactElement => {
             // case 'Image':
             //     return <ImagePage image={image} preview={preview} onChange={(data, preview) => {setImage(data); setPreview(preview)}} next={()=>setPage('Financials')} />
             case 'Financials':
-                return <FinancialPage state={financialState} onChange={(data) => setFinancialState(data)} next={()=>setPage('Review')} />
+                return <FinancialPage state={financialState} collection={collection} onChange={(data) => setFinancialState(data)} next={()=>setPage('Review')} />
             case 'Review':
                 return <ReviewNftPage details={detailState} collection={collection} onClick={handleCreate} />
             default:
