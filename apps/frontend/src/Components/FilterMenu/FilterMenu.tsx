@@ -41,7 +41,7 @@ export function TraitFilterMenu(props: TraitMenuProps) {
         }}
         className={isOpen ? styles.openButton : undefined}
       >
-        <span>{trait_type}</span> <span aria-hidden>▾</span>
+        <span className='oneLineLimit breakAll'>{trait_type}</span> <span aria-hidden>▾</span>
       </button>
       {isOpen && 
       <div className={`${styles.menu} flex-column`}>
@@ -51,7 +51,7 @@ export function TraitFilterMenu(props: TraitMenuProps) {
             return (
               <div key={trait.value} className='d-flex justify-content-between'>
                 <div className='d-flex align-items-center'>
-                  {trait.value}
+                  <span className='fourLineLimit breakAll'>{trait.value}</span>
                 </div>
                 <input type="checkbox" checked={selected_traits.findIndex(t=>t.value === trait.value) > -1} onChange={(e) => handleChange(trait, e.target.checked)} />
               </div>

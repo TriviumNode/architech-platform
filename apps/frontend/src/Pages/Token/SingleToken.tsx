@@ -56,12 +56,13 @@ export const CollectionDetailRow: FC<any> = ({fullCollection}:{fullCollection: G
       <Col className='card d-flex flex-row justify-content-between align-items-center'>
         <Link
           to={`/nfts/${collection.address}`}
+          className='mr8'
           // data-tooltip-id="collection-tooltip"
           // data-tooltip-content="View Collection"
           // data-tooltip-place="top"
         >
           <div className='d-flex align-items-center gap8'>
-            <h2 className='ml16 d-none d-md-block'>{collectionName}</h2>
+            <h2 className='ml16 d-none d-md-block twoLineLimit breakAll'>{collectionName}</h2>
             {!!collection.verified &&
               <VerifiedBadge content="Collection" />
             }
@@ -250,7 +251,7 @@ const SingleToken: FC<any> = (): ReactElement => {
                 </div>
                 <span className='lightText14'>Owned by&nbsp;</span>
                 <Link style={{overflow: "hidden"}} to={`/profile/${tokenResponse.token?.owner}`}>
-                  {truncateAddress(tokenResponse.ownerName, process.env.REACT_APP_NETWORK_PREFIX)}
+                  <span className='oneLineLimit breakAll'>{truncateAddress(tokenResponse.ownerName, process.env.REACT_APP_NETWORK_PREFIX)}</span>
                 </Link>
               </div>
               <div className='d-flex align-items-center'>
@@ -272,7 +273,7 @@ const SingleToken: FC<any> = (): ReactElement => {
               { !!tokenResponse.token.metadataExtension?.description &&
                 <div style={{margin: '0 48px 12px 48px', width: 'fit-content', maxWidth: 'calc(100% - 96px)'}}>
                   <span className='lightText12'>Description</span>
-                  <p style={{margin: '8px 0 0 0 ', fontSize: '12px', padding: '0 8px'}}>{tokenResponse.token.metadataExtension?.description}</p>
+                  <p style={{margin: '8px 0 0 0 ', fontSize: '12px', padding: '0 8px'}} className='breakAll'>{tokenResponse.token.metadataExtension?.description}</p>
                 </div>
               }
               { !!(tokenResponse.token.metadataExtension?.attributes && tokenResponse.token.metadataExtension.attributes.length) &&
@@ -282,9 +283,9 @@ const SingleToken: FC<any> = (): ReactElement => {
                   {tokenResponse.token.metadataExtension.attributes.map(a=>{
                     return (
                       <div className={`${styles.trait} grayCard`}>
-                        <span className={styles.type}>{a.trait_type}</span>
+                        <span className={`${styles.type} twoLineLimit breakAll`}>{a.trait_type}</span>
                         <hr />
-                        <span className={styles.value}>{a.value}</span>
+                        <span className={`${styles.value} twoLineLimit breakAll`}>{a.value}</span>
                       </div>
                     )
                   })}
@@ -339,7 +340,7 @@ const SingleToken: FC<any> = (): ReactElement => {
       {/* Sale Row */}
       <div className='card d-flex' style={{height: '84px', marginBottom: '8px'}}>
         <div style={{margin: '0 16px'}} className='d-flex align-items-center align-self-stretch justify-content-between wide'>
-            <div className='d-flex align-items-center lightText justify-content-between'>
+            <div className='d-flex align-items-center lightText justify-content-between twoLineLimit breakAll'>
               <h2>{!!tokenResponse.token.metadataExtension?.name ? tokenResponse.token.metadataExtension.name : `${num}${tokenResponse.token?.tokenId}`}</h2>
             </div>
             <div className='d-flex align-items-center' style={{gap: '24px'}}>
