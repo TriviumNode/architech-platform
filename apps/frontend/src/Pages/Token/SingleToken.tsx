@@ -296,7 +296,7 @@ const SingleToken: FC<any> = (): ReactElement => {
                 <span className='lightText12'>
                   Created by&nbsp;
                   <Link style={{color: '#000'}} to={`/profile/${fullCollection.full_creator.address}`}>
-                    {truncateAddress(fullCollection.full_creator.display, process.env.REACT_APP_NETWORK_PREFIX)}
+                    <span className='oneLineLimit breakAll'>{truncateAddress(fullCollection.full_creator.display, process.env.REACT_APP_NETWORK_PREFIX)}</span>
                   </Link>
                 </span>
               </div>
