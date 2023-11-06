@@ -128,6 +128,10 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
       whitelist_launch_time: collection.collectionMinter?.whitelist_launch_time ? new Date(parseInt(collection.collectionMinter.whitelist_launch_time) * 1000) : undefined,
     }
 
+    const currentRewards: RewardsState = {
+      address: ''
+    }
+
     const [detailState, setDetailState] = useState<DetailState>(currentDetail);
     const [linkState, setLinkState] = useState<LinkState>(currentLinks);
     const [rewardsState, setRewardsState] = useState<RewardsState>(DefaultRewardsState);
@@ -367,6 +371,7 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
       setDetailState(currentDetail);
       setLinkState(currentLinks);
       setTimesState(currentTimes);
+      setRewardsState(currentRewards);
     }
 
     const handleResetPreload = (e: any) => {
