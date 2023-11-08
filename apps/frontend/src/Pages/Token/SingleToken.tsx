@@ -242,19 +242,19 @@ const SingleToken: FC<any> = (): ReactElement => {
         <Col xs={12} md={true} className={styles.accordionCol}>
           <div className={`${styles.accordionItem} ${activeItem === 'item1' && styles.activeItem} ${styles.firstItem}`}  onClick={()=>setActiveItem('item1')}>
             <div className='d-flex justify-content-between' style={{margin: '32px 32px 16px 32px', height: 'fit-content', width: 'calc(100% - 64px)'}}>
-              <div>
+              <Col style={{overflow: 'hidden'}}>
                 <div className='d-flex align-items-center mb16'>
                   <h1 className='mr8' style={{lineHeight: 1}}>{num}{tokenResponse.token?.tokenId}</h1>
                   {(collection.categories || []).map(category=>
                     <Badge className='mr8'><span>{category}</span></Badge>
                   )}
                 </div>
-                <span className='lightText14'>Owned by&nbsp;</span>
+                <span className='lightText14'>Owned by&nbsp;<br/></span>
                 <Link style={{overflow: "hidden"}} to={`/profile/${tokenResponse.token?.owner}`}>
-                  <span className='oneLineLimit breakAll'>{truncateAddress(tokenResponse.ownerName, process.env.REACT_APP_NETWORK_PREFIX)}</span>
+                  <span /*className='oneLineLimit breakAll'*/>{truncateAddress(tokenResponse.ownerName, process.env.REACT_APP_NETWORK_PREFIX)}</span>
                 </Link>
-              </div>
-              <div className='d-flex align-items-center'>
+              </Col>
+              <Col xs='auto' className='d-flex align-items-center'>
                 <div className="d-flex align-items-stretch" style={{gap: '16px'}}>
                   <button onClick={handleFavorite} disabled={!!!user} className='clearBtn' style={{padding: 0, height: 'unset'}}>
                     <div className={styles.number}><img alt='' src={isFavorite ? '/red_heart.svg' : '/heart.svg'} style={{height: '1.3em'}} />&nbsp;{tokenResponse.favorites}</div>
@@ -267,7 +267,7 @@ const SingleToken: FC<any> = (): ReactElement => {
                   </div>
                 </div>
                 {/* <FontAwesomeIcon icon={faChevronRight} /> */}
-              </div>
+              </Col>
             </div>
             <div className='d-flex flex-column' style={{flexGrow: 1 }} >
               { !!tokenResponse.token.metadataExtension?.description &&
