@@ -132,7 +132,7 @@ const ProfilePage: FC<any> = (): ReactElement => {
                     >
                         <div className='d-flex flex-column genOverlay' style={{position: 'absolute', left: '16px', bottom: '16px', width: 'calc(100% - 32px)'}}>
                             <h1 className='oneLineLimit'>{userProfile.display_name}</h1>
-                            <p>{userProfile.profile?.bio}</p>
+                            <p className='breakAll'>{userProfile.profile?.bio}</p>
                             <div className='d-flex wide justify-content-space-between'>
                                 {/* <CollectionStats collection={collection} /> */}
 

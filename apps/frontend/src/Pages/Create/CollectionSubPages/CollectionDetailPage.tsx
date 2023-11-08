@@ -73,7 +73,12 @@ const CollectionDetailPage: FC<{
                     <Col>
                         <label>
                             Collection Name
-                            <input value={state.name} onChange={(e)=>updateDetailState({name: e.target.value.replace(/[<>]/gi, '')})}  className={errors?.name && 'error'} />
+                            <input
+                              value={state.name}
+                              onChange={(e)=>updateDetailState({name: e.target.value.replace(/[<>]/gi, '')})}
+                              className={errors?.name && 'error'}
+                              maxLength={128}
+                            />
                             {!!errors?.name &&
                                 <div className='inputAlert'>
                                     <img alt='alert' src='/alert.svg' style={{height:'1.5em'}} />
@@ -94,7 +99,13 @@ const CollectionDetailPage: FC<{
                         <Col>
                             <label>
                                 Collection Symbol
-                                <input value={state.symbol} disabled={isImporting} onChange={(e)=>updateDetailState({symbol: e.target.value.replace(/[^a-zA-Z]/gi, '').toUpperCase()})}  className={errors?.symbol && 'error'} />
+                                <input
+                                  value={state.symbol}
+                                  disabled={isImporting}
+                                  onChange={(e)=>updateDetailState({symbol: e.target.value.replace(/[^a-zA-Z]/gi, '').toUpperCase()})}
+                                  className={errors?.symbol && 'error'}
+                                  maxLength={16}
+                                />
                                 {!!errors?.symbol &&
                                     <div className='inputAlert'>
                                         <img alt='alert' src='/alert.svg' style={{height:'1.5em'}} />
@@ -178,7 +189,11 @@ const CollectionDetailPage: FC<{
                     <Col>
                         <label>
                             Description
-                            <textarea value={state.description} onChange={(e)=>updateDetailState({description: e.target.value.replace(/[<>]/gi, '')})} />
+                            <textarea
+                              value={state.description}
+                              onChange={(e)=>updateDetailState({description: e.target.value.replace(/[<>]/gi, '')})}
+                              maxLength={512}
+                            />
                         </label>
                     </Col>
                 </div>
