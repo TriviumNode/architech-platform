@@ -89,6 +89,7 @@ export default function ListModal({open, token, onClose, onList}: Props) {
         try {
           if (!user) throw new Error('Wallet is not connected.');
           if (parseFloat(formState.amount) <= 0) throw new Error('List Amount must be greater than 0');
+          if (token.collectionInfo.hidden || token.collectionInfo.admin_hidden) throw new Error('Collection is hidden. Hidden collections can not be listed for sale.');
 
           const denomAmount = humanToDenom(formState.amount, formState.denom?.decimals)
           const response = await listToken({
