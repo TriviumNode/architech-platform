@@ -72,7 +72,7 @@ const FinancialPage: FC<{
             <h2 className='mb32'>Financial<br />Details</h2>
                 <button type='button' onClick={()=>next()}>Next</button>
             </div>
-            <form className={styles.form}>
+            <form className={styles.form} onSubmit={()=>{}}>
               <>
                 { !!collectionType &&
                   <>

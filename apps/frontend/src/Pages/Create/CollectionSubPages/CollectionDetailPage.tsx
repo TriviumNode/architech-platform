@@ -68,7 +68,7 @@ const CollectionDetailPage: FC<{
               { !!next && <button type='button' onClick={handleNext}>Next</button> }
             </div>
             
-            <form className={styles.form}>
+            <form className={styles.form} onSubmit={()=>{}}>
                 <div className='d-flex mb24'>
                     <Col>
                         <label>

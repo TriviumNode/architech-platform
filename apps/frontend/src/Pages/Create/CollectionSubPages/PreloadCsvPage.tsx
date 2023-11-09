@@ -112,7 +112,7 @@ const PreloadCsvPage: FC<{
                   </Badge>
               </div>
             </div>
-            <form className={styles.form}>
+            <form className={styles.form} onSubmit={()=>{}}>
                 <div className='d-flex mb24 flex-wrap'>
                     <Col xs={12} md={6}>
                         <label>

@@ -18,7 +18,7 @@ const ReviewNftPage: FC<{
         <div style={{margin: '48px'}} className='d-flex flex-column'>
             <h2 className='mb32'>Review<br />NFT</h2>
             <NftPreviewCard collectionName={getCollectionName(collection as Collection)} details={details}  />
-            <form className={styles.form}>
+            <form className={styles.form} onSubmit={()=>{}}>
                 <div className='d-flex flex-column mb24 align-items-center mt16'>
                     <Col xs='auto'>
                         <button type='button' onClick={onClick}>Create NFT</button>

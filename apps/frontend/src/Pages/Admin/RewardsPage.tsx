@@ -208,7 +208,7 @@ const AdminRewardsPage: FC<{}> = (): ReactElement => {
             </div>
             
             <h4>Lookup Metadata</h4>
-            <form className={styles.form}>
+            <form className={styles.form} onSubmit={()=>{}}>
                 <div className='d-flex mb24'>
                     <Col>
                         <label>
