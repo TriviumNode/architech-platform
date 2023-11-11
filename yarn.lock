@@ -2951,13 +2951,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cloudflare/workers-types@npm:^4.20230518.0":
-  version: 4.20230518.0
-  resolution: "@cloudflare/workers-types@npm:4.20230518.0"
-  checksum: f1915738fef2c6e2236f0d5d6cc5a71d901670230ffb08b7fc13b91a489f0e1c59d2f47efd4a0b6dd8bf87153753e6c8d7eec3ff133e52d1f4f04c27330d0605
-  languageName: node
-  linkType: hard
-
 "@colors/colors@npm:1.5.0":
   version: 1.5.0
   resolution: "@colors/colors@npm:1.5.0"
@@ -3508,15 +3501,6 @@ __metadata:
   version: 8.41.0
   resolution: "@eslint/js@npm:8.41.0"
   checksum: 41cf403ccebbc90315c7190bd901fa17975327022146b2db8c846ec5b11d04c56b33ccf9064b9da7349068e96bef8f322423fbcce700d815b4097fd808aaa4c6
-  languageName: node
-  linkType: hard
-
-"@flaregun-net/proxyflare-for-pages@npm:^0.1.0":
-  version: 0.1.0
-  resolution: "@flaregun-net/proxyflare-for-pages@npm:0.1.0"
-  peerDependencies:
-    "@cloudflare/workers-types": 3.14.0
-  checksum: f9a412153db3e877e5fc42e9b5c1822797c911bb5544b9b18e7f91d73dca0ceb757015b4cb970450ef4ec77c3e9516c36231c9240abbcb3dd78ae2997c931c89
   languageName: node
   linkType: hard
 
@@ -6948,11 +6932,9 @@ __metadata:
     "@architech/lib": "npm:*"
     "@architech/types": "npm:*"
     "@archwayhq/arch3.js": "npm:^0.3.1"
-    "@cloudflare/workers-types": "npm:^4.20230518.0"
     "@cosmjs/amino": "npm:^0.30.1"
     "@cosmjs/cosmwasm-stargate": "npm:^0.30.1"
     "@cosmostation/extension": "npm:^0.0.13"
-    "@flaregun-net/proxyflare-for-pages": "npm:^0.1.0"
     "@fortawesome/fontawesome-svg-core": "npm:^6.4.0"
     "@fortawesome/free-brands-svg-icons": "npm:^6.4.2"
     "@fortawesome/free-solid-svg-icons": "npm:^6.4.0"
