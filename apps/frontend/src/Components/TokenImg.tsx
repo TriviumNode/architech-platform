@@ -25,7 +25,7 @@ const TokenImage = React.forwardRef<HTMLImageElement, ImageProps>(
   ) => {
     src = resolveIpfs(src || '/placeholder.png');
     return (
-      <img // eslint-disable-line jsx-a11y/alt-text
+      <img
         ref={ref}
         {...props}
         className={classNames(
