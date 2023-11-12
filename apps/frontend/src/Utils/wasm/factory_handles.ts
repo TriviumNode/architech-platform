@@ -1,5 +1,5 @@
 import { cw2981, factory, minter } from "@architech/types";
-import { SigningArchwayClient } from "@archwayhq/arch3.js";
+import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import secureRandom from "secure-random";
 
 import { Buffer } from 'buffer';
@@ -15,7 +15,7 @@ export const initStandardProject = async({
     contract_name,
     nft_symbol,
 }:{
-    client: SigningArchwayClient,
+    client: SigningCosmWasmClient,
     signer: string,
     minter: string;
     contract_name: string;
@@ -63,7 +63,7 @@ export const initCopyProject = async({
     metadata,
     whitelisted,
 }:{
-    client: SigningArchwayClient,
+    client: SigningCosmWasmClient,
     signer: string,
     contract: string,
     nft_admin?: string;
@@ -151,7 +151,7 @@ export const initRandomProject = async({
     /// Maximum number of mints per address
     mint_limit
 }:{
-    client: SigningArchwayClient,
+    client: SigningCosmWasmClient,
     signer: string,
     contract: string,
     nft_admin?: string;

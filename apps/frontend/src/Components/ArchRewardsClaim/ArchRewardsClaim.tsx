@@ -1,7 +1,9 @@
 import { claimRewards } from "@architech/lib";
+import { SigningArchwayClient } from "@archwayhq/arch3.js/build";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useUser } from "../../Contexts/UserContext";
+import { DISABLED_FEATURES } from "../../Utils/queryClient";
 import ArchDenom from "../ArchDenom";
 import SmallLoader from "../SmallLoader";
 
@@ -14,10 +16,11 @@ const ArchRewardsClaim = () => {
     try {
       if (!user) throw new Error('Wallet is not connected.')
       if (!balances?.rewards_records) throw new Error('Number of rewards records is 0 or unknown.')
+      if (DISABLED_FEATURES.includes('ARCH_REWARDS')) throw new Error('Arch Rewards features are disabled on this chain.')
       setClaiming(true);
 
       const result = await claimRewards({
-        client: user.client,
+        client: user.client as SigningArchwayClient,
         address: user.address,
         num_records: balances.rewards_records
       })

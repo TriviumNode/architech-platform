@@ -1,4 +1,4 @@
-import { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { cw20 } from "@architech/types";
 type QueryMsg = cw20.QueryMsg;
 
@@ -6,7 +6,7 @@ export const getTokenInfo = async ({
     client,
     contract,
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
 }) => {
     const query: QueryMsg = {
@@ -22,7 +22,7 @@ export const getBalance = async ({
     contract,
     address,
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
     address: string,
 }) => {

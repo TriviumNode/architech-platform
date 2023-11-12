@@ -1,6 +1,6 @@
-import { SigningArchwayClient, ArchwayClient } from "@archwayhq/arch3.js/build";
+import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
-export const resolveArchId = async(client: ArchwayClient | SigningArchwayClient, contract: string, address: string): Promise<string> => {
+export const resolveArchId = async(client: CosmWasmClient, contract: string, address: string): Promise<string> => {
     if (!address || !address.length || !contract || !contract.length) return;
     try {
         const query = {

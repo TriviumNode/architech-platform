@@ -1,5 +1,4 @@
 import { Denom } from "@architech/types";
-import { ArchwayClient } from "@archwayhq/arch3.js";
 
 export const PLACEHOLDER_URL = 'https://placehold.jp/a2a2a2/ffffff/350x350.png?text=%F0%9F%93%B7';
 

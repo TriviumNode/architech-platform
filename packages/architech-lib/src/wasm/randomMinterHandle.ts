@@ -1,5 +1,5 @@
+import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { minter } from "@architech/types";
-import { SigningArchwayClient } from "@archwayhq/arch3.js/build";
 
 export const mintRandom = async({
     client,
@@ -8,7 +8,7 @@ export const mintRandom = async({
     funds,
     mints = 1,
 }:{
-    client: SigningArchwayClient,
+    client: SigningCosmWasmClient,
     signer: string,
     minter_contract: string,
     funds?: { amount: string, denom: string}[],

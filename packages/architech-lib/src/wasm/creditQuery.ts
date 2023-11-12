@@ -1,12 +1,12 @@
 import { credits } from "@architech/types";
-import type { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
 export const getCreditBalance = async ({
     client,
     creditContract,
     address: user,
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     creditContract: string,
     address: string,
 }) => {

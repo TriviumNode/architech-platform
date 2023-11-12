@@ -1,5 +1,5 @@
 import type { minter } from "@architech/types";
-import { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 type QueryMsg = minter.QueryMsg;
 type GetConfigResponse = minter.GetConfigResponse;
 type GetMintLimitResponse = minter.GetMintLimitResponse;
@@ -10,7 +10,7 @@ export const getMintStatus = async ({
     client,
     contract,
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
 }) => {
     const query: QueryMsg = {
@@ -25,7 +25,7 @@ export const getPrice = async ({
     client,
     contract,
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
 }) => {
     const query: QueryMsg = {
@@ -40,7 +40,7 @@ export const getConfig = async ({
     client,
     contract,
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
 }) => {
     const query: QueryMsg = {
@@ -56,7 +56,7 @@ export const getMintLimit = async ({
     contract,
     buyer,
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
     buyer: string,
 }) => {

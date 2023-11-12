@@ -1,5 +1,5 @@
+import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { marketplace } from "@architech/types";
-import type { SigningArchwayClient } from "@archwayhq/arch3.js/build";
 import { sendTokens } from "./cw20Handle";
 import { sendNft } from "./nftHandle";
 type ExecuteMsg = marketplace.ExecuteMsg
@@ -13,7 +13,7 @@ export const purchaseNative = async({
     denom,
     amount,
 }:{
-    client: SigningArchwayClient,
+    client: SigningCosmWasmClient,
     signer: string,
     marketplace_contract: string;
     cw721_contract: string;
@@ -49,7 +49,7 @@ export const purchaseCw20 = async({
     token_id,
     amount,
 }:{
-    client: SigningArchwayClient,
+    client: SigningCosmWasmClient,
     signer: string,
     marketplace_contract: string;
     cw20_contract: string;
@@ -84,7 +84,7 @@ export const listToken = async({
     token_id,
     amount,
 }:{
-    client: SigningArchwayClient;
+    client: SigningCosmWasmClient;
     signer: string;
     marketplace_contract: string;
     cw20_contract?: string;
@@ -116,7 +116,7 @@ export const cancelListing = async({
     cw721_contract,
     token_id,
 }:{
-    client: SigningArchwayClient;
+    client: SigningCosmWasmClient;
     signer: string;
     marketplace_contract: string;
     cw721_contract: string;

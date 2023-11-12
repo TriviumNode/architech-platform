@@ -14,8 +14,8 @@ import equal from "fast-deep-equal";
 import RewardsPage, { DefaultRewardsState, RewardsState } from "./CollectionSubPages/RewardsPage";
 import { ADMINS, getMetadata, getMintStatus, parseError, preloadData, setLaunchTime, setRewardsMetadata } from "@architech/lib";
 import SmallLoader from "../../Components/SmallLoader";
-import { QueryClient } from "../../Utils/queryClient";
-import { ContractMetadata } from "@archwayhq/arch3.js/build";
+import { DISABLED_FEATURES, QueryClient } from "../../Utils/queryClient";
+import { ContractMetadata, SigningArchwayClient } from "@archwayhq/arch3.js/build";
 import ConnectWallet from "../../Components/ConnectWallet";
 import PreloadJsonPage, { DefaultPreloadState, PreloadState } from "./CollectionSubPages/PreloadJsonPage";
 
@@ -331,9 +331,9 @@ const EditCollectionPage: FC<any> = (): ReactElement => {
                 revalidator.revalidate();
                 setUnsaved(false);
                 toast.success('Saved collection profile')
-            } else if (rewardsState.address && rewardsState.address !== metadata?.rewardsAddress) {
+            } else if (rewardsState.address && rewardsState.address !== metadata?.rewardsAddress && !DISABLED_FEATURES.includes('ARCH_REWARDS')) {
                 const result = await setRewardsMetadata({
-                    client: wallet.client,
+                    client: wallet.client as SigningArchwayClient,
                     signer: wallet.address,
                     contract: fullCollection.collection.address,
                     rewards_address: rewardsState.address,

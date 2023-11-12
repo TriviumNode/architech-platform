@@ -25,7 +25,7 @@ export const getMetadata = async({
     client,
     contract,
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: ArchwayClient | SigningArchwayClient,
     contract: string,
 }) => {
     return await client.getContractMetadata(contract);
@@ -35,7 +35,7 @@ export const getRewards = async({
     client,
     address,
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: ArchwayClient | SigningArchwayClient,
     address: string,
 }): Promise<OutstandingRewards | undefined> => {
     try {

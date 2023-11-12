@@ -14,7 +14,7 @@ import { rotateNonce } from '@/services/users.service';
 import { queryDbCollectionsByCreator } from '@/queriers/collection.querier';
 import { findUserFavorites } from '@/services/favorites.service';
 import { queryClient } from '@/utils/chainClients';
-import { ARCHID_ADDRESS } from '@/config';
+import { ARCHID_ADDRESS, CHAIN_ID } from '@/config';
 
 export const walletLogin = async (req: Request, res: Response, next: NextFunction) => {
   try {

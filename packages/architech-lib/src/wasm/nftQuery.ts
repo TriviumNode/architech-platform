@@ -1,11 +1,11 @@
 import { cw2981, cw721 } from "@architech/types";
-import type { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
 export const getContractInfo = async ({
     client,
     contract,
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
 }) => {
     const query: cw721.QueryMsg = {
@@ -21,7 +21,7 @@ export const getNftInfo = async ({
     contract,
     token_id
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
     token_id: string,
 }): Promise<{token_uri?: string | null, extension?: cw721.Metadata | null}> => {
@@ -41,7 +41,7 @@ export const getAllNftInfo = async ({
     token_id,
     include_expired
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
     token_id: string,
     include_expired?: boolean;
@@ -63,7 +63,7 @@ export const getRoyalty = async ({
     token_id,
     sale_price,
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
     token_id: string,
     sale_price: string;
@@ -88,7 +88,7 @@ export const getRoyalty = async ({
 //     client,
 //     contract,
 // }:{
-//     client: SigningArchwayClient | ArchwayClient,
+//     client: CosmWasmClient,
 //     contract: string,
 // }) => {
 //     const query: cw721.Cw2981QueryMsg = {
@@ -107,7 +107,7 @@ export const getOwnedTokens = async ({
     start_after,
     limit,
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
     owner: string,
     start_after?: string;
@@ -125,7 +125,7 @@ export const getOwnedTokens = async ({
     return result.tokens;
 }
 
-export const getNumTokens = async ({ client, contract }: { client: SigningArchwayClient | ArchwayClient; contract: string }) => {
+export const getNumTokens = async ({ client, contract }: { client: CosmWasmClient; contract: string }) => {
     const query: cw721.QueryMsg = {
       num_tokens: {},
     };
@@ -140,7 +140,7 @@ export const getAllTokens = async ({
     start_after,
     limit = 1000,
   }: {
-    client: SigningArchwayClient | ArchwayClient;
+    client: CosmWasmClient;
     contract: string;
     start_after?: string;
     limit?: number;

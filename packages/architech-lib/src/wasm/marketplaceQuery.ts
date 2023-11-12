@@ -1,5 +1,5 @@
 import { marketplace } from "@architech/types";
-import type { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 type QueryMsg = marketplace.QueryMsg;
 // type Ask = marketplace.Ask;
 
@@ -18,7 +18,7 @@ export const getAllAsks = async ({
     contract,
     limit,
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
     limit?: number,
 }) => {
@@ -38,7 +38,7 @@ export const getCollectionAsks = async ({
     collection,
 }:{
     collection: string;
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
 }) => {
     const query: QueryMsg = {
@@ -57,7 +57,7 @@ export const getSellerAsks = async ({
     seller,
 }:{
     seller: string;
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
 }) => {
     const query = {
@@ -76,7 +76,7 @@ export const getAsk = async ({
     token_id
 }:{
     collection: string;
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
     token_id: string,
 }) => {
@@ -95,7 +95,7 @@ export const getAsk = async ({
 //     client,
 //     contract,
 // }:{
-//     client: SigningArchwayClient | ArchwayClient,
+//     client: CosmWasmClient,
 //     contract: string,
 // }) => {
 //     const query: QueryMsg = {
@@ -111,7 +111,7 @@ export const getVolume = async ({
     contract,
     collection
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
     collection: string,
 }): Promise<any[]> => {
@@ -130,7 +130,7 @@ export const getCollectionDossier = async ({
     contract,
     collection
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
     collection: string,
 }) => {
@@ -149,7 +149,7 @@ export const getBatchCollectionDossier = async ({
     contract,
     collections
 }:{
-    client: SigningArchwayClient | ArchwayClient,
+    client: CosmWasmClient,
     contract: string,
     collections: string[],
 }) => {

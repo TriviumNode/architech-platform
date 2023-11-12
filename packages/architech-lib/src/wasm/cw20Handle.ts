@@ -1,4 +1,4 @@
-import { SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { Coin } from "@cosmjs/amino";
 import { cw20 } from "@architech/types";
 type Cw20ExecuteMsg = cw20.ExecuteMsg
@@ -12,7 +12,7 @@ export const sendTokens = async({
     subMsg,
     funds = []
 }:{
-    client: SigningArchwayClient,
+    client: SigningCosmWasmClient,
     signer: string,
     contract: string,
     amount: string;
@@ -49,7 +49,7 @@ export const transferTokens = async({
     recipient,
     funds = []
 }:{
-    client: SigningArchwayClient,
+    client: SigningCosmWasmClient,
     signer: string,
     contract: string,
     amount: string;

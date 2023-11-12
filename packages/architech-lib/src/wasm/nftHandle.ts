@@ -1,4 +1,4 @@
-import type { SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { cw2981, cw721 } from '@architech/types'
 
 type ExecuteMsg = cw721.ExecuteMsg;
@@ -11,7 +11,7 @@ export const sendNft = async({
     recipient,
     subMsg,
 }:{
-    client: SigningArchwayClient,
+    client: SigningCosmWasmClient,
     signer: string,
     contract: string,
     tokenId: string;
@@ -43,7 +43,7 @@ export const mintNft = async({
     extension,
     owner = signer,
 }:{
-    client: SigningArchwayClient,
+    client: SigningCosmWasmClient,
     signer: string,
     contract: string,
     tokenId: string;
@@ -77,7 +77,7 @@ export const mintRoyaltyNft = async({
     royalty_payment_address,
     royalty_percentage
 }:{
-    client: SigningArchwayClient,
+    client: SigningCosmWasmClient,
     signer: string,
     contract: string,
     tokenId: string;
@@ -114,7 +114,7 @@ export const transferNft = async({
   tokenId,
   recipient,
 }:{
-  client: SigningArchwayClient,
+  client: SigningCosmWasmClient,
   signer: string,
   contract: string,
   tokenId: string;

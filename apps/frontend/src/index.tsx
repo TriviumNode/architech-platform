@@ -33,7 +33,10 @@ import { MintProvider } from './Contexts/MintContext';
 import AllMinters from './Pages/NFTs/AllMinters';
 import AllCollections from './Pages/NFTs/AllCollections';
 import TokenTasks from './Pages/TokenTasks/TokenTasks';
+import { AbstraxionProvider } from '@burnt-labs/abstraxion';
 
+import { Buffer } from "buffer";
+window.Buffer = Buffer;
 
 const router = createBrowserRouter([
   {
@@ -137,10 +140,12 @@ const root = ReactDOM.createRoot(
 
 const init = async () => {
   root.render(
-    <UserProvider>
-      <ToastContainer />
-      <div className="loading">Loading&#8230;</div>
-    </UserProvider>
+    <AbstraxionProvider>
+      <UserProvider>
+        <ToastContainer />
+        <div className="loading">Loading&#8230;</div>
+      </UserProvider>
+    </AbstraxionProvider>
   );
 
   try {
@@ -151,12 +156,12 @@ const init = async () => {
   }
 
   root.render(
-    <UserProvider>
-      <ToastContainer />
-      {/* <MintProvider> */}
+    <AbstraxionProvider>
+      <UserProvider>
+        <ToastContainer />
         <RouterProvider router={router} />
-      {/* </MintProvider> */}
-    </UserProvider>
+      </UserProvider>
+    </AbstraxionProvider>
   );
 
   // If you want to start measuring performance in your app, pass a function

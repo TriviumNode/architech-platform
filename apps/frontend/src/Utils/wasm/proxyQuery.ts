@@ -1,11 +1,11 @@
-import { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js/build"
+import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
 
 export const queryPaymentContractBalance = async ({
   client,
   address,
 }:{
-  client: ArchwayClient | SigningArchwayClient,
+  client: CosmWasmClient,
   address: string,
 }) => {
   const balance = await client.getBalance(address, 'unois');

@@ -1,4 +1,4 @@
-export type Feature = 'RANDOMMINT' | 'COPYMINT'
+export type Feature = 'RANDOMMINT' | 'COPYMINT' | 'ARCH_REWARDS'
 
 export type ChainConfig = {
   CREDIT_ADDRESS: string;
@@ -58,6 +58,20 @@ export const getAddresses = (chainId: string): ChainConfig => {
                 RANDOMNESS_COST: 1,
             };
             break;
+        case "xion-local-testnet-1":
+          return {
+            CREDIT_ADDRESS: '',
+            MARKETPLACE_ADDRESS: '',
+            NFT_FACTORY_ADDRESS: '',
+            CW721_CODE_ID: 1,
+            ARCHID_ADDRESS: '',
+            DISABLED_FEATURES: ['ARCH_REWARDS'],
+
+            NOIS_PROXY: '',
+            NOIS_PAYMENT_CONTRACT: '',
+            RANDOMNESS_COST: 1,
+          };
+          break;
         default:
             throw 'Unknown Chain ID';
     }

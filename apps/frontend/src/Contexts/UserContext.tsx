@@ -4,10 +4,11 @@ import {
   useContext,
   ReactElement,
   ReactNode,
-  useEffect
+  useEffect,
+  useRef
 } from 'react';
-import { SigningArchwayClient } from '@archwayhq/arch3.js';
-import { connectKeplrWallet, signLoginPermit } from '../Utils/keplr';
+import { ArchwayClient, SigningArchwayClient } from '@archwayhq/arch3.js';
+import { connectKeplrWallet, signLoginPermit, signLoginPermit2 } from '../Utils/keplr';
 import { toast } from 'react-toastify';
 import { checkLogin, getUserProfile, requestNonce, walletLogin } from '../Utils/backend';
 import { Coin, Pubkey } from '@cosmjs/amino';
@@ -15,22 +16,25 @@ import { Row, Col } from 'react-bootstrap';
 import Loader from '../Components/Loader';
 import { denomToHuman, getCreditBalance, getRewards, parseError } from '@architech/lib';
 import { GetUserProfileResponse } from '@architech/types';
-import { CREDIT_ADDRESS } from '../Utils/queryClient';
+import { CREDIT_ADDRESS, DISABLED_FEATURES } from '../Utils/queryClient';
 import ModalV2 from '../Components/ModalV2';
 
 import styles from './WalletModal.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMobileScreenButton } from '@fortawesome/free-solid-svg-icons';
 import { Keplr } from '@keplr-wallet/types';
+import { Abstraxion, useAbstraxionAccount, useAbstraxionSigningClient } from '@burnt-labs/abstraxion';
+import { CosmWasmClient, SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import { toBase64 } from '@cosmjs/encoding'
 
 interface Props {
   children: ReactNode;
 }
 
 export interface CurrentWallet {
-  wallet_type: 'Keplr';
+  wallet_type: 'Keplr' | 'Abstraxion';
   key_name: string;
-  client:  SigningArchwayClient;
+  client:  SigningArchwayClient | SigningCosmWasmClient;
   address: string;
   pubKey: Pubkey;
   profile: GetUserProfileResponse;
@@ -81,6 +85,22 @@ export const UserProvider = ({ children }: Props): ReactElement => {
   const [balances, setBalances] = useState<Balances>();
   const [walletStatus, setWalletStatus] = useState<STATUS>('DISCONNECTED');
   const [devMode, setDevMode] = useState(false);
+  const [showXion, setShowXion] = useState(false);
+
+  const { data, isConnected, isConnecting, isReconnecting } = useAbstraxionAccount();
+  const {client: _abstraxionClient} = useAbstraxionSigningClient() as {client?: SigningCosmWasmClient}
+  const abstraxionClientRef = useRef(_abstraxionClient);
+  abstraxionClientRef.current = _abstraxionClient;
+  const abstraxionClient = abstraxionClientRef.current;
+
+  useEffect(()=>{
+    if (isConnected && !!abstraxionClient) {
+      console.log('Abstraxion wallet connected!!')
+      connectAbstraxion()
+    } else {
+      console.log('Abstraxion disconnected :(')
+    }
+  },[isConnected, _abstraxionClient])
 
   window.addEventListener("keplr_keystorechange", () => {
     console.log("Keplr wallet changed!");
@@ -167,19 +187,22 @@ export const UserProvider = ({ children }: Props): ReactElement => {
 
     let rewardsBalance: string | undefined = undefined;
     let rewards_records: number | undefined = undefined;
-    try {
-      const rewards = await getRewards({
-        client: client,
-        address: addr,
-      });
-      if (rewards) {
-        rewardsBalance = rewards.totalRewards.find(c=>c.denom === process.env.REACT_APP_NETWORK_DENOM)?.amount
-        rewards_records = rewards.totalRecords;
+    if (!DISABLED_FEATURES.includes('ARCH_REWARDS')) {
+      try {
+        const rewards = await getRewards({
+          client: client as SigningArchwayClient,
+          address: addr,
+        });
+        if (rewards) {
+          rewardsBalance = rewards.totalRewards.find(c=>c.denom === process.env.REACT_APP_NETWORK_DENOM)?.amount
+          rewards_records = rewards.totalRecords;
+        }
+      } catch(err:any) {
+        console.error('Error fetching credit balance.', err)
+        creditErr = err.toString();
       }
-    } catch(err:any) {
-      console.error('Error fetching credit balance.', err)
-      creditErr = err.toString();
     }
+
     setBalances({
       // arch: archBalance ? parseInt(archBalance.amount) / Math.pow(10, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)) : undefined,
       arch: archBalance ? denomToHuman(archBalance.amount, parseInt(process.env.REACT_APP_NETWORK_DECIMALS)) : undefined,
@@ -193,7 +216,72 @@ export const UserProvider = ({ children }: Props): ReactElement => {
   }
 
   const connectWallet = () => {
-    setWalletStatus('SELECT')
+    if (process.env.REACT_APP_CHAIN_ID.includes('xion')) {
+      setShowXion(true);
+    } else {
+      setWalletStatus('SELECT')
+    }
+  }
+
+  const connectAbstraxion = async () => {
+    console.log('Trying to connect Abtraxion')
+    try {
+      if (!data || !isConnected) throw 'Abstraxion wallet is not connected!'
+      setWalletStatus('LOADING_CONNECT');
+      const { bech32Address: address, name, pubKey, algo } = data;
+      if (!abstraxionClient) throw 'Unable to fetch Abstraxion signer';
+      if (!pubKey) throw 'Unable to fetch Abstraxion pubKey';
+
+      getBalances(abstraxionClient, address)
+
+      const pubKeyAry = Uint8Array.from(Object.keys(pubKey).map((k: any)=>pubKey[k]))
+      const stdPubKey: Pubkey = {
+        type: 'tendermint/PubKeySecp256k1', //hopefully Keplr is always this
+        value: toBase64(pubKeyAry)
+      }      
+
+      // Check if already logged in
+      // TODO handle error
+      setWalletStatus('LOADING_NONCE');
+      try {
+        const response = await checkLogin(address);
+        const newUser: CurrentWallet = {client: abstraxionClient, address, pubKey: stdPubKey, wallet_type: 'Abstraxion', profile: response, key_name: name || 'Abstraxion Account'}
+        setUser(newUser)
+        setWalletStatus('CONNECTED');
+        localStorage.setItem(KEY, 'true');
+        return;
+      } catch (err: any){ }
+
+      // Try Login with Architech
+      try {
+        const nonceResponse = await requestNonce(address, stdPubKey)
+        console.log('Got Nonce!', nonceResponse)
+        setWalletStatus('LOADING_SIG');
+        const signResult = await signLoginPermit2(abstraxionClient, address, nonceResponse.nonce)
+        setWalletStatus('LOADING_LOGIN');
+
+        console.log('signResult', signResult)
+
+
+        const loginResult = await walletLogin(JSON.stringify(signResult.pub_key), signResult.signature)
+        // setAuthenticated(true);
+        //@ts-ignore
+        const newUser: CurrentWallet = {client: abstraxionClient, address, pubKey: stdPubKey, wallet_type: 'Abstraxion', profile: loginResult, key_name: name || 'Abstraxion Account'}
+
+        setUser(newUser)
+        localStorage.setItem(KEY, 'true');
+        setWalletStatus('CONNECTED');
+
+      }catch(err: any){
+        console.error(err);
+        toast.error(parseError(err)); 
+        setWalletStatus('DISCONNECTED');
+      }
+
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.toString())
+    }
   }
 
   const connectKeplr = async (wallet: any) => {
@@ -405,17 +493,24 @@ export const UserProvider = ({ children }: Props): ReactElement => {
   }
 
   // add values to provider to reach them out from another component
-  return <UserContext.Provider value={values}>
-          <ModalV2
-            open={walletStatus !== 'CONNECTED' && walletStatus !== 'DISCONNECTED' }
-            onClose={()=>setWalletStatus('DISCONNECTED')}
-            title={walletStatus === 'SWITCH' ? 'Change Wallet' : 'Connect Wallet'}
-            style={{maxWidth: '400px'}}
-            locked={true}
-          >
-            {modalContent()}
-        </ModalV2>
-    {children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={values}>
+      <ModalV2
+        open={!process.env.REACT_APP_CHAIN_ID.includes('xion') && (walletStatus !== 'CONNECTED' && walletStatus !== 'DISCONNECTED') }
+        onClose={()=>setWalletStatus('DISCONNECTED')}
+        title={walletStatus === 'SWITCH' ? 'Change Wallet' : 'Connect Wallet'}
+        style={{maxWidth: '400px'}}
+        locked={true}
+      >
+        {modalContent()}
+      </ModalV2>
+      <Abstraxion
+        onClose={()=>setShowXion(false)}
+        isOpen={showXion}
+      />
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 // created custom hook

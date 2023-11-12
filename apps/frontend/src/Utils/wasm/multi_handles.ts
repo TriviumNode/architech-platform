@@ -1,5 +1,5 @@
 import { cw2981, marketplace } from "@architech/types";
-import { SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { MARKETPLACE_ADDRESS } from "../queryClient";
 import { Buffer } from 'buffer';
@@ -13,7 +13,7 @@ export const mintAndList = async ({
     extension,
     amount,
 }:{
-    client: SigningArchwayClient;
+    client: SigningCosmWasmClient;
     signer: string;
     owner: string;
     nft_address: string;

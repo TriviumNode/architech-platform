@@ -1,14 +1,16 @@
 import sleep from './sleep';
-import { SigningArchwayClient } from '@archwayhq/arch3.js';
+import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { Pubkey } from '@cosmjs/amino/build/pubkeys';
 import { toBase64 } from '@cosmjs/encoding'
+import { AminoSignResponse } from '@cosmjs/amino';
 
 export const connectKeplrWallet = async(): Promise<{
-    client: SigningArchwayClient;
+    client: SigningCosmWasmClient;
     address: string;
     pubKey: Pubkey;
     keyName: string;
 }> => {
+    console.log('Connecting Keplr Wallet!!')
     if (!window.wallet) {
         sleep(1_500)
     }
@@ -25,12 +27,12 @@ export const connectKeplrWallet = async(): Promise<{
             coinType: 118,
         },
         bech32Config: {
-            bech32PrefixAccAddr: "archway",
-            bech32PrefixAccPub: "archway" + "pub",
-            bech32PrefixValAddr: "archway" + "valoper",
-            bech32PrefixValPub: "archway" + "valoperpub",
-            bech32PrefixConsAddr: "archway" + "valcons",
-            bech32PrefixConsPub: "archway" + "valconspub",
+            bech32PrefixAccAddr: process.env.REACT_APP_NETWORK_PREFIX,
+            bech32PrefixAccPub: process.env.REACT_APP_NETWORK_PREFIX + "pub",
+            bech32PrefixValAddr: process.env.REACT_APP_NETWORK_PREFIX + "valoper",
+            bech32PrefixValPub: process.env.REACT_APP_NETWORK_PREFIX + "valoperpub",
+            bech32PrefixConsAddr: process.env.REACT_APP_NETWORK_PREFIX + "valcons",
+            bech32PrefixConsPub: process.env.REACT_APP_NETWORK_PREFIX + "valconspub",
         },
         currencies: [ 
             { 
@@ -69,7 +71,7 @@ export const connectKeplrWallet = async(): Promise<{
     const offlineSigner = await window.wallet.getOfflineSignerAuto(process.env.REACT_APP_CHAIN_ID);
     const accounts = await offlineSigner.getAccounts();
 
-    const client = await SigningArchwayClient.connectWithSigner(process.env.REACT_APP_RPC_URL, offlineSigner);
+    const client = await SigningCosmWasmClient.connectWithSigner(process.env.REACT_APP_RPC_URL, offlineSigner);
 
     const stdPubKey: Pubkey = {
         type: 'tendermint/PubKeySecp256k1', //hopefully Keplr is always this
@@ -77,6 +79,59 @@ export const connectKeplrWallet = async(): Promise<{
     }
 
     return {client, address: accounts[0].address, pubKey: stdPubKey, keyName}
+}
+
+export const signLoginPermit2 = async(client: SigningCosmWasmClient, signerAddress: string, nonce: string) => {
+  if (window.keplr) {
+    await window.keplr.experimentalSuggestChain({
+      chainId: process.env.REACT_APP_CHAIN_ID,
+      chainName: `Xion ${process.env.REACT_APP_CHAIN_ID}`,
+      rpc: process.env.REACT_APP_RPC_URL,
+      rest: process.env.REACT_APP_REST_URL,
+      bip44: {
+        coinType: 118,
+      },
+      bech32Config: {
+        bech32PrefixAccAddr: process.env.REACT_APP_NETWORK_PREFIX,
+        bech32PrefixAccPub: process.env.REACT_APP_NETWORK_PREFIX + "pub",
+        bech32PrefixValAddr: process.env.REACT_APP_NETWORK_PREFIX + "valoper",
+        bech32PrefixValPub: process.env.REACT_APP_NETWORK_PREFIX + "valoperpub",
+        bech32PrefixConsAddr: process.env.REACT_APP_NETWORK_PREFIX + "valcons",
+        bech32PrefixConsPub: process.env.REACT_APP_NETWORK_PREFIX + "valconspub",
+      },
+      currencies: [ 
+        { 
+          coinDenom: process.env.REACT_APP_NETWORK_DENOM, 
+          coinMinimalDenom: process.env.REACT_APP_NETWORK_DENOM, 
+          coinDecimals: parseInt(process.env.REACT_APP_NETWORK_DECIMALS), 
+        }, 
+      ],
+      feeCurrencies: [
+        {
+          coinDenom: process.env.REACT_APP_NETWORK_DENOM, 
+          coinMinimalDenom: process.env.REACT_APP_NETWORK_DENOM, 
+          coinDecimals: parseInt(process.env.REACT_APP_NETWORK_DECIMALS), 
+        },
+      ],
+      stakeCurrency: {
+        coinDenom: process.env.REACT_APP_NETWORK_DENOM, 
+        coinMinimalDenom: process.env.REACT_APP_NETWORK_DENOM, 
+        coinDecimals: parseInt(process.env.REACT_APP_NETWORK_DECIMALS), 
+      },
+      gasPriceStep: {
+        low: 900000000000,
+        average: 900000000000,
+        high: 900000000000,
+      },
+    });
+    await window.keplr.enable(process.env.REACT_APP_CHAIN_ID);
+  }
+
+  const loginString = `Login to Architech\n${nonce}`
+
+  //@ts-ignore fuck off
+  const { pub_key, signature } = await client.signer.keplr.signArbitrary(process.env.REACT_APP_CHAIN_ID, signerAddress, loginString)
+  return { pub_key, signature };
 }
 
 export const signLoginPermit = async(nonce: string, signerAddress: string) => {
