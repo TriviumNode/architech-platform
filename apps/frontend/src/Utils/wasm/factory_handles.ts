@@ -32,7 +32,8 @@ export const initStandardProject = async({
         CW721_CODE_ID,
         msg as any,
         label,
-        'auto',
+        // 'auto',
+        2_000_000,
         {
             admin: signer,
         }

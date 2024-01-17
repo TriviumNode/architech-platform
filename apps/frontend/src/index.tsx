@@ -156,7 +156,17 @@ const init = async () => {
   }
 
   root.render(
-    <AbstraxionProvider>
+    <AbstraxionProvider
+      // chainInfo={
+      //   {
+      //     ...commonInfo,
+      //     rpc: process.env.REACT_APP_RPC_URL,
+      //     rest: process.env.REACT_APP_REST_URL,
+      //     chainId: process.env.REACT_APP_CHAIN_ID,
+      //     chainName: 'Xion Localnet',
+      //   }
+      // }
+    >
       <UserProvider>
         <ToastContainer />
         <RouterProvider router={router} />

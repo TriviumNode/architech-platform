@@ -8,7 +8,7 @@ import {
   useRef
 } from 'react';
 import { ArchwayClient, SigningArchwayClient } from '@archwayhq/arch3.js';
-import { connectKeplrWallet, signLoginPermit, signLoginPermit2 } from '../Utils/keplr';
+import { connectKeplrWallet, getAbstraxionPubKey, signLoginPermit, signLoginPermit2, signLoginPermit3 } from '../Utils/keplr';
 import { toast } from 'react-toastify';
 import { checkLogin, getUserProfile, requestNonce, walletLogin } from '../Utils/backend';
 import { Coin, Pubkey } from '@cosmjs/amino';
@@ -25,7 +25,9 @@ import { faMobileScreenButton } from '@fortawesome/free-solid-svg-icons';
 import { Keplr } from '@keplr-wallet/types';
 import { Abstraxion, useAbstraxionAccount, useAbstraxionSigningClient } from '@burnt-labs/abstraxion';
 import { CosmWasmClient, SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-import { toBase64 } from '@cosmjs/encoding'
+import { toBase64, fromBase64 } from '@cosmjs/encoding'
+import { Type, Field } from "protobufjs";
+import { GasPrice } from '@cosmjs/stargate'
 
 interface Props {
   children: ReactNode;
@@ -167,7 +169,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
     let creditErr = undefined;
     let archBalance: Coin | undefined = undefined;
     try {
-      archBalance = await client.getBalance(addr, process.env.REACT_APP_NETWORK_DENOM).catch();
+      archBalance = await client.getBalance(addr, process.env.REACT_APP_NETWORK_DENOM);
     } catch(err:any) {
       console.error('Error fetching arch balance.', err)
       archErr = err.toString();
@@ -224,21 +226,63 @@ export const UserProvider = ({ children }: Props): ReactElement => {
   }
 
   const connectAbstraxion = async () => {
-    console.log('Trying to connect Abtraxion')
     try {
-      if (!data || !isConnected) throw 'Abstraxion wallet is not connected!'
       setWalletStatus('LOADING_CONNECT');
-      const { bech32Address: address, name, pubKey, algo } = data;
+
+      if (!data || !isConnected) throw 'Abstraxion wallet is not connected!'
+      const { bech32Address: address, name, pubKey: _pubKey, algo } = data;
+      console.log('useAbstraxionAccount.data', data)
+
+
       if (!abstraxionClient) throw 'Unable to fetch Abstraxion signer';
+      console.log('abstraxionClient', abstraxionClient)
+
+      // Add custom protobuf for arbitrary signature
+      const MsgSignData = new Type("MsgSignData")
+        .add(new Field("signer", 1, "string"))
+        .add(new Field("data", 2, "string"))
+      abstraxionClient.registry.register('sign/MsgSignData', MsgSignData)
+
+      // Ensure we have the pubkey, abstracted accounts don't provide it yet
+      let pubKey: Uint8Array | undefined = _pubKey;
+      let stdPubKey: Pubkey | undefined;
+      if (!pubKey) {
+        console.log('Getting PubKey!!')
+        const _stdPubKey = await getAbstraxionPubKey(abstraxionClient, address)
+        console.log('Getting PubKey OK')
+        if (!_stdPubKey) throw 'Unable to determine Abstraxion wallet pubKey from signature';
+
+        stdPubKey = _stdPubKey
+        pubKey = _stdPubKey.value as Uint8Array
+      } else {
+        // It's actually a fucking keyed object now
+        console.log('Non Abstraxion PUBKEY raw', pubKey)
+        const pubKeyAry = Uint8Array.from(Object.keys(pubKey).map((k: any)=>(pubKey as Uint8Array)[k]))
+        stdPubKey = {
+          type: 'tendermint/PubKeySecp256k1', //hopefully Keplr is always this
+          value: toBase64(pubKeyAry)
+        }  
+      }
+
+      console.log('Final stdPubKey', stdPubKey);
       if (!pubKey) throw 'Unable to fetch Abstraxion pubKey';
 
-      getBalances(abstraxionClient, address)
 
-      const pubKeyAry = Uint8Array.from(Object.keys(pubKey).map((k: any)=>pubKey[k]))
-      const stdPubKey: Pubkey = {
-        type: 'tendermint/PubKeySecp256k1', //hopefully Keplr is always this
-        value: toBase64(pubKeyAry)
-      }      
+      // # Set default gas price on client #
+      const gasPrice = GasPrice.fromString('0uxion');
+      //@ts-ignore fuck your "private"
+      abstraxionClient.gasPrice = gasPrice;
+
+      if (window.keplr){
+        window.keplr.defaultOptions = {
+          sign: {
+            preferNoSetFee: true,
+          }
+        }
+      }
+
+      // Get token and credit balances async
+      getBalances(abstraxionClient, address)    
 
       // Check if already logged in
       // TODO handle error
@@ -252,19 +296,17 @@ export const UserProvider = ({ children }: Props): ReactElement => {
         return;
       } catch (err: any){ }
 
-      // Try Login with Architech
+      // Try Login with Architech if not already logged in
       try {
         const nonceResponse = await requestNonce(address, stdPubKey)
-        console.log('Got Nonce!', nonceResponse)
+
         setWalletStatus('LOADING_SIG');
-        const signResult = await signLoginPermit2(abstraxionClient, address, nonceResponse.nonce)
+        const {signature} = await signLoginPermit3(abstraxionClient, address, nonceResponse.nonce)
+
         setWalletStatus('LOADING_LOGIN');
-
-        console.log('signResult', signResult)
-
-
-        const loginResult = await walletLogin(JSON.stringify(signResult.pub_key), signResult.signature)
+        const loginResult = await walletLogin(JSON.stringify(stdPubKey), signature)
         // setAuthenticated(true);
+
         //@ts-ignore
         const newUser: CurrentWallet = {client: abstraxionClient, address, pubKey: stdPubKey, wallet_type: 'Abstraxion', profile: loginResult, key_name: name || 'Abstraxion Account'}
 
@@ -279,6 +321,7 @@ export const UserProvider = ({ children }: Props): ReactElement => {
       }
 
     } catch (err: any) {
+      setWalletStatus('DISCONNECTED');
       console.error(err);
       toast.error(err.toString())
     }

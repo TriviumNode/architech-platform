@@ -60,15 +60,15 @@ export const getAddresses = (chainId: string): ChainConfig => {
             break;
         case "xion-local-testnet-1":
           return {
-            CREDIT_ADDRESS: '',
-            MARKETPLACE_ADDRESS: '',
-            NFT_FACTORY_ADDRESS: '',
-            CW721_CODE_ID: 1,
+            CREDIT_ADDRESS: 'xion14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s0zg3xc',
+            MARKETPLACE_ADDRESS: 'xion1aaf9r6s7nxhysuegqrxv0wpm27ypyv4886medd3mrkrw6t4yfcns8sq992',
+            NFT_FACTORY_ADDRESS: 'xion16jzpxp0e8550c9aht6q9svcux30vtyyyyxv5w2l2djjra46580ws3rckjd',
+            CW721_CODE_ID: 2,
             ARCHID_ADDRESS: '',
             DISABLED_FEATURES: ['ARCH_REWARDS'],
 
-            NOIS_PROXY: '',
-            NOIS_PAYMENT_CONTRACT: '',
+            NOIS_PROXY: 'xion1yvgh8xeju5dyr0zxlkvq09htvhjj20fncp5g58np4u25g8rkpgjs3jmm3u',
+            NOIS_PAYMENT_CONTRACT: 'nois1lzswfaf7v4wyypfrnc0czsdcm4u0mavpfffx3d9uhqwgt84pq3wqm8e508',
             RANDOMNESS_COST: 1,
           };
           break;

@@ -10,6 +10,7 @@ export const resolveIpfs = (uri: string) => {
 }
 
 export const denomToHuman = (amount: number | string, decimals: number) => {
+  console.log('Converting', amount, 'to human with', decimals, 'decimals!')
     amount = parseInt(amount.toString());
     const humanAmount = amount / Math.pow(10, decimals)
     return humanAmount;

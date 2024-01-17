@@ -21,20 +21,28 @@ export const CATEGORIES = [
 
 
 export const DENOMS: Denom[] = [
-    {
-        nativeDenom: 'aconst',
-        decimals: 18,
-        displayDenom: 'CONST',
-        image: 'arch.svg',
-        coingeckoId: 'archway',
-    },
-    {
-        nativeDenom: 'aarch',
-        decimals: 18,
-        displayDenom: 'ARCH',
-        image: 'arch.svg',
-        coingeckoId: 'archway',
-    },
+  {
+    nativeDenom: 'aconst',
+    decimals: 18,
+    displayDenom: 'CONST',
+    image: 'arch.svg',
+    coingeckoId: 'archway',
+  },
+  {
+    nativeDenom: 'aarch',
+    decimals: 18,
+    displayDenom: 'ARCH',
+    image: 'arch.svg',
+    coingeckoId: 'archway',
+  },
+  {
+    nativeDenom: 'uxion',
+    decimals: 6,
+    displayDenom: 'XION',
+    image: 'xion128.png',
+    lightImage: 'xion128light.png',
+    coingeckoId: 'xion',
+  },
 ]
 
 export const unknownDenom: Denom = {

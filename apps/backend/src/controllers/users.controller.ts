@@ -29,6 +29,9 @@ import { findUserFavorites } from '@/services/favorites.service';
 import { ADMINS, resolveArchId } from '@/../../../packages/architech-lib/dist';
 import { queryClient } from '@/utils/chainClients';
 import { ARCHID_ADDRESS } from '@/config';
+import crypto from 'crypto';
+import { ripemd160, sha256 } from '@tendermint/sig';
+import { toBech32 } from '@cosmjs/encoding';
 
 // HTTP
 // Return user profile only.
@@ -202,16 +205,51 @@ export const updateUserImage = async (req: RequestWithUser, res: Response, next:
   }
 };
 
+export async function verifyNilSignature(message: Buffer, signature: string, publicKey: string): Promise<boolean> {
+  try {
+    const verify = crypto.createVerify('sha256');
+    verify.update(message);
+    verify.end();
+
+    const publicKeyBuffer = Buffer.from(publicKey, 'base64'); // Assuming the publicKey is in base64 format
+    return verify.verify({ key: publicKeyBuffer, format: 'der', type: 'pkcs1' }, signature, 'base64');
+  } catch (error) {
+    console.error('Error verifying signature:', error);
+    return false;
+  }
+}
+
+export function anySecp256k1PubkeyToAddress(pubkeyData: Uint8Array): string {
+  if (pubkeyData.length !== 33 && pubkeyData.length !== 34) {
+    throw new Error(`Invalid Secp256k1 pubkey length (compressed): ${pubkeyData.length}`);
+  }
+  return toBech32(process.env.PREFIX, ripemd160(sha256(pubkeyData.slice(0, 33))));
+}
+
 // HTTP
 // Returns current logon nonce for a user.
 export const getNonce = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { address, pubKey }: NonceRequestDto = req.body;
 
+    const origPubKey: Pubkey = JSON.parse(pubKey);
+    let decPubKey: Pubkey = JSON.parse(pubKey);
+    if (decPubKey.type === '/abstractaccount.v1.NilPubKey')
+      decPubKey = {
+        type: 'tendermint/PubKeyMultisigThreshold',
+        value: decPubKey.value,
+      };
+    console.log('origPubKey', origPubKey);
+    console.log('decPubKey', decPubKey);
+
     // Validate address against pubkey
-    if (!validateAddress(address, pubKey)) throw new HttpException(400, 'PubKey does not match provided address.');
+    console.log('Validating Address');
+    const idk = anySecp256k1PubkeyToAddress(new Uint8Array(Buffer.from(decPubKey.value, 'base64')));
+    console.log('IDKIDKIDK', idk);
+    if (!validateAddress(address, decPubKey)) throw new HttpException(400, 'PubKey does not match provided address.');
 
     // Get nonce (or create new user with nonce)
+    console.log('Getting Nonce');
     const result: NonceResponse = await userService.findOrCreateUser(address, pubKey);
 
     // validate response

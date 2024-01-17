@@ -1,8 +1,9 @@
 import sleep from './sleep';
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { Pubkey } from '@cosmjs/amino/build/pubkeys';
-import { toBase64 } from '@cosmjs/encoding'
+import { toBase64, fromBase64 } from '@cosmjs/encoding'
 import { AminoSignResponse } from '@cosmjs/amino';
+import { AuthInfo } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
 export const connectKeplrWallet = async(): Promise<{
     client: SigningCosmWasmClient;
@@ -81,6 +82,25 @@ export const connectKeplrWallet = async(): Promise<{
     return {client, address: accounts[0].address, pubKey: stdPubKey, keyName}
 }
 
+export const signLoginPermit3 = async(client: SigningCosmWasmClient, signerAddress: string, nonce: string) => {
+  const loginString = `Login to Architech\n${nonce}`
+
+  const arbMessage = {
+    typeUrl: 'sign/MsgSignData',
+    value: {
+      signer: signerAddress,
+      data: loginString,
+    },
+  };
+
+  const {authInfoBytes, bodyBytes, signatures} = await client.sign(signerAddress, [], {gas: '0', amount: [{amount: '0', denom: process.env.REACT_APP_NETWORK_DENOM}]}, '', { accountNumber: 0, sequence: 0, chainId: process.env.REACT_APP_CHAIN_ID })
+  const signature = Buffer.from(signatures[0]).toString('base64')
+
+  const {signerInfos} = AuthInfo.decode(authInfoBytes);
+
+  return { signature, pubKey: signerInfos[0].publicKey as unknown };
+}
+
 export const signLoginPermit2 = async(client: SigningCosmWasmClient, signerAddress: string, nonce: string) => {
   if (window.keplr) {
     await window.keplr.experimentalSuggestChain({
@@ -144,4 +164,17 @@ export const signLoginPermit = async(nonce: string, signerAddress: string) => {
     const loginString = `Login to Architech\n${nonce}`
     const { pub_key, signature } = await window.wallet.signArbitrary(process.env.REACT_APP_CHAIN_ID, signerAddress, loginString)
     return { pub_key, signature };
+}
+
+export const getAbstraxionPubKey = async (client: SigningCosmWasmClient, signerAddress: string): Promise<Pubkey> => {
+  const { pubKey } = await signLoginPermit3(client, signerAddress, 'Test') as any;
+  console.log('TESTPUBKEY', pubKey)
+  console.log('Abstraxion PUBKEY raw', pubKey.value)
+
+  const stdPubKey: Pubkey = {
+    type: pubKey.typeUrl, 
+    value: toBase64(pubKey.value)
+  }
+
+  return stdPubKey;
 }

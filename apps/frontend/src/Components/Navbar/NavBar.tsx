@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useUser } from "../../Contexts/UserContext";
-import ArchDenom from "../ArchDenom";
+import ArchDenom, { NetworkDenom } from "../ArchDenom";
 import ProfileMenu from "../ProfileMenu";
 import SmallLoader from "../SmallLoader";
 import { useLocation } from 'react-router-dom'
@@ -58,7 +58,7 @@ export const BurgerMenu = ({page, open, handleClose}:{page: HeaderPage, open: bo
         <div className='mb8 ml16' style={{width: 'fit-content'}}>
           <span>{truncateAddress(user.profile.display_name, process.env.REACT_APP_NETWORK_PREFIX)}</span>
           <div className='d-flex justify-content-between'>
-            <div style={{fontSize: '12px'}} className='d-flex align-items-center'>{balances?.arch ? balances.arch.toFixed(3) : <SmallLoader />}&nbsp;<ArchDenom /></div>
+            <div style={{fontSize: '12px'}} className='d-flex align-items-center'>{balances?.arch ? balances.arch.toFixed(3) : <SmallLoader />}&nbsp;<NetworkDenom /></div>
             <div style={{fontSize: '12px'}} className='d-flex align-items-center ml16'>{balances?.credits === undefined ? <SmallLoader /> : balances.credits.toLocaleString()}&nbsp;Credits</div>
           </div>
         </div>
@@ -177,7 +177,7 @@ const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
                   <div style={{maxWidth: '288px'}}>
                     <span>{truncateAddress(user.profile.display_name, process.env.REACT_APP_NETWORK_PREFIX)}</span><br />
                     <div className='d-flex justify-content-between'>
-                      <div style={{fontSize: '12px'}} className='d-flex align-items-center mr16'>{balances?.arch ? balances.arch.toFixed(3) : <SmallLoader />}&nbsp;<ArchDenom /></div>
+                      <div style={{fontSize: '12px'}} className='d-flex align-items-center mr16'>{balances?.arch ? balances.arch.toFixed(3) : <SmallLoader />}&nbsp;<NetworkDenom light /></div>
                       <div style={{fontSize: '12px'}} className='d-flex align-items-center'>{balances?.credits === undefined ? <SmallLoader /> : balances.credits}&nbsp;Credits</div>
                     </div>
                   </div>

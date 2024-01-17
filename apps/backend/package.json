@@ -20,6 +20,7 @@
   "dependencies": {
     "@architech/types": "*",
     "@cosmjs/amino": "^0.30.1",
+    "@cosmjs/proto-signing": "^0.30.1",
     "@tendermint/sig": "^0.6.0",
     "@typegoose/typegoose": "^9.10.1",
     "aws-sdk": "^2.1399.0",
