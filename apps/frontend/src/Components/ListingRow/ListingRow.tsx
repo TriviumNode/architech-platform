@@ -43,7 +43,7 @@ const ListingRow: FC<
             <div style={{width: '100%', display: 'flex', flexDirection: 'row'}}>
                 <img
                     alt=''
-                    src={resolveIpfs(result.token.metadataExtension?.image || '')}
+                    src={resolveIpfs(result.token.metadataExtension?.image || '', true)}
                     style={{
                         height: '48px',
                         width: '48px',

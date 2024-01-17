@@ -2,10 +2,16 @@ import { Collection, marketplace } from "@architech/types";
 import BigNumber from "bignumber.js";
 import { ADMINS } from "./constants";
 
-export const resolveIpfs = (uri: string) => {
+export const resolveIpfs = (uri: string, useProxy = false) => {
     const isIpfs = uri.startsWith('ipfs://');
-    if (isIpfs) uri = `https://ipfs.filebase.io/ipfs/${uri.replace('ipfs://', '')}`;
+    // if (isIpfs) uri = `https://ipfs.filebase.io/ipfs/${uri.replace('ipfs://', '')}`;
     // if (isIpfs) uri = `https://ipfs.io/ipfs/${uri.replace('ipfs://', '')}`;
+
+    if (isIpfs){
+      if (useProxy) uri = `${process.env.REACT_APP_BACKEND_URL}/ipfs/proxy/${uri.replace('ipfs://', '')}`;
+      else uri = `https://ipfs.filebase.io/ipfs/${uri.replace('ipfs://', '')}`;
+    }
+
     return uri;
 }
 

@@ -20,6 +20,16 @@ class IpfsRoute implements Routes {
         },
       }),
     );
+
+    this.router.use(
+      `${this.path}/proxy`,
+      proxy(`${process.env.IPFS_GATEWAY}/ipfs/`, {
+        proxyReqPathResolver: function (req) {
+          const newPath = `/ipfs${req.url}`;
+          return newPath;
+        },
+      }),
+    );
   }
 }
 
