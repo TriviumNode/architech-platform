@@ -28,6 +28,10 @@ class IpfsRoute implements Routes {
           const newPath = `/ipfs${req.url}`;
           return newPath;
         },
+        userResHeaderDecorator(headers, userReq, userRes, proxyReq, proxyRes) {
+          headers['cross-origin-resource-policy'] = 'cross-origin';
+          return headers;
+        },
       }),
     );
   }
