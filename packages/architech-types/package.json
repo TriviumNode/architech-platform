@@ -16,14 +16,14 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
+    "@typegoose/typegoose": "^9.13.2",
     "@types/elliptic": "^6.4.14",
     "class-validator": "^0.13.2",
     "eslint": "8.15.0",
-    "mongoose": "^7.3.1",
+    "mongoose": "^6.12.6",
     "react": "18.1.0",
     "ts-config-architech": "*",
     "tsup": "5.10.1",
-    "typegoose": "^5.9.1",
     "typescript": "4.5.3"
   },
   "publishConfig": {
