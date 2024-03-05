@@ -58,9 +58,9 @@ export const connectKeplrWallet = async(): Promise<{
             coinDecimals: parseInt(process.env.REACT_APP_NETWORK_DECIMALS), 
         },
         gasPriceStep: {
-            low: 900000000000,
-            average: 900000000000,
-            high: 900000000000,
+            low: 140000000000,
+            average: 140000000000,
+            high: 140000000000,
         },
     });
     await window.wallet.enable(process.env.REACT_APP_CHAIN_ID);
