@@ -1,5 +1,5 @@
-import { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js/build";
-import { cw20 } from "@architech/types";
+import type { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js";
+import type { cw20 } from "@architech/types";
 type QueryMsg = cw20.QueryMsg;
 
 export const getTokenInfo = async ({

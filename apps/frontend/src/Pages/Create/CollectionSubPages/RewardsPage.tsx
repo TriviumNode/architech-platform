@@ -45,7 +45,7 @@ const RewardsPage: FC<{
 
             </Col>
 
-            <form className={styles.form}>
+            <form className={styles.form} onSubmit={(e)=>{e.preventDefault()}}>
                 <div className='d-flex mb24'>
                     <Col xs={{span: 12, offset: 0}} md={{span: 10, offset: 1}} >
                         <label>

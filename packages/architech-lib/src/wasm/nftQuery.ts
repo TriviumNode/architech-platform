@@ -1,5 +1,5 @@
-import { cw2981, cw721 } from "@architech/types";
-import type { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import type { cw2981, cw721 } from "@architech/types";
+import type { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js";
 
 export const getContractInfo = async ({
     client,

@@ -40,7 +40,7 @@ const FinishPage: FC<{
     return (
         <div style={{margin: '48px'}} className='d-flex flex-column'>
             <h2 className='mb32'>{finishType}<br />Collection</h2>
-            <form className={styles.form}>
+            <form className={styles.form} onSubmit={()=>{}}>
                 <div className='d-flex flex-column mb24 align-items-center mt16'>
                     <div className={styles.reviewBox}>
                         <p>

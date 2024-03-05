@@ -1,5 +1,5 @@
-import { marketplace } from "@architech/types";
-import type { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import type { marketplace } from "@architech/types";
+import type { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js";
 type QueryMsg = marketplace.QueryMsg;
 // type Ask = marketplace.Ask;
 

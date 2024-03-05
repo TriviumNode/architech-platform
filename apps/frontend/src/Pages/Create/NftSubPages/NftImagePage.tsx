@@ -31,7 +31,7 @@ const ImagePage: FC<{
                 <h2 className='mb32'>NFT<br />Image</h2>
                 <button type='button' onClick={()=>next()}>Next</button>
             </div>
-            <form className={styles.form}>
+            <form className={styles.form} onSubmit={()=>{}}>
                 <div className='d-flex mb24'>
                     <Col>
                         <label>

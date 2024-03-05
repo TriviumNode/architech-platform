@@ -174,7 +174,7 @@ const Navbar = ({openMenu}:{openMenu: ()=>any}) => {
                   {/* <div className='d-flex align-items-center'>{balances?.arch ? parseFloat(balances.arch.toFixed(4)) : <SmallLoader />}&nbsp;<ArchDenom /></div>
                   <Vr color='#666666' />
                   <div className='d-flex align-items-center' style={{fontSize: '12px'}}>{balances?.credits === undefined ? <SmallLoader /> : balances.credits}&nbsp;Credits</div> */}
-                  <div>
+                  <div style={{maxWidth: '288px'}}>
                     <span>{truncateAddress(user.profile.display_name, process.env.REACT_APP_NETWORK_PREFIX)}</span><br />
                     <div className='d-flex justify-content-between'>
                       <div style={{fontSize: '12px'}} className='d-flex align-items-center mr16'>{balances?.arch ? balances.arch.toFixed(3) : <SmallLoader />}&nbsp;<ArchDenom /></div>

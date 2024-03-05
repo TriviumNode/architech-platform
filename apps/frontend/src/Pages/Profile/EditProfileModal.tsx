@@ -57,7 +57,11 @@ export default function EditProfileModal({open, userId, userProfile, onClose}: P
               <Row>
                   <label>
                       Username:<br />
-                      <input  value={formState.username} onChange={(e)=> updateFormState({username: e.target.value.replace(/[<>]/gi, '')})} />
+                      <input
+                        value={formState.username}
+                        onChange={(e)=> updateFormState({username: e.target.value.replace(/[<>]/gi, '')})}
+                        maxLength={64}
+                      />
                   </label>
               </Row>
               <Row>
@@ -69,7 +73,13 @@ export default function EditProfileModal({open, userId, userProfile, onClose}: P
               <Row style={{flexGrow: 1}}>
                   <label className='d-flex flex-column'>
                       Bio:<br />
-                      <textarea value={formState.bio} onChange={(e)=> updateFormState({bio: e.target.value.replace(/[<>]/gi, '')})} style={{boxSizing: 'border-box', height: '100%'}} /*style={{width: 'calc(100% - 32px)'}}*/  />
+                      <textarea
+                        value={formState.bio}
+                        onChange={(e)=> updateFormState({bio: e.target.value.replace(/[<>]/gi, '')})}
+                        style={{boxSizing: 'border-box', height: '100%'}}
+                        /*style={{width: 'calc(100% - 32px)'}}*/
+                        maxLength={512}
+                      />
                   </label>
               </Row>
           </Col>

@@ -33,7 +33,6 @@ const SocialLinks: FC<Props> = (props: Props): ReactElement => {
       !!twitter && 
         <div>
           <a target='_blank' rel='noreferrer' /*href={`https://x.com/${twitter.replace('@','')}`}*/ href={twitter}>
-            {/* @ts-expect-error */}
             <FontAwesomeIcon icon={faXTwitter} size='2x' color={color}
               data-tooltip-id="socials-tooltip"
               data-tooltip-content="Twitter"
@@ -47,7 +46,6 @@ const SocialLinks: FC<Props> = (props: Props): ReactElement => {
       !!discord && 
         <div>
           <a target='_blank' rel='noreferrer' href={discord}>
-            {/* @ts-expect-error */}
             <FontAwesomeIcon icon={faDiscord} size='2x' color={color}
               data-tooltip-id="socials-tooltip"
               data-tooltip-content="Discord"
@@ -74,7 +72,6 @@ const SocialLinks: FC<Props> = (props: Props): ReactElement => {
       !!github && 
         <div>
           <a target='_blank' rel='noreferrer' href={github}>
-            {/* @ts-expect-error */}
             <FontAwesomeIcon icon={faGithub} size='2x' color={color}
               data-tooltip-id="socials-tooltip"
               data-tooltip-content="GitHub"

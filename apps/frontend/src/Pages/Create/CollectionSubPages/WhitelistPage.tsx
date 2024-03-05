@@ -75,7 +75,7 @@ const WhitelistPage: FC<{
                 <button type='button' onClick={handleNext}>Next</button>
             </div>
             
-            <form className={styles.form}>
+            <form className={styles.form} onSubmit={()=>{}}>
                 <div className='d-flex' style={{marginBottom: '32px'}}>
                     <Col>
                         <label>

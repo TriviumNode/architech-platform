@@ -7,9 +7,9 @@ const TraitCard: FC<{
 }> = ({ type, value}): ReactElement => {
     return(
         <div className={`${styles.trait} grayCard`}>
-            <span className={styles.type}>{type}</span>
+            <span className={`${styles.type} twoLineLimit breakAll`}>{type}</span>
             <hr />
-            <span className={styles.value}>{value}</span>
+            <span className={`${styles.value} twoLineLimit breakAll`}>{value}</span>
         </div>
     )
 }

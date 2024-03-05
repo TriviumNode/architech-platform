@@ -158,7 +158,7 @@ const TimesPage: FC<{
                 <span style={{color: 'red', fontSize: '12px'}}>These settings can't be changed after minting has started.</span>
               </p>
             </div>
-            <form className={styles.form}>
+            <form className={styles.form} onSubmit={()=>{}}>
                 <div className='d-flex mb24'>
                     <Col>
                         <label>

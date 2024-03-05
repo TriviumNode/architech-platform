@@ -1,7 +1,8 @@
-import { cw2981, minter } from "@architech/types";
-import { SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import type { cw2981, minter } from "@architech/types";
+import type { SigningArchwayClient } from "@archwayhq/arch3.js";
+import type { ExecuteResult } from '@cosmjs/cosmwasm-stargate';
 // import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
-import { ExecuteInstruction } from '@cosmjs/cosmwasm-stargate'
+import type { ExecuteInstruction } from '@cosmjs/cosmwasm-stargate'
 type ExecuteMsg = minter.ExecuteMsg;
 
 export const preloadData = async({
@@ -14,7 +15,7 @@ export const preloadData = async({
     signer: string,
     contract: string,
     metadata: cw2981.Metadata[],
-}) => {
+}): Promise<ExecuteResult> => {
     const msg: ExecuteMsg = {
         preload_data: {
             new_data: metadata
@@ -42,7 +43,7 @@ export const mintWithMinter = async({
     minter_contract: string,
     funds?: { amount: string, denom: string}[],
     gas?: string
-}) => {
+}): Promise<ExecuteResult> => {
     const msg: ExecuteMsg = {
         mint: {}
     }
@@ -71,7 +72,7 @@ export const setLaunchTime = async({
   minter_contract: string,
   launch_time?: Date,
   whitelist_launch_time?: Date,
-}) => {
+}): Promise<ExecuteResult> => {
   const instructions: ExecuteInstruction[] = [];
   if (launch_time) {
     const msg: ExecuteMsg = {

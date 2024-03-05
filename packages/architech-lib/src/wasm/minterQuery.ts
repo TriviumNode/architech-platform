@@ -1,5 +1,5 @@
 import type { minter } from "@architech/types";
-import { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import type { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js";
 type QueryMsg = minter.QueryMsg;
 type GetConfigResponse = minter.GetConfigResponse;
 type GetMintLimitResponse = minter.GetMintLimitResponse;

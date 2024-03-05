@@ -347,6 +347,14 @@ button:disabled, #claimButton:disabled {
   height: 1.5em;
 }
 
+.fourLineLimit {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* number of lines to show */
+          line-clamp: 4; 
+  -webkit-box-orient: vertical;
+}
+
 .twoLineLimit {
   overflow: hidden;
   display: -webkit-box;
@@ -361,6 +369,10 @@ button:disabled, #claimButton:disabled {
   -webkit-line-clamp: 1; /* number of lines to show */
           line-clamp: 1; 
   -webkit-box-orient: vertical;
+}
+
+.breakAll {
+  word-break: break-all;
 }
 
 .noButton {

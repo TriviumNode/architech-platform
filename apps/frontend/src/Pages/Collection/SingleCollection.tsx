@@ -211,7 +211,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
                 >
                         <div className='d-flex flex-column genOverlay' style={{position: 'absolute', left: '16px', bottom: '16px'}}>
                             <div className='d-flex align-items-center gap8'>
-                                <h1>{collectionName}</h1>
+                                <h1 className='twoLineLimit breakAll'>{collectionName}</h1>
                                 {!!collection.verified &&
                                   <VerifiedBadge content="Collection" />
                                 }
@@ -219,7 +219,7 @@ const SingleCollection: FC<any> = (): ReactElement => {
                                     <Badge key={category}><span>{category}</span></Badge>
                                 )}
                             </div>
-                            <p>{collection.collectionProfile.description}</p>
+                            <p className='fourLineLimit breakAll'>{collection.collectionProfile.description}</p>
                             <div className='d-flex wide justify-content-space-between'>
                                 <CollectionStats collection={collection} asks={fullCollection.asks} />
                             </div>

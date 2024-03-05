@@ -99,7 +99,7 @@ const AdminTasksPage: FC<{}> = (): ReactElement => {
                 <h2 className='mb32'>Collection<br />Tasks</h2>
             </div>
             
-            <form className={styles.form}>
+            <form className={styles.form} onSubmit={()=>{}}>
                 <div className='d-flex mb24'>
                     <Col>
                         <label>
