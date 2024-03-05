@@ -2,6 +2,7 @@ import sleep from './sleep';
 import { SigningArchwayClient } from '@archwayhq/arch3.js';
 import { Pubkey } from '@cosmjs/amino/build/pubkeys';
 import { toBase64 } from '@cosmjs/encoding'
+import type { OfflineSigner } from '@cosmjs/proto-signing'
 
 export const connectKeplrWallet = async(): Promise<{
     client: SigningArchwayClient;
@@ -69,7 +70,7 @@ export const connectKeplrWallet = async(): Promise<{
     const offlineSigner = await window.wallet.getOfflineSignerAuto(process.env.REACT_APP_CHAIN_ID);
     const accounts = await offlineSigner.getAccounts();
 
-    const client = await SigningArchwayClient.connectWithSigner(process.env.REACT_APP_RPC_URL, offlineSigner);
+    const client = await SigningArchwayClient.connectWithSigner(process.env.REACT_APP_RPC_URL, offlineSigner as OfflineSigner);
 
     const stdPubKey: Pubkey = {
         type: 'tendermint/PubKeySecp256k1', //hopefully Keplr is always this

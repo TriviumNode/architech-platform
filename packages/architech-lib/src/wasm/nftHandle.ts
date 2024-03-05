@@ -1,5 +1,6 @@
-import type { SigningArchwayClient } from "@archwayhq/arch3.js/build";
-import { cw2981, cw721 } from '@architech/types'
+import type { SigningArchwayClient } from "@archwayhq/arch3.js";
+import type { ExecuteResult } from '@cosmjs/cosmwasm-stargate';
+import type { cw2981, cw721 } from '@architech/types'
 
 type ExecuteMsg = cw721.ExecuteMsg;
 
@@ -17,7 +18,7 @@ export const sendNft = async({
     tokenId: string;
     recipient: string;
     subMsg: any;
-}) => {
+}): Promise<ExecuteResult> => {
     const msg: ExecuteMsg = {
         send_nft: {
             contract: recipient,
@@ -49,7 +50,7 @@ export const mintNft = async({
     tokenId: string;
     owner?: string;
     extension: cw2981.Metadata
-}) => {
+}): Promise<ExecuteResult> => {
     const msg: ExecuteMsg = {
         mint: {
             owner,
@@ -84,7 +85,7 @@ export const mintRoyaltyNft = async({
     owner?: string;
     royalty_payment_address?: string;
     royalty_percentage?: number;
-}) => {
+}): Promise<ExecuteResult> => {
     const msg = {
         mint: {
             owner,
@@ -119,7 +120,7 @@ export const transferNft = async({
   contract: string,
   tokenId: string;
   recipient: string;
-}) => {
+}): Promise<ExecuteResult> => {
   const msg: ExecuteMsg = {
     transfer_nft: {
       token_id: tokenId,

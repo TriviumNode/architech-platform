@@ -1,5 +1,6 @@
-import { minter } from "@architech/types";
-import { SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import type { minter } from "@architech/types";
+import type { SigningArchwayClient } from "@archwayhq/arch3.js";
+import type { ExecuteResult } from '@cosmjs/cosmwasm-stargate';
 
 export const mintRandom = async({
     client,
@@ -13,7 +14,7 @@ export const mintRandom = async({
     minter_contract: string,
     funds?: { amount: string, denom: string}[],
     mints?: number,
-}) => {
+}): Promise<ExecuteResult> => {
     const msg: minter.ExecuteMsg = {
         mint: {
             mints

@@ -1,5 +1,5 @@
-import { credits } from "@architech/types";
-import type { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js/build";
+import type { credits } from "@architech/types";
+import type { ArchwayClient, SigningArchwayClient } from "@archwayhq/arch3.js";
 
 export const getCreditBalance = async ({
     client,
