@@ -1,3 +1,4 @@
+/* eslint-disable no-throw-literal */
 import { cw2981, factory, minter } from "@architech/types";
 import { SigningArchwayClient } from "@archwayhq/arch3.js";
 import secureRandom from "secure-random";
@@ -110,13 +111,36 @@ export const initCopyProject = async({
         msg,
         'auto',
     )
-    // Find instantiated Minter address
-    const minterAddress = result.logs[0].events.find(e=>e.type==='reply')?.attributes.find(a=>a.key.includes('contract_address'))?.value;
+    console.log('TX Logs', result.logs[0]);
+
+
+    // ####################################
+    // # Find instantiated Minter address #
+    // ####################################
+    /// Get all reply logs
+    const replyLogs = result.logs[0].events.filter(e=>e.type==='reply').map(e=>e.attributes);
+
+    /// Filter out reply to factory, get only the reply to the minter
+    const minterReplyAddressAttributes = replyLogs.filter(e=>e.find(a=>a.key==='_contract_address' && a.value !== contract))
+    if (minterReplyAddressAttributes.length > 1) throw 'Unable to find Minter address in logs: Found multiple reply logs'
+
+    const minterAddress = minterReplyAddressAttributes[0].find(a=>a.key==='_contract_address')?.value;
     if (!minterAddress) throw 'Unable to find Minter address in logs'
 
-    // Find instantiated NFT address
-    const nftAddress = result.logs[0].events.find(e=>e.type==='instantiate')?.attributes.find(a=>a.key.includes('contract_address') && a.value !== minterAddress)?.value;
+
+    // #################################
+    // # Find instantiated NFT address #
+    // #################################
+    /// Get all instantiate logs
+    const initLogs = result.logs[0].events.filter(e=>e.type==='instantiate').map(e=>e.attributes);
+
+    /// Filter out Minter init
+    const nftInitAttributes = initLogs.filter(e=>e.find(a=>a.key==='_contract_address' && a.value !== minterAddress))
+    if (nftInitAttributes.length > 1) throw 'Unable to find NFT address in logs: Found multiple instantiate logs'
+
+    const nftAddress = nftInitAttributes[0].find(a=>a.key==='_contract_address')?.value;;
     if (!nftAddress) throw 'Unable to find NFT address in logs'
+
     return {minterAddress, nftAddress};
 }
 
@@ -193,12 +217,36 @@ export const initRandomProject = async({
         msg,
         'auto',
     )
-    // Find instantiated Minter address
-    const minterAddress = result.logs[0].events.find(e=>e.type==='reply')?.attributes.find(a=>a.key.includes('contract_address'))?.value;
-    if (!minterAddress) throw new Error('Unable to find Minter address in logs');
+    console.log('TX Logs', result.logs[0]);
 
-    // Find instantiated NFT address
-    const nftAddress = result.logs[0].events.find(e=>e.type==='instantiate')?.attributes.find(a=>a.key.includes('contract_address') && a.value !== minterAddress)?.value;
-    if (!nftAddress) throw new Error('Unable to find NFT address in logs');
+
+    // ####################################
+    // # Find instantiated Minter address #
+    // ####################################
+    /// Get all reply logs
+    const replyLogs = result.logs[0].events.filter(e=>e.type==='reply').map(e=>e.attributes);
+
+    /// Filter out reply to factory, get only the reply to the minter
+    const minterReplyAddressAttributes = replyLogs.filter(e=>e.find(a=>a.key==='_contract_address' && a.value !== contract))
+    if (minterReplyAddressAttributes.length > 1) throw 'Unable to find Minter address in logs: Found multiple reply logs'
+
+    const minterAddress = minterReplyAddressAttributes[0].find(a=>a.key==='_contract_address')?.value;
+    if (!minterAddress) throw 'Unable to find Minter address in logs'
+
+
+    // #################################
+    // # Find instantiated NFT address #
+    // #################################
+    /// Get all instantiate logs
+    const initLogs = result.logs[0].events.filter(e=>e.type==='instantiate').map(e=>e.attributes);
+
+    /// Filter out Minter init
+    const nftInitAttributes = initLogs.filter(e=>e.find(a=>a.key==='_contract_address' && a.value !== minterAddress))
+    if (nftInitAttributes.length > 1) throw 'Unable to find NFT address in logs: Found multiple instantiate logs'
+
+    const nftAddress = nftInitAttributes[0].find(a=>a.key==='_contract_address')?.value;;
+    if (!nftAddress) throw 'Unable to find NFT address in logs'
+
+
     return {minterAddress, nftAddress};
 }

@@ -59,6 +59,6 @@ export const getAddresses = (chainId: string): ChainConfig => {
             };
             break;
         default:
-            throw 'Unknown Chain ID';
+            throw `Unknown Chain ID ${chainId}`;
     }
 }
