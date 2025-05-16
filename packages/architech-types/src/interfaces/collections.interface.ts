@@ -1,6 +1,4 @@
 import { cw721, marketplace } from "../contracts";
-import { Token } from "./tokens.interface";
-import { Ref } from '@typegoose/typegoose';
 import mongoose from "mongoose";
 import { MinterType, PaymentType } from "..";
 

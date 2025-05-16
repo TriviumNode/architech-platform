@@ -1,7 +1,5 @@
-import { ObjectId } from "mongoose";
 import { cw721, marketplace } from "../contracts";
 import { Collection } from "./collections.interface";
-import { Ref } from '@typegoose/typegoose';
 
 export interface ITokenModel {
     tokenId: string;
